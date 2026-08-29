@@ -15,9 +15,13 @@ coverage/
 .env*
 !.env.example
 
-# Backup artifacts (original zip kept outside git)
+# Backup archive (source zip)
 *.zip
 
 # Editor
 .vscode/
 .idea/
+
+# AI Studio local
+assets/.aistudio/
+
