@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScreenId, Programme } from '../../types';
-import { IMAGES, PRICING_TIERS, PROGRAMMES, TESTIMONIALS, CONTACT } from '../../data/mockData';
-import { ArrowRight, Flame, Shield, Activity, Dumbbell, Award, ChevronRight, Check, MapPin, Mail, Instagram, Facebook } from 'lucide-react';
+import { IMAGES, PRICING_TIERS, PROGRAMMES, TESTIMONIALS, CONTACT, REVIEWS } from '../../data/mockData';
+import { ArrowRight, Flame, Shield, Activity, Dumbbell, Award, ChevronRight, Check, MapPin, Mail, Instagram, Facebook, Star, StarHalf, Send, User, Phone, Calendar, CheckCircle2 } from 'lucide-react';
 
 interface HomeScreenProps {
   onSelectScreen: (screen: ScreenId) => void;
@@ -14,6 +14,51 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenConsultation,
   onSelectProgramme,
 }) => {
+  // Contact / Booking form state
+  const [formName, setFormName] = useState('');
+  const [formEmail, setFormEmail] = useState('');
+  const [formPhone, setFormPhone] = useState('');
+  const [formPackage, setFormPackage] = useState('Gold');
+  const [formTime, setFormTime] = useState('Evening');
+  const [formMessage, setFormMessage] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formSending, setFormSending] = useState(false);
+
+  const handleBookingSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormSending(true);
+
+    const subject = encodeURIComponent(`MWFITNESS Booking Enquiry — ${formPackage} Package`);
+    const body = encodeURIComponent(
+      `Hi Mike,\n\nI'd like to book some sessions.\n\n` +
+      `Name: ${formName}\nEmail: ${formEmail}\nPhone: ${formPhone || 'Not provided'}\n` +
+      `Package: ${formPackage}\nPreferred time: ${formTime}\n\n` +
+      `About me / goals:\n${formMessage}\n`
+    );
+
+    // Open the visitor's email app pre-addressed to the coach
+    setTimeout(() => {
+      window.location.href = `mailto:${CONTACT.email}?subject=${subject}&body=${body}`;
+      setFormSending(false);
+      setFormSubmitted(true);
+    }, 400);
+  };
+
+  const renderStars = (rating: number) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Star
+          key={i}
+          className={`w-4 h-4 ${
+            i <= rating ? 'text-[#ff5500] fill-[#ff5500]' : 'text-zinc-600'
+          }`}
+        />
+      );
+    }
+    return stars;
+  };
+
   return (
     <div className="space-y-16 md:space-y-24">
       {/* 1. HERO SECTION */}
@@ -491,7 +536,262 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </section>
 
-      {/* 8. PRE-FOOTER INTAKE CALLOUT */}
+      {/* 8. CLIENT REVIEWS */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
+              [ CLIENT REVIEWS ]
+            </div>
+            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+              WHAT MY CLIENTS SAY
+            </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="font-display text-4xl text-[#ff5500] font-bold">5.0</span>
+            <span className="text-xs font-mono text-zinc-300">
+              <span className="flex items-center gap-0.5 mb-1">{renderStars(5)}</span>
+              <span className="text-zinc-500">Based on {REVIEWS.length}+ happy clients</span>
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {REVIEWS.map((r) => (
+            <div key={r.id} className="bg-[#121419] border border-[#222630] p-6 flex flex-col justify-between hover:border-[#ff5500]/50 transition-colors">
+              <div>
+                <div className="flex items-center gap-1 mb-3">{renderStars(r.rating)}</div>
+                <p className="text-xs font-sans text-zinc-300 italic leading-relaxed mb-5">
+                  &ldquo;{r.quote}&rdquo;
+                </p>
+              </div>
+              <div className="pt-4 border-t border-[#1e222a] flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-mono text-white font-bold uppercase">{r.name}</div>
+                  <div className="text-[10px] font-mono text-[#ff5500] uppercase">{r.packageName} &bull; {r.date}</div>
+                </div>
+                <div className="w-8 h-8 bg-[#1e222b] border border-zinc-700 flex items-center justify-center font-mono text-xs text-zinc-300 font-bold">
+                  {r.name.split(' ').map(n => n[0]).join('')}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 9. CONTACT & BOOKING FORM */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="border-b border-[#22252e] pb-4 mb-10">
+          <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
+            [ BOOKING & CONTACT ]
+          </div>
+          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+            BOOK YOUR 4-SESSION BLOCK
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Booking Form */}
+          <div className="lg:col-span-7">
+            {formSubmitted ? (
+              <div className="bg-[#121419] border border-emerald-500/40 p-8 text-center space-y-4">
+                <div className="w-16 h-16 bg-[#16221a] border border-emerald-500 mx-auto flex items-center justify-center text-emerald-400">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="font-display text-3xl text-white uppercase tracking-wide">
+                  ENQUIRY READY TO SEND
+                </h3>
+                <p className="text-xs font-mono text-zinc-300 max-w-md mx-auto leading-relaxed">
+                  Your email app should have opened pre-addressed to{' '}
+                  <a href={`mailto:${CONTACT.email}`} className="text-[#ff5500] font-semibold">{CONTACT.email}</a> or DM @{CONTACT.instagramHandle}.
+                </p>
+                <button
+                  onClick={() => { setFormSubmitted(false); setFormName(''); setFormEmail(''); setFormPhone(''); setFormMessage(''); }}
+                  className="bg-[#1f232b] hover:bg-[#282d38] text-white font-mono text-xs uppercase px-6 py-3 tracking-wider transition-colors"
+                >
+                  Send Another Enquiry
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleBookingSubmit} className="bg-[#121419] border border-[#242833] p-6 md:p-8 space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="bk-name" className="block text-xs font-mono uppercase text-zinc-400 tracking-wider mb-1.5">
+                      Full Name *
+                    </label>
+                    <div className="relative">
+                      <User className="w-4 h-4 text-[#ff5500] absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        id="bk-name"
+                        type="text"
+                        required
+                        value={formName}
+                        onChange={(e) => setFormName(e.target.value)}
+                        placeholder="e.g. Alex Henderson"
+                        className="w-full bg-[#171920] border border-[#2a2e38] pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff5500]"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="bk-email" className="block text-xs font-mono uppercase text-zinc-400 tracking-wider mb-1.5">
+                      Email Address *
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-[#ff5500] absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        id="bk-email"
+                        type="email"
+                        required
+                        value={formEmail}
+                        onChange={(e) => setFormEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        className="w-full bg-[#171920] border border-[#2a2e38] pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff5500]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="bk-phone" className="block text-xs font-mono uppercase text-zinc-400 tracking-wider mb-1.5">
+                    Phone / WhatsApp
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-[#ff5500] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      id="bk-phone"
+                      type="tel"
+                      value={formPhone}
+                      onChange={(e) => setFormPhone(e.target.value)}
+                      placeholder="+44 7000 000000"
+                      className="w-full bg-[#171920] border border-[#2a2e38] pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff5500]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="bk-package" className="block text-xs font-mono uppercase text-zinc-400 tracking-wider mb-1.5">
+                      Package
+                    </label>
+                    <select
+                      id="bk-package"
+                      value={formPackage}
+                      onChange={(e) => setFormPackage(e.target.value)}
+                      className="w-full bg-[#171920] border border-[#2a2e38] px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff5500]"
+                    >
+                      <option value="Bronze">Bronze — £120</option>
+                      <option value="Silver">Silver — £150</option>
+                      <option value="Gold">Gold — £175</option>
+                      <option value="Platinum">Platinum — £200</option>
+                      <option value="Online Coaching">Online Coaching</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="bk-time" className="block text-xs font-mono uppercase text-zinc-400 tracking-wider mb-1.5">
+                      Preferred Time
+                    </label>
+                    <div className="relative">
+                      <Calendar className="w-4 h-4 text-[#ff5500] absolute left-3 top-1/2 -translate-y-1/2" />
+                      <select
+                        id="bk-time"
+                        value={formTime}
+                        onChange={(e) => setFormTime(e.target.value)}
+                        className="w-full bg-[#171920] border border-[#2a2e38] pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff5500]"
+                      >
+                        <option value="Morning">Morning</option>
+                        <option value="Evening">Evening</option>
+                        <option value="Weekend">Weekend</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="bk-message" className="block text-xs font-mono uppercase text-zinc-400 tracking-wider mb-1.5">
+                    Goals & Message
+                  </label>
+                  <textarea
+                    id="bk-message"
+                    rows={4}
+                    value={formMessage}
+                    onChange={(e) => setFormMessage(e.target.value)}
+                    placeholder="e.g. Looking to lose weight, build strength and sort my nutrition over 8-12 weeks."
+                    className="w-full bg-[#171920] border border-[#2a2e38] px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#ff5500]"
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={formSending}
+                  className="w-full bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase tracking-wider px-6 py-4 flex items-center justify-center gap-3 transition-all shadow-[0_0_25px_rgba(255,85,0,0.35)] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <span>{formSending ? 'Opening Email App...' : 'Send Booking Enquiry'}</span>
+                  <Send className="w-4 h-4" />
+                </button>
+                <p className="text-[11px] font-mono text-zinc-500 text-center">
+                  Submitting opens your email app pre-addressed to {CONTACT.email} — no data is stored on this site.
+                </p>
+              </form>
+            )}
+          </div>
+          {/* Booking Sidebar */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="bg-[#121419] border border-[#242833] p-6">
+              <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-3">
+                PACKAGES AT A GLANCE
+              </div>
+              <ul className="space-y-2.5 text-xs font-mono text-zinc-300">
+                {PRICING_TIERS.map((t) => (
+                  <li key={t.id} className="flex items-center justify-between border-b border-[#1e222a] pb-2 last:border-0">
+                    <span className="text-white uppercase">{t.name}</span>
+                    <span className="text-[#ff5500] font-bold">£{t.price}</span>
+                  </li>
+                ))}
+                <li className="flex items-center justify-between pt-1">
+                  <span className="text-zinc-400 uppercase">Online Coaching</span>
+                  <span className="text-emerald-400 font-bold">Message to book</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-[#121419] border border-[#242833] p-6">
+              <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-3">
+                SESSION AVAILABILITY
+              </div>
+              <p className="text-xs font-mono text-zinc-300 leading-relaxed">
+                {CONTACT.sessions}. Sessions run 1-2-1 at {CONTACT.locationShort}.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="bg-[#1a1d24] border border-[#2b303d] text-zinc-300 text-[11px] font-mono px-3 py-1.5">Morning</span>
+                <span className="bg-[#1a1d24] border border-[#2b303d] text-zinc-300 text-[11px] font-mono px-3 py-1.5">Evening</span>
+                <span className="bg-[#1a1d24] border border-[#2b303d] text-zinc-300 text-[11px] font-mono px-3 py-1.5">Weekend</span>
+              </div>
+            </div>
+
+            <div className="bg-[#121419] border border-[#242833] p-6">
+              <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-3">
+                DIRECT CONTACT
+              </div>
+              <div className="space-y-2 text-xs font-mono text-zinc-300">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-[#ff5500] shrink-0" />
+                  <a href={`mailto:${CONTACT.email}`} className="hover:text-[#ff5500] transition-colors">{CONTACT.email}</a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Instagram className="w-4 h-4 text-[#ff5500] shrink-0" />
+                  <a href={CONTACT.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500] transition-colors">@{CONTACT.instagramHandle}</a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Facebook className="w-4 h-4 text-[#ff5500] shrink-0" />
+                  <a href={CONTACT.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500] transition-colors">{CONTACT.facebookName}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+            {/* 10. PRE-FOOTER INTAKE CALLOUT */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>

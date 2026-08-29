@@ -1,4 +1,4 @@
-import { Coach, EquipmentItem, PricingTier, Programme, Testimonial } from '../types';
+import { Coach, EquipmentItem, PricingTier, Programme, Review, Testimonial } from '../types';
 
 export const IMAGES = {
   HERO_KETTLEBELL: '/images/main-hero.jpg',
@@ -112,6 +112,57 @@ export const CONTACT = {
   note: 'Inbox for more details',
   sessions: 'Morning, evening & weekend sessions from September 2026'
 };
+
+export const REVIEWS: Review[] = [
+  {
+    id: 'r1',
+    name: 'LEAH M.',
+    rating: 5,
+    quote: 'Sessions are structured, tough and actually tailored to how I train. The meal prep ideas made staying on track so much easier — best fitness investment I\'ve made.',
+    packageName: 'Gold',
+    date: 'August 2026'
+  },
+  {
+    id: 'r2',
+    name: 'DANIEL T.',
+    rating: 5,
+    quote: 'Mike knows exactly what he\'s doing. Form improved within the first couple of sessions and the nutritional advice is practical, not preachy. Strongly recommend.',
+    packageName: 'Platinum',
+    date: 'August 2026'
+  },
+  {
+    id: 'r3',
+    name: 'SARAH P.',
+    rating: 5,
+    quote: 'The BMR and macro breakdown finally made nutrition click for me. Down nearly a stone and feeling stronger than ever. Genuinely can\'t thank Mike enough.',
+    packageName: 'Gold',
+    date: 'July 2026'
+  },
+  {
+    id: 'r4',
+    name: 'JACK B.',
+    rating: 5,
+    quote: 'Online coaching around my shift pattern was perfect. Weekly check-ins and a programme that actually works with my lifestyle. Results speak for themselves.',
+    packageName: 'Online Coaching',
+    date: 'July 2026'
+  },
+  {
+    id: 'r5',
+    name: 'EMILY R.',
+    rating: 5,
+    quote: 'Never felt judged, always felt challenged. Every session is structured to my goals and the meal prep guidance keeps me on track outside the gym. Five stars.',
+    packageName: 'Silver',
+    date: 'June 2026'
+  },
+  {
+    id: 'r6',
+    name: 'MARK S.',
+    rating: 5,
+    quote: 'As someone who\u2019d never stuck with a programme before, the 4-session block was exactly what I needed. Real structure, real accountability, real results.',
+    packageName: 'Bronze',
+    date: 'June 2026'
+  }
+];
 
 export const PROGRAMMES: Programme[] = [
   {

@@ -64,6 +64,15 @@ export interface Testimonial {
   avatarText: string;
 }
 
+export interface Review {
+  id: string;
+  name: string;
+  rating: number;
+  quote: string;
+  packageName: string;
+  date: string;
+}
+
 export interface EquipmentItem {
   name: string;
   brand: string;
