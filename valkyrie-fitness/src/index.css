@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Bebas Neue", sans-serif;
+  --font-sans: "Hanken Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --color-brand-orange: #ff5500;
+  --color-brand-orange-light: #ff772e;
+  --color-brand-black: #0b0c0e;
+  --color-brand-carbon: #121418;
+  --color-brand-card: #16181d;
+  --color-brand-border: #262930;
+  --color-brand-muted: #8b929e;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: #0b0c0e;
+    color: #f3f4f6;
+  }
+}
+
+.font-display {
+  font-family: "Bebas Neue", sans-serif;
+}
+
+.font-mono {
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Gritty industrial grid background */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.bg-dots-pattern {
+  background-image: radial-gradient(rgba(255, 85, 0, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Custom industrial scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0c0e;
+}
+::-webkit-scrollbar-thumb {
+  background: #262930;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff5500;
+}
+

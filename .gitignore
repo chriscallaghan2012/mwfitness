@@ -1,0 +1,23 @@
+# OS
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build output
+build/
+dist/
+coverage/
+
+# Env
+.env*
+!.env.example
+
+# Backup artifacts (original zip kept outside git)
+*.zip
+
+# Editor
+.vscode/
+.idea/
