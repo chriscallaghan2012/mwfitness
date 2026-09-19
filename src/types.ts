@@ -1,83 +1,81 @@
-export type ScreenId = 'home' | 'packages' | 'contact' | 'app-shop';
-
-export type ContactKind = 'enquiry' | 'book-call' | 'waitlist' | 'shwag';
+export type ScreenId = 
+  | 'home' 
+  | 'pt' 
+  | 'online' 
+  | 'methodology' 
+  | 'packages' 
+  | 'programmes' 
+  | 'armory' 
+  | 'tools';
 
 export interface NavItem {
   id: ScreenId;
   label: string;
+  code: string;
 }
 
 export interface Coach {
+  id: string;
   name: string;
   role: string;
-  tagline: string;
-  intro: string[];
-  experience: string[];
-  qualifications: string[];
-  location: string;
+  credentials: string[];
+  bio: string;
+  specialty: string;
   availability: string;
 }
 
 export interface PricingTier {
   id: string;
   name: string;
-  tagline: string;
+  tag: string;
   price: number;
   originalPrice?: number;
   badge?: string;
   isPopular?: boolean;
   description: string;
   features: string[];
-  notIncluded?: string[];
-  cta: string;
-  note?: string;
+  omittedFeatures?: string[];
+  ctaText: string;
+}
+
+export interface Programme {
+  id: string;
+  title: string;
+  category: 'Powerlifting' | 'Hypertrophy' | 'Conditioning' | 'Mobility';
+  duration: string;
+  frequency: string;
+  difficulty: 'Intermediate' | 'Advanced' | 'Elite';
+  price: number;
+  description: string;
+  highlights: string[];
+  weeklyBreakdown: {
+    week: string;
+    focus: string;
+    sampleSession: string;
+  }[];
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  metric: string;
+  quote: string;
+  programme: string;
+  avatarText: string;
 }
 
 export interface Review {
   id: string;
   name: string;
-  result: string;
+  rating: number;
   quote: string;
   packageName: string;
   date: string;
 }
 
-export interface Offering {
-  id: string;
-  title: string;
-  summary: string;
-  bullets: string[];
-}
-
-export interface AppFeature {
-  id: string;
-  title: string;
-  description: string;
-}
-
-export interface ShwagProduct {
-  id: string;
+export interface EquipmentItem {
   name: string;
-  price?: string;
-  description: string;
-  imageUrl?: string;
-  link?: string;
-  badge?: string;
-}
-
-export interface ContactDetails {
-  email: string;
-  instagramHandle: string;
-  instagramUrl: string;
-  facebookName: string;
-  facebookUrl: string;
-  location: string;
-  locationShort: string;
-  sessions: string;
-  responseNote: string;
-}
-
-export interface Faq {
-  q: string;
-  a: string;
+  brand: string;
+  spec: string;
+  category: 'Barbells & Plates' | 'Racks & Platforms' | 'Conditioning' | 'Recovery';
 }

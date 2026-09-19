@@ -1,57 +1,60 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Bebas Neue", sans-serif;
   --font-sans: "Hanken Grotesk", sans-serif;
-
+  --font-mono: "JetBrains Mono", monospace;
   --color-brand-orange: #ff5500;
-  --color-brand-orange-dark: #e04800;
-  --color-brand-orange-soft: #ffede1;
-
-  --color-brand-ink: #1d2126;
-  --color-brand-body: #454a52;
-  --color-brand-muted: #848991;
-
-  --color-brand-paper: #faf7f2;
-  --color-brand-card: #ffffff;
-  --color-brand-border: #e9e4dd;
-
-  --color-brand-green: #1f9d55;
-  --color-brand-green-soft: #eaf7ef;
+  --color-brand-orange-light: #ff772e;
+  --color-brand-black: #0b0c0e;
+  --color-brand-carbon: #121418;
+  --color-brand-card: #16181d;
+  --color-brand-border: #262930;
+  --color-brand-muted: #8b929e;
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
     font-family: var(--font-sans);
-    background-color: var(--color-brand-paper);
-    color: var(--color-brand-body);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  ::selection {
-    background: var(--color-brand-orange);
-    color: #ffffff;
+    background-color: #0b0c0e;
+    color: #f3f4f6;
   }
 }
 
 .font-display {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Bebas Neue", sans-serif;
 }
 
-/* Soft rounded card */
-.card-shadow {
-  box-shadow: 0 1px 3px rgba(28, 32, 38, 0.05), 0 12px 26px rgba(28, 32, 38, 0.08);
+.font-mono {
+  font-family: "JetBrains Mono", monospace;
 }
 
-.card-shadow-hover {
-  box-shadow: 0 1px 3px rgba(28, 32, 38, 0.05), 0 14px 30px rgba(28, 32, 38, 0.1);
-  transition: box-shadow 0.2s ease;
+/* Gritty industrial grid background */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
 
-.card-shadow-hover:hover {
-  box-shadow: 0 1px 3px rgba(28, 32, 38, 0.05), 0 20px 40px rgba(28, 32, 38, 0.14);
+.bg-dots-pattern {
+  background-image: radial-gradient(rgba(255, 85, 0, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
+
+/* Custom industrial scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0c0e;
+}
+::-webkit-scrollbar-thumb {
+  background: #262930;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff5500;
+}
+
