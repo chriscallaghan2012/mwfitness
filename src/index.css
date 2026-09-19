@@ -58,3 +58,13 @@
   background: #ff5500;
 }
 
+/* Ticker tape banner */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
