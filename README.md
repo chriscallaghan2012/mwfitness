@@ -1,20 +1,57 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# MWFitnessUK — website
 
-# Run and deploy your AI Studio app
+Friendly personal training &amp; online coaching site for Michael Whitworth. React + Vite + Tailwind v4, with a Nodemailer-based contact/email backend.
 
-This contains everything you need to run your app locally.
+## Pages
 
-View your app in AI Studio: https://ai.studio/apps/bce48c13-a5b4-4e7c-92e8-c708961995bb
+- **Home** — welcome, about Mike, what's available, packages at a glance, reviews
+- **Packages** — full breakdown, prices and comparison table
+- **Get In Touch** — enquiry form + contact details
+- **App &amp; SHWAG** — app waitlist and SHWAG merch
 
-## Run Locally
+## Run locally
 
-**Prerequisites:**  Node.js
+Requires Node.js.
 
+```bash
+npm install
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+# Terminal 1 — email API (port 8787)
+cp .env.example .env   # add your SMTP details first
+npm run server
+
+# Terminal 2 — website (port 3000, proxies /api to :8787)
+npm run dev
+```
+
+Without SMTP details in `.env`, forms validate and show a clear "not configured" message instead of sending — add the details and they'll deliver.
+
+## Email backend
+
+Every contact CTA on the site (navbar, hero, packages, app waitlist, SHWAG orders) opens one contact form that POSTs the **real submitted data** to `/api/send-mail`, which emails an on-brand HTML template to you.
+
+- `api/_templates.mjs` — the email templates (edit here to change what lands in your inbox)
+- `api/_mailer.mjs` — validation + Nodemailer transport (SMTP via env)
+- `api/send-mail.mjs` — Vercel serverless function (used on production)
+- `server.mjs` — local Express server exposing the same endpoint (also serves `dist/` on :8787)
+
+### SMTP setup (`.env`)
+
+Gmail is easiest — use your Gmail address plus an **App Password** (Google Account → Security → 2-Step Verification → App passwords):
+
+```
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=YOUR_GMAIL@gmail.com
+SMTP_PASS=YOUR_16_CHAR_APP_PASSWORD
+MAIL_TO=mikeptonline@gmail.com        # where enquiries are delivered
+```
+
+## Deploy (Vercel)
+
+The `dist/` folder is the static site and `api/` is auto-detected as serverless functions.
+Add `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables.
+
+## Content
+
+All real site data lives in `src/data/siteData.ts` — packages, pricing, contact details, reviews, app features and SHWAG info. Add real SHWAG products to the `SHWAG_PRODUCTS` array.

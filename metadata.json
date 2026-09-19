@@ -1,6 +1,6 @@
 {
-  "name": "MWFITNESS",
-  "description": "MWFITNESS - 1-2-1 personal training and online coaching with Michael Whitworth, based at Pure Gym Hazel Grove, Stockport. Nutritional advice and calorie-controlled meal preparation ideas included.",
+  "name": "MWFitnessUK",
+  "description": "MWFitnessUK - friendly 1-2-1 personal training and online coaching with Michael Whitworth in Stockport for busy people. Simple packages, nutrition support, an app coming soon and SHWAG merch.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
