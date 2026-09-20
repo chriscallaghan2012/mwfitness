@@ -1,33 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { ScreenId, Programme } from './types';
+import { ScreenId } from './types';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ConsultationModal } from './components/ConsultationModal';
-import { ProgrammeModal } from './components/ProgrammeModal';
 
 // Screens
 import { HomeScreen } from './components/screens/HomeScreen';
-import { PersonalTrainingScreen } from './components/screens/PersonalTrainingScreen';
-import { OnlineCoachingScreen } from './components/screens/OnlineCoachingScreen';
-import { MethodologyScreen } from './components/screens/MethodologyScreen';
 import { PackagesScreen } from './components/screens/PackagesScreen';
-import { ProgrammesScreen } from './components/screens/ProgrammesScreen';
-import { ArmoryScreen } from './components/screens/ArmoryScreen';
-import { ToolsScreen } from './components/screens/ToolsScreen';
+import { AppScreen } from './components/screens/AppScreen';
+import { ShwagScreen } from './components/screens/ShwagScreen';
+import { ContactScreen } from './components/screens/ContactScreen';
+
+const VALID_SCREENS: ScreenId[] = ['home', 'packages', 'app', 'shwag', 'contact'];
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
-  const [consultationOpen, setConsultationOpen] = useState(false);
-  const [selectedTier, setSelectedTier] = useState('Apex Protocol');
-  const [activeProgramme, setActiveProgramme] = useState<Programme | null>(null);
+  const [bookCallOpen, setBookCallOpen] = useState(false);
+  const [bookCallInterest, setBookCallInterest] = useState('');
 
   // Handle URL hash navigation if needed
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '') as ScreenId;
-      if (['home', 'pt', 'online', 'methodology', 'packages', 'programmes', 'armory', 'tools'].includes(hash)) {
-        setCurrentScreen(hash);
-      }
+      if (VALID_SCREENS.includes(hash)) setCurrentScreen(hash);
     };
     handleHash();
     window.addEventListener('hashchange', handleHash);
@@ -40,72 +35,50 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleOpenConsultation = (tier?: string) => {
-    if (tier) setSelectedTier(tier);
-    setConsultationOpen(true);
-  };
-
-  const handleSelectProgramme = (prog: Programme) => {
-    setActiveProgramme(prog);
+  const handleOpenBookCall = (interest?: string) => {
+    if (interest) setBookCallInterest(interest);
+    setBookCallOpen(true);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0c0e] text-[#f3f4f6] font-sans selection:bg-[#ff5500] selection:text-black">
-      {/* Primary Sticky Industrial Navigation */}
+      {/* Sticky Navigation */}
       <Navbar
         currentScreen={currentScreen}
         onSelectScreen={handleSelectScreen}
-        onOpenConsultation={() => handleOpenConsultation()}
+        onOpenBookCall={() => handleOpenBookCall()}
       />
 
       {/* Main Content Area */}
       <main className="flex-1 w-full">
         {currentScreen === 'home' && (
-          <HomeScreen
-            onSelectScreen={handleSelectScreen}
-            onOpenConsultation={handleOpenConsultation}
-            onSelectProgramme={handleSelectProgramme}
-          />
-        )}
-        {currentScreen === 'pt' && (
-          <PersonalTrainingScreen onOpenConsultation={handleOpenConsultation} />
-        )}
-        {currentScreen === 'online' && (
-          <OnlineCoachingScreen onOpenConsultation={handleOpenConsultation} />
-        )}
-        {currentScreen === 'methodology' && (
-          <MethodologyScreen onOpenConsultation={() => handleOpenConsultation('Biomechanics Audit')} />
+          <HomeScreen onSelectScreen={handleSelectScreen} onOpenBookCall={handleOpenBookCall} />
         )}
         {currentScreen === 'packages' && (
-          <PackagesScreen onOpenConsultation={handleOpenConsultation} />
+          <PackagesScreen onOpenBookCall={handleOpenBookCall} />
         )}
-        {currentScreen === 'programmes' && (
-          <ProgrammesScreen onSelectProgramme={handleSelectProgramme} />
+        {currentScreen === 'app' && (
+          <AppScreen />
         )}
-        {currentScreen === 'armory' && (
-          <ArmoryScreen onOpenConsultation={() => handleOpenConsultation('Facility Tour')} />
+        {currentScreen === 'shwag' && (
+          <ShwagScreen onOpenBookCall={handleOpenBookCall} />
         )}
-        {currentScreen === 'tools' && (
-          <ToolsScreen onOpenConsultation={() => handleOpenConsultation('Calculated Protocol')} />
+        {currentScreen === 'contact' && (
+          <ContactScreen onOpenBookCall={handleOpenBookCall} />
         )}
       </main>
 
       {/* Footer */}
       <Footer
         onSelectScreen={handleSelectScreen}
-        onOpenConsultation={() => handleOpenConsultation()}
+        onOpenBookCall={() => handleOpenBookCall()}
       />
 
-      {/* Modals */}
+      {/* Book a call modal */}
       <ConsultationModal
-        isOpen={consultationOpen}
-        onClose={() => setConsultationOpen(false)}
-        defaultTier={selectedTier}
-      />
-
-      <ProgrammeModal
-        programme={activeProgramme}
-        onClose={() => setActiveProgramme(null)}
+        isOpen={bookCallOpen}
+        onClose={() => setBookCallOpen(false)}
+        defaultInterest={bookCallInterest}
       />
     </div>
   );

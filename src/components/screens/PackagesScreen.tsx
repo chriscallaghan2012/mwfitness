@@ -1,22 +1,22 @@
 import React from 'react';
-import { PRICING_TIERS, IMAGES, CONTACT } from '../../data/mockData';
-import { Check, X, ArrowRight, BadgePercent, CalendarClock } from 'lucide-react';
+import { PRICING_TIERS, CONTACT } from '../../data/mockData';
+import { Check, ArrowRight, CalendarClock, MapPin } from 'lucide-react';
 
 interface PackagesScreenProps {
-  onOpenConsultation: (tier?: string) => void;
+  onOpenBookCall: (tier?: string) => void;
 }
 
-export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenConsultation }) => {
+export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }) => {
   const formatPrice = (value: number) => `£${value.toLocaleString('en-GB')}`;
 
   return (
     <div className="space-y-16 md:space-y-24">
-      {/* 1. HERO SECTION */}
-      <section className="relative min-h-[65vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
+      {/* 1. HERO */}
+      <section className="relative min-h-[55vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0 z-0">
           <img
-            src={IMAGES.GOLD_PACKAGE_HERO}
-            alt="Gold Package Barbell Knurl"
+            src="/images/main-hero.jpg"
+            alt="MWFitnessUK training floor"
             className="w-full h-full object-cover object-center filter brightness-60 contrast-125 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e] via-[#0b0c0e]/60 to-transparent"></div>
@@ -28,229 +28,191 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenConsultati
           <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
-              <span>[ 1-2-1 PERSONAL TRAINING • ONLINE COACHING ]</span>
+              <span>[ 1-2-1 TRAINING • ONLINE COACHING ]</span>
             </div>
 
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-[0.9] font-black">
-              4-SESSION <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff5500] to-white">
-                COACHING BLOCKS.
+              Packages that fit
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#ff5500] to-white">
+                your life.
               </span>
             </h1>
 
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
-              4 x 1-2-1 personal training sessions with nutritional advice, meal preparation ideas, BMR and macro breakdowns — based at Pure Gym Hazel Grove, Stockport. Packages start at £120.
+              Everything is built around you — in person at Pure Gym Hazel Grove, or online wherever you train. Start small and build up, or go all in. Prices start at £120.
             </p>
 
-            {/* Promo Strip */}
-            <div className="flex flex-wrap items-center gap-4 pt-4">
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               <div className="flex items-center gap-2 bg-[#14161d] border border-[#262a34] px-3.5 py-2.5 font-mono text-xs text-zinc-300">
-                <BadgePercent className="w-4 h-4 text-[#ff5500]" />
-                <span>Discounts available on 8-week &amp; 12-week programmes</span>
-              </div>
-              <div className="flex items-center gap-2 bg-[#14161d] border border-[#262a34] px-3.5 py-2.5 font-mono text-xs text-zinc-300">
-                <BadgePercent className="w-4 h-4 text-[#ff5500]" />
-                <span>10% off ALL @shwagmcr merchandise</span>
-              </div>
-              <div className="flex items-center gap-2 bg-[#14161d] border border-emerald-500/40 px-3.5 py-2.5 font-mono text-xs text-emerald-300">
-                <CalendarClock className="w-4 h-4 text-emerald-400" />
+                <CalendarClock className="w-4 h-4 text-[#ff5500]" />
                 <span>{CONTACT.sessions}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-[#14161d] border border-[#262a34] px-3.5 py-2.5 font-mono text-xs text-zinc-300">
+                <MapPin className="w-4 h-4 text-[#ff5500]" />
+                <span>{CONTACT.location}</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. THE FOUR COACHING PACKAGES */}
+      {/* 2. THE PACKAGES */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {PRICING_TIERS.map((tier) => {
-            const isPopular = tier.isPopular;
-            const price = tier.price;
-            const wasPrice = tier.originalPrice;
-
-            return (
-              <div
-                key={tier.id}
-                className={`relative bg-[#121419] border flex flex-col justify-between transition-all duration-300 ${
-                  isPopular
-                    ? 'border-[#ff5500] bg-[#151821] shadow-[0_0_30px_rgba(255,85,0,0.15)] lg:-translate-y-2'
-                    : 'border-[#242833] hover:border-zinc-500'
-                }`}
-              >
-                {/* Popular Pill */}
-                {tier.badge && (
-                  <div className={`absolute top-0 right-0 font-mono text-[10px] font-bold uppercase tracking-wider px-3 py-1 ${
-                    isPopular ? 'bg-[#ff5500] text-black' : 'bg-[#222632] text-zinc-300'
-                  }`}>
-                    {tier.badge}
-                  </div>
-                )}
-
-                <div className="p-6 md:p-8 space-y-6">
-                  <div>
-                    <span className="text-xs font-mono text-[#ff5500] uppercase font-bold tracking-widest block mb-1">
-                      {tier.tag}
-                    </span>
-                    <h3 className="font-display text-3xl md:text-4xl text-white uppercase tracking-wide">
-                      {tier.name}
-                    </h3>
-                    <p className="text-xs font-sans text-zinc-400 mt-2 min-h-[36px]">
-                      {tier.description}
-                    </p>
-                  </div>
-
-                  {/* Price */}
-                  <div className="border-y border-[#1f232c] py-4">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-display text-5xl md:text-6xl text-white font-bold tracking-tight">
-                        {formatPrice(price)}
-                      </span>
-                      {wasPrice && (
-                        <span className="text-base font-mono text-zinc-500 line-through">
-                          {formatPrice(wasPrice)}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[11px] font-mono text-emerald-400 block mt-1 uppercase">
-                      One-off block of 4 x 1-2-1 sessions
-                    </span>
-                  </div>
-
-                  {/* Feature Checklist */}
-                  <div className="space-y-3">
-                    <span className="text-xs font-mono uppercase text-zinc-300 tracking-wider block font-bold">
-                      Protocol Scope:
-                    </span>
-                    <ul className="space-y-2.5 text-xs font-mono text-zinc-300">
-                      {tier.features.map((feat, i) => (
-                        <li key={i} className="flex items-start gap-2.5">
-                          <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {tier.omittedFeatures && tier.omittedFeatures.length > 0 && (
-                      <div className="pt-2 border-t border-[#1c1f26] space-y-2">
-                        <ul className="space-y-2 text-xs font-mono text-zinc-600">
-                          {tier.omittedFeatures.map((omit, i) => (
-                            <li key={i} className="flex items-start gap-2.5">
-                              <X className="w-4 h-4 text-zinc-600 shrink-0 mt-0.5" />
-                              <span className="line-through">{omit}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Card Action CTA */}
-                <div className="p-6 md:p-8 pt-0">
-                  <button
-                    onClick={() => onOpenConsultation(tier.name)}
-                    className={`w-full py-3.5 font-mono text-xs uppercase font-bold tracking-wider transition-all flex items-center justify-center gap-2 ${
-                      isPopular
-                        ? 'bg-[#ff5500] hover:bg-[#ff6a1f] text-black shadow-[0_0_20px_rgba(255,85,0,0.3)]'
-                        : 'bg-[#1e222b] hover:bg-[#282d38] text-white border border-[#303643]'
-                    }`}
-                  >
-                    <span>{tier.ctaText}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Availability Note */}
-        <div className="mt-8 bg-[#121419] border border-[#242833] p-5 flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-xs text-zinc-300">
-          <div className="flex items-center gap-2">
-            <CalendarClock className="w-4 h-4 text-[#ff5500] shrink-0" />
-            <span>{CONTACT.sessions}. Message me to check availability.</span>
-          </div>
-          <span className="text-zinc-400 uppercase tracking-wider">
-            {CONTACT.note} → {CONTACT.email}
-          </span>
-        </div>
-      </section>
-
-      {/* 3. FULL COMPARISON MATRIX TABLE */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="border-b border-[#22252e] pb-4 mb-6">
+        <div className="border-b border-[#22252e] pb-4 mb-10">
           <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
-            [ SPECIFICATION AUDIT ]
+            [ WHAT I SELL ]
           </div>
-          <h2 className="font-display text-3xl sm:text-4xl text-white uppercase tracking-tight">
-            FULL PACKAGE COMPARISON MATRIX
+          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+            FOUR SIMPLE PACKAGES.
           </h2>
         </div>
 
-        <div className="bg-[#121419] border border-[#242833] overflow-x-auto">
-          <table className="w-full text-left font-mono text-xs text-zinc-300">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {PRICING_TIERS.map((tier) => (
+            <div
+              key={tier.id}
+              className={`bg-[#121419] border p-6 md:p-8 flex flex-col relative ${
+                tier.isPopular ? 'border-[#ff5500] shadow-[0_0_20px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'
+              }`}
+            >
+              {tier.badge && (
+                <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">
+                  {tier.badge}
+                </span>
+              )}
+
+              <div className="flex items-baseline justify-between gap-4">
+                <div>
+                  <div className="text-4xl font-display text-[#ff5500] font-bold">{tier.name}</div>
+                  <div className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">{tier.tag}</div>
+                </div>
+                <div className="text-right">
+                  <div className="font-display text-4xl text-white font-bold">{formatPrice(tier.price)}</div>
+                  {tier.originalPrice && (
+                    <div className="text-xs font-mono text-zinc-500 line-through">{formatPrice(tier.originalPrice)}</div>
+                  )}
+                </div>
+              </div>
+
+              <p className="text-sm font-sans text-zinc-400 leading-relaxed mt-4">{tier.description}</p>
+
+              <ul className="mt-5 space-y-2.5 text-sm font-sans text-zinc-300">
+                {tier.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-[#ff5500] shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => onOpenBookCall(tier.name)}
+                className="mt-6 bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+              >
+                <span>{tier.ctaText}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. COMPARISON TABLE */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="border-b border-[#22252e] pb-4 mb-8">
+          <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
+            [ WHAT'S INCLUDED ]
+          </div>
+          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+            FULL BREAKDOWN.
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto border border-[#20232b] bg-[#121419]">
+          <table className="w-full min-w-[720px] text-sm font-sans">
             <thead>
-              <tr className="border-b border-[#222631] bg-[#161820] text-zinc-400">
-                <th className="p-4 font-bold uppercase">What's Included</th>
-                <th className="p-4 font-bold uppercase text-center">Bronze (£120)</th>
-                <th className="p-4 font-bold uppercase text-center">Silver (£150)</th>
-                <th className="p-4 font-bold uppercase text-center text-[#ff5500]">Gold (£175)</th>
-                <th className="p-4 font-bold uppercase text-center">Platinum (£200)</th>
+              <tr className="border-b border-[#1b1e26] bg-[#16181d]">
+                <th className="p-4 text-left text-xs font-mono text-zinc-400 uppercase tracking-wider">What's included</th>
+                {PRICING_TIERS.map((tier) => (
+                  <th key={tier.id} className="p-4 text-center">
+                    <div className="font-display text-xl text-white uppercase">{tier.name}</div>
+                    <div className="text-[11px] font-mono text-[#ff5500]">{formatPrice(tier.price)}</div>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-[#1b1e26]">
               <tr>
-                <td className="p-4 font-medium text-white">4 x 1-2-1 Personal Training Sessions</td>
+                <td className="p-4 font-medium text-white">4 x one-to-one PT sessions</td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
               </tr>
               <tr>
-                <td className="p-4 font-medium text-white">Nutritional Advice</td>
+                <td className="p-4 font-medium text-white">Simple nutrition advice</td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
               </tr>
               <tr>
-                <td className="p-4 font-medium text-white">Calorie-Controlled Meal Prep Ideas</td>
+                <td className="p-4 font-medium text-white">Easy meal prep ideas</td>
                 <td className="p-4 text-center text-zinc-600">—</td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
               </tr>
               <tr>
-                <td className="p-4 font-medium text-white">BMR Calculation</td>
+                <td className="p-4 font-medium text-white">Calories & macros worked out</td>
                 <td className="p-4 text-center text-zinc-600">—</td>
                 <td className="p-4 text-center text-zinc-600">—</td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
               </tr>
               <tr>
-                <td className="p-4 font-medium text-white">Macronutrient Breakdown</td>
-                <td className="p-4 text-center text-zinc-600">—</td>
-                <td className="p-4 text-center text-zinc-600">—</td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-              </tr>
-              <tr>
-                <td className="p-4 font-medium text-white">Weekly Programme (3-4 Extra Days)</td>
+                <td className="p-4 font-medium text-white">Weekly plan for your other gym days</td>
                 <td className="p-4 text-center text-zinc-600">—</td>
                 <td className="p-4 text-center text-zinc-600">—</td>
                 <td className="p-4 text-center text-zinc-600">—</td>
                 <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
               </tr>
               <tr>
-                <td className="p-4 font-medium text-white">Save vs Standard Rate</td>
-                <td className="p-4 text-center text-white font-bold">£20</td>
-                <td className="p-4 text-center text-white font-bold">£30</td>
-                <td className="p-4 text-center text-[#ff5500] font-bold">£25</td>
-                <td className="p-4 text-center text-white font-bold">£50</td>
+                <td className="p-4 font-medium text-white">Morning, evening & weekend slots</td>
+                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
+                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
+                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
+                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
               </tr>
             </tbody>
           </table>
+        </div>
+      </section>
+{/* 4. CTA */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 text-xs font-mono text-[#ff5500] uppercase tracking-widest">
+              <span className="w-2 h-2 bg-[#ff5500]"></span>
+              <span>Not sure which one?</span>
+            </div>
+            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+              LET'S TALK IT THROUGH.
+            </h2>
+            <p className="text-sm font-sans text-zinc-300 leading-relaxed max-w-xl">
+              Book a free call and we'll find the right package for your goals, your week and your budget. No pressure, no obligation.
+            </p>
+          </div>
+
+          <button
+            onClick={() => onOpenBookCall()}
+            className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-sm uppercase px-8 py-4 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95 shrink-0"
+          >
+            <span>Book a free call</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </section>
     </div>

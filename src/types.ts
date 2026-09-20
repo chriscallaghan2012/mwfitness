@@ -1,27 +1,9 @@
-export type ScreenId = 
-  | 'home' 
-  | 'pt' 
-  | 'online' 
-  | 'methodology' 
-  | 'packages' 
-  | 'programmes' 
-  | 'armory' 
-  | 'tools';
+export type ScreenId = 'home' | 'packages' | 'app' | 'shwag' | 'contact';
 
 export interface NavItem {
   id: ScreenId;
   label: string;
   code: string;
-}
-
-export interface Coach {
-  id: string;
-  name: string;
-  role: string;
-  credentials: string[];
-  bio: string;
-  specialty: string;
-  availability: string;
 }
 
 export interface PricingTier {
@@ -34,25 +16,7 @@ export interface PricingTier {
   isPopular?: boolean;
   description: string;
   features: string[];
-  omittedFeatures?: string[];
   ctaText: string;
-}
-
-export interface Programme {
-  id: string;
-  title: string;
-  category: 'Powerlifting' | 'Hypertrophy' | 'Conditioning' | 'Mobility';
-  duration: string;
-  frequency: string;
-  difficulty: 'Intermediate' | 'Advanced' | 'Elite';
-  price: number;
-  description: string;
-  highlights: string[];
-  weeklyBreakdown: {
-    week: string;
-    focus: string;
-    sampleSession: string;
-  }[];
 }
 
 export interface Testimonial {
@@ -73,9 +37,3 @@ export interface Review {
   date: string;
 }
 
-export interface EquipmentItem {
-  name: string;
-  brand: string;
-  spec: string;
-  category: 'Barbells & Plates' | 'Racks & Platforms' | 'Conditioning' | 'Recovery';
-}
