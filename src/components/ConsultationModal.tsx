@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, ArrowRight, PhoneCall } from 'lucide-react';
+import { X, CheckCircle, ArrowRight, PhoneCall, ChevronRight, Instagram } from 'lucide-react';
 import { postEnquiry } from '../lib/mail';
+import { ScreenId } from '../types';
+import { CONTACT } from '../data/mockData';
 
 interface ConsultationModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultInterest?: string;
+  onSelectScreen?: (screen: ScreenId) => void;
 }
 
 const TIMES = ['Morning', 'Afternoon', 'Evening', 'Weekend'];
@@ -14,6 +17,7 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
   isOpen,
   onClose,
   defaultInterest = '',
+  onSelectScreen,
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -115,13 +119,47 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={handleReset}
-              className="bg-[#22252e] hover:bg-[#2d313d] text-white font-mono text-xs uppercase px-8 py-3 tracking-wider transition-colors"
-            >
-              Back to the website
-            </button>
+            <div className="w-full max-w-md mx-auto text-left bg-[#15171d] border border-[#262930] p-4 font-mono text-xs space-y-2">
+              <div className="font-mono text-[11px] text-[#ff5500] uppercase tracking-widest mb-1">What happens next</div>
+              <div className="flex items-center gap-2.5 text-zinc-300">
+                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" /> Mike replies within 24 hours
+              </div>
+              <div className="flex items-center gap-2.5 text-zinc-300">
+                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" /> A free, no-pressure call to chat
+              </div>
+              <div className="flex items-center gap-2.5 text-zinc-300">
+                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" /> Your simple plan, made to fit your week
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onSelectScreen?.('packages');
+                }}
+                className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono text-xs uppercase px-6 py-3 tracking-wider transition-colors"
+              >
+                View packages
+              </button>
+              <a
+                href={CONTACT.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-white font-mono text-xs uppercase px-5 py-3 flex items-center gap-2 transition-colors"
+              >
+                <Instagram className="w-3.5 h-3.5 text-[#ff5500]" />
+                @{CONTACT.instagramHandle}
+              </a>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="bg-[#22252e] hover:bg-[#2d313d] text-white font-mono text-xs uppercase px-5 py-3 tracking-wider transition-colors"
+              >
+                Back to website
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">

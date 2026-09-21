@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { SHWAG } from '../../data/mockData';
+import { SHWAG, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
-import { Shirt, CheckCircle, ArrowRight, Sparkles, ExternalLink } from 'lucide-react';
+import { Shirt, CheckCircle, ArrowRight, Sparkles, ExternalLink, Instagram } from 'lucide-react';
 
 interface ShwagScreenProps {
   onOpenBookCall: () => void;
@@ -132,6 +132,16 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               <p className="text-sm font-sans text-zinc-400 leading-relaxed max-w-md mx-auto">
                 Mike will be in touch with prices and availability for your SHWAG order.
               </p>
+
+              <a
+                href={CONTACT.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-zinc-400 hover:text-[#ff5500] font-mono text-xs uppercase transition-colors"
+              >
+                <Instagram className="w-3.5 h-3.5 text-[#ff5500]" />
+                Follow @{CONTACT.instagramHandle} for SHWAG drops
+              </a>
             </div>
           ) : (
             <>

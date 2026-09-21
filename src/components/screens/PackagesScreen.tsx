@@ -65,6 +65,9 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
           <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
             FOUR SIMPLE PACKAGES.
           </h2>
+          <p className="text-sm font-sans text-zinc-400 leading-relaxed mt-3">
+            Not sure which level is right for you? Every package starts with a free chat — we'll point you the right way before you book anything.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

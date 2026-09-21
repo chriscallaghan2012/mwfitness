@@ -3,6 +3,7 @@ import { ScreenId } from './types';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ConsultationModal } from './components/ConsultationModal';
+import { PhoneCall } from 'lucide-react';
 
 // Screens
 import { HomeScreen } from './components/screens/HomeScreen';
@@ -17,6 +18,17 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
   const [bookCallOpen, setBookCallOpen] = useState(false);
   const [bookCallInterest, setBookCallInterest] = useState('');
+  const [showMobileCta, setShowMobileCta] = useState(false);
+
+  // Show the sticky mobile "book a call" bar once the visitor scrolls past the hero
+  useEffect(() => {
+    const onScroll = () => {
+      setShowMobileCta((document.documentElement.scrollTop || document.body.scrollTop) > 400);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Handle URL hash navigation if needed
   useEffect(() => {
@@ -58,7 +70,7 @@ export default function App() {
           <PackagesScreen onOpenBookCall={handleOpenBookCall} />
         )}
         {currentScreen === 'app' && (
-          <AppScreen />
+          <AppScreen onOpenBookCall={handleOpenBookCall} />
         )}
         {currentScreen === 'shwag' && (
           <ShwagScreen onOpenBookCall={handleOpenBookCall} />
@@ -74,11 +86,28 @@ export default function App() {
         onOpenBookCall={() => handleOpenBookCall()}
       />
 
+      {/* Sticky mobile CTA (appears after scrolling past the hero) */}
+      {showMobileCta && (
+        <div className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-[#0b0c0e]/95 backdrop-blur-md border-t border-[#ff5500]/40">
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Ready when you are</span>
+            <button
+              onClick={() => handleOpenBookCall()}
+              className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-4 py-2.5 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+            >
+              <PhoneCall className="w-3.5 h-3.5" />
+              Book a free call
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Book a call modal */}
       <ConsultationModal
         isOpen={bookCallOpen}
         onClose={() => setBookCallOpen(false)}
         defaultInterest={bookCallInterest}
+        onSelectScreen={handleSelectScreen}
       />
     </div>
   );

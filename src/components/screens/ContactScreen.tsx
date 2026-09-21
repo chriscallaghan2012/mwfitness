@@ -139,6 +139,29 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
                   <p className="text-sm font-sans text-zinc-400 max-w-md mx-auto mt-2 leading-relaxed">
                     Your message is on its way to Mike. He'll reply to <strong className="text-white">{email}</strong> within 24 hours.
                   </p>
+
+                  <div className="w-full max-w-md mx-auto text-left bg-[#15171d] border border-[#262930] p-4 font-mono text-xs space-y-2 mt-4">
+                    <div className="font-mono text-[11px] text-[#ff5500] uppercase tracking-widest mb-1">What happens next</div>
+                    <div className="flex items-center gap-2.5 text-zinc-300">
+                      <ArrowRight className="w-3.5 h-3.5 text-emerald-400" /> Mike replies within 24 hours
+                    </div>
+                    <div className="flex items-center gap-2.5 text-zinc-300">
+                      <ArrowRight className="w-3.5 h-3.5 text-emerald-400" /> A free, no-pressure call to chat
+                    </div>
+                    <div className="flex items-center gap-2.5 text-zinc-300">
+                      <ArrowRight className="w-3.5 h-3.5 text-emerald-400" /> Your simple plan, made to fit your week
+                    </div>
+                  </div>
+
+                  <a
+                    href={CONTACT.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-zinc-400 hover:text-[#ff5500] font-mono text-xs uppercase transition-colors mt-2"
+                  >
+                    <Instagram className="w-3.5 h-3.5 text-[#ff5500]" />
+                    Follow @{CONTACT.instagramHandle}
+                  </a>
                 </div>
               </div>
             ) : (

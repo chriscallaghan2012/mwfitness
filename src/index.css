@@ -68,3 +68,11 @@
   }
 }
 
+/* Smooth scrolling + offset for the sticky header */
+html {
+  scroll-behavior: smooth;
+}
+section[id] {
+  scroll-margin-top: 110px;
+}
+

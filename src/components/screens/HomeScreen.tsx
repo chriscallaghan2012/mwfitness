@@ -9,6 +9,10 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBookCall }) => {
+  const scrollToId = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const renderStars = (count: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star key={i} className={`w-4 h-4 ${i < count ? 'text-[#ff5500] fill-[#ff5500]' : 'text-zinc-600'}`} />
@@ -65,6 +69,22 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </button>
             </div>
 
+            <div className="flex flex-wrap items-center gap-2 pt-6" aria-label="Jump to a section">
+              <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mr-1">Jump to:</span>
+              <button onClick={() => scrollToId('about-mike')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+                About Mike
+              </button>
+              <button onClick={() => scrollToId('how-it-works')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+                How it works
+              </button>
+              <button onClick={() => scrollToId('testimonials')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+                Real results
+              </button>
+              <button onClick={() => scrollToId('packages-overview')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+                Packages
+              </button>
+            </div>
+
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-4 text-xs font-mono text-zinc-400">
               <span className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[#ff5500]" /> {CONTACT.location}
@@ -96,7 +116,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </div>
 
       {/* 3. ABOUT MIKE */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="about-mike" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
@@ -189,7 +209,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
 
       {/* 4. WHAT'S AVAILABLE */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="packages-overview" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
@@ -245,7 +265,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </section>
 {/* 5. HOW IT WORKS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 text-center">
           <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
             [ HOW IT WORKS ]
@@ -267,7 +287,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
 
       {/* 6. TESTIMONIALS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="testimonials" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10">
           <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
             [ WHAT PEOPLE SAY ]

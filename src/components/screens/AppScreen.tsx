@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { APP_FEATURES } from '../../data/mockData';
+import { APP_FEATURES, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
-import { Smartphone, CheckCircle, ArrowRight, Scale, TrendingUp, Utensils, Dumbbell } from 'lucide-react';
+import { Smartphone, CheckCircle, ArrowRight, Scale, TrendingUp, Utensils, Dumbbell, Instagram, PhoneCall } from 'lucide-react';
+
+interface AppScreenProps {
+  onOpenBookCall?: () => void;
+}
 
 const FEATURE_ICONS = [Scale, TrendingUp, Utensils, Dumbbell];
 
-export const AppScreen: React.FC = () => {
+export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
@@ -109,6 +113,26 @@ export const AppScreen: React.FC = () => {
               <p className="text-sm font-sans text-zinc-400 leading-relaxed max-w-md mx-auto">
                 We'll let you know the moment the app is ready to download. Watch this space.
               </p>
+
+              <div className="flex flex-col items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => onOpenBookCall?.()}
+                  className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono text-xs uppercase px-6 py-3 flex items-center gap-2 transition-colors"
+                >
+                  <PhoneCall className="w-3.5 h-3.5" />
+                  Book a free call while you wait
+                </button>
+                <a
+                  href={CONTACT.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-[#ff5500] font-mono text-xs uppercase flex items-center gap-2 transition-colors"
+                >
+                  <Instagram className="w-3.5 h-3.5 text-[#ff5500]" />
+                  Follow @{CONTACT.instagramHandle} for updates
+                </a>
+              </div>
             </div>
           ) : (
             <>
