@@ -28,7 +28,7 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
           <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
-              <span>[ 1-2-1 TRAINING • ONLINE COACHING ]</span>
+              <span>[ 1-2-1 TRAINING ]</span>
             </div>
 
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-[0.9] font-black">
@@ -39,7 +39,7 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
             </h1>
 
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
-              Everything is built around you — in person at Pure Gym Hazel Grove, or online wherever you train. Start small and build up, or go all in. Prices start at £120.
+              Personal training packages at Pure Gym Hazel Grove, Stockport. For coaching without personal meet-ups, see the dedicated online coaching plans.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -63,7 +63,7 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
             [ WHAT I SELL ]
           </div>
           <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            FOUR SIMPLE PACKAGES.
+            FOUR 1:1 PACKAGES.
           </h2>
           <p className="text-sm font-sans text-zinc-400 leading-relaxed mt-3">
             Not sure which level is right for you? Every package starts with a free chat — we'll point you the right way before you book anything.

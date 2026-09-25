@@ -52,6 +52,19 @@ MAIL_TO=mikeptonline@gmail.com        # where enquiries are delivered
 The `dist/` folder is the static site and `api/` is auto-detected as serverless functions.
 Add `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables.
 
+### Stripe checkout
+
+Create two one-time Prices in Stripe for the online coaching offer, then add these environment variables locally and in Vercel:
+
+```
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PRICE_ONLINE_WEEKLY=price_...
+STRIPE_PRICE_ONLINE_12_WEEK=price_...
+PUBLIC_SITE_URL=https://your-domain.example
+```
+
+The online coaching page creates a Stripe Checkout session server-side. Keep `STRIPE_SECRET_KEY` server-only and never expose it through Vite/client environment variables.
+
 ## Content
 
 All real site data lives in `src/data/siteData.ts` — packages, pricing, contact details, reviews, app features and SHWAG info. Add real SHWAG products to the `SHWAG_PRODUCTS` array.

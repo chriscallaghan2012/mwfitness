@@ -81,7 +81,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 Real results
               </button>
               <button onClick={() => scrollToId('packages-overview')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
-                Packages
+                1:1 packages
               </button>
             </div>
 
@@ -264,7 +264,28 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           ))}
         </div>
       </section>
-{/* 5. HOW IT WORKS */}
+      {/* 4. ONLINE COACHING SPOTLIGHT */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden border border-[#ff5500]/60 bg-[#171920] p-8 md:p-12">
+          <div className="absolute inset-y-0 right-0 w-1/3 bg-[#ff5500]/10 skew-x-[-18deg] translate-x-1/4 pointer-events-none"></div>
+          <div className="relative z-10 max-w-3xl space-y-4">
+            <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest">[ TRAIN ANYWHERE ]</div>
+            <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-tight">Online coaching. No meet-ups required.</h2>
+            <p className="text-sm sm:text-base font-sans text-zinc-300 leading-relaxed max-w-2xl">
+              Get a plan built around your life, your equipment and your goals, with weekly check-ins and direct support from Mike.
+            </p>
+            <button
+              onClick={() => onSelectScreen('online-coaching')}
+              className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+            >
+              See online coaching plans
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. HOW IT WORKS */}
       <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 text-center">
           <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">

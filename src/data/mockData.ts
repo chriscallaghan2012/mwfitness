@@ -60,6 +60,26 @@ export const HOW_IT_WORKS = [
   },
 ];
 
+export const ONLINE_COACHING = {
+  name: 'Online coaching',
+  intro: 'A fully tailored training and nutrition plan you can buy online and follow wherever you train. No personal meet-ups required, just clear guidance and consistent support from Mike.',
+  features: [
+    '3, 4 or 5 day training programme',
+    'Basic nutrition plan and healthy shopping lists',
+    'Meal prep ideas for real life',
+    'BMR and macronutrient breakdown',
+    'Weekly Zoom call check-ins',
+    'WhatsApp communication',
+    'Questions and queries answered the same day',
+    'Tailor-made around your needs inside and outside the gym',
+    'MWFitnessUK app coming soon for easier check-ins and communication',
+  ],
+  plans: [
+    { id: 'online-weekly', name: 'Weekly coaching', price: 149.99, description: 'Start with a complete online plan and pay in advance on a weekly basis.', badge: 'FLEXIBLE START' },
+    { id: 'online-12-week', name: '12-week coaching', price: 399.99, description: 'Commit to the full transformation block and get the best value across 12 weeks.', badge: 'BEST VALUE' },
+  ],
+};
+
 export const PRICING_TIERS: PricingTier[] = [
   {
     id: 'bronze',

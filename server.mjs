@@ -13,6 +13,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { sendContactEmail } from './api/_mailer.mjs';
+import { createCheckoutSession } from './api/_stripe.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -33,6 +34,17 @@ app.post('/api/send-mail', async (req, res) => {
   }
 });
 
+app.post('/api/create-checkout', async (req, res) => {
+  try {
+    const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
+    const result = await createCheckoutSession({ planId: req.body?.planId, origin });
+    res.json(result);
+  } catch (err) {
+    const status = /Invalid|not configured|public site/i.test(err.message || '') ? 400 : 500;
+    res.status(status).json({ ok: false, error: err.message || 'Checkout could not be started.' });
+  }
+});
+
 // Serve the built site (optional, for a full local prod check).
 const dist = path.join(__dirname, 'dist');
 if (fs.existsSync(dist)) {
@@ -44,4 +56,5 @@ const PORT = Number(process.env.PORT || 8787);
 app.listen(PORT, () => {
   console.log(`MWFitnessUK email API running on http://localhost:${PORT}`);
   console.log('POST /api/send-mail  ·  GET /api/health');
+  console.log('POST /api/create-checkout');
 });

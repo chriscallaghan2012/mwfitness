@@ -7,12 +7,13 @@ import { PhoneCall } from 'lucide-react';
 
 // Screens
 import { HomeScreen } from './components/screens/HomeScreen';
+import { OnlineCoachingScreen } from './components/screens/OnlineCoachingScreen';
 import { PackagesScreen } from './components/screens/PackagesScreen';
 import { AppScreen } from './components/screens/AppScreen';
 import { ShwagScreen } from './components/screens/ShwagScreen';
 import { ContactScreen } from './components/screens/ContactScreen';
 
-const VALID_SCREENS: ScreenId[] = ['home', 'packages', 'app', 'shwag', 'contact'];
+const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app', 'shwag', 'contact'];
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
@@ -65,6 +66,9 @@ export default function App() {
       <main className="flex-1 w-full">
         {currentScreen === 'home' && (
           <HomeScreen onSelectScreen={handleSelectScreen} onOpenBookCall={handleOpenBookCall} />
+        )}
+        {currentScreen === 'online-coaching' && (
+          <OnlineCoachingScreen onSelectScreen={handleSelectScreen} />
         )}
         {currentScreen === 'packages' && (
           <PackagesScreen onOpenBookCall={handleOpenBookCall} />
