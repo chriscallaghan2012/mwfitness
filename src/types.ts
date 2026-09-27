@@ -1,4 +1,4 @@
-export type ScreenId = 'home' | 'online-coaching' | 'packages' | 'app' | 'shwag' | 'contact';
+export type ScreenId = 'home' | 'online-coaching' | 'packages' | 'app' | 'shwag' | 'contact' | 'admin';
 
 export interface NavItem {
   id: ScreenId;
