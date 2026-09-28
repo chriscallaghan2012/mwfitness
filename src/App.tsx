@@ -12,8 +12,9 @@ import { PackagesScreen } from './components/screens/PackagesScreen';
 import { AppScreen } from './components/screens/AppScreen';
 import { ShwagScreen } from './components/screens/ShwagScreen';
 import { ContactScreen } from './components/screens/ContactScreen';
+import { AdminScreen } from './components/admin/AdminScreen';
 
-const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app', 'shwag', 'contact'];
+const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app', 'shwag', 'contact', 'admin'];
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
@@ -82,6 +83,7 @@ export default function App() {
         {currentScreen === 'contact' && (
           <ContactScreen onOpenBookCall={handleOpenBookCall} />
         )}
+        {currentScreen === 'admin' && <AdminScreen />}
       </main>
 
       {/* Footer */}

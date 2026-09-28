@@ -10,6 +10,7 @@ import {
   Smartphone,
   Shirt,
   PhoneCall,
+  Lock,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -56,6 +57,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
         <div className="hidden md:flex items-center gap-4 text-[11px] text-zinc-400">
           <span className="text-[#ff5500] font-semibold">MWFITNESSUK</span>
+          <span className="text-[#3f434d]">|</span>
+          <button
+            onClick={() => handleNavClick('admin')}
+            className="inline-flex items-center gap-1.5 text-zinc-500 hover:text-[#ff5500] transition-colors uppercase tracking-wider"
+          >
+            <Lock className="w-3 h-3" />
+            Staff login
+          </button>
         </div>
       </div>
 
@@ -168,6 +177,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           <div className="pt-4 border-t border-[#1c1f26] flex flex-col gap-2">
+            <button
+              onClick={() => handleNavClick('admin')}
+              className="w-full border border-[#1f232b] text-zinc-500 font-mono text-xs uppercase tracking-wider py-3 hover:text-[#ff5500] hover:border-[#ff5500]/40 transition-colors"
+            >
+              Staff login
+            </button>
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

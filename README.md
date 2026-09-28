@@ -68,3 +68,14 @@ The online coaching page creates a Stripe Checkout session server-side. Keep `ST
 ## Content
 
 All real site data lives in `src/data/siteData.ts` — packages, pricing, contact details, reviews, app features and SHWAG info. Add real SHWAG products to the `SHWAG_PRODUCTS` array.
+
+## Staff admin panel (Supabase)
+
+The same Supabase project that powers the **mobile app** also powers the staff
+panel at `/#admin` (reachable by visiting `/#admin` on the preview or live URL).
+
+- Add `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` to Vercel
+  (Project Settings → Environment Variables — add to **Preview** and **Production**).
+- First admin: sign up / create the user, then promote it once via the Supabase
+  SQL Editor: `update public.profiles set role = 'admin' where email = 'you@mwfitness.co.uk';`
+- Schema lives in the mobile repo: `MW-FITNESS-APP-MOBILE/supabase/migrations/0001_init.sql`.
