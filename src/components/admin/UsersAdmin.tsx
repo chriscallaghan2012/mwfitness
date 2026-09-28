@@ -9,7 +9,7 @@ const DEMO_USERS: [string, string, string][] = [
   ['Marcus Sterling', 'marcus.sterling@ukpower.org', 'athlete'],
   ['Elena Rostova', 'elena.r@vitality.io', 'athlete'],
   ['Tom Bradley', 'tom.bradley@techcorp.co.uk', 'athlete'],
-  ['Coach Matt', 'coach.matt@mwfitness.co.uk', 'coach'],
+  ['Coach Mike', 'coach.mike@mwfitness.co.uk', 'coach'],
 ];
 const DEMO_PASS = 'password123';
 const DEMO_COACH_PASS = 'coachhq2024';
@@ -74,13 +74,13 @@ export function UsersAdmin() {
           full_name: name,
           role,
           member_tier: role === 'coach' ? 'Staff' : 'MW Elite Performance Member',
-          coach_name: 'Coach Matt (Lead Strength Specialist)',
+          coach_name: 'Coach Mike (Lead Strength Specialist)',
           coach_role: 'Lead Strength Specialist',
         })
         .eq('id', data.user.id as string);
       if (!upErr) ok += 1;
     }
-    setMsg(`${ok} demo customer(s) ready — coach sign-in: coach.matt@mwfitness.co.uk / ${DEMO_COACH_PASS}`);
+    setMsg(`${ok} demo customer(s) ready — coach sign-in: coach.mike@mwfitness.co.uk / ${DEMO_COACH_PASS}`);
     setBusy(false);
     await load();
   };
