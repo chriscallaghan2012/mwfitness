@@ -2,6 +2,7 @@
 // plans, memberships, nutrition, workouts, check-ins and progress.
 // Same shared Supabase project as the mobile app.
 import { FormEvent, useEffect, useState } from 'react';
+import { Plus, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { UsersAdmin } from './UsersAdmin';
 import { PlansAdmin } from './PlansAdmin';
@@ -10,7 +11,7 @@ import { NutritionAdmin } from './NutritionAdmin';
 import { WorkoutsAdmin } from './WorkoutsAdmin';
 import { CheckinsAdmin, ProgressAdmin } from './ProgressAdmin';
 import { MessagesAdmin } from './MessagesAdmin';
-import { AdminTable, Row, card } from './fields';
+import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
 type Tab = 'overview' | 'users' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'checkins' | 'progress' | 'messages';
 
@@ -69,6 +70,12 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
   },
 };
 
+function createDemoRows(): Record<DemoTab, Row[]> {
+  return Object.fromEntries(
+    Object.entries(DEMO_TABLES).map(([key, table]) => [key, table.rows.map((row) => ({ ...row }))]),
+  ) as Record<DemoTab, Row[]>;
+}
+
 export function AdminScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -78,6 +85,11 @@ export function AdminScreen() {
   const [demoMode, setDemoMode] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
   const [stats, setStats] = useState<{ users: number; plans: number; memberships: number } | null>(null);
+  const [demoRows, setDemoRows] = useState<Record<DemoTab, Row[]>>(createDemoRows);
+  const [demoEditorOpen, setDemoEditorOpen] = useState(false);
+  const [demoEditId, setDemoEditId] = useState<string | null>(null);
+  const [demoDraft, setDemoDraft] = useState<Row>({});
+  const [demoNotice, setDemoNotice] = useState('');
 
   useEffect(() => {
     if (!supabase) return;
@@ -150,6 +162,8 @@ export function AdminScreen() {
   };
 
   const openDemo = () => {
+    setDemoRows(createDemoRows());
+    setDemoNotice('');
     setDemoMode(true);
     setSignedIn(false);
     setTab('overview');
@@ -157,9 +171,54 @@ export function AdminScreen() {
     setError(null);
   };
 
+  const exitDemo = () => {
+    setDemoRows(createDemoRows());
+    setDemoNotice('');
+    setDemoEditorOpen(false);
+    setDemoMode(false);
+    setTab('overview');
+  };
+
+  const openDemoEditor = (row?: Row) => {
+    if (tab === 'overview') return;
+    const draft: Row = {};
+    for (const column of DEMO_TABLES[tab].columns) draft[column.key] = row?.[column.key] ?? '';
+    setDemoDraft(draft);
+    setDemoEditId(row ? String(row.id) : null);
+    setDemoNotice('');
+    setDemoEditorOpen(true);
+  };
+
+  const saveDemoRow = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!demoMode || tab === 'overview') return;
+    const currentTab = tab;
+    const rowId = demoEditId ?? `demo-${currentTab}-${Date.now()}`;
+    const savedRow = { ...demoDraft, id: rowId };
+    setDemoRows((current) => ({
+      ...current,
+      [currentTab]: demoEditId
+        ? current[currentTab].map((row) => row.id === demoEditId ? savedRow : row)
+        : [...current[currentTab], savedRow],
+    }));
+    setDemoNotice('Sample change applied in this demo only. Nothing was sent to the database.');
+    setDemoEditorOpen(false);
+  };
+
+  const removeDemoRow = (row: Row) => {
+    if (!demoMode || tab === 'overview') return;
+    const currentTab = tab;
+    setDemoRows((current) => ({
+      ...current,
+      [currentTab]: current[currentTab].filter((item) => item.id !== row.id),
+    }));
+    setDemoNotice('Sample row removed in this demo only. Nothing was sent to the database.');
+  };
+
   if (!signedIn && !demoMode) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
+      <div className="min-h-[70vh] w-full px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl justify-center">
         <div className="w-full max-w-md">
           <p className="font-mono text-[11px] text-orange-400 uppercase tracking-wider mb-2">Staff only</p>
           <h1 className="text-3xl font-bold text-white mb-1">MWFitnessUK HQ</h1>
@@ -176,18 +235,20 @@ export function AdminScreen() {
             <button type="button" onClick={openDemo} className="w-full border border-orange-500/50 bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg">
               Preview sample admin data
             </button>
-            <p className="text-xs text-zinc-500 text-center mt-2">Read-only sample records. Nothing is saved or sent.</p>
+            <p className="text-xs text-zinc-500 text-center mt-2">Try sample edits safely. Changes stay in this browser session and are never saved or sent.</p>
           </div>
+        </div>
         </div>
       </div>
     );
   }
   return (
-    <div className="min-h-[60vh] px-4 py-8">
+    <div className="min-h-[60vh] w-full px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl">
       <div className="flex flex-wrap items-center gap-3 mb-2">
         <h1 className="text-2xl font-bold text-white">MWFitnessUK HQ</h1>
         {demoMode ? <span className="border border-orange-500/50 bg-orange-500/10 px-2 py-1 text-[10px] font-mono font-bold uppercase text-orange-300">Demo · sample data</span> : <span className="text-xs text-zinc-400">signed in as {email}</span>}
-        <button onClick={demoMode ? () => { setDemoMode(false); setTab('overview'); } : signOut} className="text-xs text-zinc-500 underline">
+        <button onClick={demoMode ? exitDemo : signOut} className="text-xs text-zinc-500 underline">
           {demoMode ? 'Exit demo' : 'Sign out'}
         </button>
       </div>
@@ -230,11 +291,18 @@ export function AdminScreen() {
           </p>
         </div>
       )}
-      {demoMode && tab === 'overview' && <div className={`${card} text-sm text-zinc-300`}><p className="font-mono text-[10px] uppercase text-orange-300 mb-2">Read-only preview</p><p>Every row in this preview is fictional sample data. Sign in with a staff account to manage live records.</p></div>}
+      {demoMode && tab === 'overview' && <div className={`${card} text-sm text-zinc-300`}><p className="font-mono text-[10px] uppercase text-orange-300 mb-2">Interactive sample preview</p><p>Explore and edit fictional records in each section. Changes stay in this browser session and reset when you exit demo. Live records are only changed after staff sign-in.</p></div>}
       {demoMode && tab !== 'overview' && (
-        <div className={`${card} overflow-x-auto`}>
-          <p className="font-mono text-[10px] uppercase text-orange-300 mb-3">{TABS.find((item) => item.id === tab)?.label} · sample records</p>
-          <AdminTable rows={DEMO_TABLES[tab].rows} cols={DEMO_TABLES[tab].columns} empty="No sample records." />
+        <div className={`${card} space-y-4`}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="font-mono text-[10px] uppercase text-orange-300">{TABS.find((item) => item.id === tab)?.label} · sample records</p>
+              <p className="mt-1 text-xs text-zinc-500">Edits are simulated locally and never reach Supabase.</p>
+            </div>
+            <button type="button" onClick={() => openDemoEditor()} className={btn}><Plus className="h-4 w-4" aria-hidden="true" /> Add sample</button>
+          </div>
+          <AdminTable rows={demoRows[tab]} cols={DEMO_TABLES[tab].columns} empty="No sample records." onEdit={openDemoEditor} onDelete={removeDemoRow} />
+          {demoNotice ? <p role="status" className="text-xs text-orange-200">{demoNotice}</p> : null}
         </div>
       )}
       {!demoMode && tab === 'users' && <UsersAdmin />}
@@ -245,6 +313,32 @@ export function AdminScreen() {
       {!demoMode && tab === 'checkins' && <CheckinsAdmin />}
       {!demoMode && tab === 'progress' && <ProgressAdmin />}
       {!demoMode && tab === 'messages' && <MessagesAdmin />}
+      {demoEditorOpen && demoMode && tab !== 'overview' ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/75 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDemoEditorOpen(false); }}>
+          <form onSubmit={saveDemoRow} role="dialog" aria-modal="true" aria-labelledby="demo-editor-title" className="my-auto max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl border border-zinc-700 bg-[#121315] p-5 shadow-2xl">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="font-mono text-[10px] uppercase text-orange-300">Demo only · not saved</p>
+                <h2 id="demo-editor-title" className="mt-1 text-lg font-semibold text-white">{demoEditId ? 'Edit sample record' : 'Add sample record'}</h2>
+              </div>
+              <button type="button" onClick={() => setDemoEditorOpen(false)} className={btnGhost} aria-label="Close sample editor"><X className="h-4 w-4" aria-hidden="true" /></button>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {DEMO_TABLES[tab].columns.map((column) => (
+                <label key={column.key} className="grid gap-1 text-xs text-zinc-400">
+                  {column.label}
+                  <input className={inp} value={String(demoDraft[column.key] ?? '')} onChange={(event) => setDemoDraft((draft) => ({ ...draft, [column.key]: event.target.value }))} />
+                </label>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-wrap justify-end gap-2">
+              <button type="button" onClick={() => setDemoEditorOpen(false)} className={btnGhost}>Cancel</button>
+              <button type="submit" className={btn}>{demoEditId ? 'Apply sample edit' : 'Add sample record'}</button>
+            </div>
+          </form>
+        </div>
+      ) : null}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 // Small shared helpers for the staff admin panel.
 import { FormEvent, ReactNode } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 
 export const inp =
   'w-full bg-[#121315] border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#ff5500] placeholder-zinc-600';
@@ -52,11 +53,13 @@ export function AdminTable({
   rows,
   empty,
   onEdit,
+  onDelete,
 }: {
   cols: { key: string; label: string; render?: (r: Row) => ReactNode }[];
   rows: Row[];
   empty?: string;
   onEdit?: (r: Row) => void;
+  onDelete?: (r: Row) => void;
 }) {
   if (!rows || rows.length === 0) {
     return <p className="text-sm text-zinc-400">{empty ?? 'Nothing here yet.'}</p>;
@@ -71,7 +74,7 @@ export function AdminTable({
                 {c.label}
               </th>
             ))}
-            {onEdit ? <th /> : null}
+            {onEdit || onDelete ? <th className="text-right" /> : null}
           </tr>
         </thead>
         <tbody>
@@ -82,11 +85,12 @@ export function AdminTable({
                   {c.render ? c.render(r) : String(r[c.key] ?? '—')}
                 </td>
               ))}
-              {onEdit ? (
-                <td>
-                  <button onClick={() => onEdit(r)} className={btnGhost}>
-                    Edit
-                  </button>
+              {onEdit || onDelete ? (
+                <td className="py-2">
+                  <div className="flex justify-end gap-2">
+                    {onEdit ? <button type="button" onClick={() => onEdit(r)} className={btnGhost}><Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit</button> : null}
+                    {onDelete ? <button type="button" onClick={() => onDelete(r)} className={btnGhost}><Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Remove</button> : null}
+                  </div>
                 </td>
               ) : null}
             </tr>
