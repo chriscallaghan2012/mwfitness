@@ -25,3 +25,4 @@ coverage/
 # AI Studio local
 assets/.aistudio/
 
+.vercel
