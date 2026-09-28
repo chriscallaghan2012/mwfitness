@@ -1,13 +1,30 @@
-import React from 'react';
-import { PRICING_TIERS, CONTACT } from '../../data/mockData';
+import React, { useEffect, useState } from 'react';
+import { CONTACT } from '../../data/mockData';
 import { Check, ArrowRight, CalendarClock, MapPin } from 'lucide-react';
+import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
 interface PackagesScreenProps {
   onOpenBookCall: (tier?: string) => void;
 }
 
 export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }) => {
+  const [plans, setPlans] = useState<PublicPlan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
+  const [plansError, setPlansError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void loadPublicPlans('pt').then((result) => {
+      if (!active) return;
+      setPlans(result.plans);
+      setPlansError(result.error);
+      setPlansLoading(false);
+    });
+    return () => { active = false; };
+  }, []);
+
   const formatPrice = (value: number) => `£${value.toLocaleString('en-GB')}`;
+  const comparisonFeatures = Array.from(new Set(plans.flatMap((plan) => plan.features)));
 
   return (
     <div className="space-y-16 md:space-y-24">
@@ -71,11 +88,11 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {PRICING_TIERS.map((tier) => (
+          {plans.map((tier) => (
             <div
               key={tier.id}
               className={`bg-[#121419] border p-6 md:p-8 flex flex-col relative ${
-                tier.isPopular ? 'border-[#ff5500] shadow-[0_0_20px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'
+                tier.is_popular ? 'border-[#ff5500] shadow-[0_0_20px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'
               }`}
             >
               {tier.badge && (
@@ -91,8 +108,8 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
                 </div>
                 <div className="text-right">
                   <div className="font-display text-4xl text-white font-bold">{formatPrice(tier.price)}</div>
-                  {tier.originalPrice && (
-                    <div className="text-xs font-mono text-zinc-500 line-through">{formatPrice(tier.originalPrice)}</div>
+                  {tier.original_price && (
+                    <div className="text-xs font-mono text-zinc-500 line-through">{formatPrice(tier.original_price)}</div>
                   )}
                 </div>
               </div>
@@ -112,12 +129,14 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
                 onClick={() => onOpenBookCall(tier.name)}
                 className="mt-6 bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
               >
-                <span>{tier.ctaText}</span>
+                <span>{tier.cta_text}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           ))}
         </div>
+        {plansLoading ? <p className="text-sm text-zinc-400 mt-4">Loading current packages…</p> : null}
+        {!plansLoading && plansError ? <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p> : null}
       </section>
 
       {/* 3. COMPARISON TABLE */}
@@ -136,7 +155,7 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
             <thead>
               <tr className="border-b border-[#1b1e26] bg-[#16181d]">
                 <th className="p-4 text-left text-xs font-mono text-zinc-400 uppercase tracking-wider">What's included</th>
-                {PRICING_TIERS.map((tier) => (
+                {plans.map((tier) => (
                   <th key={tier.id} className="p-4 text-center">
                     <div className="font-display text-xl text-white uppercase">{tier.name}</div>
                     <div className="text-[11px] font-mono text-[#ff5500]">{formatPrice(tier.price)}</div>
@@ -145,48 +164,16 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
               </tr>
             </thead>
             <tbody className="divide-y divide-[#1b1e26]">
-              <tr>
-                <td className="p-4 font-medium text-white">4 x one-to-one PT sessions</td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-              </tr>
-              <tr>
-                <td className="p-4 font-medium text-white">Simple nutrition advice</td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-              </tr>
-              <tr>
-                <td className="p-4 font-medium text-white">Easy meal prep ideas</td>
-                <td className="p-4 text-center text-zinc-600">—</td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-              </tr>
-              <tr>
-                <td className="p-4 font-medium text-white">Calories & macros worked out</td>
-                <td className="p-4 text-center text-zinc-600">—</td>
-                <td className="p-4 text-center text-zinc-600">—</td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-              </tr>
-              <tr>
-                <td className="p-4 font-medium text-white">Weekly plan for your other gym days</td>
-                <td className="p-4 text-center text-zinc-600">—</td>
-                <td className="p-4 text-center text-zinc-600">—</td>
-                <td className="p-4 text-center text-zinc-600">—</td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-              </tr>
-              <tr>
-                <td className="p-4 font-medium text-white">Morning, evening & weekend slots</td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-                <td className="p-4 text-center"><Check className="inline w-4 h-4 text-emerald-400" /></td>
-              </tr>
+              {comparisonFeatures.map((feature) => (
+                <tr key={feature}>
+                  <td className="p-4 font-medium text-white">{feature}</td>
+                  {plans.map((plan) => (
+                    <td key={plan.id} className="p-4 text-center">
+                      {plan.features.includes(feature) ? <Check className="inline w-4 h-4 text-emerald-400" /> : <span className="text-zinc-600">—</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

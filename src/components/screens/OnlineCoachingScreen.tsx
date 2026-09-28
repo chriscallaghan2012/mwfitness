@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScreenId } from '../../types';
 import { ONLINE_COACHING } from '../../data/mockData';
 import { createCheckoutSession } from '../../lib/stripe';
+import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { ArrowRight, Check, CreditCard, MessageCircle, Video } from 'lucide-react';
 
 interface OnlineCoachingScreenProps {
@@ -11,6 +12,20 @@ interface OnlineCoachingScreenProps {
 export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSelectScreen }) => {
   const [loadingPlan, setLoadingPlan] = useState('');
   const [error, setError] = useState('');
+  const [plans, setPlans] = useState<PublicPlan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
+  const [plansError, setPlansError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void loadPublicPlans('online').then((result) => {
+      if (!active) return;
+      setPlans(result.plans);
+      setPlansError(result.error);
+      setPlansLoading(false);
+    });
+    return () => { active = false; };
+  }, []);
 
   const handleCheckout = async (planId: string) => {
     setLoadingPlan(planId);
@@ -80,8 +95,8 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
           <p className="text-sm text-zinc-400 mt-3">All payments are made in advance. Stripe checkout is secure, and no personal meet-up is needed to start.</p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {ONLINE_COACHING.plans.map((plan) => (
-            <div key={plan.id} className={`bg-[#121419] border p-7 md:p-9 flex flex-col ${plan.id === 'online-12-week' ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'}`}>
+          {plans.map((plan) => (
+            <div key={plan.id} className={`bg-[#121419] border p-7 md:p-9 flex flex-col ${plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'}`}>
               <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest">{plan.badge}</div>
               <h3 className="font-display text-3xl text-white uppercase mt-3">{plan.name}</h3>
               <p className="text-sm text-zinc-400 leading-relaxed mt-3">{plan.description}</p>
@@ -93,6 +108,8 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
             </div>
           ))}
         </div>
+        {plansLoading ? <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p> : null}
+        {!plansLoading && plansError ? <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p> : null}
         {error && <div className="mt-5 border border-red-500/50 bg-[#2a1414] text-red-300 px-4 py-3 text-sm font-mono">{error}</div>}
       </section>
 

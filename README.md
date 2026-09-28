@@ -79,3 +79,6 @@ panel at `/#admin` (reachable by visiting `/#admin` on the preview or live URL).
 - First admin: sign up / create the user, then promote it once via the Supabase
   SQL Editor: `update public.profiles set role = 'admin' where email = 'you@mwfitness.co.uk';`
 - Schema lives in the mobile repo: `MW-FITNESS-APP-MOBILE/supabase/migrations/0001_init.sql`.
+- Apply migrations `0002_admin_control.sql` and `0003_mobile_backend.sql` after `0001_init.sql` for nutrition plans, mobile messages, and push tokens.
+- The push endpoint uses the signed-in staff JWT with Supabase RLS; configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel Preview environment too. It does not require a service-role key.
+- The mobile app uses the website origin in `EXPO_PUBLIC_WEBSITE_API_URL`; configure it in each EAS environment to enable push delivery.

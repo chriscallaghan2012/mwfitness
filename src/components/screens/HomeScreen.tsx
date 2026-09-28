@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScreenId } from '../../types';
-import { IMAGES, ABOUT, PRICING_TIERS, TESTIMONIALS, HOW_IT_WORKS, CONTACT } from '../../data/mockData';
+import { IMAGES, ABOUT, TESTIMONIALS, HOW_IT_WORKS, CONTACT } from '../../data/mockData';
 import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, GraduationCap } from 'lucide-react';
+import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
 interface HomeScreenProps {
   onSelectScreen: (screen: ScreenId) => void;
@@ -9,6 +10,21 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBookCall }) => {
+  const [plans, setPlans] = useState<PublicPlan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
+  const [plansError, setPlansError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void loadPublicPlans('pt').then((result) => {
+      if (!active) return;
+      setPlans(result.plans.slice(0, 4));
+      setPlansError(result.error);
+      setPlansLoading(false);
+    });
+    return () => { active = false; };
+  }, []);
+
   const scrollToId = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -229,14 +245,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PRICING_TIERS.map((tier) => (
+          {plans.map((tier) => (
             <div
               key={tier.id}
               className={`bg-[#121419] border p-6 flex flex-col relative group transition-all duration-300 ${
-                tier.isPopular ? 'border-[#ff5500] shadow-[0_0_20px_rgba(255,85,0,0.15)]' : 'border-[#20232b] hover:border-[#ff5500]/50'
+                tier.is_popular ? 'border-[#ff5500] shadow-[0_0_20px_rgba(255,85,0,0.15)]' : 'border-[#20232b] hover:border-[#ff5500]/50'
               }`}
             >
-              {tier.isPopular && (
+              {tier.is_popular && (
                 <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-2.5 py-1 font-bold">
                   {tier.badge}
                 </span>
@@ -248,21 +264,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
               <div className="mt-auto pt-2">
                 <div className="flex items-baseline gap-1.5">
-                  <span className="font-display text-3xl text-white font-bold">£{tier.price}</span>
-                  {tier.originalPrice && (
-                    <span className="text-xs font-mono text-zinc-500 line-through">£{tier.originalPrice}</span>
+                  <span className="font-display text-3xl text-white font-bold">£{tier.price.toLocaleString('en-GB')}</span>
+                  {tier.original_price && (
+                    <span className="text-xs font-mono text-zinc-500 line-through">£{tier.original_price.toLocaleString('en-GB')}</span>
                   )}
                 </div>
                 <button
                   onClick={() => onOpenBookCall(tier.name)}
                   className="mt-2 w-full bg-[#16181d] border border-[#2b303d] hover:bg-[#ff5500] hover:text-black text-white font-mono text-xs font-bold py-2.5 uppercase tracking-wider transition-all"
                 >
-                  {tier.ctaText}
+                  {tier.cta_text}
                 </button>
               </div>
             </div>
           ))}
         </div>
+        {plansLoading ? <p className="text-sm text-zinc-400 mt-4">Loading current packages…</p> : null}
+        {!plansLoading && plansError ? <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p> : null}
       </section>
       {/* 4. ONLINE COACHING SPOTLIGHT */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

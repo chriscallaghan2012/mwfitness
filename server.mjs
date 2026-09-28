@@ -14,6 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { sendContactEmail } from './api/_mailer.mjs';
 import { createCheckoutSession } from './api/_stripe.mjs';
+import sendPush from './api/send-push.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -45,6 +46,8 @@ app.post('/api/create-checkout', async (req, res) => {
   }
 });
 
+app.post('/api/send-push', sendPush);
+
 // Serve the built site (optional, for a full local prod check).
 const dist = path.join(__dirname, 'dist');
 if (fs.existsSync(dist)) {
@@ -57,4 +60,5 @@ app.listen(PORT, () => {
   console.log(`MWFitnessUK email API running on http://localhost:${PORT}`);
   console.log('POST /api/send-mail  ·  GET /api/health');
   console.log('POST /api/create-checkout');
+  console.log('POST /api/send-push');
 });
