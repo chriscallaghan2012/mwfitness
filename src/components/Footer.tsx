@@ -110,6 +110,10 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
             © {new Date().getFullYear()} MICHAEL WHITWORTH — MWFITNESSUK PERSONAL TRAINING. ALL RIGHTS RESERVED.
           </div>
           <div className="flex items-center gap-4">
+            <button onClick={() => onSelectScreen('admin')} className="hover:text-[#ff5500] transition-colors uppercase tracking-wider">
+              Staff login
+            </button>
+            <span>•</span>
             <span className="hover:text-zinc-300 transition-colors">FULLY INSURED</span>
             <span>•</span>
             <span className="hover:text-zinc-300 transition-colors">QUALIFIED PERSONAL TRAINER</span>
