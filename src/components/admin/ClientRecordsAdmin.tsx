@@ -21,6 +21,7 @@ export function ClientRecordsAdmin() {
   const [memberships, setMemberships] = useState<Row[]>([]);
   const [nutritionPlans, setNutritionPlans] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
+  const [refreshTick, setRefreshTick] = useState(0);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export function ClientRecordsAdmin() {
       if (!cancelled) setMessage('The shared database could not be reached. Try refreshing the client records.');
     }).finally(() => { if (!cancelled) setBusy(false); });
     return () => { cancelled = true; };
-  }, [userId, dataset, users]);
+  }, [userId, dataset, users, refreshTick]);
 
   const cols = (() => {
     if (dataset === 'checkins') return [
@@ -115,7 +116,7 @@ export function ClientRecordsAdmin() {
           <div className={card}>
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div><p className="font-mono text-[10px] uppercase text-orange-300">Client submissions</p><p className="mt-1 text-xs text-zinc-500">{DATASETS.find((item) => item.id === dataset)?.description}</p></div>
-              <button type="button" className={btnGhost} onClick={() => setUserId((value) => value)} disabled={busy}>{busy ? 'Loading…' : 'Refresh selection'}</button>
+              <button type="button" className={btnGhost} onClick={() => setRefreshTick((value) => value + 1)} disabled={busy}>{busy ? 'Loading…' : 'Refresh selection'}</button>
             </div>
             <div className="mb-4 flex gap-2 overflow-x-auto pb-1">{DATASETS.map((item) => <button key={item.id} onClick={() => setDataset(item.id)} className={dataset === item.id ? 'shrink-0 rounded-lg bg-[#ff5500] px-3 py-2 font-mono text-[10px] font-bold uppercase text-black' : 'shrink-0 rounded-lg border border-zinc-700 px-3 py-2 font-mono text-[10px] uppercase text-zinc-400'}>{item.label}</button>)}</div>
             {message && <p role="status" className="mb-3 text-xs text-orange-200">{message}</p>}
