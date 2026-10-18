@@ -20,6 +20,7 @@ const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app',
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>(() => {
+    if (new URLSearchParams(window.location.search).get('auth') === 'reset-password') return 'admin';
     if (window.location.pathname === '/privacy') return 'privacy';
     if (window.location.pathname === '/delete-account') return 'delete-account';
     return 'home';
@@ -41,6 +42,10 @@ export default function App() {
   // Handle URL hash navigation if needed
   useEffect(() => {
     const handleHash = () => {
+      if (new URLSearchParams(window.location.search).get('auth') === 'reset-password') {
+        setCurrentScreen('admin');
+        return;
+      }
       if (window.location.pathname === '/privacy') {
         setCurrentScreen('privacy');
         return;
