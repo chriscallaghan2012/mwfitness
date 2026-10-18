@@ -14,10 +14,11 @@ import { MessagesAdmin } from './MessagesAdmin';
 import { LeadsAdmin } from './LeadsAdmin';
 import { ClientRecordsAdmin } from './ClientRecordsAdmin';
 import { VideosAdmin } from './VideosAdmin';
+import { ProgrammesAdmin } from './ProgrammesAdmin';
 import { PasswordRecovery } from './PasswordRecovery';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads';
+type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'programmes' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -27,6 +28,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'memberships', label: 'Memberships' },
   { id: 'nutrition', label: 'Nutrition' },
   { id: 'workouts', label: 'Workouts' },
+  { id: 'programmes', label: 'Coaching programmes' },
   { id: 'videos', label: 'Videos' },
   { id: 'checkins', label: 'Check-ins' },
   { id: 'progress', label: 'Progress' },
@@ -66,6 +68,10 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
   workouts: {
     columns: [{ key: 'customer', label: 'Customer' }, { key: 'session', label: 'Session' }, { key: 'date', label: 'Scheduled' }, { key: 'status', label: 'Status' }],
     rows: [{ id: 'demo-workout-1', customer: 'Jamie Reed', session: 'Full body A', date: '30 Sep 2026', status: 'Planned' }],
+  },
+  programmes: {
+    columns: [{ key: 'name', label: 'Programme' }, { key: 'duration', label: 'Duration' }, { key: 'training', label: 'Training' }, { key: 'status', label: 'Status' }],
+    rows: [{ id: 'demo-programme-1', name: '12-week strength builder', duration: '12 weeks', training: '4 days/week', status: 'Sample only' }, { id: 'demo-programme-2', name: 'Beginner foundations', duration: '8 weeks', training: '3 days/week', status: 'Sample only' }],
   },
   videos: {
     columns: [{ key: 'title', label: 'Video' }, { key: 'category', label: 'Category' }, { key: 'duration', label: 'Duration' }, { key: 'status', label: 'Visibility' }],
@@ -364,6 +370,7 @@ export function AdminScreen() {
       {!demoMode && tab === 'memberships' && <MembershipsAdmin />}
       {!demoMode && tab === 'nutrition' && <NutritionAdmin />}
       {!demoMode && tab === 'workouts' && <WorkoutsAdmin />}
+      {!demoMode && tab === 'programmes' && <ProgrammesAdmin />}
       {!demoMode && tab === 'videos' && <VideosAdmin />}
       {!demoMode && tab === 'checkins' && <CheckinsAdmin />}
       {!demoMode && tab === 'progress' && <ProgressAdmin />}
