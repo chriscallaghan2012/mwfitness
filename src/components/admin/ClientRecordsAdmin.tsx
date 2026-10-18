@@ -83,8 +83,7 @@ export function ClientRecordsAdmin() {
           setProgressPhotos((data ?? []) as Row[]);
           setPhotosMessage('');
         }
-      })
-      .catch(() => {
+      }, () => {
         if (!cancelled) {
           setProgressPhotos([]);
           setPhotosMessage('Could not load private progress photos. Check staff permissions and database availability.');
