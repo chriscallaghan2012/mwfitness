@@ -12,6 +12,7 @@ import { WorkoutsAdmin } from './WorkoutsAdmin';
 import { CheckinsAdmin, ProgressAdmin } from './ProgressAdmin';
 import { MessagesAdmin } from './MessagesAdmin';
 import { LeadsAdmin } from './LeadsAdmin';
+import { PasswordRecovery } from './PasswordRecovery';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
 type Tab = 'overview' | 'users' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'checkins' | 'progress' | 'messages' | 'leads';
@@ -97,6 +98,7 @@ export function AdminScreen() {
   const [demoEditId, setDemoEditId] = useState<string | null>(null);
   const [demoDraft, setDemoDraft] = useState<Row>({});
   const [demoNotice, setDemoNotice] = useState('');
+  const [forgotMode, setForgotMode] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -235,6 +237,10 @@ export function AdminScreen() {
     setDemoNotice('Sample row removed in this demo only. Nothing was sent to the database.');
   };
 
+  if (!signedIn && !demoMode && (forgotMode || new URLSearchParams(window.location.search).get('auth') === 'reset-password')) {
+    return <PasswordRecovery onClose={() => { setForgotMode(false); setError(null); if (new URLSearchParams(window.location.search).has('auth')) window.history.replaceState({}, document.title, window.location.pathname); }} />;
+  }
+
   if (!signedIn && !demoMode) {
     return (
       <div className="min-h-[70vh] w-full px-4 py-16 sm:px-6 lg:px-8">
@@ -251,6 +257,9 @@ export function AdminScreen() {
               {loading ? 'Signing in…' : 'Sign in to HQ'}
             </button>
           </form>
+          <div className="mt-3 text-right">
+            <button type="button" onClick={() => { setForgotMode(true); setError(null); }} className="text-sm text-zinc-400 underline hover:text-white">Forgot password?</button>
+          </div>
           <div className="mt-5 border-t border-zinc-800 pt-4">
             <button type="button" onClick={openDemo} className="w-full border border-orange-500/50 bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg">
               Preview sample admin data
