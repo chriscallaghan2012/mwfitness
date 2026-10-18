@@ -12,7 +12,8 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { sendContactEmail } from './api/_mailer.mjs';
+import { sendContactEmail, validatePayload } from './api/_mailer.mjs';
+import { saveWebsiteLead } from './api/_leads.mjs';
 import { createCheckoutSession } from './api/_stripe.mjs';
 import sendPush from './api/send-push.mjs';
 
@@ -27,11 +28,18 @@ app.get('/api/health', (_req, res) => {
 
 app.post('/api/send-mail', async (req, res) => {
   try {
-    const result = await sendContactEmail(req.body);
-    res.json(result);
+    const validated = validatePayload(req.body);
+    const lead = await saveWebsiteLead(validated);
+    try {
+      await sendContactEmail(validated);
+      res.json({ ok: true, leadId: lead.id, emailSent: true });
+    } catch (mailError) {
+      console.error('MW Fitness lead saved; email notification failed:', mailError);
+      res.json({ ok: true, leadId: lead.id, emailSent: false, notice: 'Your request has been received. Email notifications are temporarily unavailable.' });
+    }
   } catch (err) {
     const status = /Missing|valid|Please|too long/i.test(err.message || '') ? 400 : 500;
-    res.status(status).json({ ok: false, error: err.message || 'Email could not be sent.' });
+    res.status(status).json({ ok: false, error: status === 400 ? err.message : 'We could not save your request. Please try again in a moment.' });
   }
 });
 
