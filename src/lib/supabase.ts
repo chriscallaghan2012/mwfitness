@@ -1,24 +1,24 @@
-// Supabase client for the MWFitnessUK website (shared database with the mobile app).
-//
-// Env (Vercel → Project Settings → Environment Variables, for BOTH Preview and
-// Production): VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY
-//
-// The publishable key is safe for the browser; Row Level Security protects data.
-// The admin panel additionally requires the signed-in user's `profiles.role`
-// to be `admin` or `coach`.
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// Shared Neon Auth + Data API client for the MW Fitness website and staff panel.
+// The legacy filename/export is retained during the migration to keep imports stable.
+import { createClient, SupabaseAuthAdapter } from '@neondatabase/neon-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL ?? '';
-const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? '';
+const authUrl = import.meta.env.VITE_NEON_AUTH_URL ?? '';
+const dataApiUrl = import.meta.env.VITE_NEON_DATA_API_URL ?? '';
 
-/** False when the Vercel env vars haven't been set — site runs without the admin panel. */
-export const isSupabaseConfigured = Boolean(url && key);
+export const isNeonConfigured = Boolean(authUrl && dataApiUrl);
 
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(url, key, {
+export const neon = isNeonConfigured
+  ? createClient({
       auth: {
-        persistSession: true,
-        autoRefreshToken: true,
+        adapter: SupabaseAuthAdapter(),
+        url: authUrl,
+      },
+      dataApi: {
+        url: dataApiUrl,
       },
     })
   : null;
+
+// Compatibility alias while components are moved to the shared Neon client.
+export const supabase = neon;
+export const isSupabaseConfigured = isNeonConfigured;

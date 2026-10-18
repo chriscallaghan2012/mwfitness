@@ -1,6 +1,6 @@
 // AdminScreen — MWFitnessUK staff HQ. Sign-in + management for customers,
 // plans, memberships, nutrition, workouts, check-ins and progress.
-// Same shared Supabase project as the mobile app.
+// Same shared Neon project as the mobile app.
 import { FormEvent, useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -11,9 +11,11 @@ import { NutritionAdmin } from './NutritionAdmin';
 import { WorkoutsAdmin } from './WorkoutsAdmin';
 import { CheckinsAdmin, ProgressAdmin } from './ProgressAdmin';
 import { MessagesAdmin } from './MessagesAdmin';
+import { LeadsAdmin } from './LeadsAdmin';
+import { PasswordRecovery } from './PasswordRecovery';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-type Tab = 'overview' | 'users' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'checkins' | 'progress' | 'messages';
+type Tab = 'overview' | 'users' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'checkins' | 'progress' | 'messages' | 'leads';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -25,6 +27,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'checkins', label: 'Check-ins' },
   { id: 'progress', label: 'Progress' },
   { id: 'messages', label: 'Messages' },
+  { id: 'leads', label: 'Website leads' },
 ];
 
 type DemoTab = Exclude<Tab, 'overview'>;
@@ -68,6 +71,10 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
     columns: [{ key: 'customer', label: 'Athlete' }, { key: 'from', label: 'From' }, { key: 'message', label: 'Message' }, { key: 'status', label: 'Push status' }],
     rows: [{ id: 'demo-message-1', customer: 'Alex Morgan', from: 'Coach', message: 'Great work staying consistent this week.', status: 'Sample only' }],
   },
+  leads: {
+    columns: [{ key: 'name', label: 'Name' }, { key: 'email', label: 'Email' }, { key: 'interest', label: 'Interested in' }, { key: 'status', label: 'Status' }],
+    rows: [{ id: 'demo-lead-1', name: 'Sample visitor', email: 'sample@example.test', interest: 'Free consultation', status: 'New · sample only' }],
+  },
 };
 
 function createDemoRows(): Record<DemoTab, Row[]> {
@@ -85,11 +92,13 @@ export function AdminScreen() {
   const [demoMode, setDemoMode] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
   const [stats, setStats] = useState<{ users: number; plans: number; memberships: number } | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [demoRows, setDemoRows] = useState<Record<DemoTab, Row[]>>(createDemoRows);
   const [demoEditorOpen, setDemoEditorOpen] = useState(false);
   const [demoEditId, setDemoEditId] = useState<string | null>(null);
   const [demoDraft, setDemoDraft] = useState<Row>({});
   const [demoNotice, setDemoNotice] = useState('');
+  const [forgotMode, setForgotMode] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -111,24 +120,37 @@ export function AdminScreen() {
   }, []);
 
   const loadStats = async () => {
-    const u = await supabase!.from('profiles').select('id', { count: 'exact', head: true });
-    const p = await supabase!.from('plans').select('id', { count: 'exact', head: true });
-    const m = await supabase!.from('memberships').select('id', { count: 'exact', head: true });
-    if (u.error || p.error || m.error) {
-      setError('Signed in but no admin access or tables are not ready yet.');
-      await supabase!.auth.signOut();
-      setSignedIn(false);
+    if (!supabase) {
       setStats(null);
       return;
     }
-    setStats({ users: u.count ?? 0, plans: p.count ?? 0, memberships: m.count ?? 0 });
+    setStatsLoading(true);
+    try {
+      const [u, p, m] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact', head: true }),
+        supabase.from('plans').select('id', { count: 'exact', head: true }),
+        supabase.from('memberships').select('id', { count: 'exact', head: true }),
+      ]);
+      if (u.error || p.error || m.error) {
+        setError('We could not load the live dashboard totals. Check your staff permissions and Neon table policies, then try again.');
+        setStats(null);
+        return;
+      }
+      setStats({ users: u.count ?? 0, plans: p.count ?? 0, memberships: m.count ?? 0 });
+      setError(null);
+    } catch {
+      setError('Could not reach the MW Fitness backend. Check your connection and try again.');
+      setStats(null);
+    } finally {
+      setStatsLoading(false);
+    }
   };
 
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     if (!supabase) {
-      setError('Live sign-in is unavailable until the website Supabase settings are configured.');
+      setError('Live sign-in is unavailable until the website Neon settings are configured.');
       return;
     }
     setLoading(true);
@@ -215,6 +237,10 @@ export function AdminScreen() {
     setDemoNotice('Sample row removed in this demo only. Nothing was sent to the database.');
   };
 
+  if (!signedIn && !demoMode && (forgotMode || new URLSearchParams(window.location.search).get('auth') === 'reset-password')) {
+    return <PasswordRecovery onClose={() => { setForgotMode(false); setError(null); if (new URLSearchParams(window.location.search).has('auth')) window.history.replaceState({}, document.title, window.location.pathname); }} />;
+  }
+
   if (!signedIn && !demoMode) {
     return (
       <div className="min-h-[70vh] w-full px-4 py-16 sm:px-6 lg:px-8">
@@ -231,6 +257,9 @@ export function AdminScreen() {
               {loading ? 'Signing in…' : 'Sign in to HQ'}
             </button>
           </form>
+          <div className="mt-3 text-right">
+            <button type="button" onClick={() => { setForgotMode(true); setError(null); }} className="text-sm text-zinc-400 underline hover:text-white">Forgot password?</button>
+          </div>
           <div className="mt-5 border-t border-zinc-800 pt-4">
             <button type="button" onClick={openDemo} className="w-full border border-orange-500/50 bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg">
               Preview sample admin data
@@ -253,15 +282,16 @@ export function AdminScreen() {
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="sticky top-28 z-30 -mx-4 mb-6 flex gap-2 overflow-x-auto border-y border-zinc-800 bg-[#0b0c0e]/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-wrap sm:overflow-visible sm:border-0 sm:bg-transparent sm:p-0">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
+            aria-pressed={tab === t.id}
             className={
               tab === t.id
                 ? 'bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-3 py-2 rounded-lg'
-                : 'border border-zinc-700 text-zinc-400 font-mono text-xs uppercase px-3 py-2 rounded-lg hover:bg-zinc-800'
+                : 'shrink-0 border border-zinc-700 text-zinc-400 font-mono text-xs uppercase px-3 py-2 rounded-lg hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5500]'
             }
           >
             {t.label}
@@ -270,24 +300,35 @@ export function AdminScreen() {
       </div>
 
       {tab === 'overview' && (
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <Stat label="Customers" value={demoMode ? 12 : stats?.users} />
-          <Stat label="Plans" value={demoMode ? 7 : stats?.plans} />
-          <Stat label="Memberships" value={demoMode ? 9 : stats?.memberships} />
+        <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-3">
+          <Stat label="Customers" value={demoMode ? demoRows.users.length : statsLoading ? undefined : stats?.users} />
+          <Stat label="Plans" value={demoMode ? demoRows.plans.length : statsLoading ? undefined : stats?.plans} />
+          <Stat label="Memberships" value={demoMode ? demoRows.memberships.length : statsLoading ? undefined : stats?.memberships} />
         </div>
       )}
       {tab === 'overview' && !demoMode && (
-        <div className={`${card} text-sm text-zinc-300`}>
+        <div className={`${card} mb-4 text-sm text-zinc-300`}>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+            <div>
+              <p className="font-mono text-[10px] uppercase text-zinc-500">Backend status</p>
+              <p className="mt-1 font-semibold text-white">{statsLoading ? 'Checking live data…' : stats ? 'Connected to MW Fitness Neon' : 'Live data needs attention'}</p>
+              <p className="mt-1 text-xs text-zinc-500">Dashboard totals come from the shared database used by the website and mobile app.</p>
+            </div>
+            <button type="button" onClick={() => void loadStats()} disabled={statsLoading} className={`${btnGhost} disabled:cursor-wait disabled:opacity-50`}>
+              {statsLoading ? 'Refreshing…' : 'Refresh totals'}
+            </button>
+          </div>
+          {error ? <p role="alert" className="mb-4 border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-300">{error}</p> : null}
           <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Quick start</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Boot demo customers: <b>Users → Add demo customers</b> (creates sign-in accounts + profiles).</li>
+            <li>Create customer accounts in <b>Users → Add customer</b> using a unique temporary password; share it securely.</li>
             <li>Edit a customer's role, tier and weights: <b>Users → Edit</b>.</li>
             <li>Assign a plan: <b>Memberships</b>.</li>
             <li>Next, give the customer a diet: <b>Nutrition → Meal templates → assign</b>.</li>
             <li>Schedule sessions: <b>Workouts</b>; review check-ins: <b>Check-ins</b>; log weigh-ins: <b>Progress</b>.</li>
           </ul>
           <p className="mt-3 text-zinc-500">
-            The mobile app reads all of this from the same database (sign in as the customer in Expo Go to see it live).
+            The mobile app reads all of this from the same Neon database after the customer signs in.
           </p>
         </div>
       )}
@@ -297,7 +338,7 @@ export function AdminScreen() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="font-mono text-[10px] uppercase text-orange-300">{TABS.find((item) => item.id === tab)?.label} · sample records</p>
-              <p className="mt-1 text-xs text-zinc-500">Edits are simulated locally and never reach Supabase.</p>
+              <p className="mt-1 text-xs text-zinc-500">Edits are simulated locally and never reach Neon.</p>
             </div>
             <button type="button" onClick={() => openDemoEditor()} className={btn}><Plus className="h-4 w-4" aria-hidden="true" /> Add sample</button>
           </div>
@@ -313,6 +354,7 @@ export function AdminScreen() {
       {!demoMode && tab === 'checkins' && <CheckinsAdmin />}
       {!demoMode && tab === 'progress' && <ProgressAdmin />}
       {!demoMode && tab === 'messages' && <MessagesAdmin />}
+      {!demoMode && tab === 'leads' && <LeadsAdmin />}
       {demoEditorOpen && demoMode && tab !== 'overview' ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/75 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDemoEditorOpen(false); }}>
           <form onSubmit={saveDemoRow} role="dialog" aria-modal="true" aria-labelledby="demo-editor-title" className="my-auto max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl border border-zinc-700 bg-[#121315] p-5 shadow-2xl">

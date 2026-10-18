@@ -1,6 +1,6 @@
 # MWFitnessUK — website
 
-Friendly personal training &amp; online coaching site for Michael Whitworth. React + Vite + Tailwind v4, with a Nodemailer-based contact/email backend.
+Friendly personal training &amp; online coaching site for Michael Whitworth. React + Vite + Tailwind v4, with a shared Neon backend for staff management, pricing and website enquiries.
 
 ## Pages
 
@@ -24,13 +24,15 @@ npm run server
 npm run dev
 ```
 
-Without SMTP details in `.env`, forms validate and show a clear "not configured" message instead of sending — add the details and they'll deliver.
+The local API needs the dedicated MW Fitness `DATABASE_URL` to save enquiries. SMTP is an optional notification channel: if SMTP is unavailable, a successfully saved enquiry still appears in the staff inbox.
 
 ## Email backend
 
-Every contact CTA on the site (navbar, hero, packages, app waitlist, SHWAG orders) opens one contact form that POSTs the **real submitted data** to `/api/send-mail`, which emails an on-brand HTML template to you.
+Every contact CTA on the site (navbar, hero, packages, app waitlist, SHWAG orders) posts the **real submitted data** to `/api/send-mail`. The server validates it and saves the enquiry to `public.website_leads` in the dedicated MW Fitness Neon database before attempting the on-brand email notification. Leads can then be reviewed and moved through new, contacted, qualified, converted or closed in **Staff login → Website leads**. Email is an alert, not the source of truth.
 
 - `api/_templates.mjs` — the email templates (edit here to change what lands in your inbox)
+- `api/_leads.mjs` — server-only Neon persistence for contact forms
+- `src/components/admin/LeadsAdmin.tsx` — staff inbox for live enquiries
 - `api/_mailer.mjs` — validation + Nodemailer transport (SMTP via env)
 - `api/send-mail.mjs` — Vercel serverless function (used on production)
 - `server.mjs` — local Express server exposing the same endpoint (also serves `dist/` on :8787)
@@ -50,7 +52,7 @@ MAIL_TO=mikeptonline@gmail.com        # where enquiries are delivered
 ## Deploy (Vercel)
 
 The `dist/` folder is the static site and `api/` is auto-detected as serverless functions.
-Add `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables.
+Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables. The website's Neon migration `0005_website_leads.sql` is maintained in the companion mobile repository and applied to the dedicated MW Fitness database.
 
 ### Stripe checkout
 
@@ -65,20 +67,27 @@ PUBLIC_SITE_URL=https://your-domain.example
 
 The online coaching page creates a Stripe Checkout session server-side. Keep `STRIPE_SECRET_KEY` server-only and never expose it through Vite/client environment variables.
 
-## Content
+## Content & staff controls
 
-All real site data lives in `src/data/siteData.ts` — packages, pricing, contact details, reviews, app features and SHWAG info. Add real SHWAG products to the `SHWAG_PRODUCTS` array.
+- **Plans and pricing** are read from the shared Neon `plans` table and edited in Staff login → Plans; active plans are shown on the public home, packages and online-coaching pages.
+- **Website enquiries** are stored in Neon and managed in Staff login → Website leads.
+- **Training operations** (customers, memberships, nutrition, workouts, check-ins, progress and coach messages) are managed in Staff login and shared with the Expo app.
+- Brand copy, reviews, contact details, static page sections and SHWAG catalogue are still authored in `src/data/mockData.ts` and the screen components. They are not yet a full database-driven CMS; central website content controls are a next implementation stage.
 
-## Staff admin panel (Supabase)
+## Shared Neon backend
 
-The same Supabase project that powers the **mobile app** also powers the staff
-panel at `/#admin` (reachable by visiting `/#admin` on the preview or live URL).
+The website staff panel and the mobile app use the same dedicated Neon project, **MW Fitness**, with Neon Auth and the Neon Data API.
 
-- Add `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` to Vercel
-  (Project Settings → Environment Variables — add to **Preview** and **Production**).
-- First admin: sign up / create the user, then promote it once via the Supabase
-  SQL Editor: `update public.profiles set role = 'admin' where email = 'you@mwfitness.co.uk';`
-- Schema lives in the mobile repo: `MW-FITNESS-APP-MOBILE/supabase/migrations/0001_init.sql`.
-- Apply migrations `0002_admin_control.sql` and `0003_mobile_backend.sql` after `0001_init.sql` for nutrition plans, mobile messages, and push tokens.
-- The push endpoint uses the signed-in staff JWT with Supabase RLS; configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel Preview environment too. It does not require a service-role key.
-- The mobile app uses the website origin in `EXPO_PUBLIC_WEBSITE_API_URL`; configure it in each EAS environment to enable push delivery.
+Set these environment variables in Vercel for Production, Preview and Development:
+
+```bash
+VITE_NEON_AUTH_URL=https://<branch-endpoint>/mwfitness/auth
+VITE_NEON_DATA_API_URL=https://<branch-endpoint>/mwfitness/rest/v1
+DATABASE_URL=<server-only pooled Neon PostgreSQL connection string>
+```
+
+Only the two `VITE_NEON_*` endpoint URLs are browser-visible. Keep `DATABASE_URL` server-only and never prefix it with `VITE_`.
+
+The shared schema and ordered migration files are maintained in `MW-FITNESS-APP-MOBILE/neon/migrations/`. The production Neon branch currently has migrations 0001–0004 applied. The push endpoint authenticates using the caller's Neon JWT and relies on PostgreSQL row-level security; it does not require a privileged database key.
+
+The first coach/admin must be created in Neon Auth and promoted to `admin` in `public.profiles` by an authorized database administrator. Do not use sample credentials for real accounts.

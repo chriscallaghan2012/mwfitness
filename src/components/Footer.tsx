@@ -109,7 +109,11 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
           <div>
             © {new Date().getFullYear()} MICHAEL WHITWORTH — MWFITNESSUK PERSONAL TRAINING. ALL RIGHTS RESERVED.
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a href="/privacy" className="hover:text-[#ff5500] transition-colors uppercase tracking-wider">Privacy</a>
+            <span>•</span>
+            <a href="/delete-account" className="hover:text-[#ff5500] transition-colors uppercase tracking-wider">Account deletion</a>
+            <span>•</span>
             <button onClick={() => onSelectScreen('admin')} className="hover:text-[#ff5500] transition-colors uppercase tracking-wider">
               Staff login
             </button>
