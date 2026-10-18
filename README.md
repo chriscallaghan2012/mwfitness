@@ -67,9 +67,12 @@ PUBLIC_SITE_URL=https://your-domain.example
 
 The online coaching page creates a Stripe Checkout session server-side. Keep `STRIPE_SECRET_KEY` server-only and never expose it through Vite/client environment variables.
 
-## Content
+## Content & staff controls
 
-All real site data lives in `src/data/siteData.ts` — packages, pricing, contact details, reviews, app features and SHWAG info. Add real SHWAG products to the `SHWAG_PRODUCTS` array.
+- **Plans and pricing** are read from the shared Neon `plans` table and edited in Staff login → Plans; active plans are shown on the public home, packages and online-coaching pages.
+- **Website enquiries** are stored in Neon and managed in Staff login → Website leads.
+- **Training operations** (customers, memberships, nutrition, workouts, check-ins, progress and coach messages) are managed in Staff login and shared with the Expo app.
+- Brand copy, reviews, contact details, static page sections and SHWAG catalogue are still authored in `src/data/mockData.ts` and the screen components. They are not yet a full database-driven CMS; central website content controls are a next implementation stage.
 
 ## Shared Neon backend
 
