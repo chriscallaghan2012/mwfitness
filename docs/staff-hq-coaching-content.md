@@ -134,3 +134,40 @@ grant insert, update, delete on public.coaching_programmes, public.coaching_prog
 ```
 
 This first version stores programme metadata and assignments only. Detailed week-by-week exercise prescriptions, progression rules and in-app presentation need a separate reviewed schema and app implementation; this scaffold does not claim those are wired to the Android app.
+
+
+## Staff-role hardening (draft; review before shared DB changes)
+
+The current shared schema's `public.is_admin()` helper returns true for both `coach` and `admin`. That is useful for staff data access, but it must not be the only protection around promoting users to the `admin` role. Add a role-change guard after testing it against a disposable Neon branch:
+
+```sql
+create or replace function public.prevent_unauthorised_profile_role_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  caller_role text;
+begin
+  if new.role is distinct from old.role and auth.uid() is not null then
+    select p.role into caller_role
+    from public.profiles p
+    where p.id = auth.uid();
+
+    if caller_role is distinct from 'admin' then
+      raise exception 'Only an administrator can change account roles'
+        using errcode = '42501';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_role_change_guard on public.profiles;
+create trigger profiles_role_change_guard
+  before update of role on public.profiles
+  for each row execute function public.prevent_unauthorised_profile_role_change();
+```
+
+This is intentionally documented only. Do not apply it to the shared database without reviewing how the deployment's Neon Auth/Data API role maps to `auth.uid()` and testing coach edits, admin edits and trusted server operations. It also does not replace a proper audit trail for role changes.
