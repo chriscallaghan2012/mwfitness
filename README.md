@@ -69,16 +69,20 @@ The online coaching page creates a Stripe Checkout session server-side. Keep `ST
 
 All real site data lives in `src/data/siteData.ts` — packages, pricing, contact details, reviews, app features and SHWAG info. Add real SHWAG products to the `SHWAG_PRODUCTS` array.
 
-## Staff admin panel (Supabase)
+## Shared Neon backend
 
-The same Supabase project that powers the **mobile app** also powers the staff
-panel at `/#admin` (reachable by visiting `/#admin` on the preview or live URL).
+The website staff panel and the mobile app use the same dedicated Neon project, **MW Fitness**, with Neon Auth and the Neon Data API.
 
-- Add `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` to Vercel
-  (Project Settings → Environment Variables — add to **Preview** and **Production**).
-- First admin: sign up / create the user, then promote it once via the Supabase
-  SQL Editor: `update public.profiles set role = 'admin' where email = 'you@mwfitness.co.uk';`
-- Schema lives in the mobile repo: `MW-FITNESS-APP-MOBILE/supabase/migrations/0001_init.sql`.
-- Apply migrations `0002_admin_control.sql` and `0003_mobile_backend.sql` after `0001_init.sql` for nutrition plans, mobile messages, and push tokens.
-- The push endpoint uses the signed-in staff JWT with Supabase RLS; configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel Preview environment too. It does not require a service-role key.
-- The mobile app uses the website origin in `EXPO_PUBLIC_WEBSITE_API_URL`; configure it in each EAS environment to enable push delivery.
+Set these environment variables in Vercel for Production, Preview and Development:
+
+```bash
+VITE_NEON_AUTH_URL=https://<branch-endpoint>/mwfitness/auth
+VITE_NEON_DATA_API_URL=https://<branch-endpoint>/mwfitness/rest/v1
+DATABASE_URL=<server-only pooled Neon PostgreSQL connection string>
+```
+
+Only the two `VITE_NEON_*` endpoint URLs are browser-visible. Keep `DATABASE_URL` server-only and never prefix it with `VITE_`.
+
+The shared schema and ordered migration files are maintained in `MW-FITNESS-APP-MOBILE/neon/migrations/`. The production Neon branch currently has migrations 0001–0004 applied. The push endpoint authenticates using the caller's Neon JWT and relies on PostgreSQL row-level security; it does not require a Supabase service-role key.
+
+The first coach/admin must be created in Neon Auth and promoted to `admin` in `public.profiles` by an authorized database administrator. Do not use sample credentials for real accounts.
