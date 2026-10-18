@@ -1,8 +1,9 @@
 /**
  * Vercel serverless function — POST /api/send-mail
- * Called by every contact form on the site (enquiry, book-a-call, waitlist, SHWAG).
+ * Save each enquiry to the shared Neon database, then send an email notification.
  */
-import { sendContactEmail } from './_mailer.mjs';
+import { sendContactEmail, validatePayload } from './_mailer.mjs';
+import { saveWebsiteLead } from './_leads.mjs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -18,11 +19,30 @@ export default async function handler(req, res) {
     }
   }
 
+  let lead;
   try {
-    const result = await sendContactEmail(payload);
-    return res.status(200).json(result);
+    const validated = validatePayload(payload);
+    lead = await saveWebsiteLead(validated);
+
+    // Email is an alert, not the source of truth. A temporary SMTP outage must
+    // not discard a successfully saved enquiry or tell the visitor to resubmit.
+    try {
+      await sendContactEmail(validated);
+      return res.status(200).json({ ok: true, leadId: lead.id, emailSent: true });
+    } catch (mailError) {
+      console.error('MW Fitness lead saved; email notification failed:', mailError);
+      return res.status(200).json({
+        ok: true,
+        leadId: lead.id,
+        emailSent: false,
+        notice: 'Your request has been received. Email notifications are temporarily unavailable.',
+      });
+    }
   } catch (err) {
     const status = /Missing|valid|Please|too long/i.test(err.message || '') ? 400 : 500;
-    return res.status(status).json({ ok: false, error: err.message || 'Email could not be sent.' });
+    return res.status(status).json({
+      ok: false,
+      error: status === 400 ? err.message : 'We could not save your request. Please try again in a moment.',
+    });
   }
 }
