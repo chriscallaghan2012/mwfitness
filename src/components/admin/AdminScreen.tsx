@@ -85,6 +85,7 @@ export function AdminScreen() {
   const [demoMode, setDemoMode] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
   const [stats, setStats] = useState<{ users: number; plans: number; memberships: number } | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [demoRows, setDemoRows] = useState<Record<DemoTab, Row[]>>(createDemoRows);
   const [demoEditorOpen, setDemoEditorOpen] = useState(false);
   const [demoEditId, setDemoEditId] = useState<string | null>(null);
@@ -111,17 +112,30 @@ export function AdminScreen() {
   }, []);
 
   const loadStats = async () => {
-    const u = await supabase!.from('profiles').select('id', { count: 'exact', head: true });
-    const p = await supabase!.from('plans').select('id', { count: 'exact', head: true });
-    const m = await supabase!.from('memberships').select('id', { count: 'exact', head: true });
-    if (u.error || p.error || m.error) {
-      setError('Signed in but no admin access or tables are not ready yet.');
-      await supabase!.auth.signOut();
-      setSignedIn(false);
+    if (!supabase) {
       setStats(null);
       return;
     }
-    setStats({ users: u.count ?? 0, plans: p.count ?? 0, memberships: m.count ?? 0 });
+    setStatsLoading(true);
+    try {
+      const [u, p, m] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact', head: true }),
+        supabase.from('plans').select('id', { count: 'exact', head: true }),
+        supabase.from('memberships').select('id', { count: 'exact', head: true }),
+      ]);
+      if (u.error || p.error || m.error) {
+        setError('We could not load the live dashboard totals. Check your staff permissions and Neon table policies, then try again.');
+        setStats(null);
+        return;
+      }
+      setStats({ users: u.count ?? 0, plans: p.count ?? 0, memberships: m.count ?? 0 });
+      setError(null);
+    } catch {
+      setError('Could not reach the MW Fitness backend. Check your connection and try again.');
+      setStats(null);
+    } finally {
+      setStatsLoading(false);
+    }
   };
 
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
@@ -253,15 +267,16 @@ export function AdminScreen() {
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="sticky top-28 z-30 -mx-4 mb-6 flex gap-2 overflow-x-auto border-y border-zinc-800 bg-[#0b0c0e]/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-wrap sm:overflow-visible sm:border-0 sm:bg-transparent sm:p-0">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
+            aria-pressed={tab === t.id}
             className={
               tab === t.id
                 ? 'bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-3 py-2 rounded-lg'
-                : 'border border-zinc-700 text-zinc-400 font-mono text-xs uppercase px-3 py-2 rounded-lg hover:bg-zinc-800'
+                : 'shrink-0 border border-zinc-700 text-zinc-400 font-mono text-xs uppercase px-3 py-2 rounded-lg hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5500]'
             }
           >
             {t.label}
@@ -270,14 +285,24 @@ export function AdminScreen() {
       </div>
 
       {tab === 'overview' && (
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <Stat label="Customers" value={demoMode ? 12 : stats?.users} />
-          <Stat label="Plans" value={demoMode ? 7 : stats?.plans} />
-          <Stat label="Memberships" value={demoMode ? 9 : stats?.memberships} />
+        <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-3">
+          <Stat label="Customers" value={demoMode ? demoRows.users.length : statsLoading ? undefined : stats?.users} />
+          <Stat label="Plans" value={demoMode ? demoRows.plans.length : statsLoading ? undefined : stats?.plans} />
+          <Stat label="Memberships" value={demoMode ? demoRows.memberships.length : statsLoading ? undefined : stats?.memberships} />
         </div>
       )}
       {tab === 'overview' && !demoMode && (
-        <div className={`${card} text-sm text-zinc-300`}>
+        <div className={`${card} mb-4 text-sm text-zinc-300`}>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+            <div>
+              <p className="font-mono text-[10px] uppercase text-zinc-500">Backend status</p>
+              <p className="mt-1 font-semibold text-white">{statsLoading ? 'Checking live data…' : stats ? 'Connected to MW Fitness Neon' : 'Live data needs attention'}</p>
+              <p className="mt-1 text-xs text-zinc-500">Dashboard totals come from the shared database used by the website and mobile app.</p>
+            </div>
+            <button type="button" onClick={() => void loadStats()} disabled={statsLoading} className={`${btnGhost} disabled:cursor-wait disabled:opacity-50`}>
+              {statsLoading ? 'Refreshing…' : 'Refresh totals'}
+            </button>
+          </div>
           <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Quick start</p>
           <ul className="list-disc list-inside space-y-1">
             <li>Create customer accounts in <b>Users → Add customer</b> using a unique temporary password; share it securely.</li>
