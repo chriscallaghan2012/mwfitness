@@ -1,4 +1,4 @@
-// UsersAdmin — customers & coaches: list, edit, create, demo bootstrap.
+// UsersAdmin — customers and coaches backed by Neon Auth and the shared profiles table.
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
