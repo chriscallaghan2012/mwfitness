@@ -12,18 +12,22 @@ import { WorkoutsAdmin } from './WorkoutsAdmin';
 import { CheckinsAdmin, ProgressAdmin } from './ProgressAdmin';
 import { MessagesAdmin } from './MessagesAdmin';
 import { LeadsAdmin } from './LeadsAdmin';
+import { ClientRecordsAdmin } from './ClientRecordsAdmin';
+import { VideosAdmin } from './VideosAdmin';
 import { PasswordRecovery } from './PasswordRecovery';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-type Tab = 'overview' | 'users' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'checkins' | 'progress' | 'messages' | 'leads';
+type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'users', label: 'Users' },
-  { id: 'plans', label: 'Plans' },
+  { id: 'client-records', label: 'Client app data' },
+  { id: 'plans', label: 'Plans & pricing' },
   { id: 'memberships', label: 'Memberships' },
   { id: 'nutrition', label: 'Nutrition' },
   { id: 'workouts', label: 'Workouts' },
+  { id: 'videos', label: 'Videos' },
   { id: 'checkins', label: 'Check-ins' },
   { id: 'progress', label: 'Progress' },
   { id: 'messages', label: 'Messages' },
@@ -39,6 +43,10 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
       { id: 'demo-user-1', name: 'Alex Morgan', email: 'alex@example.test', role: 'athlete', tier: 'Gold' },
       { id: 'demo-user-2', name: 'Jamie Reed', email: 'jamie@example.test', role: 'athlete', tier: 'Online' },
     ],
+  },
+  'client-records': {
+    columns: [{ key: 'client', label: 'Client' }, { key: 'source', label: 'App data' }, { key: 'status', label: 'Status' }],
+    rows: [{ id: 'demo-record-1', client: 'Alex Morgan', source: 'Weekly check-in', status: 'Sample only' }, { id: 'demo-record-2', client: 'Jamie Reed', source: 'Nutrition log', status: 'Sample only' }],
   },
   plans: {
     columns: [{ key: 'name', label: 'Plan' }, { key: 'price', label: 'Price' }, { key: 'kind', label: 'Type' }, { key: 'status', label: 'Status' }],
@@ -58,6 +66,10 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
   workouts: {
     columns: [{ key: 'customer', label: 'Customer' }, { key: 'session', label: 'Session' }, { key: 'date', label: 'Scheduled' }, { key: 'status', label: 'Status' }],
     rows: [{ id: 'demo-workout-1', customer: 'Jamie Reed', session: 'Full body A', date: '30 Sep 2026', status: 'Planned' }],
+  },
+  videos: {
+    columns: [{ key: 'title', label: 'Video' }, { key: 'category', label: 'Category' }, { key: 'duration', label: 'Duration' }, { key: 'status', label: 'Visibility' }],
+    rows: [{ id: 'demo-video-1', title: 'Squat technique basics', category: 'Technique', duration: '04:20', status: 'Hidden · sample only' }, { id: 'demo-video-2', title: 'Warm-up flow', category: 'Warm-up', duration: '03:10', status: 'Visible · sample only' }],
   },
   checkins: {
     columns: [{ key: 'customer', label: 'Customer' }, { key: 'date', label: 'Submitted' }, { key: 'scores', label: 'Wellbeing' }, { key: 'status', label: 'Status' }],
@@ -347,10 +359,12 @@ export function AdminScreen() {
         </div>
       )}
       {!demoMode && tab === 'users' && <UsersAdmin />}
+      {!demoMode && tab === 'client-records' && <ClientRecordsAdmin />}
       {!demoMode && tab === 'plans' && <PlansAdmin />}
       {!demoMode && tab === 'memberships' && <MembershipsAdmin />}
       {!demoMode && tab === 'nutrition' && <NutritionAdmin />}
       {!demoMode && tab === 'workouts' && <WorkoutsAdmin />}
+      {!demoMode && tab === 'videos' && <VideosAdmin />}
       {!demoMode && tab === 'checkins' && <CheckinsAdmin />}
       {!demoMode && tab === 'progress' && <ProgressAdmin />}
       {!demoMode && tab === 'messages' && <MessagesAdmin />}
