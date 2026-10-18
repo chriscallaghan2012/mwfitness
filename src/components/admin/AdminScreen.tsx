@@ -309,6 +309,7 @@ export function AdminScreen() {
               {statsLoading ? 'Refreshing…' : 'Refresh totals'}
             </button>
           </div>
+          {error ? <p role="alert" className="mb-4 border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-300">{error}</p> : null}
           <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Quick start</p>
           <ul className="list-disc list-inside space-y-1">
             <li>Create customer accounts in <b>Users → Add customer</b> using a unique temporary password; share it securely.</li>
