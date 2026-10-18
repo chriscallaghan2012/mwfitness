@@ -20,6 +20,8 @@ export function ClientRecordsAdmin() {
   const [profile, setProfile] = useState<Row | null>(null);
   const [memberships, setMemberships] = useState<Row[]>([]);
   const [nutritionPlans, setNutritionPlans] = useState<Row[]>([]);
+  const [progressPhotos, setProgressPhotos] = useState<Row[]>([]);
+  const [photosMessage, setPhotosMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const [message, setMessage] = useState('');
@@ -59,6 +61,37 @@ export function ClientRecordsAdmin() {
     }).finally(() => { if (!cancelled) setBusy(false); });
     return () => { cancelled = true; };
   }, [userId, dataset, users, refreshTick]);
+
+  useEffect(() => {
+    if (!supabase || !userId) {
+      setProgressPhotos([]);
+      setPhotosMessage('');
+      return;
+    }
+    let cancelled = false;
+    supabase.from('progress_photos')
+      .select('id,recorded_on,caption,mime_type,photo_data,created_at')
+      .eq('profile_id', userId)
+      .order('recorded_on', { ascending: false })
+      .limit(6)
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          setProgressPhotos([]);
+          setPhotosMessage('Progress photo storage is not enabled yet. Apply the reviewed mobile migration before expecting uploaded photos here.');
+        } else {
+          setProgressPhotos((data ?? []) as Row[]);
+          setPhotosMessage('');
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setProgressPhotos([]);
+          setPhotosMessage('Could not load private progress photos. Check staff permissions and database availability.');
+        }
+      });
+    return () => { cancelled = true; };
+  }, [userId, refreshTick]);
 
   const cols = (() => {
     if (dataset === 'checkins') return [
@@ -112,6 +145,31 @@ export function ClientRecordsAdmin() {
             {memberships.length ? <div className="space-y-2">{memberships.map((item) => <div key={String(item.id)} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-800 p-3"><div><p className="text-sm font-medium text-white">{String(item.plans?.name ?? item.plan_id)}</p><p className="text-xs text-zinc-500">{String(item.status)} · {item.current_period_end ? `ends ${ShortDate(String(item.current_period_end))}` : 'no end date recorded'}</p></div><span className="text-sm text-orange-300">{item.plans?.price != null ? `£${Number(item.plans.price).toFixed(2)}` : '—'}</span></div>)}</div> : <p className="text-sm text-zinc-500">No memberships found.</p>}
             <p className="mb-2 mt-5 font-mono text-[10px] uppercase text-zinc-500">Assigned nutrition plans</p>
             {nutritionPlans.length ? nutritionPlans.map((plan) => <div key={String(plan.id)} className="mb-2 rounded-lg border border-zinc-800 p-3"><p className="text-sm font-medium text-white">{String(plan.name)}</p><p className="mt-1 text-xs text-zinc-400">{String((plan.targets as Row)?.calories ?? '—')} kcal · {(plan.targets as Row)?.protein ?? '—'}g protein · {plan.active ? 'Active' : 'Inactive'}</p></div>) : <p className="text-sm text-zinc-500">No nutrition plans assigned.</p>}
+          </div>
+          <div className={card}>
+            <div className="mb-3">
+              <p className="font-mono text-[10px] uppercase text-orange-300">Private progress photos</p>
+              <p className="mt-1 text-xs text-zinc-500">Recent photos uploaded through the mobile daily check-in. Visible to authorised staff only.</p>
+            </div>
+            {photosMessage && <p role="status" className="mb-3 text-xs text-orange-200">{photosMessage}</p>}
+            {progressPhotos.length ? (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                {progressPhotos.map((photo) => (
+                  <figure key={String(photo.id)} className="overflow-hidden rounded-lg border border-zinc-800 bg-black/20">
+                    <img
+                      src={`data:${String(photo.mime_type || 'image/jpeg')};base64,${String(photo.photo_data || '')}`}
+                      alt={String(photo.caption || 'Client progress photo')}
+                      className="aspect-[3/4] w-full object-cover"
+                      loading="lazy"
+                    />
+                    <figcaption className="space-y-1 p-2">
+                      <p className="truncate text-xs text-white">{String(photo.caption || 'Progress photo')}</p>
+                      <p className="text-[10px] text-zinc-500">{ShortDate(String(photo.recorded_on || ''))}</p>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            ) : !photosMessage ? <p className="text-sm text-zinc-500">No progress photos uploaded for this client yet.</p> : null}
           </div>
           <div className={card}>
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
