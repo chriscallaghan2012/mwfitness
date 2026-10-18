@@ -114,7 +114,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
 
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
-      <div className="w-full bg-[#ff5500] text-black font-mono font-bold text-xs uppercase py-2.5 overflow-hidden whitespace-nowrap border-y border-black">
+      <div style={{ marginTop: 0, marginBottom: "1.25rem" }} className="w-full bg-[#ff5500] text-black font-mono font-bold text-xs uppercase py-2.5 overflow-hidden whitespace-nowrap border-y border-black">
         <div className="inline-block animate-[marquee_20s_linear_infinite]">
           <span className="mx-4">● 1-2-1 PERSONAL TRAINING</span>
           <span className="mx-4">● ONLINE COACHING</span>
