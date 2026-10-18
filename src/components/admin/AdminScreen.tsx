@@ -280,14 +280,14 @@ export function AdminScreen() {
         <div className={`${card} text-sm text-zinc-300`}>
           <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Quick start</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Boot demo customers: <b>Users → Add demo customers</b> (creates sign-in accounts + profiles).</li>
+            <li>Create customer accounts in <b>Users → Add customer</b> using a unique temporary password; share it securely.</li>
             <li>Edit a customer's role, tier and weights: <b>Users → Edit</b>.</li>
             <li>Assign a plan: <b>Memberships</b>.</li>
             <li>Next, give the customer a diet: <b>Nutrition → Meal templates → assign</b>.</li>
             <li>Schedule sessions: <b>Workouts</b>; review check-ins: <b>Check-ins</b>; log weigh-ins: <b>Progress</b>.</li>
           </ul>
           <p className="mt-3 text-zinc-500">
-            The mobile app reads all of this from the same database (sign in as the customer in Expo Go to see it live).
+            The mobile app reads all of this from the same Neon database after the customer signs in.
           </p>
         </div>
       )}
