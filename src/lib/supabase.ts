@@ -12,6 +12,9 @@ export const neon = isNeonConfigured
       auth: {
         adapter: SupabaseAuthAdapter(),
         url: authUrl,
+        // Public pages (including pricing) must be able to query public Neon rows
+        // before a visitor signs in. Database grants/RLS still govern what is readable.
+        allowAnonymous: true,
       },
       dataApi: {
         url: dataApiUrl,
