@@ -62,3 +62,75 @@ Creating and editing a profile is not the same as deleting the Neon Auth identit
 3. Add video upload/storage (rather than only external URLs), assignment/tagging by programme, and playback links.
 4. Review role permissions and RLS against a real coach account before using live customer records.
 5. Keep app integration disabled until the website and database path are verified; the current app dummy data stays untouched.
+
+
+## Online coaching programmes migration (draft only)
+
+The Staff HQ programme builder expects two new tables. Keep this migration in review until it has been tested against a disposable Neon branch and aligned with the companion app schema. Do not apply it to the shared production database as part of the scaffold.
+
+```sql
+create table if not exists public.coaching_programmes (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  duration_weeks integer not null check (duration_weeks between 1 and 104),
+  days_per_week integer not null check (days_per_week between 1 and 7),
+  level text not null default 'All levels',
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists coaching_programmes_active_idx
+  on public.coaching_programmes(active, name);
+
+alter table public.coaching_programmes enable row level security;
+
+create policy "active coaching programmes readable by signed-in clients"
+  on public.coaching_programmes for select to authenticated
+  using (active = true or public.is_admin());
+
+create policy "staff can manage coaching programmes"
+  on public.coaching_programmes for all to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+create trigger coaching_programmes_set_updated_at
+  before update on public.coaching_programmes
+  for each row execute function public.set_updated_at();
+
+create table if not exists public.coaching_programme_assignments (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  programme_id uuid not null references public.coaching_programmes(id) on delete restrict,
+  starts_on date not null default current_date,
+  status text not null default 'active'
+    check (status in ('active', 'completed', 'paused', 'cancelled')),
+  coach_notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists coaching_programme_assignments_profile_idx
+  on public.coaching_programme_assignments(profile_id, starts_on desc);
+
+alter table public.coaching_programme_assignments enable row level security;
+
+create policy "clients can view their own programme assignments"
+  on public.coaching_programme_assignments for select to authenticated
+  using (auth.uid() = profile_id or public.is_admin());
+
+create policy "staff can manage programme assignments"
+  on public.coaching_programme_assignments for all to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+create trigger coaching_programme_assignments_set_updated_at
+  before update on public.coaching_programme_assignments
+  for each row execute function public.set_updated_at();
+
+grant select on public.coaching_programmes, public.coaching_programme_assignments to authenticated;
+grant insert, update, delete on public.coaching_programmes, public.coaching_programme_assignments to authenticated;
+```
+
+This first version stores programme metadata and assignments only. Detailed week-by-week exercise prescriptions, progression rules and in-app presentation need a separate reviewed schema and app implementation; this scaffold does not claim those are wired to the Android app.
