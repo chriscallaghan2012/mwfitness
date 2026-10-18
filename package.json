@@ -37,5 +37,5 @@
     "typescript": "~5.8.2",
     "vite": "^6.2.3"
   },
-  "description": "MW Fitness website with shared Neon Auth and Postgres backend."
+  "description": "MW Fitness React/Vite website backed by Neon Auth and Neon Postgres."
 }
