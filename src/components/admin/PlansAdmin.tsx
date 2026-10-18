@@ -14,7 +14,8 @@ export function PlansAdmin() {
 
   const load = async () => {
     const { data, error } = await supabase!.from('plans').select('*').order('price');
-    if (!error && data) setPlans(data as Row[]);
+    if (error) { setMsg(`Could not load packages and pricing: ${error.message}`); return; }
+    setPlans((data ?? []) as Row[]);
   };
   useEffect(() => {
     void load();
@@ -26,14 +27,20 @@ export function PlansAdmin() {
   };
 
   const save = async () => {
+    const price = Number(f.price);
+    const originalPrice = f.original_price ? Number(f.original_price) : null;
+    if (!f.id?.trim() || !/^[a-z0-9][a-z0-9-]*$/.test(f.id.trim())) { setMsg('Plan ID must use lowercase letters, numbers and hyphens.'); return; }
+    if (!f.name?.trim()) { setMsg('Enter a package name.'); return; }
+    if (!f.price.trim() || !Number.isFinite(price) || price < 0) { setMsg('Enter a valid non-negative price.'); return; }
+    if (originalPrice !== null && (!Number.isFinite(originalPrice) || originalPrice < 0)) { setMsg('Original price must be a valid non-negative amount.'); return; }
     setBusy(true);
     setMsg('');
     const body: Record<string, unknown> = {
-      id: f.id?.trim(),
-      name: f.name,
-      tag: f.tag ?? '',
-      price: Number(f.price || 0),
-      original_price: f.original_price ? Number(f.original_price) : null,
+      id: f.id.trim(),
+      name: f.name.trim(),
+      tag: f.tag?.trim() || null,
+      price,
+      original_price: originalPrice,
       badge: f.badge ?? null,
       is_popular: f.is_popular === 'true',
       description: f.description ?? '',
@@ -42,22 +49,35 @@ export function PlansAdmin() {
       active: f.active === 'true',
     };
     try {
-      body['features'] = JSON.parse(f.features || '[]');
-    } catch {
-      setMsg('Features must be valid JSON (array of strings).');
+      const features = JSON.parse(f.features || '[]');
+      if (!Array.isArray(features) || features.some((item) => typeof item !== 'string')) throw new Error('Features must be an array of text values.');
+      body.features = features;
+    } catch (error) {
+      setMsg(error instanceof Error ? error.message : 'Features must be valid JSON (array of strings).');
       setBusy(false);
       return;
     }
     const { error } = edit?.id ? await supabase!.from('plans').update(body).eq('id', edit.id) : await supabase!.from('plans').insert(body);
-    setMsg(error ? `Failed: ${error.message}` : 'Saved ✓');
+    setMsg(error ? `Save failed: ${error.message}` : 'Package saved.');
     setBusy(false);
-    setEdit(null);
+    if (!error) { setEdit(null); await load(); }
+  };
+
+  const remove = async (p: Row) => {
+    if (!window.confirm(`Delete plan “${String(p.name)}”? Plans assigned to memberships may be protected by database constraints; hide the plan instead if it is already in use.`)) return;
+    setBusy(true);
+    const { error } = await supabase!.from('plans').delete().eq('id', p.id);
+    setBusy(false);
+    setMsg(error ? `Delete failed: ${error.message}` : 'Plan deleted.');
     await load();
   };
 
   const toggle = async (p: Row) => {
-    await supabase!.from('plans').update({ active: !p.active }).eq('id', p.id);
-    await load();
+    setBusy(true);
+    const { error } = await supabase!.from('plans').update({ active: !p.active }).eq('id', p.id);
+    setBusy(false);
+    setMsg(error ? `Could not update visibility: ${error.message}` : `${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);
+    if (!error) await load();
   };
 
   return (
@@ -75,6 +95,7 @@ export function PlansAdmin() {
       <AdminTable
         rows={plans ?? []}
         empty="No plans yet."
+        onDelete={remove}
         onEdit={(p) => {
           setEdit(p);
           setF({
@@ -128,7 +149,9 @@ export function PlansAdmin() {
               ))}
             </select>
           </div>
+          <input className={`${inp} mt-2`} placeholder="short tag / subtitle" value={f.tag ?? ''} onChange={(e) => setF({ ...f, tag: e.target.value })} />
           <input className={`${inp} mt-2`} placeholder="description" value={f.description ?? ''} onChange={(e) => setF({ ...f, description: e.target.value })} />
+          <input className={`${inp} mt-2`} placeholder="button text (e.g. Start coaching)" value={f.cta_text ?? ''} onChange={(e) => setF({ ...f, cta_text: e.target.value })} />
           <textarea
             className={`${inp} mt-2 min-h-20`}
             placeholder={'features (JSON array, e.g. ["4 sessions", "plan tracked"])'}

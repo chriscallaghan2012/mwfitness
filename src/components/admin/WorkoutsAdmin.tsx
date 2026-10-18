@@ -19,23 +19,24 @@ export function WorkoutsAdmin() {
     void supabase!.from('profiles').select('id,full_name').order('full_name').then((r) => !r.error && setUsers(r.data as Row[]));
     void supabase!.from('plans').select('id,name').order('name').then((r) => !r.error && setPlans(r.data as Row[]));
   };
-  const loadSessions = async () => {
-    if (!userId) {
-      setSessions(null);
-      return;
-    }
-    const { data, error } = await supabase!.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', userId).order('scheduled_on');
-    if (!error && data) setSessions(data as Row[]);
+  const loadSessions = async (profileId = userId) => {
+    if (!profileId) { setSessions(null); return; }
+    const { data, error } = await supabase!.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', profileId).order('scheduled_on');
+    if (error) { setMsg(`Could not load sessions: ${error.message}`); return; }
+    setSessions((data ?? []) as Row[]);
   };
   useEffect(() => {
     void load();
   }, []);
 
   const addTemplate = async () => {
+    if (!form.name?.trim()) { setMsg('Enter a workout template name.'); return; }
+    const days = Number(form.days_per_week || 0);
+    if (days && (!Number.isInteger(days) || days < 1 || days > 7)) { setMsg('Days per week must be between 1 and 7.'); return; }
     const { error } = await supabase!.from('workout_templates').insert({
       name: form.name,
       description: form.description ?? '',
-      days_per_week: Number(form.days_per_week || 0),
+      days_per_week: days || null,
       plan_id: form.plan_id || null,
     });
     setMsg(error ? `Failed: ${error.message}` : 'Added ✓');
@@ -43,13 +44,15 @@ export function WorkoutsAdmin() {
     await load();
   };
 
-  const removeTemplate = async (id: string) => {
-    await supabase!.from('workout_templates').delete().eq('id', id);
-    await load();
+  const removeTemplate = async (row: Row) => {
+    if (!window.confirm(`Delete workout template “${String(row.name)}”? Scheduled sessions may prevent deletion.`)) return;
+    const { error } = await supabase!.from('workout_templates').delete().eq('id', row.id);
+    setMsg(error ? `Delete failed: ${error.message}` : 'Template deleted.');
+    if (!error) await load();
   };
 
   const addSession = async () => {
-    if (!userId || !sessForm.template_id) return;
+    if (!userId || !sessForm.template_id) { setMsg('Choose a client and workout template first.'); return; }
     const { error } = await supabase!.from('workout_sessions').insert({
       profile_id: userId,
       template_id: sessForm.template_id,
@@ -63,8 +66,9 @@ export function WorkoutsAdmin() {
 
   const flipStatus = async (s: Row) => {
     const status = s.status === 'completed' ? 'planned' : 'completed';
-    await supabase!.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id);
-    await loadSessions();
+    const { error } = await supabase!.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id);
+    setMsg(error ? `Could not update session: ${error.message}` : `Session marked ${status}.`);
+    if (!error) await loadSessions();
   };
 
   return (
@@ -97,12 +101,12 @@ export function WorkoutsAdmin() {
           { key: 'name', label: 'Name', render: (r) => <span className="font-medium text-white">{r.name}</span> },
           { key: 'description', label: 'Description', render: (r) => <span className="text-zinc-400">{r.description}</span> },
           { key: 'days_per_week', label: 'Days' },
-          { key: 'xd', label: '', render: (r) => <button className={btnGhost} onClick={() => void removeTemplate(String(r.id))}>Delete</button> },
+          { key: 'xd', label: '', render: (r) => <button className={btnGhost} onClick={() => void removeTemplate(r)}>Delete</button> },
         ]}
       />
       <div className={`${card} mt-4`}>
         <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Schedule sessions for a customer</p>
-        <select className={inp} value={userId} onChange={(e) => { setUserId(e.target.value); void loadSessions(); }}>
+        <select className={inp} value={userId} onChange={(e) => { setUserId(e.target.value); void loadSessions(e.target.value); }}>
           <option value="">Customer…</option>
           {users.map((u) => (
             <option key={u.id} value={u.id}>

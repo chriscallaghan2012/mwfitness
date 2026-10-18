@@ -15,7 +15,8 @@ export function UsersAdmin() {
 
   const load = async () => {
     const { data, error } = await supabase!.from('profiles').select('*').order('created_at');
-    if (!error && data) setUsers(data as Row[]);
+    if (error) { setMsg(`Could not load users: ${error.message}`); return; }
+    setUsers((data ?? []) as Row[]);
   };
   useEffect(() => {
     void load();
@@ -25,11 +26,27 @@ export function UsersAdmin() {
     if (!edit) return;
     setBusy(true);
     setMsg('');
-    const { error } = await supabase!.from('profiles').update(f).eq('id', edit.id);
-    setMsg(error ? `Failed: ${error.message}` : 'Saved ✓');
+    const numericFields = ['current_weight', 'start_weight', 'goal_weight'];
+    const payload: Record<string, unknown> = { ...f };
+    for (const field of numericFields) {
+      const value = f[field]?.trim();
+      if (!value) payload[field] = null;
+      else if (!Number.isFinite(Number(value)) || Number(value) < 0 || Number(value) > 999) {
+        setMsg(`${field.replaceAll('_', ' ')} must be a valid weight between 0 and 999 kg.`);
+        setBusy(false);
+        return;
+      } else payload[field] = Number(value);
+    }
+    if (!String(f.full_name ?? '').trim()) {
+      setMsg('Client name cannot be blank.');
+      setBusy(false);
+      return;
+    }
+    payload.full_name = String(f.full_name).trim();
+    const { error } = await supabase!.from('profiles').update(payload).eq('id', edit.id);
+    setMsg(error ? `Save failed: ${error.message}` : 'Client profile saved.');
     setBusy(false);
-    setEdit(null);
-    await load();
+    if (!error) { setEdit(null); await load(); }
   };
 
   const addCustomer = async () => {
