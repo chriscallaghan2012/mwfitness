@@ -12,12 +12,18 @@ import { PackagesScreen } from './components/screens/PackagesScreen';
 import { AppScreen } from './components/screens/AppScreen';
 import { ShwagScreen } from './components/screens/ShwagScreen';
 import { ContactScreen } from './components/screens/ContactScreen';
+import { PrivacyScreen } from './components/screens/PrivacyScreen';
+import { AccountDeletionScreen } from './components/screens/AccountDeletionScreen';
 import { AdminScreen } from './components/admin/AdminScreen';
 
-const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app', 'shwag', 'contact', 'admin'];
+const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app', 'shwag', 'contact', 'admin', 'privacy', 'delete-account'];
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
+  const [currentScreen, setCurrentScreen] = useState<ScreenId>(() => {
+    if (window.location.pathname === '/privacy') return 'privacy';
+    if (window.location.pathname === '/delete-account') return 'delete-account';
+    return 'home';
+  });
   const [bookCallOpen, setBookCallOpen] = useState(false);
   const [bookCallInterest, setBookCallInterest] = useState('');
   const [showMobileCta, setShowMobileCta] = useState(false);
@@ -35,6 +41,14 @@ export default function App() {
   // Handle URL hash navigation if needed
   useEffect(() => {
     const handleHash = () => {
+      if (window.location.pathname === '/privacy') {
+        setCurrentScreen('privacy');
+        return;
+      }
+      if (window.location.pathname === '/delete-account') {
+        setCurrentScreen('delete-account');
+        return;
+      }
       const hash = window.location.hash.replace('#', '') as ScreenId;
       if (VALID_SCREENS.includes(hash)) setCurrentScreen(hash);
     };
@@ -84,6 +98,8 @@ export default function App() {
           <ContactScreen onOpenBookCall={handleOpenBookCall} />
         )}
         {currentScreen === 'admin' && <AdminScreen />}
+        {currentScreen === 'privacy' && <PrivacyScreen onBack={() => { window.location.href = '/'; }} />}
+        {currentScreen === 'delete-account' && <AccountDeletionScreen onBack={() => { window.location.href = '/'; }} />}
       </main>
 
       {/* Footer */}
