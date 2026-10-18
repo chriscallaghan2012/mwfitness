@@ -1,0 +1,35 @@
+name: MW Fitness Neon verification
+
+on:
+  push:
+    branches:
+      - chore/neon-shared-backend
+    paths:
+      - "src/**"
+      - "api/**"
+      - "server.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.config.*"
+      - ".github/workflows/verify-neon.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/neon-shared-backend
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install
+      - name: TypeScript check
+        run: npm run lint
+      - name: Production build
+        run: npm run build
