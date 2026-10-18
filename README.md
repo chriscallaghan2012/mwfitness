@@ -83,6 +83,6 @@ DATABASE_URL=<server-only pooled Neon PostgreSQL connection string>
 
 Only the two `VITE_NEON_*` endpoint URLs are browser-visible. Keep `DATABASE_URL` server-only and never prefix it with `VITE_`.
 
-The shared schema and ordered migration files are maintained in `MW-FITNESS-APP-MOBILE/neon/migrations/`. The production Neon branch currently has migrations 0001–0004 applied. The push endpoint authenticates using the caller's Neon JWT and relies on PostgreSQL row-level security; it does not require a Supabase service-role key.
+The shared schema and ordered migration files are maintained in `MW-FITNESS-APP-MOBILE/neon/migrations/`. The production Neon branch currently has migrations 0001–0004 applied. The push endpoint authenticates using the caller's Neon JWT and relies on PostgreSQL row-level security; it does not require a privileged database key.
 
 The first coach/admin must be created in Neon Auth and promoted to `admin` in `public.profiles` by an authorized database administrator. Do not use sample credentials for real accounts.
