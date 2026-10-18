@@ -3,17 +3,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
-const DEMO_USERS: [string, string, string][] = [
-  ['Christopher Vance', 'athlete@mwfitness.co.uk', 'athlete'],
-  ['Sarah Jenkins', 'sarah.jenkins@londonfit.co.uk', 'athlete'],
-  ['Marcus Sterling', 'marcus.sterling@ukpower.org', 'athlete'],
-  ['Elena Rostova', 'elena.r@vitality.io', 'athlete'],
-  ['Tom Bradley', 'tom.bradley@techcorp.co.uk', 'athlete'],
-  ['Coach Mike', 'coach.mike@mwfitness.co.uk', 'coach'],
-];
-const DEMO_PASS = 'password123';
-const DEMO_COACH_PASS = 'coachhq2024';
-
 export function UsersAdmin() {
   const [users, setUsers] = useState<Row[] | null>(null);
   const [msg, setMsg] = useState('');
@@ -21,6 +10,7 @@ export function UsersAdmin() {
   const [edit, setEdit] = useState<Row | null>(null);
   const [f, setF] = useState<Record<string, string>>({});
   const [email, setEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [addOpen, setAddOpen] = useState(false);
 
   const load = async () => {
@@ -43,54 +33,30 @@ export function UsersAdmin() {
   };
 
   const addCustomer = async () => {
-    if (!email) return;
+    if (!email.trim() || newPassword.length < 12) {
+      setMsg('Enter an email and a temporary password of at least 12 characters.');
+      return;
+    }
     setBusy(true);
     setMsg('Creating…');
     const { error } = await supabase!.auth.signUp({
       email: email.trim(),
-      password: DEMO_PASS,
+      password: newPassword,
       options: { data: { full_name: email.trim().split('@')[0] } },
     });
-    setMsg(error ? `Failed: ${error.message}` : `Created ${email.trim()} (temp password: ${DEMO_PASS}) — edit their profile next`);
+    setMsg(error ? `Failed: ${error.message}` : `Created ${email.trim()}. Share the temporary password securely and ask them to change it when account settings are available.`);
     setBusy(false);
     setAddOpen(false);
+    setEmail('');
+    setNewPassword('');
     await load();
   };
 
-  const addDemo = async () => {
-    setBusy(true);
-    setMsg('Booting demo customers…');
-    let ok = 0;
-    for (const [name, mail, role] of DEMO_USERS) {
-      const { data, error } = await supabase!.auth.signUp({
-        email: mail,
-        password: role === 'coach' ? DEMO_COACH_PASS : DEMO_PASS,
-        options: { data: { full_name: name } },
-      });
-      if (error || !data.user) continue;
-      const { error: upErr } = await supabase!
-        .from('profiles')
-        .update({
-          full_name: name,
-          role,
-          member_tier: role === 'coach' ? 'Staff' : 'MW Elite Performance Member',
-          coach_name: 'Coach Mike (Lead Strength Specialist)',
-          coach_role: 'Lead Strength Specialist',
-        })
-        .eq('id', data.user.id as string);
-      if (!upErr) ok += 1;
-    }
-    setMsg(`${ok} demo customer(s) ready — coach sign-in: coach.mike@mwfitness.co.uk / ${DEMO_COACH_PASS}`);
-    setBusy(false);
-    await load();
-  };
+
 
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <button disabled={busy} onClick={addDemo} className={btn}>
-          + Add demo customers
-        </button>
         <button onClick={() => setAddOpen(!addOpen)} className={btnGhost}>
           + Add customer
         </button>
@@ -104,15 +70,16 @@ export function UsersAdmin() {
         <div className={`${card} mb-4`}>
           <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">New customer sign-in</p>
           <input className={inp} placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input className={`${inp} mt-2`} type="password" placeholder="Temporary password (12+ characters)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} autoComplete="new-password" />
           <button disabled={busy} onClick={addCustomer} className={`${btn} mt-3`}>
-            Create account (temp password {DEMO_PASS})
+            Create account
           </button>
         </div>
       )}
 
       <AdminTable
         rows={users ?? []}
-        empty="No customers yet — hit “Add demo customers” to bootstrap."
+        empty="No customers yet — create the first account in Neon Auth, then refresh."
         onEdit={(u) => {
           setEdit(u);
           setF({
