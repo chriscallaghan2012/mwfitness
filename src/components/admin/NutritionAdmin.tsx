@@ -19,22 +19,32 @@ export function NutritionAdmin() {
 
   const loadTemplates = async () => {
     const { data, error } = await supabase!.from('nutrition_templates').select('*').order('name');
-    if (!error && data) setTemplates(data as Row[]);
+    if (error) { setMsg(`Could not load meal templates: ${error.message}`); return; }
+    const next = (data ?? []) as Row[];
+    setTemplates(next);
+    if (mode === 'templates') setRows(next);
   };
   const loadPlans = async () => {
     if (!userId) {
       setRows([]);
       return;
     }
-    const { data, error } = await supabase!.from('nutrition_plans').select('*').eq('profile_id', userId);
-    if (!error && data) setRows(data as Row[]);
+    const { data, error } = await supabase!.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
+    if (error) { setMsg(`Could not load this client's nutrition plans: ${error.message}`); setRows([]); return; }
+    setRows((data ?? []) as Row[]);
   };
   useEffect(() => {
     void loadTemplates();
     void supabase!.from('profiles').select('id,full_name,email').order('full_name').then((r) => {
-      if (!r.error) setUsers(r.data as Row[]);
+      if (!r.error) setUsers((r.data ?? []) as Row[]);
+      else setMsg(`Could not load clients: ${r.error.message}`);
     });
   }, []);
+
+  useEffect(() => {
+    if (mode === 'templates') void loadTemplates();
+    else void loadPlans();
+  }, [mode, userId]);
 
   const saveRow = async () => {
     setBusy(true);
@@ -49,7 +59,22 @@ export function NutritionAdmin() {
       setBusy(false);
       return;
     }
-    const body: Record<string, unknown> = { name: f.name, description: f.description ?? null, targets, sections, active: f.active === 'true' };
+    if (!f.name?.trim()) {
+      setMsg('Enter a name for this nutrition item.');
+      setBusy(false);
+      return;
+    }
+    if (mode === 'plans' && !userId) {
+      setMsg('Choose a client before saving a client nutrition plan.');
+      setBusy(false);
+      return;
+    }
+    if (!targets || typeof targets !== 'object' || Array.isArray(targets) || !Array.isArray(sections)) {
+      setMsg('Targets must be a JSON object and sections must be a JSON array.');
+      setBusy(false);
+      return;
+    }
+    const body: Record<string, unknown> = { name: f.name.trim(), description: f.description?.trim() || null, targets, sections, active: f.active === 'true' };
     if (mode === 'plans') body.profile_id = userId;
     const { error } = edit && edit.id
       ? await supabase!.from(schema()).update(body).eq('id', edit.id)
@@ -57,12 +82,17 @@ export function NutritionAdmin() {
     setMsg(error ? `Failed: ${error.message}` : 'Saved ✓');
     setBusy(false);
     setEdit(null);
-    mode === 'templates' ? await loadTemplates() : await loadPlans();
+    if (!error) mode === 'templates' ? await loadTemplates() : await loadPlans();
   };
 
-  const removeRow = async (id: string) => {
-    await supabase!.from(schema()).delete().eq('id', id);
-    mode === 'templates' ? await loadTemplates() : await loadPlans();
+  const removeRow = async (row: Row) => {
+    if (!window.confirm(`Delete “${String(row.name)}”? This cannot be undone.`)) return;
+    setBusy(true);
+    setMsg('');
+    const { error } = await supabase!.from(schema()).delete().eq('id', row.id);
+    setBusy(false);
+    setMsg(error ? `Delete failed: ${error.message}` : 'Deleted.');
+    if (!error) mode === 'templates' ? await loadTemplates() : await loadPlans();
   };
 
   const assignTemplate = async () => {
@@ -90,7 +120,7 @@ export function NutritionAdmin() {
     <div>
       <div className="flex gap-2 mb-4">
         {(['templates', 'plans'] as const).map((m) => (
-          <button key={m} onClick={() => setMode(m)} className={m === mode ? btn : btnGhost}>
+          <button key={m} onClick={() => { setEdit(null); setMode(m); }} className={m === mode ? btn : btnGhost}>
             {m === 'templates' ? 'Meal templates' : 'Client plans'}
           </button>
         ))}
@@ -98,7 +128,7 @@ export function NutritionAdmin() {
       {msg && <p className="text-xs text-zinc-400 mb-2">{msg}</p>}
       {mode === 'plans' && (
         <div className="flex flex-wrap items-end gap-3 mb-4">
-          <select className={inp} value={userId} onChange={(e) => setUserId(e.target.value)}>
+          <select className={inp} value={userId} onChange={(e) => { setEdit(null); setUserId(e.target.value); }}>
             <option value="">Customer…</option>
             {users.map((u) => (
               <option key={u.id} value={u.id}>
@@ -136,7 +166,7 @@ export function NutritionAdmin() {
           { key: 'name', label: 'Name', render: (r) => <span className="font-medium text-white">{r.name}</span> },
           { key: 'targets', label: 'Targets', render: (r) => <span className="text-zinc-400 font-mono text-[11px]">{(r.targets as Row)?.calories ?? 0} kcal · {(r.targets as Row)?.protein ?? 0}g P</span> },
           { key: 'active', label: 'Active', render: (r) => StatusPill(r.active ? 'active' : 'canceled') },
-          { key: 'del', label: '', render: (r) => <button className={btnGhost} onClick={() => void removeRow(String(r.id))}>Delete</button> },
+          { key: 'del', label: '', render: (r) => <button disabled={busy} className={btnGhost} onClick={() => void removeRow(r)}>Delete</button> },
         ]}
       />
       <button
