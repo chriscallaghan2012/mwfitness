@@ -101,3 +101,15 @@ a {
     scroll-behavior: auto !important;
   }
 }
+
+/* Keep the homepage ticker tight against the hero and following section. */
+.home-ticker {
+  margin-top: 0 !important;
+  margin-bottom: -2.75rem !important;
+}
+
+@media (min-width: 768px) {
+  .home-ticker {
+    margin-bottom: -4.75rem !important;
+  }
+}
