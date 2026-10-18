@@ -11,9 +11,10 @@ import { NutritionAdmin } from './NutritionAdmin';
 import { WorkoutsAdmin } from './WorkoutsAdmin';
 import { CheckinsAdmin, ProgressAdmin } from './ProgressAdmin';
 import { MessagesAdmin } from './MessagesAdmin';
+import { LeadsAdmin } from './LeadsAdmin';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-type Tab = 'overview' | 'users' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'checkins' | 'progress' | 'messages';
+type Tab = 'overview' | 'users' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'checkins' | 'progress' | 'messages' | 'leads';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -25,6 +26,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'checkins', label: 'Check-ins' },
   { id: 'progress', label: 'Progress' },
   { id: 'messages', label: 'Messages' },
+  { id: 'leads', label: 'Website leads' },
 ];
 
 type DemoTab = Exclude<Tab, 'overview'>;
@@ -67,6 +69,10 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
   messages: {
     columns: [{ key: 'customer', label: 'Athlete' }, { key: 'from', label: 'From' }, { key: 'message', label: 'Message' }, { key: 'status', label: 'Push status' }],
     rows: [{ id: 'demo-message-1', customer: 'Alex Morgan', from: 'Coach', message: 'Great work staying consistent this week.', status: 'Sample only' }],
+  },
+  leads: {
+    columns: [{ key: 'name', label: 'Name' }, { key: 'email', label: 'Email' }, { key: 'interest', label: 'Interested in' }, { key: 'status', label: 'Status' }],
+    rows: [{ id: 'demo-lead-1', name: 'Sample visitor', email: 'sample@example.test', interest: 'Free consultation', status: 'New · sample only' }],
   },
 };
 
@@ -338,6 +344,7 @@ export function AdminScreen() {
       {!demoMode && tab === 'checkins' && <CheckinsAdmin />}
       {!demoMode && tab === 'progress' && <ProgressAdmin />}
       {!demoMode && tab === 'messages' && <MessagesAdmin />}
+      {!demoMode && tab === 'leads' && <LeadsAdmin />}
       {demoEditorOpen && demoMode && tab !== 'overview' ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/75 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDemoEditorOpen(false); }}>
           <form onSubmit={saveDemoRow} role="dialog" aria-modal="true" aria-labelledby="demo-editor-title" className="my-auto max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl border border-zinc-700 bg-[#121315] p-5 shadow-2xl">
