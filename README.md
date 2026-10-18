@@ -1,6 +1,6 @@
 # MWFitnessUK — website
 
-Friendly personal training &amp; online coaching site for Michael Whitworth. React + Vite + Tailwind v4, with a Nodemailer-based contact/email backend.
+Friendly personal training &amp; online coaching site for Michael Whitworth. React + Vite + Tailwind v4, with a shared Neon backend for staff management, pricing and website enquiries.
 
 ## Pages
 
@@ -24,13 +24,15 @@ npm run server
 npm run dev
 ```
 
-Without SMTP details in `.env`, forms validate and show a clear "not configured" message instead of sending — add the details and they'll deliver.
+The local API needs the dedicated MW Fitness `DATABASE_URL` to save enquiries. SMTP is an optional notification channel: if SMTP is unavailable, a successfully saved enquiry still appears in the staff inbox.
 
 ## Email backend
 
-Every contact CTA on the site (navbar, hero, packages, app waitlist, SHWAG orders) opens one contact form that POSTs the **real submitted data** to `/api/send-mail`, which emails an on-brand HTML template to you.
+Every contact CTA on the site (navbar, hero, packages, app waitlist, SHWAG orders) posts the **real submitted data** to `/api/send-mail`. The server validates it and saves the enquiry to `public.website_leads` in the dedicated MW Fitness Neon database before attempting the on-brand email notification. Leads can then be reviewed and moved through new, contacted, qualified, converted or closed in **Staff login → Website leads**. Email is an alert, not the source of truth.
 
 - `api/_templates.mjs` — the email templates (edit here to change what lands in your inbox)
+- `api/_leads.mjs` — server-only Neon persistence for contact forms
+- `src/components/admin/LeadsAdmin.tsx` — staff inbox for live enquiries
 - `api/_mailer.mjs` — validation + Nodemailer transport (SMTP via env)
 - `api/send-mail.mjs` — Vercel serverless function (used on production)
 - `server.mjs` — local Express server exposing the same endpoint (also serves `dist/` on :8787)
@@ -50,7 +52,7 @@ MAIL_TO=mikeptonline@gmail.com        # where enquiries are delivered
 ## Deploy (Vercel)
 
 The `dist/` folder is the static site and `api/` is auto-detected as serverless functions.
-Add `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables.
+Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables. The website's Neon migration `0005_website_leads.sql` is maintained in the companion mobile repository and applied to the dedicated MW Fitness database.
 
 ### Stripe checkout
 
