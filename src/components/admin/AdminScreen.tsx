@@ -1,6 +1,6 @@
 // AdminScreen — MWFitnessUK staff HQ. Sign-in + management for customers,
 // plans, memberships, nutrition, workouts, check-ins and progress.
-// Same shared Supabase project as the mobile app.
+// Same shared Neon project as the mobile app.
 import { FormEvent, useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -128,7 +128,7 @@ export function AdminScreen() {
     e.preventDefault();
     setError(null);
     if (!supabase) {
-      setError('Live sign-in is unavailable until the website Supabase settings are configured.');
+      setError('Live sign-in is unavailable until the website Neon settings are configured.');
       return;
     }
     setLoading(true);
@@ -297,7 +297,7 @@ export function AdminScreen() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="font-mono text-[10px] uppercase text-orange-300">{TABS.find((item) => item.id === tab)?.label} · sample records</p>
-              <p className="mt-1 text-xs text-zinc-500">Edits are simulated locally and never reach Supabase.</p>
+              <p className="mt-1 text-xs text-zinc-500">Edits are simulated locally and never reach Neon.</p>
             </div>
             <button type="button" onClick={() => openDemoEditor()} className={btn}><Plus className="h-4 w-4" aria-hidden="true" /> Add sample</button>
           </div>
