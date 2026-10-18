@@ -55,6 +55,15 @@ export function PlansAdmin() {
     await load();
   };
 
+  const remove = async (p: Row) => {
+    if (!window.confirm(`Delete plan “${String(p.name)}”? Plans assigned to memberships may be protected by database constraints; hide the plan instead if it is already in use.`)) return;
+    setBusy(true);
+    const { error } = await supabase!.from('plans').delete().eq('id', p.id);
+    setBusy(false);
+    setMsg(error ? `Delete failed: ${error.message}` : 'Plan deleted.');
+    await load();
+  };
+
   const toggle = async (p: Row) => {
     await supabase!.from('plans').update({ active: !p.active }).eq('id', p.id);
     await load();
@@ -75,6 +84,7 @@ export function PlansAdmin() {
       <AdminTable
         rows={plans ?? []}
         empty="No plans yet."
+        onDelete={remove}
         onEdit={(p) => {
           setEdit(p);
           setF({
