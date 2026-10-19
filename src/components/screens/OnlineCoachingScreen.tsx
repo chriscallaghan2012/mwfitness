@@ -65,6 +65,8 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
         </div>
       </section>
 
+      <div className="industrial-stripe" aria-hidden="true" />
+
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10">
           <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT YOU GET ]</div>
