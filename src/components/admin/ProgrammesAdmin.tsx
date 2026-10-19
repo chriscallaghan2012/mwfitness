@@ -110,7 +110,7 @@ export function ProgrammesAdmin() {
     <div className="space-y-4">
       <div className={card}>
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div><p className="font-mono text-[10px] uppercase text-orange-300">Online coaching</p><h2 className="mt-1 text-lg font-semibold text-white">Programme builder</h2><p className="mt-1 max-w-2xl text-sm text-zinc-400">Create a time-bound training programme, then assign it to a client with a start date. This catalogue is separate from the current app dummy content.</p></div>
+          <div><p className="font-mono text-[10px] uppercase text-orange-300">Online coaching</p><h2 className="mt-1 text-lg font-semibold text-white">Programme builder</h2><p className="mt-1 max-w-2xl text-sm text-zinc-400">Create a time-bound training programme and assign it to a client. The member app is prepared to read active assignments, but live programme sync requires the reviewed coaching-programme migration and permissions.</p></div>
           <button className={btn} onClick={openNew} disabled={schemaMissing}>+ New programme</button>
         </div>
         {message && <p role="status" className="mt-4 rounded-lg border border-zinc-800 bg-black/20 p-3 text-xs text-orange-200">{message}</p>}
