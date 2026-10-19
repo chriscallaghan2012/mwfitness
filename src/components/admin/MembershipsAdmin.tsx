@@ -14,35 +14,55 @@ export function MembershipsAdmin() {
   const [form, setForm] = useState<Record<string, string>>({});
 
   const load = async () => {
-    const { data, error } = await supabase!.from('memberships').select('*, profiles(full_name,email), plans(name)').order('created_at', { ascending: false });
-    if (!error && data) setRows(data as Row[]);
-    const u = await supabase!.from('profiles').select('id,full_name,email').order('full_name');
-    if (!u.error) setUsers(u.data as Row[]);
-    const p = await supabase!.from('plans').select('id,name').order('name');
-    if (!p.error) setPlans(p.data as Row[]);
+    if (!supabase) { setMsg('Neon is not configured; memberships cannot be loaded.'); setRows([]); return; }
+    try {
+      const [membershipResult, userResult, planResult] = await Promise.all([
+        supabase.from('memberships').select('*, profiles(full_name,email), plans(name)').order('created_at', { ascending: false }),
+        supabase.from('profiles').select('id,full_name,email').order('full_name'),
+        supabase.from('plans').select('id,name').order('name'),
+      ]);
+      if (membershipResult.error) setMsg(`Could not load memberships: ${membershipResult.error.message}`);
+      else { setRows((membershipResult.data ?? []) as Row[]); setMsg(''); }
+      if (userResult.error) setMsg(`Could not load customers: ${userResult.error.message}`);
+      else setUsers((userResult.data ?? []) as Row[]);
+      if (planResult.error) setMsg(`Could not load plans: ${planResult.error.message}`);
+      else setPlans((planResult.data ?? []) as Row[]);
+    } catch (error) {
+      setMsg(`Could not load memberships: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
   useEffect(() => {
     void load();
   }, []);
 
   const assign = async () => {
-    if (!form.profile_id || !form.plan_id) {
-      setMsg('Pick a customer and a plan.');
-      return;
-    }
+    if (!form.profile_id || !form.plan_id) { setMsg('Pick a customer and a plan.'); return; }
+    if (!supabase) { setMsg('Neon is not configured; memberships cannot be assigned.'); return; }
     setBusy(true);
-    const { error } = await supabase!
-      .from('memberships')
-      .insert({ profile_id: form.profile_id, plan_id: form.plan_id, status: form.status ?? 'active' });
-    setMsg(error ? `Failed: ${error.message}` : 'Assigned ✓');
-    setBusy(false);
-    setForm({});
-    await load();
+    setMsg('');
+    try {
+      const { error } = await supabase.from('memberships').insert({ profile_id: form.profile_id, plan_id: form.plan_id, status: form.status ?? 'active' });
+      if (error) { setMsg(`Assignment failed: ${error.message}`); return; }
+      setMsg('Plan assigned.');
+      setForm({});
+      await load();
+    } catch (error) {
+      setMsg(`Assignment failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const remove = async (id: string) => {
-    await supabase!.from('memberships').delete().eq('id', id);
-    await load();
+    if (!supabase) { setMsg('Neon is not configured; memberships cannot be removed.'); return; }
+    try {
+      const { error } = await supabase.from('memberships').delete().eq('id', id);
+      if (error) { setMsg(`Could not remove membership: ${error.message}`); return; }
+      setMsg('Membership removed.');
+      await load();
+    } catch (error) {
+      setMsg(`Could not remove membership: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   return (

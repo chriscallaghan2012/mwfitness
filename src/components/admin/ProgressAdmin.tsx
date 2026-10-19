@@ -5,31 +5,51 @@ import { AdminTable, Row, ShortDate, StatusPill, btn, btnGhost, inp } from './fi
 
 export function CheckinsAdmin() {
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [checkinMsg, setCheckinMsg] = useState('');
   useEffect(() => {
     void load();
   }, []);
 
   const load = async () => {
-    const { data, error } = await supabase!.from('checkins').select('*, profiles(full_name,email)').order('checkin_date', { ascending: false });
-    if (!error && data) setRows(data as Row[]);
+    if (!supabase) { setRows([]); setCheckinMsg('Neon is not configured; check-ins cannot be loaded.'); return; }
+    try {
+      const { data, error } = await supabase.from('checkins').select('*, profiles(full_name,email)').order('checkin_date', { ascending: false });
+      if (error) setCheckinMsg('Could not load check-ins: ' + error.message);
+      else { setRows((data ?? []) as Row[]); setCheckinMsg(''); }
+    } catch (error) {
+      setCheckinMsg('Could not load check-ins: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    }
   };
 
   const review = async (r: Row) => {
     const notes = window.prompt('Coach notes for this check-in', String(r.coach_notes ?? ''));
     if (notes === null) return;
-    await supabase!
-      .from('checkins')
-      .update({ status: 'reviewed', coach_notes: notes || null, coach_prescription: notes || null })
-      .eq('id', r.id);
-    await load();
+    if (!supabase) { setCheckinMsg('Neon is not configured; check-ins cannot be updated.'); return; }
+    try {
+      const { error } = await supabase.from('checkins').update({ status: 'reviewed', coach_notes: notes || null, coach_prescription: notes || null }).eq('id', r.id);
+      if (error) { setCheckinMsg('Could not save review: ' + error.message); return; }
+      setCheckinMsg('Check-in review saved.');
+      await load();
+    } catch (error) {
+      setCheckinMsg('Could not save review: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    }
   };
 
   const remove = async (id: string) => {
-    await supabase!.from('checkins').delete().eq('id', id);
-    await load();
+    if (!supabase) { setCheckinMsg('Neon is not configured; check-ins cannot be deleted.'); return; }
+    try {
+      const { error } = await supabase.from('checkins').delete().eq('id', id);
+      if (error) { setCheckinMsg('Could not delete check-in: ' + error.message); return; }
+      setCheckinMsg('Check-in deleted.');
+      await load();
+    } catch (error) {
+      setCheckinMsg('Could not delete check-in: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    }
   };
 
   return (
+    <>
+    {checkinMsg && <p role="status" className="mb-3 text-xs text-zinc-400">{checkinMsg}</p>}
     <AdminTable
       rows={rows ?? []}
       empty="No check-ins yet."
@@ -62,6 +82,7 @@ export function CheckinsAdmin() {
         },
       ]}
     />
+    </>
   );
 }
 
@@ -73,39 +94,64 @@ export function ProgressAdmin() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    void supabase!.from('profiles').select('id,full_name').order('full_name').then((r) => !r.error && setUsers(r.data as Row[]));
+    if (!supabase) { setMsg('Neon is not configured; progress records cannot be loaded.'); return; }
+    void supabase.from('profiles').select('id,full_name').order('full_name').then(({ data, error }) => {
+      if (error) setMsg(`Could not load customers: ${error.message}`);
+      else setUsers((data ?? []) as Row[]);
+    }).catch((error) => setMsg(`Could not load customers: ${error instanceof Error ? error.message : 'Unexpected error'}`));
   }, []);
 
-  const load = async () => {
-    if (!userId) {
-      setRows(null);
-      return;
+  const load = async (profileId = userId) => {
+    if (!profileId) { setRows(null); return; }
+    if (!supabase) { setMsg('Neon is not configured; progress records cannot be loaded.'); setRows([]); return; }
+    try {
+      const { data, error } = await supabase.from('progress_logs').select('*').eq('profile_id', profileId).order('recorded_on', { ascending: false });
+      if (error) { setMsg(`Could not load progress: ${error.message}`); setRows([]); }
+      else { setRows((data ?? []) as Row[]); setMsg(''); }
+    } catch (error) {
+      setMsg(`Could not load progress: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
-    const { data, error } = await supabase!.from('progress_logs').select('*').eq('profile_id', userId).order('recorded_on', { ascending: false });
-    if (!error && data) setRows(data as Row[]);
   };
 
   const add = async () => {
-    if (!weight) return;
-    const { error } = await supabase!.from('progress_logs').insert({
-      profile_id: userId,
-      weight: Number(weight),
-      recorded_on: new Date().toISOString().slice(0, 10),
-    });
-    setMsg(error ? `Failed: ${error.message}` : 'Logged ✓');
-    setWeight('');
-    await load();
+    const parsedWeight = Number(weight);
+    if (!userId) { setMsg('Choose a customer first.'); return; }
+    if (!weight.trim() || !Number.isFinite(parsedWeight) || parsedWeight <= 0 || parsedWeight > 999) {
+      setMsg('Enter a valid weight greater than 0 and no more than 999 kg.');
+      return;
+    }
+    if (!supabase) { setMsg('Neon is not configured; progress cannot be saved.'); return; }
+    try {
+      const { error } = await supabase.from('progress_logs').insert({
+        profile_id: userId,
+        weight: parsedWeight,
+        recorded_on: new Date().toISOString().slice(0, 10),
+      });
+      if (error) { setMsg(`Failed: ${error.message}`); return; }
+      setMsg('Weigh-in logged.');
+      setWeight('');
+      await load(userId);
+    } catch (error) {
+      setMsg(`Failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   const remove = async (id: string) => {
-    await supabase!.from('progress_logs').delete().eq('id', id);
-    await load();
+    if (!supabase) { setMsg('Neon is not configured; progress cannot be deleted.'); return; }
+    try {
+      const { error } = await supabase.from('progress_logs').delete().eq('id', id);
+      if (error) { setMsg(`Could not delete weigh-in: ${error.message}`); return; }
+      setMsg('Weigh-in deleted.');
+      await load(userId);
+    } catch (error) {
+      setMsg(`Could not delete weigh-in: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   return (
     <div>
       <div className="flex flex-wrap items-end gap-3 mb-4">
-        <select className={inp} value={userId} onChange={(e) => { setUserId(e.target.value); void load(); }}>
+        <select className={inp} value={userId} onChange={(e) => { const nextUserId = e.target.value; setUserId(nextUserId); void load(nextUserId); }}>
           <option value="">Customer…</option>
           {users.map((u) => (
             <option key={u.id} value={u.id}>

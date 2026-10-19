@@ -18,20 +18,26 @@ export function LeadsAdmin() {
       return;
     }
     setLoading(true);
-    const query = supabase
-      .from('website_leads')
-      .select('id,kind,name,email,phone,interest,goal,message,page,status,created_at,times')
-      .order('created_at', { ascending: false })
-      .limit(200);
-    const { data, error: queryError } = filter === 'all' ? await query : await query.eq('status', filter);
-    if (queryError) {
-      setError('Could not load enquiries. Check the Neon migration and staff access policy.');
+    try {
+      const query = supabase
+        .from('website_leads')
+        .select('id,kind,name,email,phone,interest,goal,message,page,status,created_at,times')
+        .order('created_at', { ascending: false })
+        .limit(200);
+      const { data, error: queryError } = filter === 'all' ? await query : await query.eq('status', filter);
+      if (queryError) {
+        setError('Could not load enquiries. Check the Neon migration and staff access policy.');
+        setLeads([]);
+      } else {
+        setError('');
+        setLeads((data ?? []) as Row[]);
+      }
+    } catch {
+      setError('Could not reach the database while loading enquiries. Please retry.');
       setLeads([]);
-    } else {
-      setError('');
-      setLeads((data ?? []) as Row[]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [filter]);
 
   useEffect(() => { void load(); }, [load]);
@@ -39,13 +45,18 @@ export function LeadsAdmin() {
   const updateStatus = async (lead: Row, status: string) => {
     if (!supabase) return;
     setNotice('');
-    const { error: updateError } = await supabase.from('website_leads').update({ status }).eq('id', lead.id);
-    if (updateError) {
-      setError('Status could not be saved. Check staff permissions and try again.');
-      return;
+    try {
+      const { error: updateError } = await supabase.from('website_leads').update({ status }).eq('id', lead.id);
+      if (updateError) {
+        setError('Status could not be saved. Check staff permissions and try again.');
+        return;
+      }
+      setError('');
+      setNotice('Lead status saved.');
+      await load();
+    } catch {
+      setError('Status could not be saved because the database request failed. Please retry.');
     }
-    setNotice('Lead status saved.');
-    await load();
   };
 
   const rows = (leads ?? []).map((lead) => ({

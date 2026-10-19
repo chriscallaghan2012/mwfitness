@@ -10,10 +10,11 @@ export function VideosAdmin() {
   const [form, setForm] = useState<Record<string, string>>(EMPTY);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
-  const [schemaMissing, setSchemaMissing] = useState(false);
+  const [schemaMissing, setSchemaMissing] = useState(!supabase);
 
   const load = async () => {
     if (!supabase) { setSchemaMissing(true); setRows([]); setMessage('Neon is not configured for this website environment.'); return; }
+    try {
     const { data, error } = await supabase.from('coaching_videos').select('*').order('created_at', { ascending: false });
     if (error) {
       setRows([]);
@@ -26,6 +27,10 @@ export function VideosAdmin() {
     setSchemaMissing(false);
     setRows((data ?? []) as Row[]);
     setMessage('');
+    } catch {
+      setRows([]);
+      setMessage('Could not reach the video library. Check the connection and retry.');
+    }
   };
   useEffect(() => { void load(); }, []);
 
@@ -35,6 +40,7 @@ export function VideosAdmin() {
     setForm({ title: String(row.title ?? ''), description: String(row.description ?? ''), category: String(row.category ?? 'Technique'), video_url: String(row.video_url ?? ''), thumbnail_url: String(row.thumbnail_url ?? ''), duration_seconds: String(row.duration_seconds ?? ''), level: String(row.level ?? 'All levels'), active: row.active ? 'true' : 'false' });
   };
   const save = async () => {
+    if (!supabase) { setMessage('Live database access is not configured; no changes were saved.'); return; }
     if (!form.title.trim() || !form.video_url.trim()) { setMessage('A title and video URL are required.'); return; }
     try { new URL(form.video_url); } catch { setMessage('Enter a valid video URL.'); return; }
     if (form.thumbnail_url.trim()) { try { new URL(form.thumbnail_url); } catch { setMessage('Thumbnail must be a valid URL.'); return; } }
@@ -46,11 +52,13 @@ export function VideosAdmin() {
     setEdit(null); setMessage('Video saved.'); await load();
   };
   const remove = async (row: Row) => {
+    if (!supabase) { setMessage('Live database access is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete “${String(row.title)}” from the video library?`)) return;
     const { error } = await supabase!.from('coaching_videos').delete().eq('id', row.id);
     if (error) setMessage(`Delete failed: ${error.message}`); else { setMessage('Video deleted.'); await load(); }
   };
   const toggle = async (row: Row) => {
+    if (!supabase) { setMessage('Live database access is not configured; no changes were made.'); return; }
     const { error } = await supabase!.from('coaching_videos').update({ active: !row.active }).eq('id', row.id);
     if (error) setMessage(`Update failed: ${error.message}`); else await load();
   };

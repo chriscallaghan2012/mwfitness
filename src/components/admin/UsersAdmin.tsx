@@ -14,9 +14,22 @@ export function UsersAdmin() {
   const [addOpen, setAddOpen] = useState(false);
 
   const load = async () => {
-    const { data, error } = await supabase!.from('profiles').select('*').order('created_at');
-    if (error) { setMsg(`Could not load users: ${error.message}`); return; }
-    setUsers((data ?? []) as Row[]);
+    if (!supabase) {
+      setMsg('Neon is not configured; user records cannot be loaded.');
+      setUsers([]);
+      return;
+    }
+    try {
+      const { data, error } = await supabase.from('profiles').select('*').order('created_at');
+      if (error) {
+        setMsg(`Could not load users: ${error.message}`);
+        return;
+      }
+      setUsers((data ?? []) as Row[]);
+      setMsg('');
+    } catch (error) {
+      setMsg(`Could not load users: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
   useEffect(() => {
     void load();
@@ -24,52 +37,75 @@ export function UsersAdmin() {
 
   const saveEdit = async () => {
     if (!edit) return;
-    setBusy(true);
-    setMsg('');
-    const numericFields = ['current_weight', 'start_weight', 'goal_weight'];
-    const payload: Record<string, unknown> = { ...f };
-    for (const field of numericFields) {
-      const value = f[field]?.trim();
-      if (!value) payload[field] = null;
-      else if (!Number.isFinite(Number(value)) || Number(value) < 0 || Number(value) > 999) {
-        setMsg(`${field.replaceAll('_', ' ')} must be a valid weight between 0 and 999 kg.`);
-        setBusy(false);
-        return;
-      } else payload[field] = Number(value);
-    }
-    if (!String(f.full_name ?? '').trim()) {
-      setMsg('Client name cannot be blank.');
-      setBusy(false);
+    if (!supabase) {
+      setMsg('Neon is not configured; profile changes cannot be saved.');
       return;
     }
-    payload.full_name = String(f.full_name).trim();
-    const { error } = await supabase!.from('profiles').update(payload).eq('id', edit.id);
-    setMsg(error ? `Save failed: ${error.message}` : 'Client profile saved.');
-    setBusy(false);
-    if (!error) { setEdit(null); await load(); }
+    setBusy(true);
+    setMsg('');
+    try {
+      const numericFields = ['current_weight', 'start_weight', 'goal_weight'];
+      const payload: Record<string, unknown> = { ...f };
+      for (const field of numericFields) {
+        const value = f[field]?.trim();
+        if (!value) payload[field] = null;
+        else if (!Number.isFinite(Number(value)) || Number(value) < 0 || Number(value) > 999) {
+          setMsg(`${field.replaceAll('_', ' ')} must be a valid weight between 0 and 999 kg.`);
+          return;
+        } else payload[field] = Number(value);
+      }
+      if (!String(f.full_name ?? '').trim()) {
+        setMsg('Client name cannot be blank.');
+        return;
+      }
+      payload.full_name = String(f.full_name).trim();
+      const { error } = await supabase.from('profiles').update(payload).eq('id', edit.id);
+      if (error) {
+        setMsg(`Save failed: ${error.message}`);
+        return;
+      }
+      setMsg('Client profile saved.');
+      setEdit(null);
+      await load();
+    } catch (error) {
+      setMsg(`Save failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const addCustomer = async () => {
+    if (!supabase) {
+      setMsg('Neon is not configured; customer accounts cannot be created.');
+      return;
+    }
     if (!email.trim() || newPassword.length < 12) {
       setMsg('Enter an email and a temporary password of at least 12 characters.');
       return;
     }
     setBusy(true);
     setMsg('Creating…');
-    const { error } = await supabase!.auth.signUp({
-      email: email.trim(),
-      password: newPassword,
-      options: { data: { full_name: email.trim().split('@')[0] } },
-    });
-    setMsg(error ? `Failed: ${error.message}` : `Created ${email.trim()}. Share the temporary password securely and ask them to change it when account settings are available.`);
-    setBusy(false);
-    setAddOpen(false);
-    setEmail('');
-    setNewPassword('');
-    await load();
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: newPassword,
+        options: { data: { full_name: email.trim().split('@')[0] } },
+      });
+      if (error) {
+        setMsg(`Failed: ${error.message}`);
+        return;
+      }
+      setMsg(`Created ${email.trim()}. Share the temporary password securely and ask them to change it when account settings are available.`);
+      setAddOpen(false);
+      setEmail('');
+      setNewPassword('');
+      await load();
+    } catch (error) {
+      setMsg(`Failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    } finally {
+      setBusy(false);
+    }
   };
-
-
 
   return (
     <div>
@@ -101,7 +137,6 @@ export function UsersAdmin() {
           setEdit(u);
           setF({
             full_name: String(u.full_name ?? ''),
-            role: String(u.role ?? 'athlete'),
             member_tier: String(u.member_tier ?? ''),
             coach_name: String(u.coach_name ?? ''),
             coach_role: String(u.coach_role ?? ''),
@@ -125,12 +160,8 @@ export function UsersAdmin() {
             <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Edit customer — {edit.email}</p>
             <label className="text-[11px] text-zinc-500 uppercase">Name</label>
             <input className={inp} value={f.full_name ?? ''} onChange={(e) => setF({ ...f, full_name: e.target.value })} />
-            <label className="text-[11px] text-zinc-500 uppercase mt-2">Role</label>
-            <select className={inp} value={f.role ?? 'athlete'} onChange={(e) => setF({ ...f, role: e.target.value })}>
-              <option value="athlete">athlete</option>
-              <option value="coach">coach</option>
-              <option value="admin">admin</option>
-            </select>
+            <label className="text-[11px] text-zinc-500 uppercase mt-2">Account role</label>
+            <p className="mt-1 rounded-lg border border-zinc-800 bg-black/20 px-3 py-2 text-sm text-zinc-400">{String(edit.role ?? 'athlete')} · managed by the app administrator</p>
             <label className="text-[11px] text-zinc-500 uppercase mt-2">Member tier</label>
             <input className={inp} value={f.member_tier ?? ''} onChange={(e) => setF({ ...f, member_tier: e.target.value })} />
             <label className="text-[11px] text-zinc-500 uppercase mt-2">Coach name / role</label>
