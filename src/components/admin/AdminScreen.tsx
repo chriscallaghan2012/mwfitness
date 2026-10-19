@@ -16,9 +16,10 @@ import { ClientRecordsAdmin } from './ClientRecordsAdmin';
 import { VideosAdmin } from './VideosAdmin';
 import { ProgrammesAdmin } from './ProgrammesAdmin';
 import { PasswordRecovery } from './PasswordRecovery';
+import { MemberActivityAdmin } from './MemberActivityAdmin';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'programmes' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads';
+type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'programmes' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads' | 'member-activity';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -34,6 +35,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'progress', label: 'Progress' },
   { id: 'messages', label: 'Messages' },
   { id: 'leads', label: 'Website leads' },
+  { id: 'member-activity', label: 'Member activity' },
 ];
 
 type DemoTab = Exclude<Tab, 'overview'>;
@@ -88,6 +90,10 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
   messages: {
     columns: [{ key: 'customer', label: 'Athlete' }, { key: 'from', label: 'From' }, { key: 'message', label: 'Message' }, { key: 'status', label: 'Push status' }],
     rows: [{ id: 'demo-message-1', customer: 'Alex Morgan', from: 'Coach', message: 'Great work staying consistent this week.', status: 'Sample only' }],
+  },
+  'member-activity': {
+    columns: [{ key: 'member', label: 'Member' }, { key: 'activity', label: 'Activity' }, { key: 'status', label: 'Status' }],
+    rows: [{ id: 'demo-activity-1', member: 'Alex Morgan', activity: 'Daily hydration & steps', status: 'Sample only' }, { id: 'demo-activity-2', member: 'Jamie Reed', activity: 'Cardio session', status: 'Sample only' }],
   },
   leads: {
     columns: [{ key: 'name', label: 'Name' }, { key: 'email', label: 'Email' }, { key: 'interest', label: 'Interested in' }, { key: 'status', label: 'Status' }],
@@ -376,6 +382,7 @@ export function AdminScreen() {
       {!demoMode && tab === 'progress' && <ProgressAdmin />}
       {!demoMode && tab === 'messages' && <MessagesAdmin />}
       {!demoMode && tab === 'leads' && <LeadsAdmin />}
+      {!demoMode && tab === 'member-activity' && <MemberActivityAdmin />}
       {demoEditorOpen && demoMode && tab !== 'overview' ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/75 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDemoEditorOpen(false); }}>
           <form onSubmit={saveDemoRow} role="dialog" aria-modal="true" aria-labelledby="demo-editor-title" className="my-auto max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl border border-zinc-700 bg-[#121315] p-5 shadow-2xl">
