@@ -111,6 +111,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>
           </div>
         </div>
+        <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       </section>
 
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
