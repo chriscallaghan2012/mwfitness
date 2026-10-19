@@ -137,7 +137,6 @@ export function UsersAdmin() {
           setEdit(u);
           setF({
             full_name: String(u.full_name ?? ''),
-            role: String(u.role ?? 'athlete'),
             member_tier: String(u.member_tier ?? ''),
             coach_name: String(u.coach_name ?? ''),
             coach_role: String(u.coach_role ?? ''),
@@ -161,12 +160,8 @@ export function UsersAdmin() {
             <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Edit customer — {edit.email}</p>
             <label className="text-[11px] text-zinc-500 uppercase">Name</label>
             <input className={inp} value={f.full_name ?? ''} onChange={(e) => setF({ ...f, full_name: e.target.value })} />
-            <label className="text-[11px] text-zinc-500 uppercase mt-2">Role</label>
-            <select className={inp} value={f.role ?? 'athlete'} onChange={(e) => setF({ ...f, role: e.target.value })}>
-              <option value="athlete">athlete</option>
-              <option value="coach">coach</option>
-              <option value="admin">admin</option>
-            </select>
+            <label className="text-[11px] text-zinc-500 uppercase mt-2">Account role</label>
+            <p className="mt-1 rounded-lg border border-zinc-800 bg-black/20 px-3 py-2 text-sm text-zinc-400">{String(edit.role ?? 'athlete')} · managed by the app administrator</p>
             <label className="text-[11px] text-zinc-500 uppercase mt-2">Member tier</label>
             <input className={inp} value={f.member_tier ?? ''} onChange={(e) => setF({ ...f, member_tier: e.target.value })} />
             <label className="text-[11px] text-zinc-500 uppercase mt-2">Coach name / role</label>
