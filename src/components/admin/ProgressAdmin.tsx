@@ -74,16 +74,23 @@ export function ProgressAdmin() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    void supabase!.from('profiles').select('id,full_name').order('full_name').then((r) => !r.error && setUsers(r.data as Row[]));
+    if (!supabase) { setMsg('Neon is not configured; progress records cannot be loaded.'); return; }
+    void supabase.from('profiles').select('id,full_name').order('full_name').then(({ data, error }) => {
+      if (error) setMsg(`Could not load customers: ${error.message}`);
+      else setUsers((data ?? []) as Row[]);
+    }).catch((error) => setMsg(`Could not load customers: ${error instanceof Error ? error.message : 'Unexpected error'}`));
   }, []);
 
-  const load = async () => {
-    if (!userId) {
-      setRows(null);
-      return;
+  const load = async (profileId = userId) => {
+    if (!profileId) { setRows(null); return; }
+    if (!supabase) { setMsg('Neon is not configured; progress records cannot be loaded.'); setRows([]); return; }
+    try {
+      const { data, error } = await supabase.from('progress_logs').select('*').eq('profile_id', profileId).order('recorded_on', { ascending: false });
+      if (error) { setMsg(`Could not load progress: ${error.message}`); setRows([]); }
+      else { setRows((data ?? []) as Row[]); setMsg(''); }
+    } catch (error) {
+      setMsg(`Could not load progress: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
-    const { data, error } = await supabase!.from('progress_logs').select('*').eq('profile_id', userId).order('recorded_on', { ascending: false });
-    if (!error && data) setRows(data as Row[]);
   };
 
   const add = async () => {
@@ -106,7 +113,7 @@ export function ProgressAdmin() {
   return (
     <div>
       <div className="flex flex-wrap items-end gap-3 mb-4">
-        <select className={inp} value={userId} onChange={(e) => { setUserId(e.target.value); void load(); }}>
+        <select className={inp} value={userId} onChange={(e) => { const nextUserId = e.target.value; setUserId(nextUserId); void load(nextUserId); }}>
           <option value="">Customer…</option>
           {users.map((u) => (
             <option key={u.id} value={u.id}>
