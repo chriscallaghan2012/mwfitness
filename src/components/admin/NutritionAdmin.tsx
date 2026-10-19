@@ -66,10 +66,25 @@ export function NutritionAdmin() {
     let targets: Record<string, unknown> = {};
     let sections: unknown[] = [];
     try {
-      targets = JSON.parse(f.targets || '{}');
-      sections = JSON.parse(f.sections || '[]');
-    } catch {
-      setMsg('Targets / sections must be valid JSON.');
+      const parsedTargets: unknown = JSON.parse(f.targets || '{}');
+      const parsedSections: unknown = JSON.parse(f.sections || '[]');
+      if (!parsedTargets || typeof parsedTargets !== 'object' || Array.isArray(parsedTargets) || !Array.isArray(parsedSections)) {
+        throw new Error('Invalid nutrition data shape.');
+      }
+      targets = { ...(parsedTargets as Record<string, unknown>) };
+      sections = parsedSections;
+      for (const key of ['calories', 'protein', 'carbs', 'fats', 'water_ml']) {
+        const raw = f[key]?.trim() ?? '';
+        if (!raw) {
+          delete targets[key];
+          continue;
+        }
+        const value = Number(raw);
+        if (!Number.isFinite(value) || value < 0) throw new Error('Nutrition targets must be non-negative numbers.');
+        targets[key] = value;
+      }
+    } catch (error) {
+      setMsg(error instanceof Error ? error.message : 'Nutrition targets and meal sections are invalid.');
       setBusy(false);
       return;
     }
@@ -177,7 +192,12 @@ export function NutritionAdmin() {
           setF({
             name: String(r.name ?? ''),
             description: String(r.description ?? ''),
-            targets: JSON.stringify(r.targets ?? {}, null, 1),
+            targets: JSON.stringify(r.targets ?? {}),
+            calories: String((r.targets as Row)?.calories ?? ''),
+            protein: String((r.targets as Row)?.protein ?? ''),
+            carbs: String((r.targets as Row)?.carbs ?? ''),
+            fats: String((r.targets as Row)?.fats ?? ''),
+            water_ml: String((r.targets as Row)?.water_ml ?? ''),
             sections: JSON.stringify(r.sections ?? [], null, 1),
             active: r.active ? 'true' : 'false',
           });
@@ -192,7 +212,7 @@ export function NutritionAdmin() {
       <button
         onClick={() => {
           setEdit({ id: '', active: true } as Row);
-          setF({ name: '', description: '', targets: '{"calories":2000,"protein":150,"carbs":200,"fats":60,"water_ml":3500}', sections: '[]', active: 'true' });
+          setF({ name: '', description: '', targets: '{"calories":2000,"protein":150,"carbs":200,"fats":60,"water_ml":3500}', calories: '2000', protein: '150', carbs: '200', fats: '60', water_ml: '3500', sections: '[]', active: 'true' });
         }}
         className={btn}
       >
@@ -206,7 +226,21 @@ export function NutritionAdmin() {
           </p>
           <input className={inp} placeholder="name" value={f.name ?? ''} onChange={(e) => setF({ ...f, name: e.target.value })} />
           <input className={`${inp} mt-2`} placeholder="description" value={f.description ?? ''} onChange={(e) => setF({ ...f, description: e.target.value })} />
-          <textarea className={`${inp} mt-2 min-h-16`} placeholder='targets JSON {"calories":2000,"protein":150}' value={f.targets ?? '{}'} onChange={(e) => setF({ ...f, targets: e.target.value })} />
+          <p className="text-[11px] text-zinc-500 uppercase mt-3 mb-1">Daily targets</p>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              ['calories', 'Calories (kcal)'],
+              ['protein', 'Protein (g)'],
+              ['carbs', 'Carbs (g)'],
+              ['fats', 'Fats (g)'],
+              ['water_ml', 'Water (ml)'],
+            ] as const).map(([key, label]) => (
+              <label key={key} className="text-xs text-zinc-400">
+                {label}
+                <input className={`${inp} mt-1`} type="number" min="0" step="1" value={f[key] ?? ''} onChange={(e) => setF({ ...f, [key]: e.target.value })} />
+              </label>
+            ))}
+          </div>
           <textarea className={`${inp} mt-2 min-h-32`} placeholder='sections JSON [{"name":"BREAKFAST","items":[{"name":"…","sub":"…","calories":0,"protein":0}]}]' value={f.sections ?? '[]'} onChange={(e) => setF({ ...f, sections: e.target.value })} />
           <label className="text-[11px] text-zinc-500 uppercase flex items-center gap-2 mt-2">
             <input type="checkbox" checked={f.active === 'true'} onChange={(e) => setF({ ...f, active: e.target.checked ? 'true' : 'false' })} />
