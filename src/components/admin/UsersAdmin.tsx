@@ -9,8 +9,6 @@ export function UsersAdmin() {
   const [busy, setBusy] = useState(false);
   const [edit, setEdit] = useState<Row | null>(null);
   const [f, setF] = useState<Record<string, string>>({});
-  const [email, setEmail] = useState('');
-  const [newPassword, setNewPassword] = useState('');
   const [addOpen, setAddOpen] = useState(false);
 
   const load = async () => {
@@ -74,38 +72,7 @@ export function UsersAdmin() {
     }
   };
 
-  const addCustomer = async () => {
-    if (!supabase) {
-      setMsg('Neon is not configured; customer accounts cannot be created.');
-      return;
-    }
-    if (!email.trim() || newPassword.length < 12) {
-      setMsg('Enter an email and a temporary password of at least 12 characters.');
-      return;
-    }
-    setBusy(true);
-    setMsg('Creating…');
-    try {
-      const { error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password: newPassword,
-        options: { data: { full_name: email.trim().split('@')[0] } },
-      });
-      if (error) {
-        setMsg(`Failed: ${error.message}`);
-        return;
-      }
-      setMsg(`Created ${email.trim()}. Share the temporary password securely and ask them to change it when account settings are available.`);
-      setAddOpen(false);
-      setEmail('');
-      setNewPassword('');
-      await load();
-    } catch (error) {
-      setMsg(`Failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
-    } finally {
-      setBusy(false);
-    }
-  };
+
 
   return (
     <div>
@@ -121,12 +88,10 @@ export function UsersAdmin() {
 
       {addOpen && (
         <div className={`${card} mb-4`}>
-          <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">New customer sign-in</p>
-          <input className={inp} placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input className={`${inp} mt-2`} type="password" placeholder="Temporary password (12+ characters)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} autoComplete="new-password" />
-          <button disabled={busy} onClick={addCustomer} className={`${btn} mt-3`}>
-            Create account
-          </button>
+          <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Customer accounts are app-managed</p>
+          <p className="text-sm text-zinc-300">
+            Customer sign-in belongs in the MW Fitness mobile app. This Staff HQ panel manages coaching profiles only and must not create credentials in the browser. Account creation and removal require an authorized server-side Neon Auth account-management service.
+          </p>
         </div>
       )}
 
