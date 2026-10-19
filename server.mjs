@@ -16,15 +16,14 @@ import { sendContactEmail, validatePayload } from './api/_mailer.mjs';
 import { saveWebsiteLead } from './api/_leads.mjs';
 import { createCheckoutSession } from './api/_stripe.mjs';
 import sendPush from './api/send-push.mjs';
+import health from './api/health.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.use(express.json({ limit: '64kb' }));
 
-app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'mwfitnessuk-mailer' });
-});
+app.get('/api/health', health);
 
 app.post('/api/send-mail', async (req, res) => {
   try {
