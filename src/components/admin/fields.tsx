@@ -3,12 +3,12 @@ import { FormEvent, ReactNode } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 
 export const inp =
-  'w-full bg-[#121315] border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#ff5500] placeholder-zinc-600';
+  'w-full min-w-0 rounded-xl border border-white/[0.1] bg-[#0e1013] px-3.5 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-orange-400/70 focus:ring-2 focus:ring-orange-400/10';
 export const btn =
-  'inline-flex items-center gap-1.5 bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-3 py-2 rounded-lg active:scale-[0.98]';
+  'inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-semibold text-black shadow-sm shadow-orange-950/20 transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.99]';
 export const btnGhost =
-  'inline-flex items-center gap-1.5 border border-zinc-700 text-zinc-300 font-mono text-xs uppercase px-3 py-2 rounded-lg hover:bg-zinc-800';
-export const card = 'rounded-xl bg-[#16181d] border border-zinc-700 p-4';
+  'inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.025] px-3.5 py-2.5 text-xs font-medium text-zinc-300 transition hover:border-white/[0.18] hover:bg-white/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-50';
+export const card = 'rounded-2xl border border-white/[0.08] bg-[#14161a] p-5 shadow-sm shadow-black/10';
 
 export type Row = Record<string, any>;
 
@@ -47,7 +47,7 @@ export function StatusPill(status: string) {
   );
 }
 
-/** Generic striped table used across admin sections. */
+/** Responsive data table shared by the Staff HQ sections. */
 export function AdminTable({
   cols,
   rows,
@@ -62,41 +62,54 @@ export function AdminTable({
   onDelete?: (r: Row) => void;
 }) {
   if (!rows || rows.length === 0) {
-    return <p className="text-sm text-zinc-400">{empty ?? 'Nothing here yet.'}</p>;
+    return (
+      <div className="grid min-h-36 place-items-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.015] px-6 py-10 text-center">
+        <div>
+          <p className="text-sm font-medium text-zinc-200">Nothing to show yet</p>
+          <p className="mt-1 max-w-md text-xs leading-5 text-zinc-500">{empty ?? 'Create your first record to get started.'}</p>
+        </div>
+      </div>
+    );
   }
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="text-[10px] uppercase font-mono text-zinc-500">
-            {cols.map((c) => (
-              <th key={c.key} className="py-2">
-                {c.label}
-              </th>
-            ))}
-            {onEdit || onDelete ? <th className="text-right" /> : null}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={String(r.id)} className="border-t border-zinc-800">
-              {cols.map((c) => (
-                <td key={c.key} className="py-2 text-zinc-300">
-                  {c.render ? c.render(r) : String(r[c.key] ?? '—')}
-                </td>
+    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101215]">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-left text-sm">
+          <thead className="bg-white/[0.025]">
+            <tr className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              {cols.map((column) => (
+                <th key={column.key} className="whitespace-nowrap px-4 py-3.5">
+                  {column.label}
+                </th>
               ))}
-              {onEdit || onDelete ? (
-                <td className="py-2">
-                  <div className="flex justify-end gap-2">
-                    {onEdit ? <button type="button" onClick={() => onEdit(r)} className={btnGhost}><Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit</button> : null}
-                    {onDelete ? <button type="button" onClick={() => onDelete(r)} className={btnGhost}><Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Remove</button> : null}
-                  </div>
-                </td>
-              ) : null}
+              {onEdit || onDelete ? <th className="px-4 py-3.5 text-right">Actions</th> : null}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={String(row.id)} className="border-t border-white/[0.055] transition hover:bg-white/[0.025]">
+                {cols.map((column) => (
+                  <td key={column.key} className="max-w-[360px] px-4 py-3.5 align-middle text-zinc-300">
+                    {column.render ? column.render(row) : String(row[column.key] ?? '—')}
+                  </td>
+                ))}
+                {onEdit || onDelete ? (
+                  <td className="whitespace-nowrap px-4 py-3.5">
+                    <div className="flex justify-end gap-2">
+                      {onEdit ? <button type="button" onClick={() => onEdit(row)} className={btnGhost}><Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit</button> : null}
+                      {onDelete ? <button type="button" onClick={() => onDelete(row)} className={btnGhost}><Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Remove</button> : null}
+                    </div>
+                  </td>
+                ) : null}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex items-center justify-between border-t border-white/[0.06] px-4 py-3 text-[11px] text-zinc-500">
+        <span>{rows.length} {rows.length === 1 ? 'record' : 'records'}</span>
+        <span>{onEdit || onDelete ? 'Select a row action to manage records' : 'Workspace records'}</span>
+      </div>
     </div>
   );
 }
