@@ -45,6 +45,8 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Audited the workflow directories: the website has two workflows; Android has five (`ci`, `neon-check`, diagnostic APK, preview build, and Play internal). All currently use `workflow_dispatch` only; no schedule, `workflow_run`, `repository_dispatch`, push, or pull-request triggers were found in those workflow files.
 - [x] Expanded Android PR #13 to make `neon-check.yml` read-only, use `npm ci`, check out the selected ref, and remove its automated lockfile commit/push side effect. The diagnostic APK, preview EAS build, and Play internal submission workflows remain manually invokable only; do not run them without explicit approval.
 - [ ] Audit automation outside `.github/workflows` (package scripts, external integrations and Vercel/Expo settings) before declaring the entire release process manual-only.
+- [x] Added draft PR #11 to remove Staff HQ's unsafe browser-side account-creation flow. A staff-authorized server-side invitation endpoint is still needed before account creation can be re-enabled: https://github.com/chriscallaghan2012/mwfitness/pull/11.
+- [x] Added draft Android PR #14 correcting an unquoted email placeholder in `LoginScreen.tsx`, which is malformed JSX and can prevent the current source from compiling: https://github.com/chriscallaghan2012/MW-FITNESS-APP-MOBILE/pull/14. A manual build/typecheck has not been run.
 - [ ] After approval, verify workflow files on the merged default branch and confirm no push/PR trigger can start them. Do not manually dispatch any workflow unless asked.
 
 ## Must pass before any release
