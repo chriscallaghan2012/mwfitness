@@ -1,20 +1,10 @@
 name: MW Fitness Neon verification
 
 on:
-  push:
-    branches:
-      - chore/neon-shared-backend
-    paths:
-      - "src/**"
-      - "api/**"
-      - "server.mjs"
-      - "package.json"
-      - "vite.config.*"
-      - ".github/workflows/verify-neon.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -22,22 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: chore/neon-shared-backend
+          ref: ${{ github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Install dependencies
-        run: npm install
-      - name: Refresh and commit lockfile
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: sync Neon website dependency lockfile"
-            git push origin HEAD:chore/neon-shared-backend
-          fi
-      - name: TypeScript check
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: TypeScript and lint checks
         run: npm run lint
       - name: Production build
         run: npm run build
