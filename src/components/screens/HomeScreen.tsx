@@ -138,6 +138,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </div>
 
+      <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
+
       {/* 3. ABOUT MIKE */}
       <section id="about-mike" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
