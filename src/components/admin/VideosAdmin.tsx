@@ -66,7 +66,7 @@ export function VideosAdmin() {
   return (
     <div className="space-y-4">
       <div className={card}>
-        <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-mono text-[10px] uppercase text-orange-300">Coaching content</p><h2 className="mt-1 text-lg font-semibold text-white">Video library</h2><p className="mt-1 max-w-2xl text-sm text-zinc-400">Prepare exercise demos, technique explainers and coaching videos for the future app library. This does not change the app's current dummy content.</p></div><button className={btn} onClick={openNew} disabled={schemaMissing}>+ Add video</button></div>
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-mono text-[10px] uppercase text-orange-300">Coaching content</p><h2 className="mt-1 text-lg font-semibold text-white">Video library</h2><p className="mt-1 max-w-2xl text-sm text-zinc-400">Publish exercise demos and coaching videos for the member app. The app reader is prepared, but live publishing remains blocked until the reviewed coaching_videos migration and permissions are installed.</p></div><button className={btn} onClick={openNew} disabled={schemaMissing}>+ Add video</button></div>
         {message && <p role="status" className="mt-4 rounded-lg border border-zinc-800 bg-black/20 p-3 text-xs text-orange-200">{message}</p>}
       </div>
       <AdminTable rows={rows ?? []} empty={schemaMissing ? 'Live video storage is awaiting its migration.' : 'No videos added yet.'} onEdit={openEdit} onDelete={remove} cols={[
