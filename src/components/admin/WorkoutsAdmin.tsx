@@ -50,15 +50,21 @@ export function WorkoutsAdmin() {
     if (!form.name?.trim()) { setMsg('Enter a workout template name.'); return; }
     const days = Number(form.days_per_week || 0);
     if (days && (!Number.isInteger(days) || days < 1 || days > 7)) { setMsg('Days per week must be between 1 and 7.'); return; }
-    const { error } = await supabase!.from('workout_templates').insert({
-      name: form.name,
-      description: form.description ?? '',
-      days_per_week: days || null,
-      plan_id: form.plan_id || null,
-    });
-    setMsg(error ? `Failed: ${error.message}` : 'Added ✓');
-    setForm({});
-    await load();
+    if (!supabase) { setMsg('Neon is not configured; workout templates cannot be created.'); return; }
+    try {
+      const { error } = await supabase.from('workout_templates').insert({
+        name: form.name.trim(),
+        description: form.description ?? '',
+        days_per_week: days || null,
+        plan_id: form.plan_id || null,
+      });
+      if (error) { setMsg(`Could not add template: ${error.message}`); return; }
+      setMsg('Workout template added.');
+      setForm({});
+      await load();
+    } catch (error) {
+      setMsg(`Could not add template: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   const removeTemplate = async (row: Row) => {
@@ -70,22 +76,34 @@ export function WorkoutsAdmin() {
 
   const addSession = async () => {
     if (!userId || !sessForm.template_id) { setMsg('Choose a client and workout template first.'); return; }
-    const { error } = await supabase!.from('workout_sessions').insert({
-      profile_id: userId,
-      template_id: sessForm.template_id,
-      scheduled_on: sessForm.scheduled_on || null,
-      status: 'planned',
-    });
-    setMsg(error ? `Failed: ${error.message}` : 'Scheduled ✓');
-    setSessForm({});
-    await loadSessions();
+    if (!supabase) { setMsg('Neon is not configured; sessions cannot be scheduled.'); return; }
+    try {
+      const { error } = await supabase.from('workout_sessions').insert({
+        profile_id: userId,
+        template_id: sessForm.template_id,
+        scheduled_on: sessForm.scheduled_on || null,
+        status: 'planned',
+      });
+      if (error) { setMsg(`Could not schedule session: ${error.message}`); return; }
+      setMsg('Workout session scheduled.');
+      setSessForm({});
+      await loadSessions(userId);
+    } catch (error) {
+      setMsg(`Could not schedule session: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   const flipStatus = async (s: Row) => {
+    if (!supabase) { setMsg('Neon is not configured; session status cannot be updated.'); return; }
     const status = s.status === 'completed' ? 'planned' : 'completed';
-    const { error } = await supabase!.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id);
-    setMsg(error ? `Could not update session: ${error.message}` : `Session marked ${status}.`);
-    if (!error) await loadSessions();
+    try {
+      const { error } = await supabase.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id);
+      if (error) { setMsg(`Could not update session: ${error.message}`); return; }
+      setMsg(`Session marked ${status}.`);
+      await loadSessions(userId);
+    } catch (error) {
+      setMsg(`Could not update session: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   return (
