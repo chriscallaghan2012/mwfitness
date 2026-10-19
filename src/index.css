@@ -114,11 +114,3 @@ a {
     margin-bottom: 2.25rem !important;
   }
 }
-
-
-/* Restrained industrial orange/charcoal accent — reusable beyond the footer. */
-.industrial-stripe {
-  height: 6px;
-  width: 100%;
-  background-image: repeating-linear-gradient(45deg, #ff5500, #ff5500 15px, #121418 15px, #121418 30px);
-}
