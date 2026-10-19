@@ -51,7 +51,7 @@ export function NutritionAdmin() {
     void supabase.from('profiles').select('id,full_name,email').order('full_name').then((r) => {
       if (!r.error) setUsers((r.data ?? []) as Row[]);
       else setMsg(`Could not load clients: ${r.error.message}`);
-    }).catch(() => setMsg('Could not reach the client service. Check the connection and retry.'));
+    }, () => setMsg('Could not reach the client service. Check the connection and retry.'));
   }, []);
 
   useEffect(() => {
