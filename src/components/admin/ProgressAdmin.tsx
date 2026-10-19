@@ -95,7 +95,7 @@ export function ProgressAdmin() {
 
   useEffect(() => {
     if (!supabase) { setMsg('Neon is not configured; progress records cannot be loaded.'); return; }
-    void supabase.from('profiles').select('id,full_name').order('full_name').then(({ data, error }) => {
+    void Promise.resolve(supabase.from('profiles').select('id,full_name').order('full_name')).then(({ data, error }) => {
       if (error) setMsg(`Could not load customers: ${error.message}`);
       else setUsers((data ?? []) as Row[]);
     }).catch((error) => setMsg(`Could not load customers: ${error instanceof Error ? error.message : 'Unexpected error'}`));
