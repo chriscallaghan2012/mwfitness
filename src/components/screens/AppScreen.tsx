@@ -71,6 +71,8 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
         </div>
       </section>
 
+      <div className="industrial-stripe" aria-hidden="true" />
+
       {/* 2. FEATURES */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 text-center">
