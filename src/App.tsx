@@ -19,12 +19,24 @@ import { AdminScreen } from './components/admin/AdminScreen';
 const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app', 'shwag', 'contact', 'admin', 'privacy', 'delete-account'];
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<ScreenId>(() => {
+  const screenFromLocation = (): ScreenId => {
     if (new URLSearchParams(window.location.search).get('auth') === 'reset-password') return 'admin';
-    if (window.location.pathname === '/privacy') return 'privacy';
-    if (window.location.pathname === '/delete-account') return 'delete-account';
-    return 'home';
-  });
+    const path = window.location.pathname.replace(/\\/+$/, '') || '/';
+    const routes: Record<string, ScreenId> = {
+      '/': 'home',
+      '/online-coaching': 'online-coaching',
+      '/packages': 'packages',
+      '/app': 'app',
+      '/shwag': 'shwag',
+      '/contact': 'contact',
+      '/admin': 'admin',
+      '/privacy': 'privacy',
+      '/delete-account': 'delete-account',
+    };
+    return routes[path] || 'home';
+  };
+
+  const [currentScreen, setCurrentScreen] = useState<ScreenId>(screenFromLocation);
   const [bookCallOpen, setBookCallOpen] = useState(false);
   const [bookCallInterest, setBookCallInterest] = useState('');
   const [showMobileCta, setShowMobileCta] = useState(false);
@@ -39,32 +51,30 @@ export default function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Handle URL hash navigation if needed
+  // Keep real page URLs in sync with client-side navigation and browser back/forward.
   useEffect(() => {
-    const handleHash = () => {
-      if (new URLSearchParams(window.location.search).get('auth') === 'reset-password') {
-        setCurrentScreen('admin');
-        return;
-      }
-      if (window.location.pathname === '/privacy') {
-        setCurrentScreen('privacy');
-        return;
-      }
-      if (window.location.pathname === '/delete-account') {
-        setCurrentScreen('delete-account');
-        return;
-      }
-      const hash = window.location.hash.replace('#', '') as ScreenId;
-      if (VALID_SCREENS.includes(hash)) setCurrentScreen(hash);
-    };
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
+    const handlePopState = () => setCurrentScreen(screenFromLocation());
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const handleSelectScreen = (screen: ScreenId) => {
+    const routes: Record<ScreenId, string> = {
+      home: '/',
+      'online-coaching': '/online-coaching',
+      packages: '/packages',
+      app: '/app',
+      shwag: '/shwag',
+      contact: '/contact',
+      admin: '/admin',
+      privacy: '/privacy',
+      'delete-account': '/delete-account',
+    };
+    const nextPath = routes[screen];
+    if (window.location.pathname !== nextPath || window.location.search) {
+      window.history.pushState({}, '', nextPath);
+    }
     setCurrentScreen(screen);
-    window.location.hash = screen;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
