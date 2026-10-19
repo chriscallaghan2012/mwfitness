@@ -9,6 +9,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Pricing query errors are logged in the browser console for diagnosis while visitor-facing error copy remains generic.
 - [x] Video library load exceptions and missing Neon configuration now produce explicit states; save/delete/visibility actions are guarded when no live client is configured.
 - [x] Staff HQ plan, workout, nutrition, membership, user, and check-in/progress modules guard missing Neon configuration instead of dereferencing a null client.
+- [x] Staff user CRUD now catches load/save/create exceptions, checks for a missing Neon client before writes, and always clears its busy state after save/create failures.
 - [x] Nutrition date changes now show the selected day as loading until that date's log resolves; failed daily-log saves show a connection error and reliably clear the saving state.
 - [x] Android changes are on `work/mwfitness-android-bulk-fixes-2026-10`; website changes are intended for `work/mwfitness-bulk-fixes-2026-10`. No main merge or deployment.
 
@@ -26,7 +27,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Run website TypeScript/build/lint and Android Expo lint/typecheck locally; this environment has GitHub source access but no verified repository checkout/build output.
 - [ ] Verify the pricing query's actual runtime error from browser console and environment; logging has been added, but the underlying cause is not yet confirmed.
 - [ ] Capture the Android launch crash trace from the installed test APK/device. Startup diagnostic handling exists, but the crash is not claimed fixed without the actual error.
-- [ ] Continue Staff HQ CRUD and authorization/RLS audit against disposable test data, including all save/delete paths; guards added here cover missing configuration, not a complete permission audit.
+- [ ] Continue Staff HQ CRUD and authorization/RLS audit against disposable test data, including all save/delete paths; guards added here cover missing configuration and user CRUD exceptions, not a complete permission audit.
 
 ## Known blocked items / not claimed complete
 - Pricing's underlying environment/database cause is not yet observable from repository source alone; browser console + intended Vercel/local env and Neon permissions must be checked.
