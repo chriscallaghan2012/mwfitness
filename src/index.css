@@ -122,3 +122,10 @@ a {
   width: 100%;
   background-image: repeating-linear-gradient(45deg, #ff5500, #ff5500 15px, #121418 15px, #121418 30px);
 }
+
+/* Short markers let the industrial motif appear inside the page, not only at edges. */
+.industrial-stripe--marker {
+  width: 84px;
+  height: 5px;
+  margin-top: 12px;
+}
