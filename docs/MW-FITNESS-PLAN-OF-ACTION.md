@@ -71,3 +71,9 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - The reported immediate Android launch crash requires a real crash trace to diagnose.
 - Video storage/upload, video-to-programme assignment, programme schema, and verified server-side Neon Auth account deletion need schema/API/security review before implementation or use.
 - No production database changes, merges to `main`, Vercel deployments, EAS builds, or Play submissions have been performed.
+
+
+## Additional source audit — Android login (2026-10-19)
+- [x] Follow-up inspection of the PR #14 branch found a second malformed login field: `<Icon name=mail ... />` passed `mail` as an identifier rather than the string icon name. Corrected to `name="mail"` in the same draft PR: https://github.com/chriscallaghan2012/MW-FITNESS-APP-MOBILE/pull/14.
+- [ ] Run the TypeScript/Expo export checks only after explicit approval. The two source defects are plausible compile blockers, but no build has run and they are not claimed to explain every possible native startup crash.
+- [ ] Continue source scan for JSX attribute/type errors across the remaining app screens and components; do not change demo/sample data as part of this scan.
