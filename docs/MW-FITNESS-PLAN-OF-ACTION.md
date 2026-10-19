@@ -94,3 +94,10 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Replace the sample roster and simulated coach actions with live, permission-checked data only after the server-side account/data API contract is verified.
 - [x] User instruction reaffirmed: **do not run GitHub Actions of any kind unless the user explicitly asks**. No workflow dispatches, builds, diagnostics, or deployment actions are permitted without that explicit request.
 - [ ] Continue local/source-level validation without GitHub Actions; report that build/test gates remain unverified until explicitly authorized.
+
+
+## Follow-up — industrial brand accents and admin prototype safety (2026-10-19)
+- [x] Added restrained industrial orange/charcoal stripe accents in draft website PR #12 and mobile app PR #15. Website uses the pattern at the home and 1:1 package hero edges plus the existing footer; app uses a native-view pattern on sign-in and admin dashboard.
+- [x] Changed the app admin prototype's sample check-in, broadcast, and coach-note actions so they no longer simulate success; each now explains that no live change was saved or sent.
+- [ ] Replace app dashboard sample data and simulated actions with authenticated backend-backed records after verifying API/RLS contracts and account onboarding/deletion flow.
+- [x] No GitHub Actions, builds, diagnostics, or deployment workflows were run during this work.
