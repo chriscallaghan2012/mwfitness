@@ -27,6 +27,10 @@ export async function loadPublicPlans(kind: PublicPlan['kind']): Promise<{ plans
     .order('price');
 
   if (error) {
+    // Keep customer-facing copy generic, but retain the actual Neon error in
+    // the browser console so a local/staging check can identify grants, schema,
+    // or environment problems without exposing backend details to visitors.
+    console.error('[MW Fitness] Public pricing query failed:', error.message);
     return { plans: [], error: 'Pricing is temporarily unavailable. Please contact Mike for current options.' };
   }
 
