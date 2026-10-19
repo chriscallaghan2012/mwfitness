@@ -88,3 +88,9 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - The mobile app's current AdminDashboardScreen roster is still a hard-coded sample list; it is not connected to real account CRUD. Do not present it as live customer management.
 - [ ] Implement app-admin create/deactivate/delete account controls only after a server-side service is designed. The mobile app must never contain an Auth admin secret or use public client credentials to create/delete Auth users. The service must verify the current caller's staff role server-side, validate inputs, prevent deleting/demoting the last admin, define whether deletion is soft or permanent, and safely handle dependent profile/data cleanup.
 - [ ] Before implementing account actions, confirm Neon Auth's supported administrative API and the deployed staff identity/role mapping. Test only in a disposable environment; do not apply production schema changes or expose service credentials to the app.
+
+## Follow-up — admin dashboard truthfulness and workflow restriction (2026-10-19)
+- [x] Added a visible demo-data disclosure to Android AdminDashboardScreen in draft PR #15: https://github.com/chriscallaghan2012/MW-FITNESS-APP-MOBILE/pull/15. It clarifies that the roster, activity feed, check-in queue and coach actions are sample-only, and account create/remove is not implemented yet.
+- [ ] Replace the sample roster and simulated coach actions with live, permission-checked data only after the server-side account/data API contract is verified.
+- [x] User instruction reaffirmed: **do not run GitHub Actions of any kind unless the user explicitly asks**. No workflow dispatches, builds, diagnostics, or deployment actions are permitted without that explicit request.
+- [ ] Continue local/source-level validation without GitHub Actions; report that build/test gates remain unverified until explicitly authorized.
