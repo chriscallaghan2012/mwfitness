@@ -104,11 +104,14 @@ export function ProgressAdmin() {
   const load = async (profileId = userId) => {
     if (!profileId) { setRows(null); return; }
     if (!neon) { setMsg('Neon is not configured; progress records cannot be loaded.'); setRows([]); return; }
+    // Never leave the previous customer's weigh-ins visible during a new query.
+    setRows([]);
     try {
       const { data, error } = await neon.from('progress_logs').select('*').eq('profile_id', profileId).order('recorded_on', { ascending: false });
       if (error) { setMsg(`Could not load progress: ${error.message}`); setRows([]); }
       else { setRows((data ?? []) as Row[]); setMsg(''); }
     } catch (error) {
+      setRows([]);
       setMsg(`Could not load progress: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
   };
