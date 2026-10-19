@@ -29,7 +29,7 @@ export function PlansAdmin() {
 
   const blank = () => {
     setEdit({ id: '', active: true } as Row);
-    setF({ id: '', name: '', price: '', original_price: '', badge: '', kind: 'pt', cta_text: '', features: '[]', active: 'true' });
+    setF({ id: '', name: '', price: '', original_price: '', badge: '', kind: 'pt', cta_text: '', features: '', active: 'true' });
   };
 
   const save = async () => {
@@ -55,15 +55,11 @@ export function PlansAdmin() {
       kind: f.kind ?? 'pt',
       active: f.active === 'true',
     };
-    try {
-      const features = JSON.parse(f.features || '[]');
-      if (!Array.isArray(features) || features.some((item) => typeof item !== 'string')) throw new Error('Features must be an array of text values.');
-      body.features = features;
-    } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Features must be valid JSON (array of strings).');
-      setBusy(false);
-      return;
-    }
+    const features = (f.features ?? '')
+      .split(/\r?\n/)
+      .map((feature) => feature.trim())
+      .filter(Boolean);
+    body.features = features;
     try {
       const { error } = edit?.id ? await supabase.from('plans').update(body).eq('id', edit.id) : await supabase.from('plans').insert(body);
       setMsg(error ? `Save failed: ${error.message}` : 'Package saved.');
@@ -126,7 +122,7 @@ export function PlansAdmin() {
             kind: String(p.kind ?? 'pt'),
             cta_text: String(p.cta_text ?? ''),
             description: String(p.description ?? ''),
-            features: JSON.stringify(p.features ?? [], null, 1),
+            features: Array.isArray(p.features) ? p.features.map(String).join('\n') : '',
             is_popular: p.is_popular ? 'true' : 'false',
             active: p.active ? 'true' : 'false',
           });
@@ -172,7 +168,7 @@ export function PlansAdmin() {
           <input className={`${inp} mt-2`} placeholder="button text (e.g. Start coaching)" value={f.cta_text ?? ''} onChange={(e) => setF({ ...f, cta_text: e.target.value })} />
           <textarea
             className={`${inp} mt-2 min-h-20`}
-            placeholder={'features (JSON array, e.g. ["4 sessions", "plan tracked"])'}
+            placeholder={'Package features — one per line (e.g. 4 coaching sessions)'}
             value={f.features ?? '[]'}
             onChange={(e) => setF({ ...f, features: e.target.value })}
           />
