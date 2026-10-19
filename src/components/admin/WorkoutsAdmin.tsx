@@ -15,16 +15,32 @@ export function WorkoutsAdmin() {
 
   const load = async () => {
     if (!supabase) { setMsg('Neon is not configured; live workouts cannot be loaded.'); setTemplates([]); setSessions([]); return; }
-    const { data, error } = await supabase!.from('workout_templates').select('*, plans(name)').order('name');
-    if (!error && data) setTemplates(data as Row[]);
-    void supabase!.from('profiles').select('id,full_name').order('full_name').then((r) => !r.error && setUsers(r.data as Row[]));
-    void supabase!.from('plans').select('id,name').order('name').then((r) => !r.error && setPlans(r.data as Row[]));
+    try {
+      const [templateResult, userResult, planResult] = await Promise.all([
+        supabase.from('workout_templates').select('*, plans(name)').order('name'),
+        supabase.from('profiles').select('id,full_name').order('full_name'),
+        supabase.from('plans').select('id,name').order('name'),
+      ]);
+      if (templateResult.error) setMsg(`Could not load workout templates: ${templateResult.error.message}`);
+      else setTemplates((templateResult.data ?? []) as Row[]);
+      if (userResult.error) setMsg(`Could not load customers: ${userResult.error.message}`);
+      else setUsers((userResult.data ?? []) as Row[]);
+      if (planResult.error) setMsg(`Could not load plans: ${planResult.error.message}`);
+      else setPlans((planResult.data ?? []) as Row[]);
+    } catch (error) {
+      setMsg(`Could not load workout setup: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
   const loadSessions = async (profileId = userId) => {
     if (!profileId) { setSessions(null); return; }
-    const { data, error } = await supabase!.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', profileId).order('scheduled_on');
-    if (error) { setMsg(`Could not load sessions: ${error.message}`); return; }
-    setSessions((data ?? []) as Row[]);
+    if (!supabase) { setMsg('Neon is not configured; sessions cannot be loaded.'); setSessions([]); return; }
+    try {
+      const { data, error } = await supabase.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', profileId).order('scheduled_on');
+      if (error) { setMsg(`Could not load sessions: ${error.message}`); return; }
+      setSessions((data ?? []) as Row[]);
+    } catch (error) {
+      setMsg(`Could not load sessions: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
   useEffect(() => {
     void load();
