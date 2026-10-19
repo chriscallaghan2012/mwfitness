@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { AdminTable, Row, StatusPill, btn, btnGhost, card, inp } from './fields';
+import { MealSectionsEditor } from './MealSectionsEditor';
 
 export function NutritionAdmin() {
   const [mode, setMode] = useState<'templates' | 'plans'>('templates');
@@ -241,7 +242,7 @@ export function NutritionAdmin() {
               </label>
             ))}
           </div>
-          <textarea className={`${inp} mt-2 min-h-32`} placeholder='sections JSON [{"name":"BREAKFAST","items":[{"name":"…","sub":"…","calories":0,"protein":0}]}]' value={f.sections ?? '[]'} onChange={(e) => setF({ ...f, sections: e.target.value })} />
+          <MealSectionsEditor value={f.sections ?? '[]'} onChange={(sections) => setF({ ...f, sections })} />
           <label className="text-[11px] text-zinc-500 uppercase flex items-center gap-2 mt-2">
             <input type="checkbox" checked={f.active === 'true'} onChange={(e) => setF({ ...f, active: e.target.checked ? 'true' : 'false' })} />
             Active
