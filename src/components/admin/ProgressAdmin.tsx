@@ -5,32 +5,51 @@ import { AdminTable, Row, ShortDate, StatusPill, btn, btnGhost, inp } from './fi
 
 export function CheckinsAdmin() {
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [checkinMsg, setCheckinMsg] = useState('');
   useEffect(() => {
     void load();
   }, []);
 
   const load = async () => {
-    if (!supabase) { setRows([]); return; }
-    const { data, error } = await supabase!.from('checkins').select('*, profiles(full_name,email)').order('checkin_date', { ascending: false });
-    if (!error && data) setRows(data as Row[]);
+    if (!supabase) { setRows([]); setCheckinMsg('Neon is not configured; check-ins cannot be loaded.'); return; }
+    try {
+      const { data, error } = await supabase.from('checkins').select('*, profiles(full_name,email)').order('checkin_date', { ascending: false });
+      if (error) setCheckinMsg('Could not load check-ins: ' + error.message);
+      else { setRows((data ?? []) as Row[]); setCheckinMsg(''); }
+    } catch (error) {
+      setCheckinMsg('Could not load check-ins: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    }
   };
 
   const review = async (r: Row) => {
     const notes = window.prompt('Coach notes for this check-in', String(r.coach_notes ?? ''));
     if (notes === null) return;
-    await supabase!
-      .from('checkins')
-      .update({ status: 'reviewed', coach_notes: notes || null, coach_prescription: notes || null })
-      .eq('id', r.id);
-    await load();
+    if (!supabase) { setCheckinMsg('Neon is not configured; check-ins cannot be updated.'); return; }
+    try {
+      const { error } = await supabase.from('checkins').update({ status: 'reviewed', coach_notes: notes || null, coach_prescription: notes || null }).eq('id', r.id);
+      if (error) { setCheckinMsg('Could not save review: ' + error.message); return; }
+      setCheckinMsg('Check-in review saved.');
+      await load();
+    } catch (error) {
+      setCheckinMsg('Could not save review: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    }
   };
 
   const remove = async (id: string) => {
-    await supabase!.from('checkins').delete().eq('id', id);
-    await load();
+    if (!supabase) { setCheckinMsg('Neon is not configured; check-ins cannot be deleted.'); return; }
+    try {
+      const { error } = await supabase.from('checkins').delete().eq('id', id);
+      if (error) { setCheckinMsg('Could not delete check-in: ' + error.message); return; }
+      setCheckinMsg('Check-in deleted.');
+      await load();
+    } catch (error) {
+      setCheckinMsg('Could not delete check-in: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    }
   };
 
   return (
+    <>
+    {checkinMsg && <p role="status" className="mb-3 text-xs text-zinc-400">{checkinMsg}</p>}
     <AdminTable
       rows={rows ?? []}
       empty="No check-ins yet."
@@ -63,6 +82,7 @@ export function CheckinsAdmin() {
         },
       ]}
     />
+    </>
   );
 }
 
