@@ -68,10 +68,16 @@ export function WorkoutsAdmin() {
   };
 
   const removeTemplate = async (row: Row) => {
+    if (!supabase) { setMsg('Neon is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete workout template “${String(row.name)}”? Scheduled sessions may prevent deletion.`)) return;
-    const { error } = await supabase!.from('workout_templates').delete().eq('id', row.id);
-    setMsg(error ? `Delete failed: ${error.message}` : 'Template deleted.');
-    if (!error) await load();
+    setMsg('');
+    try {
+      const { error } = await supabase.from('workout_templates').delete().eq('id', row.id);
+      setMsg(error ? `Delete failed: ${error.message}` : 'Template deleted.');
+      if (!error) await load();
+    } catch (error) {
+      setMsg(`Delete failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   const addSession = async () => {
