@@ -71,7 +71,6 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
             </div>
           </div>
         </div>
-        <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       </section>
 
       {/* 2. THE PACKAGES */}
