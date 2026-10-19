@@ -35,7 +35,8 @@ function updateItem(
         if (!value.trim()) delete next[key];
         else {
           const number = Number(value);
-          next[key] = Number.isFinite(number) && number >= 0 ? number : value;
+          if (!Number.isFinite(number) || number < 0) return item;
+          next[key] = number;
         }
       } else {
         next[key] = value;
