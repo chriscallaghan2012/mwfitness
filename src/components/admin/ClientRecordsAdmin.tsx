@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btnGhost, card, inp } from './fields';
 
-type Dataset = 'checkins' | 'progress_logs' | 'nutrition_logs' | 'workout_sessions' | 'coach_messages';
+type Dataset = 'checkins' | 'progress_logs' | 'nutrition_logs' | 'nutrition_daily_logs' | 'workout_sessions' | 'coach_messages';
 
 const DATASETS: { id: Dataset; label: string; dateKey: string; description: string }[] = [
   { id: 'checkins', label: 'Check-ins', dateKey: 'checkin_date', description: 'Weekly wellbeing submissions from the mobile app.' },
   { id: 'progress_logs', label: 'Progress', dateKey: 'recorded_on', description: 'Weight and progress records submitted in the app.' },
   { id: 'nutrition_logs', label: 'Nutrition logs', dateKey: 'logged_on', description: 'Daily calories, protein and water entries.' },
+  { id: 'nutrition_daily_logs', label: 'Nutrition completion', dateKey: 'log_date', description: 'Meal completion and day-complete records saved by the mobile nutrition screen.' },
   { id: 'workout_sessions', label: 'Workout sessions', dateKey: 'scheduled_on', description: 'Scheduled and completed sessions.' },
   { id: 'coach_messages', label: 'Messages', dateKey: 'created_at', description: 'Coach messages associated with this client.' },
 ];
@@ -106,6 +107,11 @@ export function ClientRecordsAdmin() {
     if (dataset === 'nutrition_logs') return [
       { key: 'logged_on', label: 'Date', render: (r: Row) => ShortDate(String(r.logged_on ?? '')) },
       { key: 'calories', label: 'Calories' }, { key: 'protein_grams', label: 'Protein (g)' }, { key: 'water_liters', label: 'Water (L)' },
+    ];
+    if (dataset === 'nutrition_daily_logs') return [
+      { key: 'log_date', label: 'Date', render: (r: Row) => ShortDate(String(r.log_date ?? '')) },
+      { key: 'day_type', label: 'Day type' }, { key: 'completed_day', label: 'Day complete', render: (r: Row) => r.completed_day ? 'Yes' : 'No' },
+      { key: 'completed_meal_ids', label: 'Completed meal IDs', render: (r: Row) => Array.isArray(r.completed_meal_ids) ? r.completed_meal_ids.join(', ') || 'None' : '—' },
     ];
     if (dataset === 'workout_sessions') return [
       { key: 'scheduled_on', label: 'Scheduled', render: (r: Row) => ShortDate(String(r.scheduled_on ?? '')) },
