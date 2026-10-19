@@ -12,6 +12,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Staff user CRUD now catches load/save/create exceptions, checks for a missing Neon client before writes, and always clears its busy state after save/create failures.
 - [x] Removed role editing from routine client-profile editing: the single coach/operator keeps staff access, while trainees are managed as client accounts.
 - [x] Progress tools now load the newly selected client rather than a stale previous ID, validate manual weigh-ins, and surface database errors for check-in review/delete and progress CRUD.
+- [x] Check-in list loading, review saves, and deletes now surface backend errors rather than silently failing.
 - [x] Membership assignment/removal and workout/session loading now report backend errors instead of silently leaving stale tables.
 - [x] Workout template creation, session scheduling/status changes, and lead inbox load/status updates now catch request failures and show actionable error states.
 - [x] Android login no longer presents a role toggle that only changed labels; access is determined by the authenticated profile, with coach/admin profiles routed to the coaching dashboard and trainee profiles to the member experience.
