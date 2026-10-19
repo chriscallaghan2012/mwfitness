@@ -66,6 +66,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Verify the real production plan records are Bronze, Silver and Platinum, in the intended order, with correct prices/features and functional Stripe checkout.
 - [ ] Inspect production cookies/storage, Neon auth/session behaviour, Stripe checkout, analytics and third-party embeds. The cookie policy is a draft disclosure, not proof of compliance; implement consent gating if any non-essential cookies are active.
 - [ ] Review the privacy policy against the actual data flows: controller details, purposes and lawful bases, retention, processors, international transfers, data-subject rights and ICO complaint route. Business owner must verify factual statements before final publication.
-- [ ] Run `npm run lint` and `npm run build`, then interactive desktop/mobile checks for package links, footer legal links, direct `/privacy`, `/cookies` and `/delete-account` routes, and checkout.
+- [x] GitHub Actions workflow 39264171899 passed `npm run lint` and `npm run build` on the follow-up branch (19 October 2026).
+- [ ] Complete interactive desktop/mobile checks for package links, footer legal links, direct `/privacy`, `/cookies` and `/delete-account` routes, and checkout. Live production inspection was not available through the web inspection tool.
 - [ ] Only merge/deploy the follow-up once those release checks pass. Android deployment remains user-managed.
 
