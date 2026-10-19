@@ -15,6 +15,9 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Check-in list loading, review saves, and deletes now surface backend errors rather than silently failing.
 - [x] Membership assignment/removal and workout/session loading now report backend errors instead of silently leaving stale tables.
 - [x] Workout template creation, session scheduling/status changes, and lead inbox load/status updates now catch request failures and show actionable error states.
+- [x] Nutrition admin now guards missing Neon configuration for client-plan reads and all writes, catches rejected save/delete/assignment requests, and keeps the editor open when a save fails.
+- [x] Programme visibility updates now check the live database client, disable during requests, and report rejected updates instead of silently failing.
+- [x] Workout template deletion now guards missing Neon configuration and catches rejected delete requests.
 - [x] Android login no longer presents a role toggle that only changed labels; access is determined by the authenticated profile, with coach/admin profiles routed to the coaching dashboard and trainee profiles to the member experience.
 - [x] Nutrition date changes now show the selected day as loading until that date's log resolves; failed daily-log saves show a connection error and reliably clear the saving state.
 - [x] Android changes are on `work/mwfitness-android-bulk-fixes-2026-10`; website changes are intended for `work/mwfitness-bulk-fixes-2026-10`. No main merge or deployment.
@@ -33,7 +36,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Run website TypeScript/build/lint and Android Expo lint/typecheck locally; this environment has GitHub source access but no verified repository checkout/build output.
 - [ ] Verify the pricing query's actual runtime error from browser console and environment; logging has been added, but the underlying cause is not yet confirmed.
 - [ ] Capture the Android launch crash trace from the installed test APK/device. Startup diagnostic handling exists, but the crash is not claimed fixed without the actual error.
-- [ ] Continue Staff HQ CRUD and authorization/RLS audit against disposable test data, including all save/delete paths; recent hardening covers user, membership, progress/check-in and workout loading paths, but is not a complete permission audit.
+- [ ] Continue Staff HQ CRUD and authorization/RLS audit against disposable test data, including all save/delete paths; recent hardening now covers nutrition, programme visibility, workout deletion, user, membership, progress/check-in and workout loading paths, but is not a complete permission audit.
 - [ ] Access control: product intent is one coach/operator with staff access and trainee accounts. The routine user editor no longer changes roles. Still verify that new sign-ups default to trainee access and deployed RLS prevents trainees from reading or writing other clients' records; do not apply the documented draft trigger to shared production without testing the deployed auth mapping.
 
 ## Known blocked items / not claimed complete
