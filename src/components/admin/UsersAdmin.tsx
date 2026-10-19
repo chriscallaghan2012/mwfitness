@@ -88,10 +88,10 @@ export function UsersAdmin() {
 
       {addOpen && (
         <div className={`${card} mb-4`}>
-          <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Secure account invitation required</p>
+          <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Customer accounts are app-managed</p>
           <p className="text-sm text-zinc-300">
-            Customer creation is temporarily disabled here. Creating an account through the browser sign-up flow can replace the signed-in staff session and is not a safe staff invitation process.
-            A server-side, staff-authorized invitation endpoint must be configured before accounts can be created from Staff HQ.
+            Customer login belongs in the MW Fitness mobile app, not the public website. An authorized app administrator should create and remove customer accounts through a secure server-side account-management service.
+            This website panel manages coaching records only; it must not create customer credentials or replace the signed-in staff session.
           </p>
         </div>
       )}
