@@ -30,16 +30,18 @@ export function NutritionAdmin() {
       setRows([]);
       return;
     }
-    const { data, error } = await supabase!.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
+    if (!supabase) { setMsg('Neon is not configured; client nutrition plans cannot be loaded.'); setRows([]); return; }
+    const { data, error } = await supabase.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
     if (error) { setMsg(`Could not load this client's nutrition plans: ${error.message}`); setRows([]); return; }
     setRows((data ?? []) as Row[]);
   };
   useEffect(() => {
     void loadTemplates();
-    void supabase!.from('profiles').select('id,full_name,email').order('full_name').then((r) => {
+    if (!supabase) { setMsg('Neon is not configured; clients cannot be loaded.'); return; }
+    void supabase.from('profiles').select('id,full_name,email').order('full_name').then((r) => {
       if (!r.error) setUsers((r.data ?? []) as Row[]);
       else setMsg(`Could not load clients: ${r.error.message}`);
-    });
+    }).catch(() => setMsg('Could not reach the client service. Check the connection and retry.'));
   }, []);
 
   useEffect(() => {
@@ -48,6 +50,7 @@ export function NutritionAdmin() {
   }, [mode, userId]);
 
   const saveRow = async () => {
+    if (!supabase) { setMsg('Neon is not configured; no changes were saved.'); return; }
     setBusy(true);
     setMsg('');
     let targets: Record<string, unknown> = {};
@@ -77,35 +80,41 @@ export function NutritionAdmin() {
     }
     const body: Record<string, unknown> = { name: f.name.trim(), description: f.description?.trim() || null, targets, sections, active: f.active === 'true' };
     if (mode === 'plans') body.profile_id = userId;
-    const { error } = edit && edit.id
-      ? await supabase!.from(schema()).update(body).eq('id', edit.id)
-      : await supabase!.from(schema()).insert(body);
-    setMsg(error ? `Failed: ${error.message}` : 'Saved ✓');
-    setBusy(false);
-    setEdit(null);
-    if (!error) mode === 'templates' ? await loadTemplates() : await loadPlans();
+    try {
+      const { error } = edit && edit.id
+        ? await supabase.from(schema()).update(body).eq('id', edit.id)
+        : await supabase.from(schema()).insert(body);
+      setMsg(error ? `Failed: ${error.message}` : 'Saved ✓');
+      if (!error) { setEdit(null); if (mode === 'templates') await loadTemplates(); else await loadPlans(); }
+    } catch {
+      setMsg('Could not save this nutrition item. Check the connection and try again.');
+    } finally { setBusy(false); }
   };
 
   const removeRow = async (row: Row) => {
+    if (!supabase) { setMsg('Neon is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete “${String(row.name)}”? This cannot be undone.`)) return;
-    setBusy(true);
-    setMsg('');
-    const { error } = await supabase!.from(schema()).delete().eq('id', row.id);
-    setBusy(false);
-    setMsg(error ? `Delete failed: ${error.message}` : 'Deleted.');
-    if (!error) mode === 'templates' ? await loadTemplates() : await loadPlans();
+    setBusy(true); setMsg('');
+    try {
+      const { error } = await supabase.from(schema()).delete().eq('id', row.id);
+      setMsg(error ? `Delete failed: ${error.message}` : 'Deleted.');
+      if (!error) { if (mode === 'templates') await loadTemplates(); else await loadPlans(); }
+    } catch { setMsg('Could not delete this nutrition item. Check the connection and try again.'); }
+    finally { setBusy(false); }
   };
 
   const assignTemplate = async () => {
-    if (!userId || !assignTpl) return;
-    setBusy(true);
-    const { data: t, error: tErr } = await supabase!.from('nutrition_templates').select('*').eq('id', assignTpl).maybeSingle();
+    if (!supabase) { setMsg('Neon is not configured; no assignment was created.'); return; }
+    if (!userId || !assignTpl) { setMsg('Choose a client and a meal template first.'); return; }
+    setBusy(true); setMsg('');
+    try {
+    const { data: t, error: tErr } = await supabase.from('nutrition_templates').select('*').eq('id', assignTpl).maybeSingle();
     if (tErr || !t) {
       setMsg('Template not found.');
       setBusy(false);
       return;
     }
-    const { error } = await supabase!.from('nutrition_plans').insert({
+    const { error } = await supabase.from('nutrition_plans').insert({
       profile_id: userId,
       name: String(t.name),
       targets: t.targets,
@@ -113,8 +122,9 @@ export function NutritionAdmin() {
       active: true,
     });
     setMsg(error ? `Failed: ${error.message}` : `Assigned “${t.name}” ✓`);
-    setBusy(false);
-    await loadPlans();
+    if (!error) await loadPlans();
+    } catch { setMsg('Could not assign this template. Check the connection and try again.'); }
+    finally { setBusy(false); }
   };
 
   return (
