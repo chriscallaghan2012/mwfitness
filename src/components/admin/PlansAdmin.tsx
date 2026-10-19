@@ -14,9 +14,14 @@ export function PlansAdmin() {
 
   const load = async () => {
     if (!supabase) { setMsg('Neon is not configured; live pricing cannot be loaded.'); setPlans([]); return; }
-    const { data, error } = await supabase!.from('plans').select('*').order('price');
-    if (error) { setMsg(`Could not load packages and pricing: ${error.message}`); return; }
-    setPlans((data ?? []) as Row[]);
+    try {
+      const { data, error } = await supabase.from('plans').select('*').order('price');
+      if (error) { setMsg(`Could not load packages and pricing: ${error.message}`); return; }
+      setPlans((data ?? []) as Row[]);
+    } catch {
+      setMsg('Could not reach packages and pricing. Check the connection and retry.');
+      setPlans([]);
+    }
   };
   useEffect(() => {
     void load();
@@ -59,29 +64,38 @@ export function PlansAdmin() {
       setBusy(false);
       return;
     }
-    const { error } = edit?.id ? await supabase!.from('plans').update(body).eq('id', edit.id) : await supabase!.from('plans').insert(body);
-    setMsg(error ? `Save failed: ${error.message}` : 'Package saved.');
-    setBusy(false);
-    if (!error) { setEdit(null); await load(); }
+    try {
+      const { error } = edit?.id ? await supabase.from('plans').update(body).eq('id', edit.id) : await supabase.from('plans').insert(body);
+      setMsg(error ? `Save failed: ${error.message}` : 'Package saved.');
+      if (!error) { setEdit(null); await load(); }
+    } catch {
+      setMsg('Could not save this package. Check the connection and retry.');
+    } finally { setBusy(false); }
   };
 
   const remove = async (p: Row) => {
     if (!supabase) { setMsg('Neon is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete plan “${String(p.name)}”? Plans assigned to memberships may be protected by database constraints; hide the plan instead if it is already in use.`)) return;
-    setBusy(true);
-    const { error } = await supabase!.from('plans').delete().eq('id', p.id);
-    setBusy(false);
-    setMsg(error ? `Delete failed: ${error.message}` : 'Plan deleted.');
-    await load();
+    setBusy(true); setMsg('');
+    try {
+      const { error } = await supabase.from('plans').delete().eq('id', p.id);
+      setMsg(error ? `Delete failed: ${error.message}` : 'Plan deleted.');
+      if (!error) await load();
+    } catch {
+      setMsg('Could not delete this plan. Check the connection and retry.');
+    } finally { setBusy(false); }
   };
 
   const toggle = async (p: Row) => {
     if (!supabase) { setMsg('Neon is not configured; no changes were made.'); return; }
-    setBusy(true);
-    const { error } = await supabase!.from('plans').update({ active: !p.active }).eq('id', p.id);
-    setBusy(false);
-    setMsg(error ? `Could not update visibility: ${error.message}` : `${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);
-    if (!error) await load();
+    setBusy(true); setMsg('');
+    try {
+      const { error } = await supabase.from('plans').update({ active: !p.active }).eq('id', p.id);
+      setMsg(error ? `Could not update visibility: ${error.message}` : `${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);
+      if (!error) await load();
+    } catch {
+      setMsg('Could not update plan visibility. Check the connection and retry.');
+    } finally { setBusy(false); }
   };
 
   return (
