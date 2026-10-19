@@ -127,7 +127,7 @@ export function ClientRecordsAdmin() {
     <div className="space-y-4">
       <div className={card}>
         <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-orange-300">App data explorer</p>
-        <p className="mb-4 text-sm text-zinc-400">Inspect submissions synced from the mobile app. This is read-only scaffolding; it does not change the app's dummy data or write into client records.</p>
+        <p className="mb-4 text-sm text-zinc-400">Inspect live submissions from the mobile app through the shared Neon database. This view is read-only; manage plans and assignments in their dedicated admin tabs.</p>
         <label className="mb-1 block text-xs text-zinc-400">Client</label>
         <select className={inp} value={userId} onChange={(event) => setUserId(event.target.value)}>
           <option value="">Choose a client…</option>
