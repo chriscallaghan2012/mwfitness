@@ -77,3 +77,5 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Follow-up inspection of the PR #14 branch found a second malformed login field: `<Icon name=mail ... />` passed `mail` as an identifier rather than the string icon name. Corrected to `name="mail"` in the same draft PR: https://github.com/chriscallaghan2012/MW-FITNESS-APP-MOBILE/pull/14.
 - [ ] Run the TypeScript/Expo export checks only after explicit approval. The two source defects are plausible compile blockers, but no build has run and they are not claimed to explain every possible native startup crash.
 - [ ] Continue source scan for JSX attribute/type errors across the remaining app screens and components; do not change demo/sample data as part of this scan.
+
+- [x] Performed a targeted JSX attribute scan across 12 additional Android screens (workout, nutrition, training, profile, messages, admin dashboard, calendar, coach/member check-ins, goals, member tools, progress) plus shared icon/UI/navigation components; no additional suspicious unquoted attributes were found in that limited scan. This is not a substitute for TypeScript/lint/build validation.
