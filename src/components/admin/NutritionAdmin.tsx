@@ -21,7 +21,7 @@ export function NutritionAdmin() {
     if (!neon) { setMsg('Neon is not configured; meal templates cannot be loaded.'); setRows([]); return; }
     try {
       const { data, error } = await neon.from('nutrition_templates').select('*').order('name');
-      if (error) { setMsg(`Could not load meal templates: ${error.message}`); return; }
+      if (error) { setMsg(`Could not load meal templates: ${error.message}`); setRows([]); return; }
       const next = (data ?? []) as Row[];
       setTemplates(next);
       if (mode === 'templates') setRows(next);
@@ -36,6 +36,8 @@ export function NutritionAdmin() {
       return;
     }
     if (!neon) { setMsg('Neon is not configured; client nutrition plans cannot be loaded.'); setRows([]); return; }
+    // Clear the previous customer's data immediately while the new query runs.
+    setRows([]);
     try {
       const { data, error } = await neon.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
       if (error) { setMsg(`Could not load this client's nutrition plans: ${error.message}`); setRows([]); return; }
