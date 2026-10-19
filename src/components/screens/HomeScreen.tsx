@@ -77,7 +77,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <span>Shop online plans</span>
               </button>
               <button
-                onClick={() => onSelectScreen('packages')}
+                onClick={() => onSelectScreen('online-coaching')}
                 className="bg-[#16181d] border border-[#2b303d] hover:border-[#ff5500] text-white font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 transition-colors"
               >
                 <span>Compare Bronze, Silver & Platinum</span>
@@ -97,7 +97,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 Real results
               </button>
               <button onClick={() => scrollToId('packages-overview')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
-                1:1 packages
+                Online packages
               </button>
             </div>
 
