@@ -78,7 +78,7 @@ export function UsersAdmin() {
     <div>
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <button onClick={() => setAddOpen(!addOpen)} className={btnGhost}>
-          + Add customer
+          Account management
         </button>
         <button onClick={() => void load()} className={btnGhost}>
           Refresh
