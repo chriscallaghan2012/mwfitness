@@ -54,7 +54,7 @@ export function MessagesAdmin() {
       setBody('');
       await load();
       try {
-        const accessToken = await neon.auth.getJWTToken?.();
+        const accessToken = await neon.auth.getJWTToken?.(false);
         if (!accessToken) throw new Error('Could not obtain a Neon access token for push delivery.');
         const response = await fetch('/api/send-push', {
           method: 'POST',
