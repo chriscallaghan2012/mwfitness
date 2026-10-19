@@ -16,9 +16,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
   useEffect(() => {
     let active = true;
-    void loadPublicPlans('pt').then((result) => {
+    void loadPublicPlans('online').then((result) => {
       if (!active) return;
-      setPlans(result.plans.slice(0, 4));
+      setPlans(result.plans.slice(0, 3));
       setPlansError(result.error);
       setPlansLoading(false);
     });
@@ -77,10 +77,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <span>Book a free call</span>
               </button>
               <button
-                onClick={() => onSelectScreen('packages')}
+                onClick={() => onSelectScreen('online-coaching')}
                 className="bg-[#16181d] border border-[#2b303d] hover:border-[#ff5500] text-white font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 transition-colors"
               >
-                <span>View packages</span>
+                <span>Explore online plans</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
