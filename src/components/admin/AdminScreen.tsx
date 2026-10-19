@@ -44,61 +44,189 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
   users: {
     columns: [{ key: 'name', label: 'Customer' }, { key: 'email', label: 'Email' }, { key: 'role', label: 'Role' }, { key: 'tier', label: 'Tier' }],
     rows: [
-      { id: 'demo-user-1', name: 'Alex Morgan', email: 'alex@example.test', role: 'athlete', tier: 'Gold' },
-      { id: 'demo-user-2', name: 'Jamie Reed', email: 'jamie@example.test', role: 'athlete', tier: 'Online' },
+      { id: 'demo-user-1', name: 'Alex Morgan', email: 'alex@example.test', role: 'athlete', tier: 'Gold', phone: '07700 900101', goal: 'Build strength', startWeight: '86.4', currentWeight: '81.6', goalWeight: '78', joined: '2026-06-02', status: 'Active', notes: 'Consistent training; review sleep routine.' },
+      { id: 'demo-user-2', name: 'Jamie Reed', email: 'jamie@example.test', role: 'athlete', tier: 'Online', phone: '07700 900102', goal: 'Improve fitness', startWeight: '94', currentWeight: '91.2', goalWeight: '85', joined: '2026-07-14', status: 'Active', notes: 'Prefers evening sessions.' },
+      { id: 'demo-user-3', name: 'Taylor Brooks', email: 'taylor@example.test', role: 'athlete', tier: 'Starter', phone: '07700 900103', goal: 'Fat loss', startWeight: '78', currentWeight: '76.8', goalWeight: '70', joined: '2026-08-01', status: 'Onboarding', notes: 'Needs initial check-in.' },
+      { id: 'demo-user-4', name: 'Morgan Ellis', email: 'morgan@example.test', role: 'athlete', tier: 'Elite', phone: '07700 900104', goal: 'Hypertrophy', startWeight: '73', currentWeight: '74.1', goalWeight: '78', joined: '2026-05-21', status: 'At risk', notes: 'Missed two check-ins; follow up.' },
+      { id: 'demo-user-5', name: 'Casey Patel', email: 'casey@example.test', role: 'athlete', tier: '1:1 Coaching', phone: '07700 900105', goal: 'Return to consistent training', startWeight: '88', currentWeight: '86.9', goalWeight: '82', joined: '2026-09-09', status: 'Active', notes: 'Training around a busy work schedule.' },
     ],
   },
   'client-records': {
     columns: [{ key: 'client', label: 'Client' }, { key: 'source', label: 'App data' }, { key: 'status', label: 'Status' }],
-    rows: [{ id: 'demo-record-1', client: 'Alex Morgan', source: 'Weekly check-in', status: 'Sample only' }, { id: 'demo-record-2', client: 'Jamie Reed', source: 'Nutrition log', status: 'Sample only' }],
+    rows: [{ id: 'demo-record-1', client: 'Alex Morgan', source: 'Weekly check-in', status: 'Needs review', lastSync: '2026-10-17', detail: 'Sleep 8/10, energy 7/10; asks for meal-prep ideas.' }, { id: 'demo-record-2', client: 'Jamie Reed', source: 'Nutrition log', status: 'Up to date', lastSync: '2026-10-18', detail: 'Training-day targets and meals logged.' }, { id: 'demo-record-3', client: 'Taylor Brooks', source: 'Workout session', status: 'Awaiting sync', lastSync: '2026-10-16', detail: 'Full Body A session completed.' }, { id: 'demo-record-4', client: 'Morgan Ellis', source: 'Progress photo', status: 'Needs review', lastSync: '2026-10-15', detail: 'New progress photos awaiting coach review.' }],
   },
   plans: {
     columns: [{ key: 'name', label: 'Plan' }, { key: 'price', label: 'Price' }, { key: 'kind', label: 'Type' }, { key: 'status', label: 'Status' }],
     rows: [
-      { id: 'demo-plan-1', name: 'Gold Coaching', price: '£175.00', kind: 'PT', status: 'Active' },
-      { id: 'demo-plan-2', name: '12-week Online', price: '£399.99', kind: 'Online', status: 'Active' },
+      { id: 'demo-plan-1', name: 'Gold Coaching', price: '£175.00', kind: 'PT', billing: 'Monthly', status: 'Active', description: 'Personal coaching with structured progression.', features: 'Monthly review\\nTraining plan\\nCoach messaging' },
+      { id: 'demo-plan-2', name: '12-week Online', price: '£399.99', kind: 'Online', billing: '12 weeks', status: 'Active', description: 'Remote coaching and accountability.', features: 'Workout plan\\nNutrition guidance\\nWeekly check-in' },
+      { id: 'demo-plan-3', name: 'PT 4 Sessions', price: '£140.00', kind: 'PT', billing: 'One-off', status: 'Active', description: 'Four in-person sessions.', features: '4 coached sessions\\nTechnique review' },
+      { id: 'demo-plan-4', name: 'Online Essentials', price: '£89.00', kind: 'Online', billing: 'Monthly', status: 'Draft', description: 'A lighter-touch online plan.', features: 'Monthly programme\\nProgress tracking' },
     ],
   },
   memberships: {
     columns: [{ key: 'customer', label: 'Customer' }, { key: 'plan', label: 'Plan' }, { key: 'status', label: 'Status' }, { key: 'renewal', label: 'Next renewal' }],
-    rows: [{ id: 'demo-membership-1', customer: 'Alex Morgan', plan: 'Gold Coaching', status: 'Active', renewal: '12 Oct 2026' }],
+    rows: [{ id: 'demo-membership-1', customer: 'Alex Morgan', plan: 'Gold Coaching', status: 'Active', started: '2026-06-02', renewal: '2026-11-12', amount: '175', notes: 'Renewal confirmed.' }, { id: 'demo-membership-2', customer: 'Jamie Reed', plan: 'Online Coaching', status: 'Active', started: '2026-07-14', renewal: '2026-11-14', amount: '89', notes: 'Monthly online plan.' }, { id: 'demo-membership-3', customer: 'Taylor Brooks', plan: 'PT 4 Sessions', status: 'Trial', started: '2026-10-01', renewal: '2026-10-31', amount: '140', notes: 'Trial conversion follow-up.' }],
   },
   nutrition: {
     columns: [{ key: 'customer', label: 'Customer' }, { key: 'plan', label: 'Nutrition plan' }, { key: 'calories', label: 'Daily target' }, { key: 'status', label: 'Status' }],
-    rows: [{ id: 'demo-nutrition-1', customer: 'Alex Morgan', plan: 'Training day', calories: '2,250 kcal', status: 'Assigned' }],
+    rows: [{ id: 'demo-nutrition-1', customer: 'Alex Morgan', plan: 'Training day', calories: '2,250 kcal', protein: '165', carbs: '245', fats: '65', water: '3500', status: 'Assigned', meals: 'Breakfast: oats, yoghurt, berries\\nLunch: chicken rice bowl\\nDinner: salmon, potatoes, vegetables' }, { id: 'demo-nutrition-2', customer: 'Jamie Reed', plan: 'Rest day', calories: '2,050 kcal', protein: '160', carbs: '190', fats: '70', water: '3000', status: 'Assigned', meals: 'Higher-fibre meals; keep snacks planned.' }, { id: 'demo-nutrition-3', customer: 'Taylor Brooks', plan: 'Starter plan', calories: '1,900 kcal', protein: '140', carbs: '205', fats: '60', water: '2500', status: 'Needs review', meals: 'Awaiting food preferences.' }],
   },
   workouts: {
     columns: [{ key: 'customer', label: 'Customer' }, { key: 'session', label: 'Session' }, { key: 'date', label: 'Scheduled' }, { key: 'status', label: 'Status' }],
-    rows: [{ id: 'demo-workout-1', customer: 'Jamie Reed', session: 'Full body A', date: '30 Sep 2026', status: 'Planned' }],
+    rows: [{ id: 'demo-workout-1', customer: 'Jamie Reed', session: 'Full body A', date: '2026-10-21', status: 'Planned', duration: '55', location: 'Gym', notes: 'Focus on controlled tempo.' }, { id: 'demo-workout-2', customer: 'Alex Morgan', session: 'Upper body B', date: '2026-10-20', status: 'Completed', duration: '48', location: 'Gym', notes: 'Progressed row load.' }, { id: 'demo-workout-3', customer: 'Taylor Brooks', session: 'Beginner conditioning', date: '2026-10-22', status: 'Needs reschedule', duration: '35', location: 'Home', notes: 'Client requested a new time.' }],
   },
   programmes: {
     columns: [{ key: 'name', label: 'Programme' }, { key: 'duration', label: 'Duration' }, { key: 'training', label: 'Training' }, { key: 'status', label: 'Status' }],
-    rows: [{ id: 'demo-programme-1', name: '12-week strength builder', duration: '12 weeks', training: '4 days/week', status: 'Sample only' }, { id: 'demo-programme-2', name: 'Beginner foundations', duration: '8 weeks', training: '3 days/week', status: 'Sample only' }],
+    rows: [{ id: 'demo-programme-1', name: '12-week strength builder', duration: '12 weeks', training: '4 days/week', focus: 'Strength', status: 'Active', description: 'Progressive compound lifts and accessories.' }, { id: 'demo-programme-2', name: 'Beginner foundations', duration: '8 weeks', training: '3 days/week', focus: 'Beginner foundations', status: 'Active', description: 'Build technique, confidence and consistency.' }, { id: 'demo-programme-3', name: 'Lean & athletic', duration: '10 weeks', training: '4 days/week', focus: 'Fat loss', status: 'Draft', description: 'Strength training with conditioning.' }],
   },
   videos: {
     columns: [{ key: 'title', label: 'Video' }, { key: 'category', label: 'Category' }, { key: 'duration', label: 'Duration' }, { key: 'status', label: 'Visibility' }],
-    rows: [{ id: 'demo-video-1', title: 'Squat technique basics', category: 'Technique', duration: '04:20', status: 'Hidden · sample only' }, { id: 'demo-video-2', title: 'Warm-up flow', category: 'Warm-up', duration: '03:10', status: 'Visible · sample only' }],
+    rows: [{ id: 'demo-video-1', title: 'Squat technique basics', category: 'Technique', duration: '04:20', url: 'https://example.test/squat-technique', status: 'Hidden', description: 'Bracing, depth and safe setup.' }, { id: 'demo-video-2', title: 'Warm-up flow', category: 'Warm-up', duration: '03:10', url: 'https://example.test/warm-up', status: 'Visible', description: 'Five-minute general warm-up.' }, { id: 'demo-video-3', title: 'Hip hinge walkthrough', category: 'Technique', duration: '05:45', url: 'https://example.test/hip-hinge', status: 'Draft', description: 'Learn the hinge pattern.' }],
   },
   checkins: {
     columns: [{ key: 'customer', label: 'Customer' }, { key: 'date', label: 'Submitted' }, { key: 'scores', label: 'Wellbeing' }, { key: 'status', label: 'Status' }],
-    rows: [{ id: 'demo-checkin-1', customer: 'Alex Morgan', date: '27 Sep 2026', scores: 'Sleep 8 · Energy 7', status: 'Needs review' }],
+    rows: [{ id: 'demo-checkin-1', customer: 'Alex Morgan', date: '2026-10-18', sleep: '8', energy: '7', mood: '8', adherence: '90', scores: 'Sleep 8 · Energy 7', status: 'Needs review', notes: 'Good week overall; discuss weekend routine.' }, { id: 'demo-checkin-2', customer: 'Jamie Reed', date: '2026-10-17', sleep: '7', energy: '8', mood: '7', adherence: '85', scores: 'Sleep 7 · Energy 8', status: 'Reviewed', notes: 'Keep current plan.' }, { id: 'demo-checkin-3', customer: 'Morgan Ellis', date: '2026-10-16', sleep: '5', energy: '4', mood: '5', adherence: '55', scores: 'Sleep 5 · Energy 4', status: 'Follow up required', notes: 'Missed sessions; coach follow-up needed.' }],
   },
   progress: {
     columns: [{ key: 'customer', label: 'Customer' }, { key: 'date', label: 'Recorded' }, { key: 'weight', label: 'Weight' }, { key: 'note', label: 'Note' }],
-    rows: [{ id: 'demo-progress-1', customer: 'Alex Morgan', date: '27 Sep 2026', weight: '81.6 kg', note: 'Weekly check-in' }],
+    rows: [{ id: 'demo-progress-1', customer: 'Alex Morgan', date: '2026-10-18', weight: '81.6', bodyFat: '19.8', waist: '86', steps: '9200', note: 'Down 0.4 kg this week; strength maintained.' }, { id: 'demo-progress-2', customer: 'Jamie Reed', date: '2026-10-17', weight: '91.2', bodyFat: '25.1', waist: '99', steps: '8100', note: 'Consistency improving.' }, { id: 'demo-progress-3', customer: 'Taylor Brooks', date: '2026-10-16', weight: '76.8', bodyFat: '28.4', waist: '91', steps: '7400', note: 'Baseline measurements recorded.' }],
   },
   messages: {
     columns: [{ key: 'customer', label: 'Athlete' }, { key: 'from', label: 'From' }, { key: 'message', label: 'Message' }, { key: 'status', label: 'Push status' }],
-    rows: [{ id: 'demo-message-1', customer: 'Alex Morgan', from: 'Coach', message: 'Great work staying consistent this week.', status: 'Sample only' }],
+    rows: [{ id: 'demo-message-1', customer: 'Alex Morgan', from: 'Coach', message: 'Great work staying consistent this week. Keep your water target in focus.', sentAt: '2026-10-18', status: 'Read' }, { id: 'demo-message-2', customer: 'Jamie Reed', from: 'Coach', message: 'I have updated your next workout. Let me know how it feels.', sentAt: '2026-10-17', status: 'Sent' }, { id: 'demo-message-3', customer: 'Taylor Brooks', from: 'Client', message: 'Can we move Thursday to Friday evening?', sentAt: '2026-10-16', status: 'Queued' }],
   },
   'member-activity': {
     columns: [{ key: 'member', label: 'Member' }, { key: 'activity', label: 'Activity' }, { key: 'status', label: 'Status' }],
-    rows: [{ id: 'demo-activity-1', member: 'Alex Morgan', activity: 'Daily hydration & steps', status: 'Sample only' }, { id: 'demo-activity-2', member: 'Jamie Reed', activity: 'Cardio session', status: 'Sample only' }],
+    rows: [{ id: 'demo-activity-1', member: 'Alex Morgan', activity: 'Steps', value: '9,200 steps', date: '2026-10-18', status: 'Complete', notes: 'Daily target achieved.' }, { id: 'demo-activity-2', member: 'Jamie Reed', activity: 'Cardio', value: '25 min cycling', date: '2026-10-18', status: 'Complete', notes: 'Moderate effort.' }, { id: 'demo-activity-3', member: 'Taylor Brooks', activity: 'Hydration', value: '1.8 L / 2.5 L', date: '2026-10-18', status: 'In progress', notes: 'Remind to drink through the afternoon.' }, { id: 'demo-activity-4', member: 'Morgan Ellis', activity: 'Workout', value: 'Upper body session', date: '2026-10-17', status: 'Missed', notes: 'Follow-up recommended.' }],
   },
   leads: {
     columns: [{ key: 'name', label: 'Name' }, { key: 'email', label: 'Email' }, { key: 'interest', label: 'Interested in' }, { key: 'status', label: 'Status' }],
-    rows: [{ id: 'demo-lead-1', name: 'Sample visitor', email: 'sample@example.test', interest: 'Free consultation', status: 'New · sample only' }],
+    rows: [{ id: 'demo-lead-1', name: 'Jordan Taylor', email: 'jordan@example.test', phone: '07700 900201', interest: 'Free consultation', source: 'Website', status: 'New', followUp: '2026-10-20', notes: 'Asked about online coaching.' }, { id: 'demo-lead-2', name: 'Sam Carter', email: 'sam@example.test', phone: '07700 900202', interest: 'Personal training', source: 'Referral', status: 'Contacted', followUp: '2026-10-21', notes: 'Prefers weekday mornings.' }, { id: 'demo-lead-3', name: 'Riley James', email: 'riley@example.test', phone: '07700 900203', interest: 'Nutrition', source: 'Instagram', status: 'Booked', followUp: '2026-10-22', notes: 'Consultation booked.' }],
   },
+};
+
+type DemoField = { key: string; label: string; type?: 'text' | 'email' | 'number' | 'date' | 'select' | 'textarea'; options?: string[]; placeholder?: string };
+const DEMO_FIELDS: Record<DemoTab, DemoField[]> = {
+  users: [
+    { key: 'name', label: 'Full name', placeholder: 'Client full name' },
+    { key: 'email', label: 'Email address', type: 'email', placeholder: 'client@example.test' },
+    { key: 'role', label: 'Account role', type: 'select', options: ['athlete', 'coach', 'admin'] },
+    { key: 'tier', label: 'Membership tier', type: 'select', options: ['Starter', 'Online', 'Gold', 'Elite', '1:1 Coaching'] },
+    { key: 'phone', label: 'Phone number', placeholder: '+44…' },
+    { key: 'goal', label: 'Primary goal', placeholder: 'Build strength, lose fat…' },
+    { key: 'startWeight', label: 'Starting weight (kg)', type: 'number' },
+    { key: 'currentWeight', label: 'Current weight (kg)', type: 'number' },
+    { key: 'goalWeight', label: 'Goal weight (kg)', type: 'number' },
+    { key: 'joined', label: 'Joined', type: 'date' },
+    { key: 'status', label: 'Account status', type: 'select', options: ['Active', 'Onboarding', 'Paused', 'At risk'] },
+    { key: 'notes', label: 'Coach notes', type: 'textarea' },
+  ],
+  'client-records': [
+    { key: 'client', label: 'Client', placeholder: 'Client name' },
+    { key: 'source', label: 'Record type', type: 'select', options: ['Weekly check-in', 'Nutrition log', 'Workout session', 'Progress photo', 'Daily metrics', 'Coach message'] },
+    { key: 'status', label: 'Status', type: 'select', options: ['Up to date', 'Needs review', 'Awaiting sync', 'Sample only'] },
+    { key: 'lastSync', label: 'Last synced', type: 'date' },
+    { key: 'detail', label: 'Record summary', type: 'textarea' },
+  ],
+  plans: [
+    { key: 'name', label: 'Plan name', placeholder: 'e.g. Gold Coaching' },
+    { key: 'price', label: 'Price (£)', type: 'number' },
+    { key: 'kind', label: 'Plan type', type: 'select', options: ['PT', 'Online', 'Hybrid', 'Nutrition'] },
+    { key: 'billing', label: 'Billing cadence', type: 'select', options: ['One-off', 'Weekly', 'Monthly', '12 weeks'] },
+    { key: 'status', label: 'Visibility', type: 'select', options: ['Active', 'Draft', 'Hidden'] },
+    { key: 'description', label: 'Description', type: 'textarea' },
+    { key: 'features', label: 'Included features', type: 'textarea', placeholder: 'One feature per line' },
+  ],
+  memberships: [
+    { key: 'customer', label: 'Customer', placeholder: 'Client name' },
+    { key: 'plan', label: 'Plan', type: 'select', options: ['Gold Coaching', 'Online Coaching', '12-week Strength', 'PT 4 Sessions'] },
+    { key: 'status', label: 'Membership status', type: 'select', options: ['Active', 'Trial', 'Paused', 'Past due', 'Cancelled'] },
+    { key: 'started', label: 'Start date', type: 'date' },
+    { key: 'renewal', label: 'Next renewal', type: 'date' },
+    { key: 'amount', label: 'Recurring amount (£)', type: 'number' },
+    { key: 'notes', label: 'Notes', type: 'textarea' },
+  ],
+  nutrition: [
+    { key: 'customer', label: 'Customer', placeholder: 'Client name' },
+    { key: 'plan', label: 'Nutrition plan', placeholder: 'Training day / rest day' },
+    { key: 'calories', label: 'Calories (kcal)', type: 'number' },
+    { key: 'protein', label: 'Protein (g)', type: 'number' },
+    { key: 'carbs', label: 'Carbohydrates (g)', type: 'number' },
+    { key: 'fats', label: 'Fats (g)', type: 'number' },
+    { key: 'water', label: 'Water target (ml)', type: 'number' },
+    { key: 'status', label: 'Assignment status', type: 'select', options: ['Assigned', 'Draft', 'Needs review'] },
+    { key: 'meals', label: 'Meals / food notes', type: 'textarea' },
+  ],
+  workouts: [
+    { key: 'customer', label: 'Customer', placeholder: 'Client name' },
+    { key: 'session', label: 'Workout / session', placeholder: 'Full body A' },
+    { key: 'date', label: 'Scheduled date', type: 'date' },
+    { key: 'status', label: 'Session status', type: 'select', options: ['Planned', 'Completed', 'Skipped', 'Needs reschedule'] },
+    { key: 'duration', label: 'Duration (minutes)', type: 'number' },
+    { key: 'location', label: 'Location', placeholder: 'Gym / home / remote' },
+    { key: 'notes', label: 'Coach notes', type: 'textarea' },
+  ],
+  programmes: [
+    { key: 'name', label: 'Programme name', placeholder: 'Programme title' },
+    { key: 'duration', label: 'Duration', placeholder: '12 weeks' },
+    { key: 'training', label: 'Training frequency', placeholder: '4 days/week' },
+    { key: 'focus', label: 'Primary focus', type: 'select', options: ['Strength', 'Fat loss', 'Hypertrophy', 'Beginner foundations', 'Mobility'] },
+    { key: 'status', label: 'Programme status', type: 'select', options: ['Draft', 'Active', 'Archived', 'Sample only'] },
+    { key: 'description', label: 'Programme overview', type: 'textarea' },
+  ],
+  videos: [
+    { key: 'title', label: 'Video title', placeholder: 'Squat technique basics' },
+    { key: 'category', label: 'Category', type: 'select', options: ['Technique', 'Warm-up', 'Strength', 'Mobility', 'Nutrition', 'Recovery'] },
+    { key: 'duration', label: 'Duration', placeholder: '04:20' },
+    { key: 'url', label: 'Video URL', placeholder: 'https://…' },
+    { key: 'status', label: 'Visibility', type: 'select', options: ['Visible', 'Hidden', 'Draft'] },
+    { key: 'description', label: 'Description', type: 'textarea' },
+  ],
+  checkins: [
+    { key: 'customer', label: 'Customer', placeholder: 'Client name' },
+    { key: 'date', label: 'Submitted date', type: 'date' },
+    { key: 'sleep', label: 'Sleep score (1–10)', type: 'number' },
+    { key: 'energy', label: 'Energy score (1–10)', type: 'number' },
+    { key: 'mood', label: 'Mood score (1–10)', type: 'number' },
+    { key: 'adherence', label: 'Plan adherence (%)', type: 'number' },
+    { key: 'status', label: 'Review status', type: 'select', options: ['Needs review', 'Reviewed', 'Follow up required'] },
+    { key: 'notes', label: 'Client update / coach response', type: 'textarea' },
+  ],
+  progress: [
+    { key: 'customer', label: 'Customer', placeholder: 'Client name' },
+    { key: 'date', label: 'Recorded date', type: 'date' },
+    { key: 'weight', label: 'Weight (kg)', type: 'number' },
+    { key: 'bodyFat', label: 'Body fat (%)', type: 'number' },
+    { key: 'waist', label: 'Waist (cm)', type: 'number' },
+    { key: 'steps', label: 'Average daily steps', type: 'number' },
+    { key: 'note', label: 'Progress note', type: 'textarea' },
+  ],
+  messages: [
+    { key: 'customer', label: 'Customer', placeholder: 'Client name' },
+    { key: 'from', label: 'Sender', type: 'select', options: ['Coach', 'Client', 'System'] },
+    { key: 'message', label: 'Message', type: 'textarea' },
+    { key: 'sentAt', label: 'Sent date', type: 'date' },
+    { key: 'status', label: 'Delivery status', type: 'select', options: ['Draft', 'Queued', 'Sent', 'Read', 'Failed'] },
+  ],
+  leads: [
+    { key: 'name', label: 'Full name', placeholder: 'Lead name' },
+    { key: 'email', label: 'Email address', type: 'email' },
+    { key: 'phone', label: 'Phone number' },
+    { key: 'interest', label: 'Interested in', type: 'select', options: ['Free consultation', 'Personal training', 'Online coaching', 'Nutrition', 'App'] },
+    { key: 'source', label: 'Lead source', type: 'select', options: ['Website', 'Instagram', 'Referral', 'Facebook', 'Other'] },
+    { key: 'status', label: 'Lead status', type: 'select', options: ['New', 'Contacted', 'Booked', 'Converted', 'Not proceeding'] },
+    { key: 'followUp', label: 'Follow-up date', type: 'date' },
+    { key: 'notes', label: 'Notes', type: 'textarea' },
+  ],
+  'member-activity': [
+    { key: 'member', label: 'Member', placeholder: 'Client name' },
+    { key: 'activity', label: 'Activity', type: 'select', options: ['Steps', 'Cardio', 'Hydration', 'Workout', 'Sleep', 'Nutrition log'] },
+    { key: 'value', label: 'Value / result', placeholder: 'e.g. 8,400 steps' },
+    { key: 'date', label: 'Activity date', type: 'date' },
+    { key: 'status', label: 'Status', type: 'select', options: ['Complete', 'In progress', 'Missed', 'Sample only'] },
+    { key: 'notes', label: 'Notes', type: 'textarea' },
+  ],
 };
 
 function createDemoRows(): Record<DemoTab, Row[]> {
@@ -306,7 +434,7 @@ export function AdminScreen() {
         </button>
       </div>
 
-      <div className="sticky top-28 z-30 -mx-4 mb-6 flex gap-2 overflow-x-auto border-y border-zinc-800 bg-[#0b0c0e]/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-wrap sm:overflow-visible sm:border-0 sm:bg-transparent sm:p-0">
+      <div className="sticky top-24 z-30 -mx-4 mb-6 flex gap-2 overflow-x-auto border-y border-white/[0.08] bg-[#0b0c0e]/95 px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:flex-wrap sm:overflow-visible sm:rounded-2xl sm:border sm:border-white/[0.07] sm:bg-white/[0.025] sm:p-3">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -314,8 +442,8 @@ export function AdminScreen() {
             aria-pressed={tab === t.id}
             className={
               tab === t.id
-                ? 'bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-3 py-2 rounded-lg'
-                : 'shrink-0 border border-zinc-700 text-zinc-400 font-mono text-xs uppercase px-3 py-2 rounded-lg hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5500]'
+                ? 'rounded-xl bg-orange-500 px-3.5 py-2.5 text-xs font-semibold text-black shadow-md shadow-orange-950/20 transition'
+                : 'shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.025] px-3.5 py-2.5 text-xs font-medium text-zinc-400 transition hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400'
             }
           >
             {t.label}
@@ -356,9 +484,60 @@ export function AdminScreen() {
           </p>
         </div>
       )}
-      {demoMode && tab === 'overview' && <div className={`${card} text-sm text-zinc-300`}><p className="font-mono text-[10px] uppercase text-orange-300 mb-2">Interactive sample preview</p><p>Explore and edit fictional records in each section. Changes stay in this browser session and reset when you exit demo. Live records are only changed after staff sign-in.</p></div>}
+      {demoMode && tab === 'overview' && (
+        <div className="space-y-5">
+          <div className="relative overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-br from-[#21170f] via-[#15171b] to-[#111216] p-6 sm:p-8">
+            <div className="pointer-events-none absolute -right-10 -top-20 h-64 w-64 rounded-full bg-orange-500/10 blur-3xl" />
+            <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-orange-300">Coach workspace · sandbox</p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Your coaching command centre.</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-300">Explore a populated example workspace, edit records and test the management flows. Everything here is fictional and stays in this browser session.</p>
+              </div>
+              <button type="button" onClick={() => setTab('users')} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-black shadow-lg shadow-orange-950/30 transition hover:bg-orange-400">Open clients <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { label: 'Client accounts', value: demoRows.users.length, hint: 'Across all coaching tiers', tab: 'users' as Tab },
+              { label: 'Live packages', value: demoRows.plans.filter((r) => r.status === 'Active').length, hint: 'Demo catalogue only', tab: 'plans' as Tab },
+              { label: 'Needs coach review', value: demoRows.checkins.filter((r) => r.status === 'Needs review' || r.status === 'Follow up required').length, hint: 'Check-ins to look at', tab: 'checkins' as Tab },
+              { label: 'New leads', value: demoRows.leads.filter((r) => r.status === 'New').length, hint: 'Awaiting first contact', tab: 'leads' as Tab },
+            ].map((stat) => (
+              <button key={stat.label} type="button" onClick={() => setTab(stat.tab)} className="group rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5 text-left transition hover:border-orange-500/30 hover:bg-white/[0.055]">
+                <span className="text-xs text-zinc-400">{stat.label}</span>
+                <span className="mt-3 block text-3xl font-semibold tracking-tight text-white">{stat.value}</span>
+                <span className="mt-2 block text-xs text-zinc-500">{stat.hint}</span>
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+            <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
+              <div className="mb-4 flex items-center justify-between gap-3"><div><p className="text-xs text-zinc-500">WORKSPACE</p><h3 className="mt-1 text-lg font-semibold text-white">Manage your business</h3></div><span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-orange-300">Demo data</span></div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {TABS.filter((item) => item.id !== 'overview').map((item) => (
+                  <button key={item.id} type="button" onClick={() => setTab(item.id)} className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 py-3 text-left text-sm text-zinc-200 transition hover:border-orange-500/30 hover:bg-orange-500/[0.06]"><span>{item.label}</span><span className="text-xs text-zinc-600">↗</span></button>
+                ))}
+              </div>
+            </section>
+            <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
+              <p className="text-xs text-zinc-500">COACH PRIORITIES</p><h3 className="mt-1 text-lg font-semibold text-white">Needs attention</h3>
+              <div className="mt-4 space-y-3">
+                {[
+                  { title: 'Weekly check-ins', detail: 'Review client wellbeing and adherence.', count: demoRows.checkins.filter((r) => r.status === 'Needs review' || r.status === 'Follow up required').length, tab: 'checkins' as Tab },
+                  { title: 'Lead follow-up', detail: 'Contact new enquiries and book consultations.', count: demoRows.leads.filter((r) => r.status === 'New').length, tab: 'leads' as Tab },
+                  { title: 'Client progress', detail: 'Review measurements and coaching notes.', count: demoRows.progress.length, tab: 'progress' as Tab },
+                ].map((item) => (
+                  <button key={item.title} type="button" onClick={() => setTab(item.tab)} className="flex w-full items-center gap-3 rounded-xl border border-white/[0.06] p-3 text-left transition hover:border-orange-500/25 hover:bg-white/[0.025]"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-orange-500/10 text-sm font-semibold text-orange-300">{item.count}</span><span className="min-w-0 flex-1"><span className="block text-sm font-medium text-white">{item.title}</span><span className="mt-1 block text-xs leading-5 text-zinc-500">{item.detail}</span></span><span className="text-zinc-600">↗</span></button>
+                ))}
+              </div>
+              <p className="mt-5 rounded-xl border border-orange-500/15 bg-orange-500/[0.05] p-3 text-xs leading-5 text-zinc-400">Sandbox only: edits are simulated locally. Sign in with staff credentials to work with live records.</p>
+            </section>
+          </div>
+        </div>
+      )}
       {demoMode && tab !== 'overview' && (
-        <div className={`${card} space-y-4`}>
+        <div className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519] space-y-5`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="font-mono text-[10px] uppercase text-orange-300">{TABS.find((item) => item.id === tab)?.label} · sample records</p>
@@ -394,10 +573,19 @@ export function AdminScreen() {
               <button type="button" onClick={() => setDemoEditorOpen(false)} className={btnGhost} aria-label="Close sample editor"><X className="h-4 w-4" aria-hidden="true" /></button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              {DEMO_TABLES[tab].columns.map((column) => (
-                <label key={column.key} className="grid gap-1 text-xs text-zinc-400">
-                  {column.label}
-                  <input className={inp} value={String(demoDraft[column.key] ?? '')} onChange={(event) => setDemoDraft((draft) => ({ ...draft, [column.key]: event.target.value }))} />
+              {DEMO_FIELDS[tab].map((field) => (
+                <label key={field.key} className={`grid gap-1.5 text-xs font-medium text-zinc-400 ${field.type === 'textarea' ? 'sm:col-span-2' : ''}`}>
+                  <span>{field.label}</span>
+                  {field.type === 'select' ? (
+                    <select className={inp} value={String(demoDraft[field.key] ?? '')} onChange={(event) => setDemoDraft((draft) => ({ ...draft, [field.key]: event.target.value }))}>
+                      <option value="">Choose…</option>
+                      {(field.options ?? []).map((option) => <option key={option} value={option}>{option}</option>)}
+                    </select>
+                  ) : field.type === 'textarea' ? (
+                    <textarea rows={3} className={`${inp} resize-y`} placeholder={field.placeholder ?? ''} value={String(demoDraft[field.key] ?? '')} onChange={(event) => setDemoDraft((draft) => ({ ...draft, [field.key]: event.target.value }))} />
+                  ) : (
+                    <input type={field.type ?? 'text'} min={field.type === 'number' ? 0 : undefined} step={field.type === 'number' ? 'any' : undefined} className={inp} placeholder={field.placeholder ?? ''} value={String(demoDraft[field.key] ?? '')} onChange={(event) => setDemoDraft((draft) => ({ ...draft, [field.key]: event.target.value }))} />
+                  )}
                 </label>
               ))}
             </div>
