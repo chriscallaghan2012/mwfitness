@@ -13,6 +13,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Removed role editing from routine client-profile editing: the single coach/operator keeps staff access, while trainees are managed as client accounts.
 - [x] Progress tools now load the newly selected client rather than a stale previous ID, validate manual weigh-ins, and surface database errors for check-in review/delete and progress CRUD.
 - [x] Membership assignment/removal and workout/session loading now report backend errors instead of silently leaving stale tables.
+- [x] Workout template creation, session scheduling/status changes, and lead inbox load/status updates now catch request failures and show actionable error states.
 - [x] Nutrition date changes now show the selected day as loading until that date's log resolves; failed daily-log saves show a connection error and reliably clear the saving state.
 - [x] Android changes are on `work/mwfitness-android-bulk-fixes-2026-10`; website changes are intended for `work/mwfitness-bulk-fixes-2026-10`. No main merge or deployment.
 
