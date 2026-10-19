@@ -72,6 +72,8 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
         </div>
       </section>
 
+      <div className="industrial-stripe" aria-hidden="true" />
+
       {/* 2. CONTACT DETAILS + FORM */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
