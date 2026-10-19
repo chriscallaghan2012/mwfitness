@@ -13,15 +13,17 @@ import { AppScreen } from './components/screens/AppScreen';
 import { ShwagScreen } from './components/screens/ShwagScreen';
 import { ContactScreen } from './components/screens/ContactScreen';
 import { PrivacyScreen } from './components/screens/PrivacyScreen';
+import { CookiePolicyScreen } from './components/screens/CookiePolicyScreen';
 import { AccountDeletionScreen } from './components/screens/AccountDeletionScreen';
 import { AdminScreen } from './components/admin/AdminScreen';
 
-const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app', 'shwag', 'contact', 'admin', 'privacy', 'delete-account'];
+const VALID_SCREENS: ScreenId[] = ['home', 'online-coaching', 'packages', 'app', 'shwag', 'contact', 'admin', 'privacy', 'cookies', 'delete-account'];
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>(() => {
     if (new URLSearchParams(window.location.search).get('auth') === 'reset-password') return 'admin';
     if (window.location.pathname === '/privacy') return 'privacy';
+    if (window.location.pathname === '/cookies') return 'cookies';
     if (window.location.pathname === '/delete-account') return 'delete-account';
     return 'home';
   });
@@ -48,6 +50,10 @@ export default function App() {
       }
       if (window.location.pathname === '/privacy') {
         setCurrentScreen('privacy');
+        return;
+      }
+      if (window.location.pathname === '/cookies') {
+        setCurrentScreen('cookies');
         return;
       }
       if (window.location.pathname === '/delete-account') {
@@ -104,6 +110,7 @@ export default function App() {
         )}
         {currentScreen === 'admin' && <AdminScreen />}
         {currentScreen === 'privacy' && <PrivacyScreen onBack={() => { window.location.href = '/'; }} />}
+        {currentScreen === 'cookies' && <CookiePolicyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'delete-account' && <AccountDeletionScreen onBack={() => { window.location.href = '/'; }} />}
       </main>
 
