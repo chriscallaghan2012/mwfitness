@@ -21,7 +21,8 @@ export function PasswordRecovery({ onClose }: Props) {
     if (!neon) { setError('Password reset is unavailable because Neon Auth is not configured.'); return; }
     setLoading(true);
     try {
-      const { error: requestError } = await neon.auth.resetPasswordForEmail(email.trim(), {
+      const { error: requestError } = await neon.auth.requestPasswordReset({
+        email: email.trim(),
         redirectTo: `${window.location.origin}/?auth=reset-password`,
       });
       if (requestError) throw requestError;
@@ -36,15 +37,13 @@ export function PasswordRecovery({ onClose }: Props) {
     setError('');
     setNotice('');
     if (!neon) { setError('Password reset is unavailable because Neon Auth is not configured.'); return; }
-    if (!token.trim() || !email.trim()) { setError('The reset link is missing its token or email. Request a fresh link and open it from your email.'); return; }
+    if (!token.trim()) { setError('The reset link is missing its token. Request a fresh link and open it from your email.'); return; }
     if (password.length < 8) { setError('Choose a password with at least 8 characters.'); return; }
     if (password !== confirmPassword) { setError('The passwords do not match.'); return; }
     setLoading(true);
     try {
-      const { error: verifyError } = await neon.auth.verifyOtp({ email: email.trim(), token: token.trim(), type: 'recovery' });
-      if (verifyError) throw verifyError;
-      const { error: updateError } = await neon.auth.updateUser({ password });
-      if (updateError) throw updateError;
+      const { error: resetError } = await neon.auth.resetPassword({ newPassword: password, token: token.trim() });
+      if (resetError) throw resetError;
       setNotice('Password updated. You can now sign in with your new password.');
       setResetMode(false);
       setPassword('');
@@ -65,7 +64,7 @@ export function PasswordRecovery({ onClose }: Props) {
         <h1 className="mb-2 text-3xl font-bold text-white">{resetMode ? 'Choose a new password' : 'Reset your password'}</h1>
         <p className="mb-6 text-sm text-zinc-400">{resetMode ? 'Use the secure reset link sent by Neon Auth.' : 'Enter your staff email to request a secure reset link.'}</p>
         <form onSubmit={(event) => { event.preventDefault(); void (resetMode ? completeReset(event) : requestReset(event)); }} className="space-y-4">
-          <input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Staff email address" autoComplete="email" className={field} />
+          <input type="email" required={!resetMode} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Staff email address" autoComplete="email" className={field} />
           {resetMode ? <>
             <input type="text" required value={token} onChange={(event) => setToken(event.target.value)} placeholder="Reset token from the email link" autoComplete="one-time-code" className={field} />
             <input type="password" required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="New password (8+ characters)" autoComplete="new-password" className={field} />

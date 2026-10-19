@@ -307,7 +307,7 @@ export function AdminScreen() {
     }
     setLoading(true);
     try {
-      const { data, error } = await neon.auth.signInWithPassword({ email: email.trim(), password });
+      const { data, error } = await neon.auth.signIn.email({ email: email.trim(), password });
       if (error) throw error;
       const { data: profile, error: profileError } = await neon.from('profiles').select('role').eq('id', data.user!.id).maybeSingle();
       if (profileError || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
