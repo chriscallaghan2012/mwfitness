@@ -1,6 +1,6 @@
 // UsersAdmin — customers and coaches backed by Neon Auth and the shared profiles table.
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
 export function UsersAdmin() {
@@ -12,13 +12,13 @@ export function UsersAdmin() {
   const [addOpen, setAddOpen] = useState(false);
 
   const load = async () => {
-    if (!supabase) {
+    if (!neon) {
       setMsg('Neon is not configured; user records cannot be loaded.');
       setUsers([]);
       return;
     }
     try {
-      const { data, error } = await supabase.from('profiles').select('*').order('created_at');
+      const { data, error } = await neon.from('profiles').select('*').order('created_at');
       if (error) {
         setMsg(`Could not load users: ${error.message}`);
         return;
@@ -35,7 +35,7 @@ export function UsersAdmin() {
 
   const saveEdit = async () => {
     if (!edit) return;
-    if (!supabase) {
+    if (!neon) {
       setMsg('Neon is not configured; profile changes cannot be saved.');
       return;
     }
@@ -57,7 +57,7 @@ export function UsersAdmin() {
         return;
       }
       payload.full_name = String(f.full_name).trim();
-      const { error } = await supabase.from('profiles').update(payload).eq('id', edit.id);
+      const { error } = await neon.from('profiles').update(payload).eq('id', edit.id);
       if (error) {
         setMsg(`Save failed: ${error.message}`);
         return;

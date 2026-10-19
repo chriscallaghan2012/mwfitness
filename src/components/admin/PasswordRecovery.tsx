@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 
 type Props = { onClose: () => void };
 
@@ -18,10 +18,10 @@ export function PasswordRecovery({ onClose }: Props) {
     event.preventDefault();
     setError('');
     setNotice('');
-    if (!supabase) { setError('Password reset is unavailable because Neon Auth is not configured.'); return; }
+    if (!neon) { setError('Password reset is unavailable because Neon Auth is not configured.'); return; }
     setLoading(true);
     try {
-      const { error: requestError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      const { error: requestError } = await neon.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/?auth=reset-password`,
       });
       if (requestError) throw requestError;
@@ -35,15 +35,15 @@ export function PasswordRecovery({ onClose }: Props) {
     event.preventDefault();
     setError('');
     setNotice('');
-    if (!supabase) { setError('Password reset is unavailable because Neon Auth is not configured.'); return; }
+    if (!neon) { setError('Password reset is unavailable because Neon Auth is not configured.'); return; }
     if (!token.trim() || !email.trim()) { setError('The reset link is missing its token or email. Request a fresh link and open it from your email.'); return; }
     if (password.length < 8) { setError('Choose a password with at least 8 characters.'); return; }
     if (password !== confirmPassword) { setError('The passwords do not match.'); return; }
     setLoading(true);
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({ email: email.trim(), token: token.trim(), type: 'recovery' });
+      const { error: verifyError } = await neon.auth.verifyOtp({ email: email.trim(), token: token.trim(), type: 'recovery' });
       if (verifyError) throw verifyError;
-      const { error: updateError } = await supabase.auth.updateUser({ password });
+      const { error: updateError } = await neon.auth.updateUser({ password });
       if (updateError) throw updateError;
       setNotice('Password updated. You can now sign in with your new password.');
       setResetMode(false);
@@ -73,7 +73,7 @@ export function PasswordRecovery({ onClose }: Props) {
           </> : null}
           {error ? <p role="alert" className="text-sm text-red-400">{error}</p> : null}
           {notice ? <p role="status" className="text-sm text-emerald-300">{notice}</p> : null}
-          <button type="submit" disabled={loading || !supabase} className={button}>{loading ? 'Please wait…' : resetMode ? 'Set new password' : 'Email reset link'}</button>
+          <button type="submit" disabled={loading || !neon} className={button}>{loading ? 'Please wait…' : resetMode ? 'Set new password' : 'Email reset link'}</button>
         </form>
         <button type="button" onClick={onClose} className="mt-4 text-sm text-zinc-400 underline">Back to staff sign in</button>
       </div>

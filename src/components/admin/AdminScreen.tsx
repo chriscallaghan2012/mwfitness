@@ -3,7 +3,7 @@
 // Same shared Neon project as the mobile app.
 import { FormEvent, useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { UsersAdmin } from './UsersAdmin';
 import { PlansAdmin } from './PlansAdmin';
 import { MembershipsAdmin } from './MembershipsAdmin';
@@ -253,15 +253,15 @@ export function AdminScreen() {
   const [forgotMode, setForgotMode] = useState(false);
 
   useEffect(() => {
-    if (!supabase) return;
-    supabase.auth
+    if (!neon) return;
+    neon.auth
       .getSession()
       .then(async ({ data }) => {
         const user = data.session?.user;
         if (!user) return;
-        const { data: profile, error } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+        const { data: profile, error } = await neon.from('profiles').select('role').eq('id', user.id).maybeSingle();
         if (error || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
-          await supabase.auth.signOut();
+          await neon.auth.signOut();
           return;
         }
         setEmail(user.email ?? '');
@@ -272,16 +272,16 @@ export function AdminScreen() {
   }, []);
 
   const loadStats = async () => {
-    if (!supabase) {
+    if (!neon) {
       setStats(null);
       return;
     }
     setStatsLoading(true);
     try {
       const [u, p, m] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('plans').select('id', { count: 'exact', head: true }),
-        supabase.from('memberships').select('id', { count: 'exact', head: true }),
+        neon.from('profiles').select('id', { count: 'exact', head: true }),
+        neon.from('plans').select('id', { count: 'exact', head: true }),
+        neon.from('memberships').select('id', { count: 'exact', head: true }),
       ]);
       if (u.error || p.error || m.error) {
         setError('We could not load the live dashboard totals. Check your staff permissions and Neon table policies, then try again.');
@@ -301,17 +301,17 @@ export function AdminScreen() {
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    if (!supabase) {
+    if (!neon) {
       setError('Live sign-in is unavailable until the website Neon settings are configured.');
       return;
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      const { data, error } = await neon.auth.signInWithPassword({ email: email.trim(), password });
       if (error) throw error;
-      const { data: profile, error: profileError } = await supabase.from('profiles').select('role').eq('id', data.user!.id).maybeSingle();
+      const { data: profile, error: profileError } = await neon.from('profiles').select('role').eq('id', data.user!.id).maybeSingle();
       if (profileError || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
-        await supabase.auth.signOut();
+        await neon.auth.signOut();
         setError('This account does not have admin access.');
         return;
       }
@@ -327,7 +327,7 @@ export function AdminScreen() {
   };
 
   const signOut = () => {
-    void supabase?.auth.signOut();
+    void neon?.auth.signOut();
     setSignedIn(false);
     setDemoMode(false);
     setTab('overview');
@@ -405,7 +405,7 @@ export function AdminScreen() {
             <input type="email" value={email} onChange={(ev) => setEmail(ev.target.value)} placeholder="you@mwfitness.co.uk" className="w-full bg-[#121315] border border-zinc-700 rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-[#ff5500]" />
             <input type="password" value={password} onChange={(ev) => setPassword(ev.target.value)} placeholder="Password" className="w-full bg-[#121315] border border-zinc-700 rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-[#ff5500]" />
             {error && <p className="text-sm text-red-400">{error}</p>}
-            <button type="submit" disabled={loading || !supabase} className="w-full bg-[#ff5500] hover:bg-[#ff6a1f] disabled:opacity-50 text-black font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg active:scale-[0.98]">
+            <button type="submit" disabled={loading || !neon} className="w-full bg-[#ff5500] hover:bg-[#ff6a1f] disabled:opacity-50 text-black font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg active:scale-[0.98]">
               {loading ? 'Signing in…' : 'Sign in to HQ'}
             </button>
           </form>

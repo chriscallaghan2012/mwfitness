@@ -23,6 +23,12 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
       setPlans(result.plans);
       setPlansError(result.error);
       setPlansLoading(false);
+    }, (cause: unknown) => {
+      if (!active) return;
+      console.error('[MW Fitness] Online coaching pricing request failed:', cause);
+      setPlans([]);
+      setPlansError('Pricing is temporarily unavailable. Please contact Mike for current options.');
+      setPlansLoading(false);
     });
     return () => { active = false; };
   }, []);
@@ -30,13 +36,19 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
   const handleCheckout = async (planId: string) => {
     setLoadingPlan(planId);
     setError('');
-    const result = await createCheckoutSession(planId);
-    if (result.url) {
-      window.location.assign(result.url);
-      return;
+    try {
+      const result = await createCheckoutSession(planId);
+      if (result.url) {
+        window.location.assign(result.url);
+        return;
+      }
+      setError(result.error || 'Checkout is unavailable right now. Please contact Mike and he will help you get started.');
+    } catch (cause) {
+      console.error('[MW Fitness] Checkout request failed:', cause);
+      setError('Checkout is unavailable right now. Please contact Mike and he will help you get started.');
+    } finally {
+      setLoadingPlan('');
     }
-    setError(result.error || 'Checkout is unavailable right now. Please contact Mike and he will help you get started.');
-    setLoadingPlan('');
   };
 
   return (

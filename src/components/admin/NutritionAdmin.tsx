@@ -1,6 +1,6 @@
 // NutritionAdmin — global meal templates + per-customer nutrition plans.
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, StatusPill, btn, btnGhost, card, inp } from './fields';
 
 export function NutritionAdmin() {
@@ -18,9 +18,9 @@ export function NutritionAdmin() {
   const schema = () => (mode === 'templates' ? 'nutrition_templates' : 'nutrition_plans') as 'nutrition_templates' | 'nutrition_plans';
 
   const loadTemplates = async () => {
-    if (!supabase) { setMsg('Neon is not configured; meal templates cannot be loaded.'); setRows([]); return; }
+    if (!neon) { setMsg('Neon is not configured; meal templates cannot be loaded.'); setRows([]); return; }
     try {
-      const { data, error } = await supabase.from('nutrition_templates').select('*').order('name');
+      const { data, error } = await neon.from('nutrition_templates').select('*').order('name');
       if (error) { setMsg(`Could not load meal templates: ${error.message}`); return; }
       const next = (data ?? []) as Row[];
       setTemplates(next);
@@ -35,9 +35,9 @@ export function NutritionAdmin() {
       setRows([]);
       return;
     }
-    if (!supabase) { setMsg('Neon is not configured; client nutrition plans cannot be loaded.'); setRows([]); return; }
+    if (!neon) { setMsg('Neon is not configured; client nutrition plans cannot be loaded.'); setRows([]); return; }
     try {
-      const { data, error } = await supabase.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
+      const { data, error } = await neon.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
       if (error) { setMsg(`Could not load this client's nutrition plans: ${error.message}`); setRows([]); return; }
       setRows((data ?? []) as Row[]);
     } catch {
@@ -47,8 +47,8 @@ export function NutritionAdmin() {
   };
   useEffect(() => {
     void loadTemplates();
-    if (!supabase) { setMsg('Neon is not configured; clients cannot be loaded.'); return; }
-    void supabase.from('profiles').select('id,full_name,email').order('full_name').then((r) => {
+    if (!neon) { setMsg('Neon is not configured; clients cannot be loaded.'); return; }
+    void neon.from('profiles').select('id,full_name,email').order('full_name').then((r) => {
       if (!r.error) setUsers((r.data ?? []) as Row[]);
       else setMsg(`Could not load clients: ${r.error.message}`);
     }, () => setMsg('Could not reach the client service. Check the connection and retry.'));
@@ -60,7 +60,7 @@ export function NutritionAdmin() {
   }, [mode, userId]);
 
   const saveRow = async () => {
-    if (!supabase) { setMsg('Neon is not configured; no changes were saved.'); return; }
+    if (!neon) { setMsg('Neon is not configured; no changes were saved.'); return; }
     setBusy(true);
     setMsg('');
     let targets: Record<string, unknown> = {};
@@ -92,8 +92,8 @@ export function NutritionAdmin() {
     if (mode === 'plans') body.profile_id = userId;
     try {
       const { error } = edit && edit.id
-        ? await supabase.from(schema()).update(body).eq('id', edit.id)
-        : await supabase.from(schema()).insert(body);
+        ? await neon.from(schema()).update(body).eq('id', edit.id)
+        : await neon.from(schema()).insert(body);
       setMsg(error ? `Failed: ${error.message}` : 'Saved ✓');
       if (!error) { setEdit(null); if (mode === 'templates') await loadTemplates(); else await loadPlans(); }
     } catch {
@@ -102,11 +102,11 @@ export function NutritionAdmin() {
   };
 
   const removeRow = async (row: Row) => {
-    if (!supabase) { setMsg('Neon is not configured; no changes were made.'); return; }
+    if (!neon) { setMsg('Neon is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete “${String(row.name)}”? This cannot be undone.`)) return;
     setBusy(true); setMsg('');
     try {
-      const { error } = await supabase.from(schema()).delete().eq('id', row.id);
+      const { error } = await neon.from(schema()).delete().eq('id', row.id);
       setMsg(error ? `Delete failed: ${error.message}` : 'Deleted.');
       if (!error) { if (mode === 'templates') await loadTemplates(); else await loadPlans(); }
     } catch { setMsg('Could not delete this nutrition item. Check the connection and try again.'); }
@@ -114,16 +114,16 @@ export function NutritionAdmin() {
   };
 
   const assignTemplate = async () => {
-    if (!supabase) { setMsg('Neon is not configured; no assignment was created.'); return; }
+    if (!neon) { setMsg('Neon is not configured; no assignment was created.'); return; }
     if (!userId || !assignTpl) { setMsg('Choose a client and a meal template first.'); return; }
     setBusy(true); setMsg('');
     try {
-    const { data: t, error: tErr } = await supabase.from('nutrition_templates').select('*').eq('id', assignTpl).maybeSingle();
+    const { data: t, error: tErr } = await neon.from('nutrition_templates').select('*').eq('id', assignTpl).maybeSingle();
     if (tErr || !t) {
       setMsg(tErr ? `Could not load meal template: ${tErr.message}` : 'Template not found.');
       return;
     }
-    const { error } = await supabase.from('nutrition_plans').insert({
+    const { error } = await neon.from('nutrition_plans').insert({
       profile_id: userId,
       name: String(t.name),
       targets: t.targets,

@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { neon } from './neon';
 
 export interface PublicPlan {
   id: string;
@@ -15,11 +15,11 @@ export interface PublicPlan {
 }
 
 export async function loadPublicPlans(kind: PublicPlan['kind']): Promise<{ plans: PublicPlan[]; error: string | null }> {
-  if (!supabase) {
+  if (!neon) {
     return { plans: [], error: 'Pricing is temporarily unavailable. Please contact Mike for current options.' };
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await neon
     .from('plans')
     .select('id,name,tag,price,original_price,badge,is_popular,description,features,cta_text,kind')
     .eq('active', true)

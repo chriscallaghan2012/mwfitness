@@ -21,6 +21,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       setPlans(result.plans.slice(0, 3));
       setPlansError(result.error);
       setPlansLoading(false);
+    }, (cause: unknown) => {
+      if (!active) return;
+      console.error('[MW Fitness] Home pricing request failed:', cause);
+      setPlans([]);
+      setPlansError('Pricing is temporarily unavailable. Please contact Mike for current options.');
+      setPlansLoading(false);
     });
     return () => { active = false; };
   }, []);

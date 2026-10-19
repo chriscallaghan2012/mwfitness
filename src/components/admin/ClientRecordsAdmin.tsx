@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btnGhost, card, inp } from './fields';
 
 type Dataset = 'checkins' | 'progress_logs' | 'nutrition_logs' | 'workout_sessions' | 'coach_messages';
@@ -27,7 +27,7 @@ export function ClientRecordsAdmin() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    void supabase?.from('profiles').select('id,full_name,email,role,member_tier,since,current_weight,start_weight,goal_weight').order('full_name')
+    void neon?.from('profiles').select('id,full_name,email,role,member_tier,since,current_weight,start_weight,goal_weight').order('full_name')
       .then(({ data, error }) => {
         if (error) setMessage('Could not load clients. Check staff permissions and database policies.');
         else setUsers((data ?? []) as Row[]);
@@ -35,7 +35,7 @@ export function ClientRecordsAdmin() {
   }, []);
 
   useEffect(() => {
-    if (!supabase || !userId) {
+    if (!neon || !userId) {
       setRows(null); setProfile(null); setMemberships([]); setNutritionPlans([]);
       return;
     }
@@ -45,9 +45,9 @@ export function ClientRecordsAdmin() {
     const selected = users.find((user) => user.id === userId) ?? null;
     setProfile(selected);
     Promise.all([
-      supabase.from(dataset).select('*').eq(dataset === 'coach_messages' ? 'athlete_profile_id' : 'profile_id', userId).order(DATASETS.find((item) => item.id === dataset)?.dateKey ?? 'created_at', { ascending: false }),
-      supabase.from('memberships').select('*, plans(name,price,kind)').eq('profile_id', userId).order('created_at', { ascending: false }),
-      supabase.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
+      neon.from(dataset).select('*').eq(dataset === 'coach_messages' ? 'athlete_profile_id' : 'profile_id', userId).order(DATASETS.find((item) => item.id === dataset)?.dateKey ?? 'created_at', { ascending: false }),
+      neon.from('memberships').select('*, plans(name,price,kind)').eq('profile_id', userId).order('created_at', { ascending: false }),
+      neon.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
     ]).then(([records, membershipResult, nutritionResult]) => {
       if (cancelled) return;
       if (records.error) {
@@ -63,13 +63,13 @@ export function ClientRecordsAdmin() {
   }, [userId, dataset, users, refreshTick]);
 
   useEffect(() => {
-    if (!supabase || !userId) {
+    if (!neon || !userId) {
       setProgressPhotos([]);
       setPhotosMessage('');
       return;
     }
     let cancelled = false;
-    supabase.from('progress_photos')
+    neon.from('progress_photos')
       .select('id,recorded_on,caption,mime_type,photo_data,created_at')
       .eq('profile_id', userId)
       .order('recorded_on', { ascending: false })

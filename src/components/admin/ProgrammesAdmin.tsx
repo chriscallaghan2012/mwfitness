@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
 const EMPTY = { name: '', description: '', duration_weeks: '12', days_per_week: '4', level: 'All levels', active: 'true' };
@@ -14,16 +14,16 @@ export function ProgrammesAdmin() {
   const [programmeId, setProgrammeId] = useState('');
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
   const [busy, setBusy] = useState(false);
-  const [schemaMissing, setSchemaMissing] = useState(!supabase);
+  const [schemaMissing, setSchemaMissing] = useState(!neon);
   const [message, setMessage] = useState('');
 
   const load = async () => {
-    if (!supabase) { setSchemaMissing(true); setMessage('Neon is not configured for this website environment.'); return; }
+    if (!neon) { setSchemaMissing(true); setMessage('Neon is not configured for this website environment.'); return; }
     try {
     const [programResult, clientResult, assignmentResult] = await Promise.all([
-      supabase.from('coaching_programmes').select('*').order('created_at', { ascending: false }),
-      supabase.from('profiles').select('id,full_name,email').order('full_name'),
-      supabase.from('coaching_programme_assignments').select('*, profiles(full_name,email), coaching_programmes(name)').order('created_at', { ascending: false }),
+      neon.from('coaching_programmes').select('*').order('created_at', { ascending: false }),
+      neon.from('profiles').select('id,full_name,email').order('full_name'),
+      neon.from('coaching_programme_assignments').select('*, profiles(full_name,email), coaching_programmes(name)').order('created_at', { ascending: false }),
     ]);
     const missing = [programResult, assignmentResult].some((r) => r.error && /does not exist|not found|schema cache|could not find/i.test(r.error.message));
     if (missing) {
@@ -62,7 +62,7 @@ export function ProgrammesAdmin() {
   };
 
   const save = async () => {
-    if (!supabase) { setMessage('Live database access is not configured; no changes were saved.'); return; }
+    if (!neon) { setMessage('Live database access is not configured; no changes were saved.'); return; }
     const weeks = Number(form.duration_weeks);
     const days = Number(form.days_per_week);
     if (!form.name.trim()) { setMessage('Enter a programme name.'); return; }
@@ -71,37 +71,37 @@ export function ProgrammesAdmin() {
     setBusy(true); setMessage('');
     const payload = { name: form.name.trim(), description: form.description.trim() || null, duration_weeks: weeks, days_per_week: days, level: form.level.trim() || 'All levels', active: form.active === 'true' };
     const result = edit?.id
-      ? await supabase!.from('coaching_programmes').update(payload).eq('id', edit.id)
-      : await supabase!.from('coaching_programmes').insert(payload);
+      ? await neon!.from('coaching_programmes').update(payload).eq('id', edit.id)
+      : await neon!.from('coaching_programmes').insert(payload);
     setBusy(false);
     if (result.error) { setMessage(`Save failed: ${result.error.message}`); return; }
     setEdit(null); setMessage('Programme saved.'); await load();
   };
 
   const remove = async (row: Row) => {
-    if (!supabase) { setMessage('Live database access is not configured; no changes were made.'); return; }
+    if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete programme “${String(row.name)}”? Assigned clients may prevent deletion; deactivate it instead if in use.`)) return;
     setBusy(true);
-    const { error } = await supabase!.from('coaching_programmes').delete().eq('id', row.id);
+    const { error } = await neon!.from('coaching_programmes').delete().eq('id', row.id);
     setBusy(false);
     setMessage(error ? `Delete failed: ${error.message}` : 'Programme deleted.');
     if (!error) await load();
   };
 
   const assign = async () => {
-    if (!supabase) { setMessage('Live database access is not configured; no assignment was created.'); return; }
+    if (!neon) { setMessage('Live database access is not configured; no assignment was created.'); return; }
     if (!clientId || !programmeId || !startDate) { setMessage('Choose a client, programme and start date.'); return; }
     setBusy(true); setMessage('');
-    const { error } = await supabase!.from('coaching_programme_assignments').insert({ profile_id: clientId, programme_id: programmeId, starts_on: startDate, status: 'active' });
+    const { error } = await neon!.from('coaching_programme_assignments').insert({ profile_id: clientId, programme_id: programmeId, starts_on: startDate, status: 'active' });
     setBusy(false);
     if (error) { setMessage(`Assignment failed: ${error.message}`); return; }
     setMessage('Programme assigned to client.'); await load();
   };
 
   const finish = async (row: Row) => {
-    if (!supabase) { setMessage('Live database access is not configured; no assignment was changed.'); return; }
+    if (!neon) { setMessage('Live database access is not configured; no assignment was changed.'); return; }
     const status = row.status === 'completed' ? 'active' : 'completed';
-    const { error } = await supabase!.from('coaching_programme_assignments').update({ status }).eq('id', row.id);
+    const { error } = await neon!.from('coaching_programme_assignments').update({ status }).eq('id', row.id);
     setMessage(error ? `Could not update assignment: ${error.message}` : `Assignment marked ${status}.`);
     if (!error) await load();
   };
@@ -119,7 +119,7 @@ export function ProgrammesAdmin() {
         { key: 'name', label: 'Programme', render: (r) => <div><p className="font-medium text-white">{String(r.name)}</p><p className="text-xs text-zinc-500">{String(r.level ?? 'All levels')}</p></div> },
         { key: 'duration_weeks', label: 'Duration', render: (r) => `${String(r.duration_weeks)} weeks` },
         { key: 'days_per_week', label: 'Training', render: (r) => `${String(r.days_per_week)} days/week` },
-        { key: 'active', label: 'Status', render: (r) => <button className={btnGhost} disabled={busy || schemaMissing} onClick={async () => { if (!supabase) { setMessage('Live database access is not configured; no changes were made.'); return; } setBusy(true); setMessage(''); try { const { error } = await supabase.from('coaching_programmes').update({ active: !r.active }).eq('id', r.id); setMessage(error ? `Visibility update failed: ${error.message}` : 'Programme visibility updated.'); if (!error) await load(); } catch { setMessage('Could not update programme visibility. Check the connection and retry.'); } finally { setBusy(false); } }}>{r.active ? 'Live' : 'Hidden'}</button> },
+        { key: 'active', label: 'Status', render: (r) => <button className={btnGhost} disabled={busy || schemaMissing} onClick={async () => { if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; } setBusy(true); setMessage(''); try { const { error } = await neon.from('coaching_programmes').update({ active: !r.active }).eq('id', r.id); setMessage(error ? `Visibility update failed: ${error.message}` : 'Programme visibility updated.'); if (!error) await load(); } catch { setMessage('Could not update programme visibility. Check the connection and retry.'); } finally { setBusy(false); } }}>{r.active ? 'Live' : 'Hidden'}</button> },
       ]} />
       <div className={card}>
         <h3 className="font-semibold text-white">Assign programme</h3>
