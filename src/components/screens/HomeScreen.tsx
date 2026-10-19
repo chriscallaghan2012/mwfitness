@@ -16,9 +16,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
   useEffect(() => {
     let active = true;
-    void loadPublicPlans('pt').then((result) => {
+    void loadPublicPlans('online').then((result) => {
       if (!active) return;
-      setPlans(result.plans.slice(0, 4));
+      setPlans(result.plans.slice(0, 3));
       setPlansError(result.error);
       setPlansLoading(false);
     });
@@ -70,17 +70,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <button
-                onClick={() => onOpenBookCall()}
+                onClick={() => onSelectScreen('online-coaching')}
                 className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
               >
-                <PhoneCall className="w-4 h-4" />
-                <span>Book a free call</span>
+                <ArrowRight className="w-4 h-4" />
+                <span>Shop online plans</span>
               </button>
               <button
                 onClick={() => onSelectScreen('packages')}
                 className="bg-[#16181d] border border-[#2b303d] hover:border-[#ff5500] text-white font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 transition-colors"
               >
-                <span>View packages</span>
+                <span>Compare Bronze, Silver & Platinum</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -116,13 +116,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
       <div style={{ marginTop: 0 }} className="home-ticker w-full bg-[#ff5500] text-black font-mono font-bold text-xs uppercase py-2.5 overflow-hidden whitespace-nowrap border-y border-black">
         <div className="inline-block animate-[marquee_20s_linear_infinite]">
-          <span className="mx-4">● 1-2-1 PERSONAL TRAINING</span>
+          <span className="mx-4">● BRONZE • SILVER • PLATINUM ONLINE PLANS</span>
           <span className="mx-4">● ONLINE COACHING</span>
           <span className="mx-4">● NUTRITIONAL ADVICE</span>
           <span className="mx-4">● CALORIE-CONTROLLED MEAL PREP IDEAS</span>
           <span className="mx-4">● BMR & MACRO BREAKDOWNS</span>
           <span className="mx-4">● PURE GYM HAZEL GROVE • STOCKPORT</span>
-          <span className="mx-4">● 1-2-1 PERSONAL TRAINING</span>
+          <span className="mx-4">● BRONZE • SILVER • PLATINUM ONLINE PLANS</span>
           <span className="mx-4">● ONLINE COACHING</span>
           <span className="mx-4">● NUTRITIONAL ADVICE</span>
           <span className="mx-4">● CALORIE-CONTROLLED MEAL PREP IDEAS</span>
@@ -229,17 +229,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
-              [ WHAT'S AVAILABLE ]
+              [ ONLINE COACHING PACKAGES ]
             </div>
             <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-              PACKAGES THAT FIT YOUR WEEK.
+              BRONZE. SILVER. PLATINUM.
             </h2>
           </div>
           <button
-            onClick={() => onSelectScreen('packages')}
+            onClick={() => onSelectScreen('online-coaching')}
             className="text-xs font-mono text-zinc-400 hover:text-white uppercase tracking-wider flex items-center gap-1.5 group"
           >
-            <span>See all packages</span>
+            <span>Compare and buy online plans</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -270,10 +270,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                   )}
                 </div>
                 <button
-                  onClick={() => onOpenBookCall(tier.name)}
+                  onClick={() => onSelectScreen('online-coaching')}
                   className="mt-2 w-full bg-[#16181d] border border-[#2b303d] hover:bg-[#ff5500] hover:text-black text-white font-mono text-xs font-bold py-2.5 uppercase tracking-wider transition-all"
                 >
-                  {tier.cta_text}
+                  Choose online plan
                 </button>
               </div>
             </div>
