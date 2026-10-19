@@ -68,7 +68,7 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10">
           <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT YOU GET ]</div>
-          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Coaching built around real life.</h2>
+          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Bronze, Silver & Platinum coaching.</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
@@ -91,10 +91,10 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
       <section id="online-plans" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10">
           <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ BUY ONLINE ]</div>
-          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Pick your commitment.</h2>
+          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Choose your online package.</h2>
           <p className="text-sm text-zinc-400 mt-3">All payments are made in advance. Stripe checkout is secure, and no personal meet-up is needed to start.</p>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {plans.map((plan) => (
             <div key={plan.id} className={`bg-[#121419] border p-7 md:p-9 flex flex-col ${plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'}`}>
               <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest">{plan.badge}</div>
