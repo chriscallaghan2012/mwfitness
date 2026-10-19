@@ -31,6 +31,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Reworked the demo overview into a coaching command-centre dashboard with actionable metrics, workspace shortcuts and coach priorities.
 - [x] Added a responsive Staff HQ navigation rail and upgraded shared admin inputs, buttons, cards, empty states and data-table styling.
 - [ ] Audit every live-mode admin form for missing domain fields and replace raw JSON-only editing where a guided form is appropriate.
+- [x] Opened website PR #10 for guided package feature editing and common nutrition target fields; it preserves the existing stored data shapes and leaves meal-section JSON editing as a known follow-up: https://github.com/chriscallaghan2012/mwfitness/pull/10.
 - [ ] Run TypeScript/build/lint and interactive demo CRUD checks before asking for merge approval. No build/test pass is claimed yet.
 - [ ] User approval still required before merge/deployment; this branch has not been merged to `main`.
 
