@@ -88,7 +88,7 @@ export function NutritionAdmin() {
       setBusy(false);
       return;
     }
-    const body: Record<string, unknown> = { name: f.name.trim(), description: f.description?.trim() || null, targets, sections, active: f.active === 'true' };
+    const body: Record<string, unknown> = { name: f.name.trim(), description: f.description?.trim() || null, targets, sections, active: f.active === 'true', day_type: f.day_type === 'non_training' ? 'non_training' : 'training' };
     if (mode === 'plans') body.profile_id = userId;
     try {
       const { error } = edit && edit.id
@@ -128,6 +128,7 @@ export function NutritionAdmin() {
       name: String(t.name),
       targets: t.targets,
       sections: t.sections,
+      day_type: t.day_type ?? 'training',
       active: true,
     });
     setMsg(error ? `Failed: ${error.message}` : `Assigned “${t.name}” ✓`);
@@ -180,10 +181,12 @@ export function NutritionAdmin() {
             targets: JSON.stringify(r.targets ?? {}, null, 1),
             sections: JSON.stringify(r.sections ?? [], null, 1),
             active: r.active ? 'true' : 'false',
+            day_type: String(r.day_type ?? 'training'),
           });
         }}
         cols={[
           { key: 'name', label: 'Name', render: (r) => <span className="font-medium text-white">{r.name}</span> },
+          { key: 'day_type', label: 'Day type', render: (r) => <span className="text-zinc-400 text-xs">{r.day_type === 'non_training' ? 'Non-training' : 'Training'}</span> },
           { key: 'targets', label: 'Targets', render: (r) => <span className="text-zinc-400 font-mono text-[11px]">{(r.targets as Row)?.calories ?? 0} kcal · {(r.targets as Row)?.protein ?? 0}g P</span> },
           { key: 'active', label: 'Active', render: (r) => StatusPill(r.active ? 'active' : 'canceled') },
           { key: 'del', label: '', render: (r) => <button disabled={busy} className={btnGhost} onClick={() => void removeRow(r)}>Delete</button> },
@@ -192,7 +195,7 @@ export function NutritionAdmin() {
       <button
         onClick={() => {
           setEdit({ id: '', active: true } as Row);
-          setF({ name: '', description: '', targets: '{"calories":2000,"protein":150,"carbs":200,"fats":60,"water_ml":3500}', sections: '[]', active: 'true' });
+          setF({ name: '', description: '', targets: '{"calories":2000,"protein":150,"carbs":200,"fats":60,"water_ml":3500}', sections: '[]', active: 'true', day_type: 'training' });
         }}
         className={btn}
       >
@@ -206,6 +209,10 @@ export function NutritionAdmin() {
           </p>
           <input className={inp} placeholder="name" value={f.name ?? ''} onChange={(e) => setF({ ...f, name: e.target.value })} />
           <input className={`${inp} mt-2`} placeholder="description" value={f.description ?? ''} onChange={(e) => setF({ ...f, description: e.target.value })} />
+          <select className={`${inp} mt-2`} value={f.day_type ?? 'training'} onChange={(e) => setF({ ...f, day_type: e.target.value })} aria-label="Plan day type">
+            <option value="training">Training day</option>
+            <option value="non_training">Non-training day</option>
+          </select>
           <textarea className={`${inp} mt-2 min-h-16`} placeholder='targets JSON {"calories":2000,"protein":150}' value={f.targets ?? '{}'} onChange={(e) => setF({ ...f, targets: e.target.value })} />
           <textarea className={`${inp} mt-2 min-h-32`} placeholder='sections JSON [{"name":"BREAKFAST","items":[{"name":"…","sub":"…","calories":0,"protein":0}]}]' value={f.sections ?? '[]'} onChange={(e) => setF({ ...f, sections: e.target.value })} />
           <label className="text-[11px] text-zinc-500 uppercase flex items-center gap-2 mt-2">
