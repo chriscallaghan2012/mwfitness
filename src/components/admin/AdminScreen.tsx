@@ -434,7 +434,10 @@ export function AdminScreen() {
         </button>
       </div>
 
-      <div className="sticky top-24 z-30 -mx-4 mb-6 flex gap-2 overflow-x-auto border-y border-white/[0.08] bg-[#0b0c0e]/95 px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:flex-wrap sm:overflow-visible sm:rounded-2xl sm:border sm:border-white/[0.07] sm:bg-white/[0.025] sm:p-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <aside className="min-w-0">
+          <p className="mb-2 hidden px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 lg:block">Workspace</p>
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:sticky lg:top-28 lg:flex lg:h-fit lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -442,14 +445,17 @@ export function AdminScreen() {
             aria-pressed={tab === t.id}
             className={
               tab === t.id
-                ? 'rounded-xl bg-orange-500 px-3.5 py-2.5 text-xs font-semibold text-black shadow-md shadow-orange-950/20 transition'
-                : 'shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.025] px-3.5 py-2.5 text-xs font-medium text-zinc-400 transition hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400'
+                ? 'flex w-full items-center justify-start rounded-xl bg-orange-500 px-3.5 py-3 text-left text-xs font-semibold text-black shadow-md shadow-orange-950/20 transition'
+                : 'flex w-full items-center justify-start rounded-xl border border-transparent bg-white/[0.02] px-3.5 py-3 text-left text-xs font-medium text-zinc-400 transition hover:border-white/[0.08] hover:bg-white/[0.05] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400'
             }
           >
             {t.label}
           </button>
         ))}
       </div>
+        </aside>
+        <div className="min-w-0 space-y-5">
+
 
       {tab === 'overview' && (
         <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-3">
@@ -596,6 +602,8 @@ export function AdminScreen() {
           </form>
         </div>
       ) : null}
+        </div>
+      </div>
       </div>
     </div>
   );
