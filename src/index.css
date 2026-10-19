@@ -128,3 +128,19 @@ a {
   height: 5px;
   margin-top: 12px;
 }
+
+
+/* Full-width dashboard band beneath page heroes and the homepage ticker. */
+.industrial-stripe--divider {
+  width: 100%;
+  height: 14px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(255, 85, 0),
+    rgb(255, 85, 0) 15px,
+    rgb(18, 20, 24) 15px,
+    rgb(18, 20, 24) 30px
+  );
+  border-top: 1px solid rgba(255, 85, 0, 0.45);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+}
