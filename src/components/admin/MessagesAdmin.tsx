@@ -40,12 +40,12 @@ export function MessagesAdmin() {
     setStatus('');
     try {
       const { data: sessionData, error: sessionError } = await neon.auth.getSession();
-      if (sessionError || !sessionData.session) throw new Error('Your staff session has expired. Sign in again.');
+      if (sessionError || !sessionData?.user) throw new Error('Your staff session has expired. Sign in again.');
       const { data, error: insertError } = await neon
         .from('coach_messages')
         .insert(athleteIds.map((athlete_profile_id) => ({
           athlete_profile_id,
-          sender_profile_id: sessionData.session!.user.id,
+          sender_profile_id: sessionData.user.id,
           body: body.trim(),
         })))
         .select('id');
@@ -54,9 +54,11 @@ export function MessagesAdmin() {
       setBody('');
       await load();
       try {
+        const accessToken = await neon.auth.getJWTToken?.();
+        if (!accessToken) throw new Error('Could not obtain a Neon access token for push delivery.');
         const response = await fetch('/api/send-push', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${sessionData.session.access_token}`, 'Content-Type': 'application/json' },
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ messageIds: (data ?? []).map((message) => message.id) }),
         });
         const result = await response.json() as { accepted?: number; failed?: number; noDevice?: number; error?: string };
