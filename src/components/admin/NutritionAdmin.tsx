@@ -19,11 +19,16 @@ export function NutritionAdmin() {
 
   const loadTemplates = async () => {
     if (!supabase) { setMsg('Neon is not configured; meal templates cannot be loaded.'); setRows([]); return; }
-    const { data, error } = await supabase!.from('nutrition_templates').select('*').order('name');
-    if (error) { setMsg(`Could not load meal templates: ${error.message}`); return; }
-    const next = (data ?? []) as Row[];
-    setTemplates(next);
-    if (mode === 'templates') setRows(next);
+    try {
+      const { data, error } = await supabase.from('nutrition_templates').select('*').order('name');
+      if (error) { setMsg(`Could not load meal templates: ${error.message}`); return; }
+      const next = (data ?? []) as Row[];
+      setTemplates(next);
+      if (mode === 'templates') setRows(next);
+    } catch {
+      setMsg('Could not reach meal templates. Check the connection and retry.');
+      setRows([]);
+    }
   };
   const loadPlans = async () => {
     if (!userId) {
@@ -31,9 +36,14 @@ export function NutritionAdmin() {
       return;
     }
     if (!supabase) { setMsg('Neon is not configured; client nutrition plans cannot be loaded.'); setRows([]); return; }
-    const { data, error } = await supabase.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
-    if (error) { setMsg(`Could not load this client's nutrition plans: ${error.message}`); setRows([]); return; }
-    setRows((data ?? []) as Row[]);
+    try {
+      const { data, error } = await supabase.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
+      if (error) { setMsg(`Could not load this client's nutrition plans: ${error.message}`); setRows([]); return; }
+      setRows((data ?? []) as Row[]);
+    } catch {
+      setMsg('Could not reach this client’s nutrition plans. Check the connection and retry.');
+      setRows([]);
+    }
   };
   useEffect(() => {
     void loadTemplates();
@@ -110,8 +120,7 @@ export function NutritionAdmin() {
     try {
     const { data: t, error: tErr } = await supabase.from('nutrition_templates').select('*').eq('id', assignTpl).maybeSingle();
     if (tErr || !t) {
-      setMsg('Template not found.');
-      setBusy(false);
+      setMsg(tErr ? `Could not load meal template: ${tErr.message}` : 'Template not found.');
       return;
     }
     const { error } = await supabase.from('nutrition_plans').insert({
