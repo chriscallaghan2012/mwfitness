@@ -56,3 +56,16 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - The reported immediate Android launch crash requires a real crash trace to diagnose.
 - Video storage/upload, video-to-programme assignment, programme schema, and verified server-side Neon Auth account deletion need schema/API/security review before implementation or use.
 - No production database changes, merges to `main`, Vercel deployments, EAS builds, or Play submissions have been performed.
+
+
+## Website follow-up — online package sales and compliance (2026-10-19)
+
+- [x] PR #7 was merged to `main`; production commit `07b5abfb4f035a4e21c931589385a1e27588daad` reached Vercel `READY`.
+- [x] User confirmed online pricing is visible on production. Do not report it as a current defect unless it regresses.
+- [x] Follow-up branch `work/mwfitness-online-packages-compliance-2026-10` now loads online plans in the homepage package area, directs primary homepage actions toward online coaching, gives the online plan grid three responsive columns, simplifies the footer, removes footer staff login and non-link claims, and adds a cookie policy route/link.
+- [ ] Verify the real production plan records are Bronze, Silver and Platinum, in the intended order, with correct prices/features and functional Stripe checkout.
+- [ ] Inspect production cookies/storage, Neon auth/session behaviour, Stripe checkout, analytics and third-party embeds. The cookie policy is a draft disclosure, not proof of compliance; implement consent gating if any non-essential cookies are active.
+- [ ] Review the privacy policy against the actual data flows: controller details, purposes and lawful bases, retention, processors, international transfers, data-subject rights and ICO complaint route. Business owner must verify factual statements before final publication.
+- [ ] Run `npm run lint` and `npm run build`, then interactive desktop/mobile checks for package links, footer legal links, direct `/privacy`, `/cookies` and `/delete-account` routes, and checkout.
+- [ ] Only merge/deploy the follow-up once those release checks pass. Android deployment remains user-managed.
+
