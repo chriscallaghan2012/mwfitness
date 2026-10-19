@@ -7,7 +7,11 @@ function parseSections(value: string): JsonRecord[] | null {
   try {
     const parsed: unknown = JSON.parse(value || '[]');
     if (!Array.isArray(parsed)) return null;
-    if (parsed.some((section) => !section || typeof section !== 'object' || Array.isArray(section))) return null;
+    if (parsed.some((section) => {
+      if (!section || typeof section !== 'object' || Array.isArray(section)) return true;
+      const items = (section as JsonRecord).items;
+      return items !== undefined && (!Array.isArray(items) || items.some((item) => !item || typeof item !== 'object' || Array.isArray(item)));
+    })) return null;
     return parsed as JsonRecord[];
   } catch {
     return null;
