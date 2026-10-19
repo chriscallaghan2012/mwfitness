@@ -114,3 +114,17 @@ a {
     margin-bottom: 2.25rem !important;
   }
 }
+
+
+/* Restrained industrial orange/charcoal accent used on hero edges and section markers. */
+.industrial-stripe {
+  height: 6px;
+  width: 100%;
+  background-image: repeating-linear-gradient(45deg, #ff5500, #ff5500 15px, #121418 15px, #121418 30px);
+}
+
+.industrial-stripe--marker {
+  width: 84px;
+  height: 5px;
+  margin-top: 12px;
+}
