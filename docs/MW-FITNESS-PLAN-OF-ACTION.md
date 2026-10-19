@@ -28,6 +28,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Verify the pricing query's actual runtime error from browser console and environment; logging has been added, but the underlying cause is not yet confirmed.
 - [ ] Capture the Android launch crash trace from the installed test APK/device. Startup diagnostic handling exists, but the crash is not claimed fixed without the actual error.
 - [ ] Continue Staff HQ CRUD and authorization/RLS audit against disposable test data, including all save/delete paths; guards added here cover missing configuration and user CRUD exceptions, not a complete permission audit.
+- [ ] Security finding: the Staff HQ user editor exposes `role` (including `admin`) in its profile update payload, while the app currently maps both `coach` and `admin` profiles to the same admin dashboard role. Verify deployed RLS and add a tested server/database role-change guard before using live staff accounts; do not apply the documented draft trigger to shared production.
 
 ## Known blocked items / not claimed complete
 - Pricing's underlying environment/database cause is not yet observable from repository source alone; browser console + intended Vercel/local env and Neon permissions must be checked.
