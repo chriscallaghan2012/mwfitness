@@ -55,3 +55,22 @@ CREATE POLICY "admins can manage daily nutrition logs"
   WITH CHECK (is_admin());
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.nutrition_daily_logs TO authenticated;
+
+-- Allow an authenticated member to reply in their own coach conversation.
+DROP POLICY IF EXISTS "athletes can send own coach messages" ON public.coach_messages;
+CREATE POLICY "athletes can send own coach messages"
+  ON public.coach_messages
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    auth.uid() = athlete_profile_id
+    AND auth.uid() = sender_profile_id
+    AND NOT is_admin()
+  );
+
+-- Staff need to read athlete replies as well as messages they authored.
+DROP POLICY IF EXISTS "staff can read messages they sent" ON public.coach_messages;
+DROP POLICY IF EXISTS "staff can read all coach messages" ON public.coach_messages;
+CREATE POLICY "staff can read all coach messages"
+  ON public.coach_messages
+  FOR SELECT TO authenticated
+  USING (is_admin());
