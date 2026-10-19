@@ -356,7 +356,7 @@ export function AdminScreen() {
   const openDemoEditor = (row?: Row) => {
     if (tab === 'overview') return;
     const draft: Row = {};
-    for (const column of DEMO_TABLES[tab].columns) draft[column.key] = row?.[column.key] ?? '';
+    for (const field of DEMO_FIELDS[tab]) draft[field.key] = row?.[field.key] ?? '';
     setDemoDraft(draft);
     setDemoEditId(row ? String(row.id) : null);
     setDemoNotice('');
@@ -474,7 +474,7 @@ export function AdminScreen() {
           <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Quick start</p>
           <ul className="list-disc list-inside space-y-1">
             <li>Create customer accounts in <b>Users → Add customer</b> using a unique temporary password; share it securely.</li>
-            <li>Edit a customer's role, tier and weights: <b>Users → Edit</b>.</li>
+            <li>Update client profile details, membership tier and coaching notes: <b>Users → Edit</b>.</li>
             <li>Assign a plan: <b>Memberships</b>.</li>
             <li>Next, give the customer a diet: <b>Nutrition → Meal templates → assign</b>.</li>
             <li>Schedule sessions: <b>Workouts</b>; review check-ins: <b>Check-ins</b>; log weigh-ins: <b>Progress</b>.</li>
