@@ -119,7 +119,7 @@ export function ProgrammesAdmin() {
         { key: 'name', label: 'Programme', render: (r) => <div><p className="font-medium text-white">{String(r.name)}</p><p className="text-xs text-zinc-500">{String(r.level ?? 'All levels')}</p></div> },
         { key: 'duration_weeks', label: 'Duration', render: (r) => `${String(r.duration_weeks)} weeks` },
         { key: 'days_per_week', label: 'Training', render: (r) => `${String(r.days_per_week)} days/week` },
-        { key: 'active', label: 'Status', render: (r) => <button className={btnGhost} disabled={busy} onClick={async () => { const { error } = await supabase!.from('coaching_programmes').update({ active: !r.active }).eq('id', r.id); setMessage(error ? error.message : 'Programme visibility updated.'); if (!error) await load(); }}>{r.active ? 'Live' : 'Hidden'}</button> },
+        { key: 'active', label: 'Status', render: (r) => <button className={btnGhost} disabled={busy || schemaMissing} onClick={async () => { if (!supabase) { setMessage('Live database access is not configured; no changes were made.'); return; } setBusy(true); setMessage(''); try { const { error } = await supabase.from('coaching_programmes').update({ active: !r.active }).eq('id', r.id); setMessage(error ? `Visibility update failed: ${error.message}` : 'Programme visibility updated.'); if (!error) await load(); } catch { setMessage('Could not update programme visibility. Check the connection and retry.'); } finally { setBusy(false); } }}>{r.active ? 'Live' : 'Hidden'}</button> },
       ]} />
       <div className={card}>
         <h3 className="font-semibold text-white">Assign programme</h3>
