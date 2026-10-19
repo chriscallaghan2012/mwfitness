@@ -38,7 +38,9 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Website `.github/workflows/verify-neon.yml`: removed push trigger and automated lockfile commit/push. It is manual-only (`workflow_dispatch`), uses `npm ci`, has read-only repository permissions, and checks out the selected ref.
 - [x] Website `.github/workflows/verify-staff-hq.yml`: removed pull-request and push triggers; manual-only (`workflow_dispatch`), uses `npm ci`, read-only repository permissions, and checks out the selected ref.
 - [ ] Open/review a PR for these workflow changes; do not merge or run the workflows until explicitly approved.
-- [ ] Audit all remaining workflow files and any other CI/release automation in both repositories, including scheduled triggers, `workflow_run`, `repository_dispatch`, deployment jobs and Android build/submission workflows. Search on the app repository returned no matching workflow files so far; confirm repository workflow inventory rather than assuming none exist.
+- [x] Confirmed the Android repository's `.github/workflows/ci.yml` already has only `workflow_dispatch` and read-only permissions; no EAS build or Play submission is performed by that workflow.
+- [x] Opened Android PR #13 to switch CI to `npm ci` and add an Android JS bundle export while keeping it manual-only: https://github.com/chriscallaghan2012/MW-FITNESS-APP-MOBILE/pull/13. It has not been run or merged.
+- [ ] Audit all remaining workflow files and any other CI/release automation in both repositories, including scheduled triggers, `workflow_run`, `repository_dispatch`, deployment jobs and Android build/submission workflows.
 - [ ] After approval, verify workflow files on the merged default branch and confirm no push/PR trigger can start them. Do not manually dispatch any workflow unless asked.
 
 ## Must pass before any release
@@ -54,7 +56,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 ## Progress update — remaining tracks
 - [ ] Run website TypeScript/build/lint and Android Expo lint/typecheck locally; this environment has GitHub source access but no verified repository checkout/build output.
 - [ ] Verify the pricing query's actual runtime error from browser console and environment; logging has been added, but the underlying cause is not yet confirmed.
-- [ ] Capture the Android launch crash trace from the installed test APK/device. Startup diagnostic handling exists, but the crash is not claimed fixed without the actual error.
+- [ ] Capture the Android launch crash trace from the installed test APK/device. Startup diagnostic handling exists, but the crash is not claimed fixed without the actual error. Source review shows font-load failures are caught and release the splash gate; Neon session restore errors are swallowed, so the actual native/device trace is still required before a safe root-cause fix.
 - [ ] Continue Staff HQ CRUD and authorization/RLS audit against disposable test data, including all save/delete paths; recent hardening now covers nutrition, plan catalogue, programme visibility, workout deletion, user, membership, progress/check-in and workout loading paths, but is not a complete permission audit.
 - [ ] Access control: product intent is one coach/operator with staff access and trainee accounts. The routine user editor no longer changes roles. Still verify that new sign-ups default to trainee access and deployed RLS prevents trainees from reading or writing other clients' records; do not apply the documented draft trigger to shared production without testing the deployed auth mapping.
 
