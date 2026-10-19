@@ -1,6 +1,6 @@
 # MW Fitness — plan of action and test gates
 
-This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). Local testing and branch pushes only until Mike explicitly approves otherwise. Do not deploy, merge to main, run workflows/build submissions, or change the shared Neon database without approval.
+This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). Keep all validation workflows manual-only; never deploy, merge to main, submit Android builds, or change the shared Neon database without explicit approval.
 
 ## Completed in this work batch
 - [x] Android nutrition day selector now loads and saves the selected calendar date rather than always reading/writing today's nutrition log.
@@ -33,6 +33,13 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Audit every live-mode admin form for missing domain fields and replace raw JSON-only editing where a guided form is appropriate.
 - [ ] Run TypeScript/build/lint and interactive demo CRUD checks before asking for merge approval. No build/test pass is claimed yet.
 - [ ] User approval still required before merge/deployment; this branch has not been merged to `main`.
+
+## GitHub Actions control — in progress
+- [x] Website `.github/workflows/verify-neon.yml`: removed push trigger and automated lockfile commit/push. It is manual-only (`workflow_dispatch`), uses `npm ci`, has read-only repository permissions, and checks out the selected ref.
+- [x] Website `.github/workflows/verify-staff-hq.yml`: removed pull-request and push triggers; manual-only (`workflow_dispatch`), uses `npm ci`, read-only repository permissions, and checks out the selected ref.
+- [ ] Open/review a PR for these workflow changes; do not merge or run the workflows until explicitly approved.
+- [ ] Audit all remaining workflow files and any other CI/release automation in both repositories, including scheduled triggers, `workflow_run`, `repository_dispatch`, deployment jobs and Android build/submission workflows. Search on the app repository returned no matching workflow files so far; confirm repository workflow inventory rather than assuming none exist.
+- [ ] After approval, verify workflow files on the merged default branch and confirm no push/PR trigger can start them. Do not manually dispatch any workflow unless asked.
 
 ## Must pass before any release
 1. **Website pricing** — use the local/staging browser console to capture the actual Neon query error; verify `VITE_NEON_AUTH_URL` and `VITE_NEON_DATA_API_URL` are present in the intended environment, and verify active `plans` rows plus anonymous SELECT/RLS/grants for public pricing. Do not hard-code a price fallback or mask missing live prices with demo values.
