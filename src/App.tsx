@@ -19,7 +19,8 @@ import { AdminScreen } from './components/admin/AdminScreen';
 export default function App() {
   const screenFromLocation = (): ScreenId => {
     if (new URLSearchParams(window.location.search).get('auth') === 'reset-password') return 'admin';
-    const path = window.location.pathname.replace(/\\/+$/, '') || '/';
+    const rawPath = window.location.pathname;
+    const path = rawPath.length > 1 && rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath;
     const routes: Record<string, ScreenId> = {
       '/': 'home',
       '/online-coaching': 'online-coaching',
