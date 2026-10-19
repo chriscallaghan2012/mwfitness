@@ -142,6 +142,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
               TRAINING MADE SIMPLE.
             </h2>
+            <div aria-hidden="true" className="industrial-stripe industrial-stripe--marker" />
           </div>
           <button
             onClick={() => onOpenBookCall()}
