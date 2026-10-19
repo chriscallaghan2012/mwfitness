@@ -94,20 +94,38 @@ export function ProgressAdmin() {
   };
 
   const add = async () => {
-    if (!weight) return;
-    const { error } = await supabase!.from('progress_logs').insert({
-      profile_id: userId,
-      weight: Number(weight),
-      recorded_on: new Date().toISOString().slice(0, 10),
-    });
-    setMsg(error ? `Failed: ${error.message}` : 'Logged ✓');
-    setWeight('');
-    await load();
+    const parsedWeight = Number(weight);
+    if (!userId) { setMsg('Choose a customer first.'); return; }
+    if (!weight.trim() || !Number.isFinite(parsedWeight) || parsedWeight <= 0 || parsedWeight > 999) {
+      setMsg('Enter a valid weight greater than 0 and no more than 999 kg.');
+      return;
+    }
+    if (!supabase) { setMsg('Neon is not configured; progress cannot be saved.'); return; }
+    try {
+      const { error } = await supabase.from('progress_logs').insert({
+        profile_id: userId,
+        weight: parsedWeight,
+        recorded_on: new Date().toISOString().slice(0, 10),
+      });
+      if (error) { setMsg(`Failed: ${error.message}`); return; }
+      setMsg('Weigh-in logged.');
+      setWeight('');
+      await load(userId);
+    } catch (error) {
+      setMsg(`Failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   const remove = async (id: string) => {
-    await supabase!.from('progress_logs').delete().eq('id', id);
-    await load();
+    if (!supabase) { setMsg('Neon is not configured; progress cannot be deleted.'); return; }
+    try {
+      const { error } = await supabase.from('progress_logs').delete().eq('id', id);
+      if (error) { setMsg(`Could not delete weigh-in: ${error.message}`); return; }
+      setMsg('Weigh-in deleted.');
+      await load(userId);
+    } catch (error) {
+      setMsg(`Could not delete weigh-in: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    }
   };
 
   return (
