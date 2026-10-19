@@ -56,3 +56,38 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - The reported immediate Android launch crash requires a real crash trace to diagnose.
 - Video storage/upload, video-to-programme assignment, programme schema, and verified server-side Neon Auth account deletion need schema/API/security review before implementation or use.
 - No production database changes, merges to `main`, Vercel deployments, EAS builds, or Play submissions have been performed.
+
+
+## Neon-only live-data audit — 2026-10-19
+
+### Prepared implementation (not merged, deployed, or applied to the shared database)
+
+- [x] Renamed the website client to `src/lib/neon.ts` and moved website/admin imports to the shared `neon` client.
+- [x] Replaced the legacy auth adapter with Neon SDK's native `BetterAuthVanillaAdapter`; website staff sign-in and password recovery now use Neon/Better Auth methods.
+- [x] Updated Android sign-in and session restoration to the native Neon Auth response shape.
+- [x] Added a read-only `GET /api/plans?kind=pt|online` endpoint that reads active public plans through the server-side Neon connection and never returns Stripe price IDs.
+- [x] Changed the public website plan loader to use that endpoint, so public pricing no longer depends on browser-side anonymous Data API access.
+- [x] Updated the Android nutrition loader to map existing `nutrition_plans.targets/sections` JSON into the meal UI instead of querying absent normalized meal tables.
+- [x] Prepared a migration adding training/non-training plan types, daily meal-completion logs, and the RLS policies needed for member replies in coach conversations.
+- [x] Replaced the Android messages preview flow with Neon-backed conversation loading and message inserts; demo mode remains explicitly local.
+- [x] Removed misleading Staff HQ success labels for actions that are not connected to live services.
+
+### Verified from the live Neon schema
+
+- [x] The public `plans` table has six active rows: two online-coaching plans and four PT plans.
+- [x] Anonymous/public SELECT privileges and read policies exist for `plans`.
+- [x] The Vercel Neon Auth/Data API environment URLs point at the same Neon endpoint used by the configured Data API.
+- [x] The Vercel `DATABASE_URL` points at the same Neon project and `mwfitness` database.
+- [x] The live database currently has the existing `nutrition_plans`, `nutrition_templates`, `nutrition_logs`, `coach_messages`, and `device_push_tokens` tables. It does not have `nutrition_plan_days`, `nutrition_plan_meals`, `nutrition_plan_foods`, or `nutrition_daily_logs`.
+- [x] `coach_messages` and `device_push_tokens` currently contain no rows; no Android device-token registration flow exists yet.
+
+### Release gates still open
+
+- [ ] Run website lint/build and Android TypeScript/lint/Android export against the complete repositories. No successful build is claimed yet.
+- [ ] Apply `db/migrations/20261019_mobile_nutrition_live.sql` only after review/approval; it has not been executed against shared Neon.
+- [ ] Add the SDK-57-compatible Expo Notifications dependency, Android permission/token registration, token persistence, and notification-tap handling.
+- [ ] Verify that a member can send a message, Staff HQ can read/reply, and a registered device receives the push notification.
+- [ ] Verify `/api/plans?kind=online` and `/api/plans?kind=pt` in the deployed environment; the public domain could not be reached from this execution environment, so the endpoint has not been exercised over HTTP.
+- [ ] Test Stripe checkout in test mode and confirm success/cancel handling.
+- [ ] Run the configured manual GitHub Actions checks when a supported workflow-dispatch path is available.
+- [ ] Consolidate changes to a work branch only after the above code checks; no production merge or deployment without approval.
