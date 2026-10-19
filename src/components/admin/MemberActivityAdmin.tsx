@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -10,7 +10,7 @@ const panel = 'rounded-xl border border-zinc-800 bg-[#121315] p-4';
 const tableClass = 'w-full min-w-[620px] text-left text-xs';
 const cell = 'border-b border-zinc-800 px-3 py-3 align-top';
 
-function Empty({ children }: { children: React.ReactNode }) {
+function Empty({ children }: { children: ReactNode }) {
   return <p className="py-5 text-sm text-zinc-500">{children}</p>;
 }
 
