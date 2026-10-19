@@ -24,6 +24,16 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Nutrition date changes now show the selected day as loading until that date's log resolves; failed daily-log saves show a connection error and reliably clear the saving state.
 - [x] Android changes are on `work/mwfitness-android-bulk-fixes-2026-10`; website changes are intended for `work/mwfitness-bulk-fixes-2026-10`. No main merge or deployment.
 
+## Premium Staff HQ / demo workspace — active work (2026-10-19)
+- [x] Replaced the demo's tiny two-row lists with a richer fictional workspace across clients, app records, plans, memberships, nutrition, workouts, programmes, videos, check-ins, progress, messages, leads and activity.
+- [x] Added module-specific demo form schemas instead of generating forms only from the small set of table columns. The demo editor now exposes coaching fields, goals, measurements, nutrition macros/meals, workout scheduling, programme metadata, check-in scores, lead follow-up, and notes.
+- [x] Demo record editing initializes all module fields, not only visible table columns; sample edits remain browser-local and never write to Neon.
+- [x] Reworked the demo overview into a coaching command-centre dashboard with actionable metrics, workspace shortcuts and coach priorities.
+- [x] Added a responsive Staff HQ navigation rail and upgraded shared admin inputs, buttons, cards, empty states and data-table styling.
+- [ ] Audit every live-mode admin form for missing domain fields and replace raw JSON-only editing where a guided form is appropriate.
+- [ ] Run TypeScript/build/lint and interactive demo CRUD checks before asking for merge approval. No build/test pass is claimed yet.
+- [ ] User approval still required before merge/deployment; this branch has not been merged to `main`.
+
 ## Must pass before any release
 1. **Website pricing** — use the local/staging browser console to capture the actual Neon query error; verify `VITE_NEON_AUTH_URL` and `VITE_NEON_DATA_API_URL` are present in the intended environment, and verify active `plans` rows plus anonymous SELECT/RLS/grants for public pricing. Do not hard-code a price fallback or mask missing live prices with demo values.
 2. **Staff HQ access** — test real coach and admin accounts; confirm non-staff accounts are rejected; review RLS policies for every staff-read and write table. Keep demo mode browser-local and ensure it cannot write to Neon.
