@@ -42,7 +42,9 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Open/review a PR for these workflow changes; do not merge or run the workflows until explicitly approved.
 - [x] Confirmed the Android repository's `.github/workflows/ci.yml` already has only `workflow_dispatch` and read-only permissions; no EAS build or Play submission is performed by that workflow.
 - [x] Opened Android PR #13 to switch CI to `npm ci` and add an Android JS bundle export while keeping it manual-only: https://github.com/chriscallaghan2012/MW-FITNESS-APP-MOBILE/pull/13. It has not been run or merged.
-- [ ] Audit all remaining workflow files and any other CI/release automation in both repositories, including scheduled triggers, `workflow_run`, `repository_dispatch`, deployment jobs and Android build/submission workflows.
+- [x] Audited the workflow directories: the website has two workflows; Android has five (`ci`, `neon-check`, diagnostic APK, preview build, and Play internal). All currently use `workflow_dispatch` only; no schedule, `workflow_run`, `repository_dispatch`, push, or pull-request triggers were found in those workflow files.
+- [x] Expanded Android PR #13 to make `neon-check.yml` read-only, use `npm ci`, check out the selected ref, and remove its automated lockfile commit/push side effect. The diagnostic APK, preview EAS build, and Play internal submission workflows remain manually invokable only; do not run them without explicit approval.
+- [ ] Audit automation outside `.github/workflows` (package scripts, external integrations and Vercel/Expo settings) before declaring the entire release process manual-only.
 - [ ] After approval, verify workflow files on the merged default branch and confirm no push/PR trigger can start them. Do not manually dispatch any workflow unless asked.
 
 ## Must pass before any release
