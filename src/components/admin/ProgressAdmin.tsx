@@ -98,7 +98,7 @@ export function ProgressAdmin() {
     void supabase.from('profiles').select('id,full_name').order('full_name').then(({ data, error }) => {
       if (error) setMsg(`Could not load customers: ${error.message}`);
       else setUsers((data ?? []) as Row[]);
-    }).catch((error) => setMsg(`Could not load customers: ${error instanceof Error ? error.message : 'Unexpected error'}`));
+    }, (error) => setMsg(`Could not load customers: ${error instanceof Error ? error.message : 'Unexpected error'}`));
   }, []);
 
   const load = async (profileId = userId) => {
