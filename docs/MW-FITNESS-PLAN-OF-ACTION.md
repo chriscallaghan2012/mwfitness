@@ -79,3 +79,12 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Continue source scan for JSX attribute/type errors across the remaining app screens and components; do not change demo/sample data as part of this scan.
 
 - [x] Performed a targeted JSX attribute scan across 12 additional Android screens (workout, nutrition, training, profile, messages, admin dashboard, calendar, coach/member check-ins, goals, member tools, progress) plus shared icon/UI/navigation components; no additional suspicious unquoted attributes were found in that limited scan. This is not a substitute for TypeScript/lint/build validation.
+
+
+## Account ownership clarification — 2026-10-19
+- Product rule confirmed by the user: customer/member sign-in is for the MW Fitness mobile app, not the public marketing website. Keep the website public-facing; do not build a customer web login.
+- The website's existing Staff HQ/admin login is a separate staff-only tool, not a customer portal. Its Users panel must not create customer credentials or use browser-side sign-up.
+- Updated draft PR #11 copy to state that customer accounts are app-managed and the website panel manages coaching records only: https://github.com/chriscallaghan2012/mwfitness/pull/11.
+- The mobile app's current AdminDashboardScreen roster is still a hard-coded sample list; it is not connected to real account CRUD. Do not present it as live customer management.
+- [ ] Implement app-admin create/deactivate/delete account controls only after a server-side service is designed. The mobile app must never contain an Auth admin secret or use public client credentials to create/delete Auth users. The service must verify the current caller's staff role server-side, validate inputs, prevent deleting/demoting the last admin, define whether deletion is soft or permanent, and safely handle dependent profile/data cleanup.
+- [ ] Before implementing account actions, confirm Neon Auth's supported administrative API and the deployed staff identity/role mapping. Test only in a disposable environment; do not apply production schema changes or expose service credentials to the app.
