@@ -14,6 +14,7 @@ export function WorkoutsAdmin() {
   const [sessForm, setSessForm] = useState<Record<string, string>>({});
 
   const load = async () => {
+    if (!supabase) { setMsg('Neon is not configured; live workouts cannot be loaded.'); setTemplates([]); setSessions([]); return; }
     const { data, error } = await supabase!.from('workout_templates').select('*, plans(name)').order('name');
     if (!error && data) setTemplates(data as Row[]);
     void supabase!.from('profiles').select('id,full_name').order('full_name').then((r) => !r.error && setUsers(r.data as Row[]));

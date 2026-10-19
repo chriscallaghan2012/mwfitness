@@ -14,6 +14,7 @@ export function MembershipsAdmin() {
   const [form, setForm] = useState<Record<string, string>>({});
 
   const load = async () => {
+    if (!supabase) { setMsg('Neon is not configured; memberships cannot be loaded.'); setRows([]); return; }
     const { data, error } = await supabase!.from('memberships').select('*, profiles(full_name,email), plans(name)').order('created_at', { ascending: false });
     if (!error && data) setRows(data as Row[]);
     const u = await supabase!.from('profiles').select('id,full_name,email').order('full_name');

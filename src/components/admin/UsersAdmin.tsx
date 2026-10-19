@@ -14,6 +14,7 @@ export function UsersAdmin() {
   const [addOpen, setAddOpen] = useState(false);
 
   const load = async () => {
+    if (!supabase) { setMsg('Neon is not configured; user records cannot be loaded.'); setUsers([]); return; }
     const { data, error } = await supabase!.from('profiles').select('*').order('created_at');
     if (error) { setMsg(`Could not load users: ${error.message}`); return; }
     setUsers((data ?? []) as Row[]);

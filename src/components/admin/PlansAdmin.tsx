@@ -13,6 +13,7 @@ export function PlansAdmin() {
   const [f, setF] = useState<Record<string, string>>({ active: 'true' });
 
   const load = async () => {
+    if (!supabase) { setMsg('Neon is not configured; live pricing cannot be loaded.'); setPlans([]); return; }
     const { data, error } = await supabase!.from('plans').select('*').order('price');
     if (error) { setMsg(`Could not load packages and pricing: ${error.message}`); return; }
     setPlans((data ?? []) as Row[]);
@@ -27,6 +28,7 @@ export function PlansAdmin() {
   };
 
   const save = async () => {
+    if (!supabase) { setMsg('Neon is not configured; no changes were saved.'); return; }
     const price = Number(f.price);
     const originalPrice = f.original_price ? Number(f.original_price) : null;
     if (!f.id?.trim() || !/^[a-z0-9][a-z0-9-]*$/.test(f.id.trim())) { setMsg('Plan ID must use lowercase letters, numbers and hyphens.'); return; }
@@ -64,6 +66,7 @@ export function PlansAdmin() {
   };
 
   const remove = async (p: Row) => {
+    if (!supabase) { setMsg('Neon is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete plan “${String(p.name)}”? Plans assigned to memberships may be protected by database constraints; hide the plan instead if it is already in use.`)) return;
     setBusy(true);
     const { error } = await supabase!.from('plans').delete().eq('id', p.id);
@@ -73,6 +76,7 @@ export function PlansAdmin() {
   };
 
   const toggle = async (p: Row) => {
+    if (!supabase) { setMsg('Neon is not configured; no changes were made.'); return; }
     setBusy(true);
     const { error } = await supabase!.from('plans').update({ active: !p.active }).eq('id', p.id);
     setBusy(false);

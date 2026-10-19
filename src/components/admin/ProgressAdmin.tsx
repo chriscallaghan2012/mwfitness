@@ -10,6 +10,7 @@ export function CheckinsAdmin() {
   }, []);
 
   const load = async () => {
+    if (!supabase) { setRows([]); return; }
     const { data, error } = await supabase!.from('checkins').select('*, profiles(full_name,email)').order('checkin_date', { ascending: false });
     if (!error && data) setRows(data as Row[]);
   };

@@ -18,6 +18,7 @@ export function NutritionAdmin() {
   const schema = () => (mode === 'templates' ? 'nutrition_templates' : 'nutrition_plans') as 'nutrition_templates' | 'nutrition_plans';
 
   const loadTemplates = async () => {
+    if (!supabase) { setMsg('Neon is not configured; meal templates cannot be loaded.'); setRows([]); return; }
     const { data, error } = await supabase!.from('nutrition_templates').select('*').order('name');
     if (error) { setMsg(`Could not load meal templates: ${error.message}`); return; }
     const next = (data ?? []) as Row[];
