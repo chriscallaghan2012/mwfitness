@@ -1,8 +1,8 @@
 // AdminScreen — MWFitnessUK staff HQ. Sign-in + management for customers,
 // plans, memberships, nutrition, workouts, check-ins and progress.
 // Same shared Neon project as the mobile app.
-import { FormEvent, useEffect, useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { FormEvent, ReactNode, useEffect, useState } from 'react';
+import { Activity, CircleDollarSign, CreditCard, Plus, Users, X } from 'lucide-react';
 import { neon } from '../../lib/neon';
 import { UsersAdmin } from './UsersAdmin';
 import { PlansAdmin } from './PlansAdmin';
@@ -294,7 +294,7 @@ export function AdminScreen() {
     setStatsLoading(true);
     try {
       const [u, p, m] = await Promise.all([
-        neon.from('profiles').select('id', { count: 'exact', head: true }),
+        neon.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'athlete'),
         neon.from('plans').select('id', { count: 'exact', head: true }),
         neon.from('memberships').select('id', { count: 'exact', head: true }),
       ]);
@@ -474,12 +474,13 @@ export function AdminScreen() {
 
 
       {tab === 'overview' && (
-        <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-3">
-          <Stat label="Customers" value={demoMode ? demoRows.users.length : statsLoading ? undefined : stats?.users} />
-          <Stat label="Plans" value={demoMode ? demoRows.plans.length : statsLoading ? undefined : stats?.plans} />
-          <Stat label="Memberships" value={demoMode ? demoRows.memberships.length : statsLoading ? undefined : stats?.memberships} />
+        <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+          <MetricCard label="Member profiles" value={demoMode ? String(demoRows.users.length) : statsLoading ? "…" : String(stats?.users ?? "—")} detail={demoMode ? "Fictional sample records" : "Athlete profiles in Neon"} icon={<Users className="h-4 w-4" />} />
+          <MetricCard label="Membership records" value={demoMode ? String(demoRows.memberships.length) : statsLoading ? "…" : String(stats?.memberships ?? "—")} detail="Membership rows, not sales" icon={<Activity className="h-4 w-4" />} />
+          <MetricCard label="Available plans" value={demoMode ? String(demoRows.plans.filter((r) => r.status === "Active").length) : statsLoading ? "…" : String(stats?.plans ?? "—")} detail="Plan catalogue count" icon={<CreditCard className="h-4 w-4" />} />
+          <div className="relative overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/[0.12] via-[#17191d] to-[#111317] p-5 shadow-lg shadow-black/10"><div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-orange-500/10 blur-2xl" /><div className="relative flex items-start justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-400">Revenue tracked</p><p className="mt-3 text-xl font-semibold tracking-tight text-white">Not connected</p><p className="mt-1 text-xs leading-5 text-zinc-500">Verified Stripe payment totals are not wired into this dashboard yet.</p></div><span className="grid h-9 w-9 place-items-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-orange-300"><CircleDollarSign className="h-4 w-4" /></span></div></div>
         </div>
-      )}
+      )})}
       {tab === 'overview' && !demoMode && (
         <div className={`${card} mb-4 text-sm text-zinc-300`}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3">
@@ -636,11 +637,11 @@ function ProgressRing({ value, label, tone = "orange" }: { value: number; label:
   );
 }
 
-function Stat({ label, value }: { label: string; value?: number }) {
+function MetricCard({ label, value, detail, icon }: { label: string; value: string; detail: string; icon: ReactNode }) {
   return (
-    <div className="rounded-xl bg-[#16181d] border border-zinc-700 p-3">
-      <p className="text-2xl font-bold text-white">{value ?? '—'}</p>
-      <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-wider mt-1">{label}</p>
+    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#1a1c21] to-[#121417] p-5 shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:border-orange-500/25">
+      <div className="absolute -right-7 -top-7 h-20 w-20 rounded-full bg-orange-500/[0.045] blur-xl transition group-hover:bg-orange-500/[0.1]" />
+      <div className="relative flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">{label}</p><p className="mt-3 text-2xl font-semibold tracking-tight text-white">{value}</p><p className="mt-1 text-xs leading-5 text-zinc-500">{detail}</p></div><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.035] text-orange-300">{icon}</span></div>
     </div>
   );
 }
