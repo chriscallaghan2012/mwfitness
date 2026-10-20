@@ -44,12 +44,22 @@ export function VideosAdmin() {
     if (!form.title.trim() || !form.video_url.trim()) { setMessage('A title and video URL are required.'); return; }
     try { new URL(form.video_url); } catch { setMessage('Enter a valid video URL.'); return; }
     if (form.thumbnail_url.trim()) { try { new URL(form.thumbnail_url); } catch { setMessage('Thumbnail must be a valid URL.'); return; } }
+    const duration = form.duration_seconds.trim() ? Number(form.duration_seconds) : null;
+    if (duration !== null && (!Number.isInteger(duration) || duration < 0)) { setMessage('Duration must be a non-negative whole number of seconds.'); return; }
     setBusy(true); setMessage('');
-    const body = { title: form.title.trim(), description: form.description.trim() || null, category: form.category.trim() || 'General', video_url: form.video_url.trim(), thumbnail_url: form.thumbnail_url.trim() || null, duration_seconds: form.duration_seconds ? Number(form.duration_seconds) : null, level: form.level.trim() || 'All levels', active: form.active === 'true' };
-    const result = edit?.id ? await neon!.from('coaching_videos').update(body).eq('id', edit.id) : await neon!.from('coaching_videos').insert(body);
-    setBusy(false);
-    if (result.error) { setMessage(`Save failed: ${result.error.message}`); return; }
-    setEdit(null); setMessage('Video saved.'); await load();
+    const body = { title: form.title.trim(), description: form.description.trim() || null, category: form.category.trim() || 'General', video_url: form.video_url.trim(), thumbnail_url: form.thumbnail_url.trim() || null, duration_seconds: duration, level: form.level.trim() || 'All levels', active: form.active === 'true' };
+    try {
+      const result = edit?.id
+        ? await neon.from('coaching_videos').update(body).eq('id', edit.id).select('id')
+        : await neon.from('coaching_videos').insert(body).select('id');
+      if (result.error) { setMessage(`Save failed: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMessage('Nothing was saved. The video may no longer exist or your staff permissions may not allow this change.'); return; }
+      setEdit(null); setMessage('Video saved.'); await load();
+    } catch {
+      setMessage('Could not save this video. Check the connection and try again.');
+    } finally {
+      setBusy(false);
+    }
   };
   const remove = async (row: Row) => {
     if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
