@@ -11,7 +11,7 @@ interface FooterProps {
 const NAV_LINKS: { id: ScreenId; label: string }[] = [
   { id: 'home', label: 'Home' },
   { id: 'online-coaching', label: 'Online coaching plans' },
-  { id: 'packages', label: '1:1 personal training' },
+  { id: 'packages', label: 'Online packages' },
   { id: 'app', label: 'The App' },
   { id: 'contact', label: 'Contact' },
 ];
