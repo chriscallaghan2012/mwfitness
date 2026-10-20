@@ -24,9 +24,9 @@ export async function sendAutomaticTemplate({ templateKey, lead }) {
   const idem = 'website-lead:' + String(lead.id) + ':' + templateKey;
   const existing = await database.query('select id,status from public.communication_deliveries where idempotency_key=$1 limit 1', [idem]);
   if (existing.rows && existing.rows[0]) return { sent: existing.rows[0].status === 'accepted' || existing.rows[0].status === 'delivered', duplicate: true };
-  const result = await database.query('select template_key,name,category,subject,preheader,html_body,text_body,enabled,version from public.communication_templates where template_key=$1 and channel=$2 limit 1', [templateKey, 'email']);
+  const result = await database.query('select t.template_key,t.name,t.category,t.subject,t.preheader,t.html_body,t.text_body,t.enabled,t.version,r.enabled as rule_enabled from public.communication_templates t join public.communication_automation_rules r on r.template_key=t.template_key where t.template_key=$1 and t.channel=$2 limit 1', [templateKey, 'email']);
   const template = result.rows && result.rows[0];
-  if (!template || !template.enabled) return { sent: false, reason: 'Automation template is missing or disabled.' };
+  if (!template || !template.enabled || !template.rule_enabled) return { sent: false, reason: 'Automation template or matching rule is disabled.' };
   const variables = {
     name: lead.name || 'there', email, interest: lead.interest || '', message: lead.message || '',
     subject: template.subject, preheader: template.preheader, headline: template.name,
