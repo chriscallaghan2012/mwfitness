@@ -39,7 +39,7 @@ export function MessagesAdmin() {
     setError('');
     setStatus('');
     try {
-      const { data: sessionData, error: sessionError } = await neon.auth.getSession({});
+      const { data: sessionData, error: sessionError } = await neon.auth.getSession({ query: {} });
       if (sessionError || !sessionData?.user) throw new Error('Your staff session has expired. Sign in again.');
       const { data, error: insertError } = await neon
         .from('coach_messages')
