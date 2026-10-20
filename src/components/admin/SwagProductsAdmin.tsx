@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-const blank = { slug: '', name: '', description: '', category: 'apparel', price: '0', compare_at_price: '', image_url: '', product_url: '', sizes: '', stock_status: 'available', active: false, sort_order: '100' };
+const blank = { slug: '', name: '', description: '', category: 'apparel', price: '0', compare_at_price: '', image_url: '', product_url: '', sizes: '', stock_status: 'enquiry_only', active: false, sort_order: '100' };
 
 export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
   const [products, setProducts] = useState<Row[]>([]);
