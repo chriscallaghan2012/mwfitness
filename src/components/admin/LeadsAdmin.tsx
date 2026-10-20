@@ -46,9 +46,13 @@ export function LeadsAdmin() {
     if (!neon) return;
     setNotice('');
     try {
-      const { error: updateError } = await neon.from('website_leads').update({ status }).eq('id', lead.id);
+      const { data: updatedRows, error: updateError } = await neon.from('website_leads').update({ status }).eq('id', lead.id).select('id');
       if (updateError) {
         setError('Status could not be saved. Check staff permissions and try again.');
+        return;
+      }
+      if (!updatedRows?.length) {
+        setError('Lead status was not saved. The lead may no longer exist or staff permissions may not allow this change.');
         return;
       }
       setError('');
