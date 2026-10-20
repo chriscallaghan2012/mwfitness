@@ -131,12 +131,13 @@ export function ProgressAdmin() {
     }
     if (!neon) { setMsg('Neon is not configured; progress cannot be saved.'); return; }
     try {
-      const { error } = await neon.from('progress_logs').insert({
+      const result = await neon.from('progress_logs').insert({
         profile_id: userId,
         weight: parsedWeight,
         recorded_on: new Date().toISOString().slice(0, 10),
-      });
-      if (error) { setMsg(`Failed: ${error.message}`); return; }
+      }).select('id');
+      if (result.error) { setMsg(`Failed: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('The weigh-in was not saved. Check your staff permissions and try again.'); return; }
       setMsg('Weigh-in logged.');
       setWeight('');
       await load(userId);
@@ -148,8 +149,9 @@ export function ProgressAdmin() {
   const remove = async (id: string) => {
     if (!neon) { setMsg('Neon is not configured; progress cannot be deleted.'); return; }
     try {
-      const { error } = await neon.from('progress_logs').delete().eq('id', id);
-      if (error) { setMsg(`Could not delete weigh-in: ${error.message}`); return; }
+      const result = await neon.from('progress_logs').delete().eq('id', id).select('id');
+      if (result.error) { setMsg(`Could not delete weigh-in: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('The weigh-in was not deleted. It may already be gone or your staff permissions may not allow this change.'); return; }
       setMsg('Weigh-in deleted.');
       await load(userId);
     } catch (error) {
