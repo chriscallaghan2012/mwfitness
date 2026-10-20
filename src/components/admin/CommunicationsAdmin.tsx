@@ -85,10 +85,12 @@ export function CommunicationsAdmin() {
 
   const selected = useMemo(() => templates.find((item) => item.id === selectedId), [templates, selectedId]);
   useEffect(() => { if (selected) setDraft({ ...selected }); }, [selected]);
+  // A recipient count is valid only for the exact template that was previewed.
+  useEffect(() => { setPreviewCount(null); }, [selectedId]);
 
   const saveTemplate = async () => {
     if (!neon || !selected || !draft.id) return;
-    setSaving(true); setError(''); setNotice('');
+    setSaving(true); setError(''); setNotice(''); setPreviewCount(null);
     try {
       const { data: session, error: sessionError } = await neon.auth.getSession({ query: {} });
       if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
