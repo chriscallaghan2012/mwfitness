@@ -52,8 +52,8 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
   };
 
   return (
-    <div className="space-y-16 md:space-y-24">
-      <section className="relative min-h-[58vh] flex items-center overflow-hidden border-b border-[#262930]">
+    <div className="page-layout">
+      <section className="page-hero relative min-h-[58vh] flex items-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0">
           <img src="/images/main-hero.jpg" alt="Online coaching at MWFitnessUK" className="w-full h-full object-cover filter brightness-50 contrast-125" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0b0c0e] via-[#0b0c0e]/75 to-transparent" />
