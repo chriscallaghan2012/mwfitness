@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-const blank = { slug: '', name: '', description: '', category: 'apparel', price: '0', compare_at_price: '', image_url: '', product_url: '', sizes: '', stock_status: 'available', active: false, sort_order: '100' };
+const blank = { slug: '', name: '', description: '', category: 'apparel', price: '0', compare_at_price: '', image_url: '', product_url: '', sizes: '', stock_status: 'enquiry_only', active: false, sort_order: '100' };
 
 export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
   const [products, setProducts] = useState<Row[]>([]);
@@ -122,7 +122,7 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
         <label className="grid gap-1.5 text-xs text-zinc-400">Price (£)<input type="number" min="0" step="0.01" className={inp} value={String(draft.price ?? '0')} onChange={(e) => set('price', e.target.value)} /></label>
         <label className="grid gap-1.5 text-xs text-zinc-400">Compare-at price (£, optional)<input type="number" min="0" step="0.01" className={inp} value={String(draft.compare_at_price || '')} onChange={(e) => set('compare_at_price', e.target.value)} /></label>
         <label className="grid gap-1.5 text-xs text-zinc-400">Category<select className={inp} value={String(draft.category || 'apparel')} onChange={(e) => set('category', e.target.value)}>{['apparel','accessories','equipment','other'].map((v) => <option key={v}>{v}</option>)}</select></label>
-        <label className="grid gap-1.5 text-xs text-zinc-400">Availability<select className={inp} value={String(draft.stock_status || 'available')} onChange={(e) => set('stock_status', e.target.value)}>{[['available','Available'],['limited','Limited stock'],['sold_out','Sold out'],['preorder','Pre-order']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></label>
+        <label className="grid gap-1.5 text-xs text-zinc-400">Availability<select className={inp} value={String(draft.stock_status || 'available')} onChange={(e) => set('stock_status', e.target.value)}>{[['available','Available'],['limited','Limited stock'],['sold_out','Sold out'],['preorder','Pre-order'],['enquiry_only','Enquiry only']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></label>
         <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Description<textarea className={inp} rows={3} value={String(draft.description || '')} onChange={(e) => set('description', e.target.value)} /></label>
         <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Image URL<input className={inp} value={String(draft.image_url || '')} onChange={(e) => set('image_url', e.target.value)} placeholder="https://…" /></label>
         <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Product / order URL (optional)<input className={inp} value={String(draft.product_url || '')} onChange={(e) => set('product_url', e.target.value)} placeholder="https://…" /></label>
