@@ -85,7 +85,7 @@ export function CommunicationsAdmin() {
     if (!neon || !selected || !draft.id) return;
     setSaving(true); setError(''); setNotice('');
     try {
-      const { data: session, error: sessionError } = await neon.auth.getSession({});
+      const { data: session, error: sessionError } = await neon.auth.getSession({ query: {} });
       if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
       const { data: savedRows, error: saveError } = await neon.from('communication_templates').update({
         name: String(draft.name ?? '').trim(),
@@ -114,7 +114,7 @@ export function CommunicationsAdmin() {
     if (!neon || !selected) return;
     setTestSending(true); setError(''); setNotice('');
     try {
-      const { data: session, error: sessionError } = await neon.auth.getSession();
+      const { data: session, error: sessionError } = await neon.auth.getSession({ query: {} });
       if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
       const token = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
       if (!token) throw new Error('Could not obtain a Neon access token.');
