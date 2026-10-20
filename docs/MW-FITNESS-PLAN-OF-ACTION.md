@@ -132,3 +132,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Staff profile edits now verify an affected row instead of treating a zero-row update as success.
 - [x] Added request sequencing to nutrition-plan and progress-log customer queries so a slower response for a previous customer cannot replace the current customer's rows.
 - [ ] These are source-level changes only until typecheck/build and interactive Neon CRUD checks pass. No GitHub Actions, local build, Neon migration or deployment has been run.
+
+
+- [x] Extended the guided food editor to capture gram amounts, calories, protein, carbohydrates, fats and salt so the mobile macro overview can receive the full set of values from Staff HQ.
+- [x] Changed marketing preference uniqueness and unsubscribe upserts to be case-insensitive, avoiding duplicate suppression records for differently-cased versions of the same email address.
