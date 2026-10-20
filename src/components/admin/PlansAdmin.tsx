@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Fmt, Row, StatusPill, btn, btnGhost, card, inp } from './fields';
+import { SwagProductsAdmin } from './SwagProductsAdmin';
 
 const KINDS = ['pt', 'online'];
 
@@ -11,6 +12,7 @@ export function PlansAdmin() {
   const [busy, setBusy] = useState(false);
   const [edit, setEdit] = useState<Row | null>(null);
   const [f, setF] = useState<Record<string, string>>({ active: 'true' });
+  const [showSwag, setShowSwag] = useState(false);
 
   const load = async () => {
     if (!neon) { setMsg('Neon is not configured; live pricing cannot be loaded.'); setPlans([]); return; }
@@ -26,6 +28,8 @@ export function PlansAdmin() {
   useEffect(() => {
     void load();
   }, []);
+
+  if (showSwag) return <SwagProductsAdmin onBack={() => setShowSwag(false)} />;
 
   const blank = () => {
     setEdit({ id: '', active: true } as Row);
@@ -107,6 +111,9 @@ export function PlansAdmin() {
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <button onClick={blank} className={btn}>
           + New plan
+        </button>
+        <button type="button" onClick={() => setShowSwag(true)} className={btnGhost}>
+          Manage swag products
         </button>
         <button onClick={() => void load()} className={btnGhost}>
           Refresh

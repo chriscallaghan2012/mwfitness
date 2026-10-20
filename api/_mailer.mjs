@@ -62,8 +62,28 @@ export async function sendContactEmail(payload) {
   const data = validatePayload(payload);
   const mail = renderEmail(data.kind, data);
 
-  const { host, port, secure, auth } = smtpConfig();
   const to = process.env.MAIL_TO || 'mwfitnessukonline@gmail.com';
+  if (process.env.RESEND_API_KEY) {
+    const from = process.env.RESEND_FROM_EMAIL;
+    if (!from) throw new Error('RESEND_FROM_EMAIL must be set to a verified sender.');
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + process.env.RESEND_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from,
+        to: [to],
+        reply_to: data.email,
+        subject: mail.subject,
+        text: mail.text,
+        html: mail.html,
+      }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.message || result.error || 'Resend rejected the website enquiry email.');
+    return { ok: true, to, subject: mail.subject, info: result.id || 'accepted-by-resend', provider: 'resend' };
+  }
+
+  const { host, port, secure, auth } = smtpConfig();
 
   const transporter = nodemailer.createTransport({ host, port, secure, auth });
   const info = await transporter.sendMail({

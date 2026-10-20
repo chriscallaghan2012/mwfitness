@@ -138,3 +138,28 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Changed marketing preference uniqueness and unsubscribe upserts to be case-insensitive, avoiding duplicate suppression records for differently-cased versions of the same email address.
 
 - [x] Extended affected-row verification to package visibility toggles, workout template deletion/session status, membership assignment/removal, progress weigh-in creation/deletion, and multi-recipient coach-message inserts.
+
+
+## Website completion track — Staff HQ, swag and Resend (2026-10-20)
+
+### Implemented on `work/staff-hq-email-suite-swag-2026-10` (not yet merged, deployed, or database-applied)
+
+- [x] Added a server-side Resend dispatch endpoint for authenticated coach/admin users, with individual sends, member audiences, consent-filtered marketing audiences, exact recipient-count confirmation, per-recipient idempotency keys, and event/delivery audit rows.
+- [x] Routed Staff HQ test sends through Resend so a test can only target the signed-in staff member.
+- [x] Added audience-count preview and confirmed send controls to the communications composer.
+- [x] Improved email preview by rendering common template placeholders with sample values in the sandboxed iframe.
+- [x] Added guarded toggles for website enquiry, consultation and app-waitlist acknowledgement automations. Other app/scheduled rules remain locked until their event handlers are implemented.
+- [x] Added an idempotent transactional-email helper for enabled website form automations; failure to send the acknowledgement does not discard a saved website lead.
+- [x] Made the existing website enquiry alert prefer Resend when `RESEND_API_KEY` and a verified `RESEND_FROM_EMAIL` are configured; SMTP remains a fallback.
+- [x] Added the public Neon-backed swag catalogue endpoint, a Staff HQ product editor (name, slug, description, category, price, compare-at price, image/order URL, sizes, stock status, visibility and sort order), and connected the public SHWAG cards to the catalogue API.
+- [x] Added a prepared `swag_products` migration with public read access only for active products and staff-only writes.
+
+### Required before real sends / production use
+
+- [ ] Configure `RESEND_API_KEY` and a sender address on a verified MW Fitness domain in Vercel and local environment. The connected Resend account currently lists `christopherjcallaghan.com`, `rub-n-scub.com`, and `dapperman.co.uk` as verified; `mwfitnessuk.com` is not listed as verified, so do not send from it until domain verification is completed.
+- [ ] Review and approve the prepared communications and swag migrations, then apply them to a disposable Neon branch and verify policies before considering any shared database change. They have not been applied by this task.
+- [ ] Test template save/preview/test-send, one-recipient sends, consent-filtered audience counts, suppression/unsubscribe handling, duplicate-send protection, and delivery history using test addresses.
+- [ ] Add Resend webhook signature verification and delivery/bounce/complaint event ingestion before describing accepted messages as delivered. Current delivery rows record provider acceptance/failure only.
+- [ ] Implement event handlers for app push/in-app and scheduled automations. Those rules must remain disabled until each trigger is implemented and tested.
+- [ ] Run website TypeScript/build checks locally or in an approved manual workflow. No build pass is claimed; no GitHub Actions, deploy, Slack post or shared database migration was run.
+

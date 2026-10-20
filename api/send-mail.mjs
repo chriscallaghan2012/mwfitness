@@ -4,6 +4,7 @@
  */
 import { sendContactEmail, validatePayload } from './_mailer.mjs';
 import { saveWebsiteLead } from './_leads.mjs';
+import { sendAutomaticTemplate } from './_communications.mjs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -24,20 +25,24 @@ export default async function handler(req, res) {
     const validated = validatePayload(payload);
     lead = await saveWebsiteLead(validated);
 
-    // Email is an alert, not the source of truth. A temporary SMTP outage must
-    // not discard a successfully saved enquiry or tell the visitor to resubmit.
+    // Email is an alert, not the source of truth. A temporary provider outage
+    // must not discard a successfully saved enquiry or tell the visitor to resubmit.
+    let emailSent = false;
     try {
       await sendContactEmail(validated);
-      return res.status(200).json({ ok: true, leadId: lead.id, emailSent: true });
+      emailSent = true;
     } catch (mailError) {
-      console.error('MW Fitness lead saved; email notification failed:', mailError);
-      return res.status(200).json({
-        ok: true,
-        leadId: lead.id,
-        emailSent: false,
-        notice: 'Your request has been received. Email notifications are temporarily unavailable.',
-      });
+      console.error('MW Fitness lead saved; staff email notification failed:', mailError);
     }
+    const templateKey = validated.kind === 'book-call' ? 'consultation-confirmation' : validated.kind === 'waitlist' ? 'app-waitlist-acknowledgement' : 'website-enquiry-acknowledgement';
+    try { await sendAutomaticTemplate({ templateKey, lead: { ...validated, id: lead.id } }); }
+    catch (automationError) { console.error('MW Fitness lead saved; automatic acknowledgement failed:', automationError); }
+    return res.status(200).json({
+      ok: true,
+      leadId: lead.id,
+      emailSent,
+      notice: emailSent ? undefined : 'Your request has been received. Email notifications are temporarily unavailable.',
+    });
   } catch (err) {
     const status = /Missing|valid|Please|too long/i.test(err.message || '') ? 400 : 500;
     return res.status(status).json({

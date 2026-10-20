@@ -1,13 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SHWAG, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { Shirt, CheckCircle, ArrowRight, Sparkles, ExternalLink, Instagram } from 'lucide-react';
+
+type SwagProduct = { id: string; slug: string; name: string; description: string; category: string; price: number; compare_at_price: number | null; image_url: string; product_url: string; sizes: string[]; stock_status: string };
 
 interface ShwagScreenProps {
   onOpenBookCall: () => void;
 }
 
 export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
+  const [products, setProducts] = useState<SwagProduct[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState('');
+  useEffect(() => {
+    let active = true;
+    fetch('/api/products').then(async (response) => {
+      const result = await response.json() as { products?: SwagProduct[]; error?: string };
+      if (!response.ok) throw new Error(result.error || 'The swag catalogue is temporarily unavailable.');
+      if (active) {
+        const nextProducts = Array.isArray(result.products) ? result.products : [];
+        setProducts(nextProducts);
+        setItem((current) => nextProducts.some((product) => product.name === current) ? current : nextProducts[0]?.name || 'Something else');
+      }
+    }).catch((err) => { if (active) setProductsError(err instanceof Error ? err.message : 'The swag catalogue is temporarily unavailable.'); })
+      .finally(() => { if (active) setProductsLoading(false); });
+    return () => { active = false; };
+  }, []);
+  const chooseProduct = (productName: string) => {
+    setItem(productName);
+    document.getElementById('swag-order-enquiry')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [item, setItem] = useState('Classic SHWAG T-Shirt');
@@ -102,25 +125,30 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
           </h2>
         </div>
 
+        {productsLoading ? <p className="text-sm text-zinc-400">Loading the latest SHWAG range…</p> : null}
+        {productsError ? <p role="status" className="mb-4 border border-orange-500/20 bg-orange-500/5 p-3 text-sm text-zinc-300">{productsError} You can still send an order enquiry below.</p> : null}
+        {!productsLoading && products.length === 0 ? <div className="border border-dashed border-[#30333b] bg-[#121419] p-8 text-center"><Shirt className="mx-auto mb-3 h-8 w-8 text-[#ff5500]/60" /><h3 className="font-display text-xl text-white uppercase">New drops coming soon</h3><p className="mt-2 text-sm text-zinc-400">Ask Mike about available sizes, colours and upcoming SHWAG.</p></div> : null}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {SHWAG.products.map((product) => (
-            <div key={product.name} className="bg-[#121419] border border-[#20232b] p-6 flex flex-col hover:border-[#ff5500]/50 transition-all duration-300">
-              <div className="aspect-square bg-[#16181d] border border-[#262930] flex items-center justify-center mb-4">
-                <Shirt className="w-12 h-12 text-[#ff5500]/40" />
+          {products.map((product) => (
+            <article key={product.id} className="bg-[#121419] border border-[#20232b] p-5 flex flex-col hover:border-[#ff5500]/50 transition-all duration-300">
+              <div className="aspect-square bg-[#16181d] border border-[#262930] flex items-center justify-center mb-4 overflow-hidden">
+                {product.image_url ? <img src={product.image_url} alt={product.name} loading="lazy" className="h-full w-full object-cover" /> : <Shirt className="w-12 h-12 text-[#ff5500]/40" />}
               </div>
               <h3 className="font-display text-xl text-white uppercase tracking-wider mb-1">{product.name}</h3>
-              <div className="text-xs font-mono text-[#ff5500] uppercase tracking-wider mb-3">{product.note}</div>
-              <div className="mt-auto pt-2 text-[11px] font-mono text-zinc-500 flex items-center gap-1.5">
-                <ExternalLink className="w-3 h-3" />
-                <span>Link coming soon</span>
+              {product.description ? <p className="text-sm text-zinc-400 leading-relaxed mb-3">{product.description}</p> : null}
+              <p className="font-mono text-lg text-[#ff5500] mb-2">{Number(product.price) > 0 ? '£' + Number(product.price).toFixed(2) : 'Price on request'}{Number(product.price) > 0 && product.compare_at_price != null && product.compare_at_price > product.price ? <span className="ml-2 text-xs text-zinc-500 line-through">£{Number(product.compare_at_price).toFixed(2)}</span> : null}</p>
+              {product.sizes?.length ? <p className="text-[11px] text-zinc-500 mb-3">Sizes: {product.sizes.join(', ')}</p> : null}
+              <p className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-4">{String(product.stock_status).replace('_', ' ')}</p>
+              <div className="mt-auto">
+                {product.product_url && product.stock_status !== 'sold_out' ? <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center gap-2 bg-[#ff5500] px-4 py-3 text-xs font-mono font-bold uppercase text-black">View product <ExternalLink className="h-3.5 w-3.5" /></a> : <button type="button" disabled={product.stock_status === 'sold_out'} onClick={() => chooseProduct(product.name)} className="inline-flex w-full items-center justify-center gap-2 border border-[#ff5500]/60 px-4 py-3 text-xs font-mono font-bold uppercase text-[#ff5500] disabled:opacity-40">{product.stock_status === 'sold_out' ? 'Sold out' : 'Enquire about item'} <ArrowRight className="h-3.5 w-3.5" /></button>}
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </section>
 
       {/* 4. ORDER ENQUIRY */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <section id="swag-order-enquiry" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="bg-[#121419] border border-[#242833] p-8 md:p-10">
           {done ? (
             <div className="space-y-5 text-center py-6 animate-in zoom-in-95 duration-200">
@@ -172,8 +200,8 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
                 <div>
                   <label className="block text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">Which item?</label>
                   <select value={item} onChange={(e) => setItem(e.target.value)} className={inputClass}>
-                    {SHWAG.products.map((product) => (
-                      <option key={product.name} value={product.name}>{product.name}</option>
+                    {products.map((product) => (
+                      <option key={product.id} value={product.name}>{product.name}</option>
                     ))}
                     <option value="Something else">Something else</option>
                   </select>

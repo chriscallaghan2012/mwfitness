@@ -14,9 +14,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { sendContactEmail, validatePayload } from './api/_mailer.mjs';
 import { saveWebsiteLead } from './api/_leads.mjs';
+import { sendAutomaticTemplate } from './api/_communications.mjs';
 import { createCheckoutSession } from './api/_stripe.mjs';
 import sendPush from './api/send-push.mjs';
 import testCommunication from './api/test-communication.mjs';
+import communicationsSend from './api/communications-send.mjs';
+import communicationsRules from './api/communications-rules.mjs';
+import communicationsNotifications from './api/communications-notifications.mjs';
 import unsubscribe from './api/unsubscribe.mjs';
 import health from './api/health.mjs';
 
@@ -32,13 +36,13 @@ app.post('/api/send-mail', async (req, res) => {
   try {
     const validated = validatePayload(req.body);
     const lead = await saveWebsiteLead(validated);
-    try {
-      await sendContactEmail(validated);
-      res.json({ ok: true, leadId: lead.id, emailSent: true });
-    } catch (mailError) {
-      console.error('MW Fitness lead saved; email notification failed:', mailError);
-      res.json({ ok: true, leadId: lead.id, emailSent: false, notice: 'Your request has been received. Email notifications are temporarily unavailable.' });
-    }
+    let emailSent = false;
+    try { await sendContactEmail(validated); emailSent = true; }
+    catch (mailError) { console.error('MW Fitness lead saved; staff email notification failed:', mailError); }
+    const templateKey = validated.kind === 'book-call' ? 'consultation-confirmation' : validated.kind === 'waitlist' ? 'app-waitlist-acknowledgement' : 'website-enquiry-acknowledgement';
+    try { await sendAutomaticTemplate({ templateKey, lead: { ...validated, id: lead.id } }); }
+    catch (automationError) { console.error('MW Fitness lead saved; automatic acknowledgement failed:', automationError); }
+    res.json({ ok: true, leadId: lead.id, emailSent, notice: emailSent ? undefined : 'Your request has been received. Email notifications are temporarily unavailable.' });
   } catch (err) {
     const status = /Missing|valid|Please|too long/i.test(err.message || '') ? 400 : 500;
     res.status(status).json({ ok: false, error: status === 400 ? err.message : 'We could not save your request. Please try again in a moment.' });
@@ -58,6 +62,9 @@ app.post('/api/create-checkout', async (req, res) => {
 
 app.post('/api/send-push', sendPush);
 app.post('/api/test-communication', testCommunication);
+app.post('/api/communications-send', communicationsSend);
+app.post('/api/communications-rules', communicationsRules);
+app.post('/api/communications-notifications', communicationsNotifications);
 app.all('/api/unsubscribe', unsubscribe);
 
 // Serve the built site (optional, for a full local prod check).
