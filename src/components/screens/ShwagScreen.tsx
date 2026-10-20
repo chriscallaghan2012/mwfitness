@@ -18,7 +18,11 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
     fetch('/api/products').then(async (response) => {
       const result = await response.json() as { products?: SwagProduct[]; error?: string };
       if (!response.ok) throw new Error(result.error || 'The swag catalogue is temporarily unavailable.');
-      if (active) setProducts(Array.isArray(result.products) ? result.products : []);
+      if (active) {
+        const nextProducts = Array.isArray(result.products) ? result.products : [];
+        setProducts(nextProducts);
+        setItem((current) => nextProducts.some((product) => product.name === current) ? current : nextProducts[0]?.name || 'Something else');
+      }
     }).catch((err) => { if (active) setProductsError(err instanceof Error ? err.message : 'The swag catalogue is temporarily unavailable.'); })
       .finally(() => { if (active) setProductsLoading(false); });
     return () => { active = false; };
@@ -132,7 +136,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               </div>
               <h3 className="font-display text-xl text-white uppercase tracking-wider mb-1">{product.name}</h3>
               {product.description ? <p className="text-sm text-zinc-400 leading-relaxed mb-3">{product.description}</p> : null}
-              <p className="font-mono text-lg text-[#ff5500] mb-2">£{Number(product.price).toFixed(2)}{product.compare_at_price != null && product.compare_at_price > product.price ? <span className="ml-2 text-xs text-zinc-500 line-through">£{Number(product.compare_at_price).toFixed(2)}</span> : null}</p>
+              <p className="font-mono text-lg text-[#ff5500] mb-2">{Number(product.price) > 0 ? '£' + Number(product.price).toFixed(2) : 'Price on request'}{Number(product.price) > 0 && product.compare_at_price != null && product.compare_at_price > product.price ? <span className="ml-2 text-xs text-zinc-500 line-through">£{Number(product.compare_at_price).toFixed(2)}</span> : null}</p>
               {product.sizes?.length ? <p className="text-[11px] text-zinc-500 mb-3">Sizes: {product.sizes.join(', ')}</p> : null}
               <p className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-4">{String(product.stock_status).replace('_', ' ')}</p>
               <div className="mt-auto">
