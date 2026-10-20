@@ -22,7 +22,7 @@ export function ProgrammesAdmin() {
     try {
     const [programResult, clientResult, assignmentResult] = await Promise.all([
       neon.from('coaching_programmes').select('*').order('created_at', { ascending: false }),
-      neon.from('profiles').select('id,full_name,email').order('full_name'),
+      neon.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name'),
       neon.from('coaching_programme_assignments').select('*, profiles(full_name,email), coaching_programmes(name)').order('created_at', { ascending: false }),
     ]);
     const missing = [programResult, assignmentResult].some((r) => r.error && /does not exist|not found|schema cache|could not find/i.test(r.error.message));
@@ -70,40 +70,71 @@ export function ProgrammesAdmin() {
     if (!Number.isInteger(days) || days < 1 || days > 7) { setMessage('Training days per week must be between 1 and 7.'); return; }
     setBusy(true); setMessage('');
     const payload = { name: form.name.trim(), description: form.description.trim() || null, duration_weeks: weeks, days_per_week: days, level: form.level.trim() || 'All levels', active: form.active === 'true' };
-    const result = edit?.id
-      ? await neon!.from('coaching_programmes').update(payload).eq('id', edit.id)
-      : await neon!.from('coaching_programmes').insert(payload);
-    setBusy(false);
-    if (result.error) { setMessage(`Save failed: ${result.error.message}`); return; }
-    setEdit(null); setMessage('Programme saved.'); await load();
+    try {
+      const result = edit?.id
+        ? await neon.from('coaching_programmes').update(payload).eq('id', edit.id).select('id')
+        : await neon.from('coaching_programmes').insert(payload).select('id');
+      if (result.error) { setMessage('Save failed: ' + result.error.message); return; }
+      if (!result.data?.length) { setMessage('Nothing was saved. Check that the programme still exists and staff permissions allow this change.'); return; }
+      setEdit(null); setMessage('Programme saved.'); await load();
+    } catch (error) {
+      setMessage('Could not save programme: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    } finally { setBusy(false); }
   };
 
   const remove = async (row: Row) => {
     if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
-    if (!window.confirm(`Delete programme “${String(row.name)}”? Assigned clients may prevent deletion; deactivate it instead if in use.`)) return;
-    setBusy(true);
-    const { error } = await neon!.from('coaching_programmes').delete().eq('id', row.id);
-    setBusy(false);
-    setMessage(error ? `Delete failed: ${error.message}` : 'Programme deleted.');
-    if (!error) await load();
+    if (!window.confirm('Delete programme "' + String(row.name) + '"? Assigned clients may prevent deletion; deactivate it instead if in use.')) return;
+    setBusy(true); setMessage('');
+    try {
+      const result = await neon.from('coaching_programmes').delete().eq('id', row.id).select('id');
+      if (result.error) { setMessage('Delete failed: ' + result.error.message); return; }
+      if (!result.data?.length) { setMessage('The programme was not deleted. It may already be gone or staff permissions may not allow this change.'); return; }
+      setMessage('Programme deleted.'); await load();
+    } catch (error) {
+      setMessage('Could not delete programme: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    } finally { setBusy(false); }
   };
 
   const assign = async () => {
     if (!neon) { setMessage('Live database access is not configured; no assignment was created.'); return; }
     if (!clientId || !programmeId || !startDate) { setMessage('Choose a client, programme and start date.'); return; }
     setBusy(true); setMessage('');
-    const { error } = await neon!.from('coaching_programme_assignments').insert({ profile_id: clientId, programme_id: programmeId, starts_on: startDate, status: 'active' });
-    setBusy(false);
-    if (error) { setMessage(`Assignment failed: ${error.message}`); return; }
-    setMessage('Programme assigned to client.'); await load();
+    try {
+      const result = await neon.from('coaching_programme_assignments').insert({ profile_id: clientId, programme_id: programmeId, starts_on: startDate, status: 'active' }).select('id');
+      if (result.error) { setMessage('Assignment failed: ' + result.error.message); return; }
+      if (!result.data?.length) { setMessage('The assignment was not saved. Check the client, programme and staff permissions.'); return; }
+      setMessage('Programme assigned to client.'); await load();
+    } catch (error) {
+      setMessage('Could not assign programme: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    } finally { setBusy(false); }
   };
 
   const finish = async (row: Row) => {
     if (!neon) { setMessage('Live database access is not configured; no assignment was changed.'); return; }
     const status = row.status === 'completed' ? 'active' : 'completed';
-    const { error } = await neon!.from('coaching_programme_assignments').update({ status }).eq('id', row.id);
-    setMessage(error ? `Could not update assignment: ${error.message}` : `Assignment marked ${status}.`);
-    if (!error) await load();
+    setBusy(true); setMessage('');
+    try {
+      const result = await neon.from('coaching_programme_assignments').update({ status }).eq('id', row.id).select('id');
+      if (result.error) { setMessage('Could not update assignment: ' + result.error.message); return; }
+      if (!result.data?.length) { setMessage('Assignment was not updated. Check staff permissions and refresh the list.'); return; }
+      setMessage('Assignment marked ' + status + '.'); await load();
+    } catch (error) {
+      setMessage('Could not update assignment: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    } finally { setBusy(false); }
+  };
+
+  const toggleVisibility = async (row: Row) => {
+    if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
+    setBusy(true); setMessage('');
+    try {
+      const result = await neon.from('coaching_programmes').update({ active: !row.active }).eq('id', row.id).select('id');
+      if (result.error) { setMessage('Visibility update failed: ' + result.error.message); return; }
+      if (!result.data?.length) { setMessage('Visibility was not changed. Refresh the list and check staff permissions.'); return; }
+      setMessage('Programme visibility updated.'); await load();
+    } catch (error) {
+      setMessage('Could not update programme visibility: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    } finally { setBusy(false); }
   };
 
   return (
@@ -119,7 +150,7 @@ export function ProgrammesAdmin() {
         { key: 'name', label: 'Programme', render: (r) => <div><p className="font-medium text-white">{String(r.name)}</p><p className="text-xs text-zinc-500">{String(r.level ?? 'All levels')}</p></div> },
         { key: 'duration_weeks', label: 'Duration', render: (r) => `${String(r.duration_weeks)} weeks` },
         { key: 'days_per_week', label: 'Training', render: (r) => `${String(r.days_per_week)} days/week` },
-        { key: 'active', label: 'Status', render: (r) => <button className={btnGhost} disabled={busy || schemaMissing} onClick={async () => { if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; } setBusy(true); setMessage(''); try { const { error } = await neon.from('coaching_programmes').update({ active: !r.active }).eq('id', r.id); setMessage(error ? `Visibility update failed: ${error.message}` : 'Programme visibility updated.'); if (!error) await load(); } catch { setMessage('Could not update programme visibility. Check the connection and retry.'); } finally { setBusy(false); } }}>{r.active ? 'Live' : 'Hidden'}</button> },
+        { key: 'active', label: 'Status', render: (r) => <button className={btnGhost} disabled={busy || schemaMissing} onClick={() => void toggleVisibility(r)}>{r.active ? 'Live' : 'Hidden'}</button> },
       ]} />
       <div className={card}>
         <h3 className="font-semibold text-white">Assign programme</h3>
