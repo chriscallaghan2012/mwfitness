@@ -1,10 +1,10 @@
 # MWFitnessUK — website
 
-Friendly personal training &amp; online coaching site for Michael Whitworth. React + Vite + Tailwind v4, with a shared Neon backend for staff management, pricing and website enquiries.
+Online coaching website for Michael Whitworth. React + Vite + Tailwind v4, with a shared Neon backend for staff management, pricing and website enquiries.
 
 ## Pages
 
-- **Home** — welcome, about Mike, what's available, packages at a glance, reviews
+- **Home** — welcome, online coaching overview, packages at a glance, reviews
 - **Packages** — full breakdown, prices and comparison table
 - **Get In Touch** — enquiry form + contact details
 - **App &amp; SHWAG** — app waitlist and SHWAG merch
