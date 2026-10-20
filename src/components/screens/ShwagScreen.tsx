@@ -37,9 +37,9 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
     'w-full bg-[#16181d] border border-[#262930] text-zinc-200 px-4 py-3 text-sm font-sans focus:outline-none focus:border-[#ff5500] placeholder:text-zinc-600';
 
   return (
-    <div className="space-y-16 md:space-y-24">
+    <div className="page-layout">
       {/* 1. HERO */}
-      <section className="relative min-h-[55vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
+      <section className="page-hero relative min-h-[55vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[#0b0c0e]"></div>
           <div className="absolute inset-0 bg-dots-pattern opacity-60"></div>
