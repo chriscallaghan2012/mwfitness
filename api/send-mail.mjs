@@ -4,6 +4,7 @@
  */
 import { sendContactEmail, validatePayload } from './_mailer.mjs';
 import { saveWebsiteLead } from './_leads.mjs';
+import { sendAutomaticTemplate } from './_communications.mjs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -28,6 +29,9 @@ export default async function handler(req, res) {
     // not discard a successfully saved enquiry or tell the visitor to resubmit.
     try {
       await sendContactEmail(validated);
+      const templateKey = validated.kind === 'book-call' ? 'consultation-confirmation' : validated.kind === 'waitlist' ? 'app-waitlist-acknowledgement' : 'website-enquiry-acknowledgement';
+      try { await sendAutomaticTemplate({ templateKey, lead: { ...validated, id: lead.id } }); }
+      catch (automationError) { console.error('MW Fitness lead saved; automatic acknowledgement failed:', automationError); }
       return res.status(200).json({ ok: true, leadId: lead.id, emailSent: true });
     } catch (mailError) {
       console.error('MW Fitness lead saved; email notification failed:', mailError);
