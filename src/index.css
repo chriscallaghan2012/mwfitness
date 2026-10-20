@@ -238,7 +238,19 @@ a[class*="bg-orange-500"]::after {
   pointer-events: none;
   transform: skewX(-22deg);
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.68), rgba(255,255,255,0.12), transparent);
-  animation: mw-button-shine 3.6s ease-in-out infinite;
+  opacity: 0;
+  left: -65%;
+  animation: none;
+}
+
+/* The shine is triggered only while the pointer is over the button/link. */
+button[class*="bg-[#ff5500]"]:hover::after,
+a[class*="bg-[#ff5500]"]:hover::after,
+button[class*="bg-brand-orange"]:hover::after,
+a[class*="bg-brand-orange"]:hover::after,
+button[class*="bg-orange-500"]:hover::after,
+a[class*="bg-orange-500"]:hover::after {
+  animation: mw-button-shine 700ms ease-out 1;
 }
 
 @keyframes mw-button-shine {
@@ -254,8 +266,8 @@ button[class*="bg-brand-orange"]:hover,
 a[class*="bg-brand-orange"]:hover,
 button[class*="bg-orange-500"]:hover,
 a[class*="bg-orange-500"]:hover {
-  background-color: #ff6a1f !important;
-  box-shadow: 0 0 22px rgba(255, 85, 0, 0.28);
+  background-color: #ff5500 !important;
+  box-shadow: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
