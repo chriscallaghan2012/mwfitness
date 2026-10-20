@@ -3,6 +3,8 @@ import { neon } from '../../lib/neon';
 
 type Props = { onClose: () => void };
 
+const STAFF_ADMIN_EMAILS = new Set(['instantonlinesuccess@gmail.com', 'mwfitnessukonline@gmail.com']);
+
 export function PasswordRecovery({ onClose }: Props) {
   const params = new URLSearchParams(window.location.search);
   const [resetMode, setResetMode] = useState(params.get('auth') === 'reset-password');
@@ -19,6 +21,7 @@ export function PasswordRecovery({ onClose }: Props) {
     setError('');
     setNotice('');
     if (!neon) { setError('Password reset is unavailable because Neon Auth is not configured.'); return; }
+    if (!STAFF_ADMIN_EMAILS.has(email.trim().toLowerCase())) { setNotice('If an authorised staff account exists for that email, a reset link can be requested from the configured Neon Auth flow.'); return; }
     setLoading(true);
     try {
       const { error: requestError } = await neon.auth.requestPasswordReset({

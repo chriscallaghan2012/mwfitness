@@ -42,6 +42,9 @@ const TABS: { id: Tab; label: string }[] = [
 
 type DemoTab = Exclude<Tab, 'overview'>;
 
+const AUTHORISED_ADMIN_EMAILS = new Set(['instantonlinesuccess@gmail.com', 'mwfitnessukonline@gmail.com']);
+const isAuthorisedAdminEmail = (email: string | null | undefined) => AUTHORISED_ADMIN_EMAILS.has(String(email || '').trim().toLowerCase());
+
 const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; rows: Row[] }> = {
   users: {
     columns: [{ key: 'name', label: 'Customer' }, { key: 'email', label: 'Email' }, { key: 'role', label: 'Role' }, { key: 'tier', label: 'Tier' }],
@@ -271,7 +274,8 @@ export function AdminScreen() {
         const user = data.user;
         if (!user) return;
         const { data: profile, error } = await neon.from('profiles').select('role').eq('id', user.id).maybeSingle();
-        if (error || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
+        const emailIsNamedAdmin = isAuthorisedAdminEmail(user.email);
+        if (error || (profile?.role !== 'admin' && profile?.role !== 'coach') || (emailIsNamedAdmin && profile?.role !== 'admin')) {
           await neon.auth.signOut({});
           return;
         }
@@ -321,7 +325,8 @@ export function AdminScreen() {
       const { data, error } = await neon.auth.signIn.email({ email: email.trim(), password });
       if (error) throw error;
       const { data: profile, error: profileError } = await neon.from('profiles').select('role').eq('id', data.user!.id).maybeSingle();
-      if (profileError || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
+      const emailIsNamedAdmin = isAuthorisedAdminEmail(data.user?.email ?? email);
+      if (profileError || (profile?.role !== 'admin' && profile?.role !== 'coach') || (emailIsNamedAdmin && profile?.role !== 'admin')) {
         await neon.auth.signOut({});
         setError('This account does not have admin access.');
         return;
