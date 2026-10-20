@@ -78,9 +78,11 @@ export function WorkoutsAdmin() {
     if (!window.confirm(`Delete workout template “${String(row.name)}”? Scheduled sessions may prevent deletion.`)) return;
     setMsg('');
     try {
-      const { error } = await neon.from('workout_templates').delete().eq('id', row.id);
-      setMsg(error ? `Delete failed: ${error.message}` : 'Template deleted.');
-      if (!error) await load();
+      const result = await neon.from('workout_templates').delete().eq('id', row.id).select('id');
+      if (result.error) { setMsg(`Delete failed: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('The template was not deleted. It may already be gone or your staff permissions may not allow this change.'); return; }
+      setMsg('Template deleted.');
+      await load();
     } catch (error) {
       setMsg(`Delete failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
@@ -109,8 +111,9 @@ export function WorkoutsAdmin() {
     if (!neon) { setMsg('Neon is not configured; session status cannot be updated.'); return; }
     const status = s.status === 'completed' ? 'planned' : 'completed';
     try {
-      const { error } = await neon.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id);
-      if (error) { setMsg(`Could not update session: ${error.message}`); return; }
+      const result = await neon.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id).select('id');
+      if (result.error) { setMsg(`Could not update session: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('The session was not updated. It may no longer exist or your staff permissions may not allow this change.'); return; }
       setMsg(`Session marked ${status}.`);
       await loadSessions(userId);
     } catch (error) {
