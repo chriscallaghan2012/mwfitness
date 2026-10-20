@@ -32,6 +32,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/cookies",
+      "destination": "/index.html"
+    },
+    {
       "source": "/delete-account",
       "destination": "/index.html"
     }
