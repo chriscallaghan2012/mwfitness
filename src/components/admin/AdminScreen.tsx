@@ -50,7 +50,7 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
       { id: 'demo-user-2', name: 'Jamie Reed', email: 'jamie@example.test', role: 'athlete', tier: 'Online', phone: '07700 900102', goal: 'Improve fitness', startWeight: '94', currentWeight: '91.2', goalWeight: '85', joined: '2026-07-14', status: 'Active', notes: 'Prefers evening sessions.' },
       { id: 'demo-user-3', name: 'Taylor Brooks', email: 'taylor@example.test', role: 'athlete', tier: 'Starter', phone: '07700 900103', goal: 'Fat loss', startWeight: '78', currentWeight: '76.8', goalWeight: '70', joined: '2026-08-01', status: 'Onboarding', notes: 'Needs initial check-in.' },
       { id: 'demo-user-4', name: 'Morgan Ellis', email: 'morgan@example.test', role: 'athlete', tier: 'Elite', phone: '07700 900104', goal: 'Hypertrophy', startWeight: '73', currentWeight: '74.1', goalWeight: '78', joined: '2026-05-21', status: 'At risk', notes: 'Missed two check-ins; follow up.' },
-      { id: 'demo-user-5', name: 'Casey Patel', email: 'casey@example.test', role: 'athlete', tier: '1:1 Coaching', phone: '07700 900105', goal: 'Return to consistent training', startWeight: '88', currentWeight: '86.9', goalWeight: '82', joined: '2026-09-09', status: 'Active', notes: 'Training around a busy work schedule.' },
+      { id: 'demo-user-5', name: 'Casey Patel', email: 'casey@example.test', role: 'athlete', tier: 'Online Coaching', phone: '07700 900105', goal: 'Return to consistent training', startWeight: '88', currentWeight: '86.9', goalWeight: '82', joined: '2026-09-09', status: 'Active', notes: 'Training around a busy work schedule.' },
     ],
   },
   'client-records': {
@@ -118,7 +118,7 @@ const DEMO_FIELDS: Record<DemoTab, DemoField[]> = {
     { key: 'name', label: 'Full name', placeholder: 'Client full name' },
     { key: 'email', label: 'Email address', type: 'email', placeholder: 'client@example.test' },
     { key: 'role', label: 'Account role', type: 'select', options: ['athlete', 'coach', 'admin'] },
-    { key: 'tier', label: 'Membership tier', type: 'select', options: ['Starter', 'Online', 'Gold', 'Elite', '1:1 Coaching'] },
+    { key: 'tier', label: 'Membership tier', type: 'select', options: ['Starter', 'Online', 'Gold', 'Elite', 'Online Coaching'] },
     { key: 'phone', label: 'Phone number', placeholder: '+44…' },
     { key: 'goal', label: 'Primary goal', placeholder: 'Build strength, lose fat…' },
     { key: 'startWeight', label: 'Starting weight (kg)', type: 'number' },

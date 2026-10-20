@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CONTACT } from '../../data/mockData';
-import { Check, ArrowRight, CalendarClock, MapPin } from 'lucide-react';
+import { Check, ArrowRight, CalendarClock } from 'lucide-react';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
 interface PackagesScreenProps {
@@ -14,7 +13,7 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
 
   useEffect(() => {
     let active = true;
-    void loadPublicPlans('pt').then((result) => {
+    void loadPublicPlans('online').then((result) => {
       if (!active) return;
       setPlans(result.plans);
       setPlansError(result.error);
@@ -27,9 +26,9 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
   const comparisonFeatures = Array.from(new Set(plans.flatMap((plan) => plan.features)));
 
   return (
-    <div className="space-y-16 md:space-y-24">
+    <div className="page-layout">
       {/* 1. HERO */}
-      <section className="relative min-h-[55vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
+      <section className="page-hero relative min-h-[55vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/main-hero.jpg"
@@ -45,29 +44,26 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
           <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
-              <span>[ 1-2-1 TRAINING ]</span>
+              <span>[ ONLINE COACHING ]</span>
             </div>
 
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-[0.9] font-black">
-              Packages that fit
+              Online coaching packages
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#ff5500] to-white">
                 your life.
               </span>
             </h1>
 
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
-              Personal training packages at Pure Gym Hazel Grove, Stockport. For coaching without personal meet-ups, see the dedicated online coaching plans.
+              Choose the online coaching plan that fits your goals, routine and level of support. Current active plans and prices are managed in Staff HQ.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <div className="flex items-center gap-2 bg-[#14161d] border border-[#262a34] px-3.5 py-2.5 font-mono text-xs text-zinc-300">
                 <CalendarClock className="w-4 h-4 text-[#ff5500]" />
-                <span>{CONTACT.sessions}</span>
+                <span>Flexible online coaching</span>
               </div>
-              <div className="flex items-center gap-2 bg-[#14161d] border border-[#262a34] px-3.5 py-2.5 font-mono text-xs text-zinc-300">
-                <MapPin className="w-4 h-4 text-[#ff5500]" />
-                <span>{CONTACT.location}</span>
-              </div>
+
             </div>
           </div>
         </div>
@@ -83,11 +79,11 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
             [ WHAT I SELL ]
           </div>
           <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            FOUR 1:1 PACKAGES.
+            ONLINE COACHING PLANS.
           </h2>
           <div aria-hidden="true" className="industrial-stripe industrial-stripe--marker" />
           <p className="text-sm font-sans text-zinc-400 leading-relaxed mt-3">
-            Not sure which level is right for you? Every package starts with a free chat — we'll point you the right way before you book anything.
+            Compare the active online plans below. Mike manages package details, features and pricing in Staff HQ.
           </p>
         </div>
 
@@ -150,7 +146,7 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
             [ WHAT'S INCLUDED ]
           </div>
           <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            FULL BREAKDOWN.
+            COMPARE YOUR OPTIONS.
           </h2>
         </div>
 
@@ -196,7 +192,7 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
               LET'S TALK IT THROUGH.
             </h2>
             <p className="text-sm font-sans text-zinc-300 leading-relaxed max-w-xl">
-              Book a free call and we'll find the right package for your goals, your week and your budget. No pressure, no obligation.
+              Book a free call to talk through the online coaching options and find the right fit. No pressure, no obligation.
             </p>
           </div>
 

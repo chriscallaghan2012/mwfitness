@@ -13,7 +13,7 @@ export const AccountDeletionScreen: React.FC<{ onBack: () => void }> = ({ onBack
       <p className="font-mono text-xs uppercase tracking-widest text-[#ff5500]">MWFitnessUK</p>
       <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">Account and data deletion</h1>
       <p className="mt-4 leading-7 text-zinc-300">You can request deletion of your MW Fitness app account and associated personal information by emailing our team. We will verify that the request comes from the account holder before processing it.</p>
-      <a href="mailto:mikeptonline@gmail.com?subject=MW%20Fitness%20account%20deletion%20request" className="mt-6 inline-flex items-center gap-2 bg-[#ff5500] px-5 py-3 font-mono text-sm font-bold uppercase text-black hover:bg-[#ff7547]">
+      <a href="mailto:mwfitnessukonline@gmail.com?subject=MW%20Fitness%20account%20deletion%20request" className="mt-6 inline-flex items-center gap-2 bg-[#ff5500] px-5 py-3 font-mono text-sm font-bold uppercase text-black hover:bg-[#ff7547]">
         <Mail className="h-4 w-4" /> Request account deletion
       </a>
       <div className="mt-8 space-y-4 text-sm leading-6 text-zinc-400">

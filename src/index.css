@@ -102,17 +102,10 @@ a {
   }
 }
 
-/* Homepage ticker spacing: desktop defaults, with a tighter mobile gap. */
+/* The ticker sits directly beneath the home hero; section rhythm is handled by .page-layout. */
 .home-ticker {
-  margin-top: -6rem !important;
+  margin-top: 0 !important;
   margin-bottom: 0 !important;
-}
-
-@media (max-width: 767px) {
-  .home-ticker {
-    margin-top: -6rem !important;
-    margin-bottom: 0 !important;
-  }
 }
 
 
@@ -145,4 +138,26 @@ a {
   );
   border-top: 1px solid rgba(255, 85, 0, 0.45);
   border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+}
+
+
+/* Page rhythm: heroes and full-width stripes sit flush; content sections get one consistent gap. */
+.page-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.page-layout > .page-hero,
+.page-layout > .industrial-stripe--divider,
+.page-layout > .home-ticker {
+  margin-block: 0 !important;
+}
+.page-layout > :not(.page-hero):not(.industrial-stripe--divider):not(.home-ticker) {
+  margin-block-start: clamp(3rem, 5vw, 4.5rem);
+}
+.page-layout > .industrial-stripe--divider + :not(.home-ticker) {
+  margin-block-start: clamp(3rem, 5vw, 4.5rem);
+}
+.page-layout > .home-ticker + .industrial-stripe--divider {
+  margin-block-start: 0;
 }

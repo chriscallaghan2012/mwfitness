@@ -22,7 +22,7 @@ interface NavbarProps {
 const NAV_ITEMS: { id: ScreenId; label: string; code: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'home', label: 'Home', code: '01', icon: Flame },
   { id: 'online-coaching', label: 'Online coaching', code: '02', icon: Dumbbell },
-  { id: 'packages', label: '1:1 packages', code: '03', icon: CreditCard },
+  { id: 'packages', label: 'Online packages', code: '03', icon: CreditCard },
   { id: 'app', label: 'The App', code: '04', icon: Smartphone },
   { id: 'shwag', label: 'SHWAG', code: '05', icon: Shirt },
   { id: 'contact', label: 'Contact', code: '06', icon: PhoneCall },

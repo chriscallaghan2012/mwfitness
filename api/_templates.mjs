@@ -60,7 +60,7 @@ function layout(title, intro, bodyRows, note, ctaLabel, ctaUrl) {
           <tr>
             <td style="padding:20px 32px;border-top:1px solid #eee;color:#848991;font-size:12px;line-height:1.6">
               MWFitnessUK — Pure Gym Hazel Grove, Stockport<br />
-              mikeptonline@gmail.com · @michael_whitworth85
+              mwfitnessukonline@gmail.com · @michael_whitworth85
             </td>
           </tr>
         </table>

@@ -14,7 +14,7 @@ export const IMAGES = {
 
 export const CONTACT = {
   name: 'Mike',
-  email: 'mikeptonline@gmail.com',
+  email: 'mwfitnessukonline@gmail.com',
   instagramHandle: 'michael_whitworth85',
   instagramUrl: 'https://instagram.com/michael_whitworth85',
   facebookName: 'Michael Whitworth',

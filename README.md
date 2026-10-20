@@ -46,7 +46,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=YOUR_GMAIL@gmail.com
 SMTP_PASS=YOUR_16_CHAR_APP_PASSWORD
-MAIL_TO=mikeptonline@gmail.com        # where enquiries are delivered
+MAIL_TO=mwfitnessukonline@gmail.com        # where enquiries are delivered
 ```
 
 ## Deploy (Vercel)
