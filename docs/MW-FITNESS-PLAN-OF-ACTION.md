@@ -54,12 +54,12 @@ This file contains historical notes for both `mwfitness` (website / Staff HQ) an
 ## Known blocked items / not claimed complete
 - The reported immediate Android launch crash requires a real crash trace to diagnose.
 - Video storage/upload, video-to-programme assignment, programme schema, and verified server-side Neon Auth account deletion need schema/API/security review before implementation or use.
-- No production database changes, merges to `main`, Vercel deployments, EAS builds, or Play submissions have been performed.
+- Historical snapshot corrected on 2026-10-20: website PRs #17–#19 and #22–#26 are merged into `main`; PR #29's manual-only workflow change is also merged. No shared Neon migrations, fresh build verification, Vercel deployment, EAS build, or Play submission is claimed by this reconciliation.
 
 
 ## Neon-only live-data audit — 2026-10-19
 
-### Prepared implementation (not merged, deployed, or applied to the shared database)
+### Prepared implementation (source merged to `main`; not deployed or applied to the shared database)
 
 - [x] Renamed the website client to `src/lib/neon.ts` and moved website/admin imports to the shared `neon` client.
 - [x] Replaced the legacy auth adapter with Neon SDK's native `BetterAuthVanillaAdapter`; website staff sign-in and password recovery now use Neon/Better Auth methods.
@@ -93,7 +93,7 @@ This file contains historical notes for both `mwfitness` (website / Staff HQ) an
 
 ## Communications centre + Android startup follow-up (2026-10-20)
 - [x] Communications centre shell added to Staff HQ with template editing, read-only automation rules/history, and a local-only broadcast draft; dispatch button remains disabled.
-- [x] Prepared communications schema and starter content on the working branch only: 13 email templates and 12 automation rules, all automation rules disabled. Migration has **not** been applied to shared/production Neon.
+- [x] Communications schema and starter content are committed in `main`: 13 email templates and 12 automation rules, all automation rules disabled. Migration has **not** been applied to shared/production Neon.
 - [x] Unsubscribe endpoint changed so GET renders a confirmation form without mutating preferences; the signed unsubscribe action occurs only on POST. Local Express server now parses the confirmation form.
 - [x] Test-email failure path records a failed delivery and bounded error message; it still requires live SMTP/Neon verification.
 - [x] Communications UI clears stale records on missing Neon/read failure and checks that template updates actually affect a row.
