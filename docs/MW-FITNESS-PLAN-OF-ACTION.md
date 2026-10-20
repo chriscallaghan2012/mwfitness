@@ -1,6 +1,6 @@
 # MW Fitness — plan of action and test gates
 
-This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). Continue fixing the working branches and verify the changes before merging them to main. Do not deploy, run GitHub workflows/build submissions, or change the shared Neon database without explicit approval.
+This file contains historical notes for both `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). For current website work, `main` is the source of truth. Compare divergent branches at file level and recover only changes genuinely missing from `main`; do not merge stale branches wholesale or assume ahead/behind counts equal missing features. Keep website and Android changes separate. Do not deploy, dispatch GitHub workflows/build submissions, post to Slack, send test emails, or change the shared Neon database without explicit approval. Website verification is configured as manual-only.
 
 ## Completed in this work batch
 - [x] Android nutrition day selector now loads and saves the selected calendar date rather than always reading/writing today's nutrition log.
@@ -22,7 +22,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Pricing catalogue admin now catches rejected plan reads, creates/edits, deletes and visibility updates, preserving form state on save failures.
 - [x] Android login no longer presents a role toggle that only changed labels; access is determined by the authenticated profile, with coach/admin profiles routed to the coaching dashboard and trainee profiles to the member experience.
 - [x] Nutrition date changes now show the selected day as loading until that date's log resolves; failed daily-log saves show a connection error and reliably clear the saving state.
-- [x] Android changes are on `work/mwfitness-android-bulk-fixes-2026-10`; website changes are intended for `work/mwfitness-bulk-fixes-2026-10`. No main merge or deployment.
+- Historical branch note (not current status): Android and website changes were once separated across working branches. Current website merge status must be checked against `main`; do not treat this historical note as evidence that the website changes are still unmerged.
 
 ## Premium Staff HQ / demo workspace — active work (2026-10-19)
 - [x] Replaced the demo's tiny two-row lists with a richer fictional workspace across clients, app records, plans, memberships, nutrition, workouts, programmes, videos, check-ins, progress, messages, leads and activity.
@@ -32,7 +32,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Added a responsive Staff HQ navigation rail and upgraded shared admin inputs, buttons, cards, empty states and data-table styling.
 - [ ] Audit every live-mode admin form for missing domain fields and replace raw JSON-only editing where a guided form is appropriate.
 - [ ] Run TypeScript/build/lint and interactive demo CRUD checks before asking for merge approval. No build/test pass is claimed yet.
-- [ ] User approval still required before merge/deployment; this branch has not been merged to `main`.
+- Historical status note: this branch checklist is not the current merge status. The consolidated website implementation is on `main`; use the latest GitHub comparison and PR history for current status.
 
 ## Must pass before any release
 1. **Website pricing** — user confirms public pricing currently displays correctly on the live site. Do not treat pricing as a live incident or change its data flow without a reproducible failure. Keep the Neon-backed implementation and never add hard-coded fallback prices.
@@ -89,7 +89,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Verify `/api/plans?kind=online` and `/api/plans?kind=pt` in the deployed environment; the public domain could not be reached from this execution environment, so the endpoint has not been exercised over HTTP.
 - [ ] Test Stripe checkout in test mode and confirm success/cancel handling.
 - [ ] Run the configured manual GitHub Actions checks when a supported workflow-dispatch path is available.
-- [ ] Consolidate changes to a work branch only after the above code checks; no production merge or deployment without approval.
+- [ ] Run website TypeScript/build/lint and record the exact `main` SHA and result before treating the website as verified. No fresh build pass is claimed. Deployment remains separate and requires explicit approval.
 
 ## Communications centre + Android startup follow-up (2026-10-20)
 - [x] Communications centre shell added to Staff HQ with template editing, read-only automation rules/history, and a local-only broadcast draft; dispatch button remains disabled.
@@ -121,7 +121,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Replaced the package feature JSON array editor with one feature per line; each non-empty line saves as one public feature.
 - [x] Consolidated the online-plan-focused footer and direct privacy, cookie and account/data deletion links without the staff-login link or unverified insurance/qualification claims.
 - [x] Added the cookie policy screen, /cookies client route and Vercel SPA rewrite. The policy explicitly remains a draft until live cookies and third-party scripts are audited.
-- [ ] Reconcile the remaining stale open PRs against this consolidated branch before closing or merging them. Do not merge their branches wholesale because they diverged and may reintroduce compatibility aliases or older Neon code.
+- [x] Reconciled stale/diverged website branches against current `main` at file level on 2026-10-20. No open PRs remained after the manual-only workflow fix was merged. The older branches contain superseded versions (including legacy `supabase` compatibility-client imports and older Staff HQ forms); preserve them as history and do not merge wholesale.
 
 
 ## CRUD verification hardening — 2026-10-20
