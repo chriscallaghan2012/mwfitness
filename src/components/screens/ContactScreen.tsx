@@ -48,8 +48,8 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
       <section className="page-hero relative min-h-[40vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/facility-gym.jpg"
-            alt="Pure Gym Hazel Grove"
+            src="/images/main-hero.jpg"
+            alt="MWFitnessUK online coaching"
             className="w-full h-full object-cover object-center filter brightness-60 contrast-125"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e] via-[#0b0c0e]/60 to-transparent"></div>
@@ -196,7 +196,6 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
                       <label className="block text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">Interested in</label>
                       <select value={interest} onChange={(e) => setInterest(e.target.value)} className={inputClass}>
                         <option value="Not sure yet">Not sure yet</option>
-                        <option value="1-2-1 Personal Training">1-2-1 Personal Training</option>
                         <option value="Online Coaching">Online Coaching</option>
                         <option value="The App">The App</option>
                         <option value="SHWAG merch">SHWAG merch</option>

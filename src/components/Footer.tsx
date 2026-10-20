@@ -11,7 +11,6 @@ interface FooterProps {
 const NAV_LINKS: { id: ScreenId; label: string }[] = [
   { id: 'home', label: 'Home' },
   { id: 'online-coaching', label: 'Online coaching plans' },
-  { id: 'packages', label: 'Online packages' },
   { id: 'app', label: 'The App' },
   { id: 'contact', label: 'Contact' },
 ];
@@ -26,8 +25,8 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
             <div className="w-8 h-8 bg-[#16181d] border border-[#ff5500] flex items-center justify-center"><span aria-hidden="true" className="font-display text-xl leading-none tracking-tighter text-[#ff5500]">MW</span></div>
             <span className="font-display text-2xl tracking-widest text-white font-bold">MWFITNESS<span className="text-[#ff5500]">UK</span></span>
           </div>
-          <p className="text-xs font-mono text-zinc-400 max-w-sm leading-relaxed">Online coaching built around real life, with personal training available in Hazel Grove, Stockport.</p>
-          <button onClick={() => onSelectScreen('online-coaching')} className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs py-2.5 px-4 uppercase tracking-wider">Explore online plans <span aria-hidden="true">→</span></button>
+          <p className="text-xs font-mono text-zinc-400 max-w-sm leading-relaxed">Online coaching built around real life, with training and nutrition support wherever you train.</p>
+          <button onClick={() => onSelectScreen('online-coaching')} className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs py-2.5 px-4 uppercase tracking-wider">Explore online coaching <span aria-hidden="true">→</span></button>
         </div>
         <div className="space-y-3">
           <h2 className="font-mono text-xs text-white uppercase tracking-wider font-bold">Explore</h2>

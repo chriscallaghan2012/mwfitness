@@ -71,7 +71,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </h1>
 
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
-              Simple personal training and online coaching for busy people. No jargon, no judgement — just clear guidance, real support and results that last.
+              Online coaching built around your goals and routine. No jargon, no judgement — just clear training and nutrition guidance, real support and progress that lasts.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -103,7 +103,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 Real results
               </button>
               <button onClick={() => scrollToId('packages-overview')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
-                Online packages
+                Online coaching
               </button>
             </div>
 
@@ -134,7 +134,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           <span className="mx-4">● NUTRITIONAL ADVICE</span>
           <span className="mx-4">● CALORIE-CONTROLLED MEAL PREP IDEAS</span>
           <span className="mx-4">● BMR & MACRO BREAKDOWNS</span>
-          <span className="mx-4">● PURE GYM HAZEL GROVE • STOCKPORT</span>
+          <span className="mx-4">● TRAIN ANYWHERE WITH ONLINE SUPPORT</span>
         </div>
       </div>
 
@@ -170,7 +170,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </div>
               <div>
                 <div className="font-display text-xl text-white uppercase leading-none">{ABOUT.greeting}</div>
-                <div className="text-[11px] font-mono text-zinc-500">Personal Trainer • {CONTACT.locationShort}</div>
+                <div className="text-[11px] font-mono text-zinc-500">Online Coach • Train anywhere</div>
               </div>
             </div>
             <p className="text-sm font-sans text-zinc-300 leading-relaxed">{ABOUT.intro}</p>
@@ -246,10 +246,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </h2>
           </div>
           <button
-            onClick={() => onSelectScreen('packages')}
+            onClick={() => onSelectScreen('online-coaching')}
             className="text-xs font-mono text-zinc-400 hover:text-white uppercase tracking-wider flex items-center gap-1.5 group"
           >
-            <span>See all packages</span>
+            <span>Explore online coaching</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -289,7 +289,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>
           ))}
         </div>
-        {plansLoading ? <p className="text-sm text-zinc-400 mt-4">Loading current packages…</p> : null}
+        {plansLoading ? <p className="text-sm text-zinc-400 mt-4">Loading online coaching plans…</p> : null}
         {!plansLoading && plansError ? <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p> : null}
       </section>
       {/* 4. ONLINE COACHING SPOTLIGHT */}
@@ -306,7 +306,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               onClick={() => onSelectScreen('online-coaching')}
               className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
             >
-              See online coaching plans
+              Explore online coaching
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

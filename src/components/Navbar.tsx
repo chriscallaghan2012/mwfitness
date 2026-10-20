@@ -5,7 +5,6 @@ import {
   X,
   ChevronRight,
   Flame,
-  CreditCard,
   Dumbbell,
   Smartphone,
   Shirt,
@@ -22,10 +21,9 @@ interface NavbarProps {
 const NAV_ITEMS: { id: ScreenId; label: string; code: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'home', label: 'Home', code: '01', icon: Flame },
   { id: 'online-coaching', label: 'Online coaching', code: '02', icon: Dumbbell },
-  { id: 'packages', label: 'Online packages', code: '03', icon: CreditCard },
-  { id: 'app', label: 'The App', code: '04', icon: Smartphone },
-  { id: 'shwag', label: 'SHWAG', code: '05', icon: Shirt },
-  { id: 'contact', label: 'Contact', code: '06', icon: PhoneCall },
+  { id: 'app', label: 'The App', code: '03', icon: Smartphone },
+  { id: 'shwag', label: 'SHWAG', code: '04', icon: Shirt },
+  { id: 'contact', label: 'Contact', code: '05', icon: PhoneCall },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -51,9 +49,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             NOW BOOKING
           </span>
           <span className="text-[#3f434d]">|</span>
-          <span className="text-zinc-300">PURE GYM HAZEL GROVE • STOCKPORT</span>
+          <span className="text-zinc-300">ONLINE COACHING • TRAIN ANYWHERE</span>
           <span className="text-[#3f434d] hidden sm:inline">|</span>
-          <span className="text-[#ff5500] hidden sm:inline font-medium">MORNING / EVENING / WEEKEND SESSIONS</span>
+          <span className="text-[#ff5500] hidden sm:inline font-medium">PLANS BUILT AROUND YOUR LIFE</span>
         </div>
         <div className="hidden md:flex items-center gap-4 text-[11px] text-zinc-400">
           <span className="text-[#ff5500] font-semibold">MWFITNESSUK</span>
@@ -86,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 MWFitness<span className="text-[#ff5500]">UK</span>
               </div>
               <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
-                Personal training • Stockport
+                Online coaching • Train anywhere
               </div>
             </div>
           </button>

@@ -8,10 +8,6 @@
       "destination": "/index.html"
     },
     {
-      "source": "/packages",
-      "destination": "/index.html"
-    },
-    {
       "source": "/app",
       "destination": "/index.html"
     },
@@ -38,6 +34,13 @@
     {
       "source": "/delete-account",
       "destination": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/packages",
+      "destination": "/online-coaching",
+      "permanent": true
     }
   ]
 }

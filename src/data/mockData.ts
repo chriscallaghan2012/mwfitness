@@ -1,9 +1,9 @@
-import { PricingTier, Review, Testimonial } from '../types';
+import { Review, Testimonial } from '../types';
 
 export const SITE = {
   brand: 'MWFitnessUK',
-  byline: 'Personal training & online coaching for busy people',
-  town: 'Hazel Grove, Stockport',
+  byline: 'Online coaching for busy people',
+  town: 'Online coaching • Train anywhere',
 };
 
 export const IMAGES = {
@@ -19,19 +19,19 @@ export const CONTACT = {
   instagramUrl: 'https://instagram.com/michael_whitworth85',
   facebookName: 'Michael Whitworth',
   facebookUrl: 'https://www.facebook.com/search/top?q=Michael%20Whitworth',
-  location: 'Pure Gym Hazel Grove, Stockport',
-  locationShort: 'Pure Gym Hazel Grove',
-  sessions: 'Morning, evening and weekend sessions',
+  location: 'Online coaching • Train anywhere',
+  locationShort: 'Train anywhere',
+  sessions: 'Flexible online coaching and check-ins',
 };
 
 export const ABOUT = {
   greeting: "Hi, I'm Mike.",
   intro:
-    "I'm a personal trainer based at Pure Gym, Hazel Grove in Stockport. I help busy people get fit, feel stronger and build habits that actually last. No fancy jargon, no judgement — just clear guidance and support that fits around your life.",
+    "I help busy people get fitter, feel stronger and build habits that last through online coaching. No fancy jargon, no judgement — just clear guidance and support that fits around your life.",
   experience: [
-    'Years of experience coaching 1-2-1 and online clients of every age and ability',
-    'From complete beginners to people getting back into the gym after a long break',
-    'Hands-on help with training, nutrition and staying consistent week to week',
+    'Online coaching for people of every age and ability',
+    'Support for complete beginners and people returning to training',
+    'Practical training and nutrition guidance to help you stay consistent week to week',
   ],
   background:
     "I know what it's like to have a full-on week — work, family and not much spare time. That's exactly who I built MWFitnessUK around. Every plan I write is simple, realistic and made to fit around your life, not the other way round.",
@@ -56,7 +56,7 @@ export const HOW_IT_WORKS = [
   {
     step: '03',
     title: 'Train with support',
-    text: 'We work together — in person or online — with check-ins, tweaks and real accountability as you go.',
+    text: 'We work together online — with check-ins, plan updates and real accountability as you go.',
   },
 ];
 
@@ -79,75 +79,6 @@ export const ONLINE_COACHING = {
     { id: 'online-12-week', name: '12-week coaching', price: 399.99, description: 'Commit to the full transformation block and get the best value across 12 weeks.', badge: 'BEST VALUE' },
   ],
 };
-
-export const PRICING_TIERS: PricingTier[] = [
-  {
-    id: 'bronze',
-    name: 'Bronze',
-    tag: 'Great for getting started',
-    price: 120,
-    originalPrice: 140,
-    badge: 'NEW TO THE GYM',
-    description: '4 one-to-one sessions with Mike, plus simple nutrition advice to get you going.',
-    features: [
-      '4 x one-to-one PT sessions',
-      'Simple nutrition advice for your goals',
-      'A plan tracked session by session',
-      'Morning, evening & weekend slots',
-      'At Pure Gym Hazel Grove, Stockport',
-    ],
-    ctaText: 'Choose Bronze',
-  },
-  {
-    id: 'silver',
-    name: 'Silver',
-    tag: 'Training + meal ideas',
-    price: 150,
-    originalPrice: 180,
-    badge: 'SAVE £30',
-    description: 'Everything in Bronze, plus easy meal prep ideas to keep your food on track all week.',
-    features: [
-      'Everything in Bronze',
-      'Easy, calorie-conscious meal prep ideas',
-      'Food plans that fit a busy week',
-      'Session-by-session support',
-    ],
-    ctaText: 'Choose Silver',
-  },
-  {
-    id: 'gold',
-    name: 'Gold',
-    tag: 'Full nutrition worked out',
-    price: 175,
-    originalPrice: 200,
-    badge: 'MOST POPULAR',
-    isPopular: true,
-    description: 'Everything in Silver, plus your calories and macros worked out for you — so you always know what to eat.',
-    features: [
-      'Everything in Silver',
-      'Your calories worked out for you',
-      'Your protein, carbs & fats made simple',
-      'No guessing around food ever again',
-    ],
-    ctaText: 'Choose Gold',
-  },
-  {
-    id: 'platinum',
-    name: 'Platinum',
-    tag: 'The complete package',
-    price: 200,
-    originalPrice: 250,
-    badge: 'EVERYTHING INCLUDED',
-    description: 'Everything in Gold, plus a weekly training plan for your other gym days. The full MWFitnessUK experience.',
-    features: [
-      'Everything in Gold',
-      'A weekly plan for your other gym days',
-      'Coaching between sessions when you need it',
-      'The complete MWFitnessUK package',
-    ],
-    ctaText: 'Choose Platinum',
-  },
-];
 
 export const REVIEWS: Review[] = [
   {
@@ -273,12 +204,12 @@ export const FAQS = [
     a: 'Absolutely. Most of my clients started exactly where you are now. Every session is built around your level, and I\u2019ll show you exactly what to do, step by step.',
   },
   {
-    q: 'Where do sessions take place?',
-    a: 'In-person 1-2-1 sessions run at Pure Gym Hazel Grove, Stockport. If you prefer online coaching, I\u2019ll build your plan around whatever gym (or home) equipment you have.',
+    q: 'Where can I train with online coaching?',
+    a: 'Anywhere that suits you — at your gym or at home. Your plan is built around the equipment you have and the time available to you.',
   },
   {
     q: 'What if I have a busy week?',
-    a: 'That\u2019s exactly who I work with. Sessions run morning, evening and weekend, and plans are made to fit around work, kids and life — not the other way round.',
+    a: 'That\u2019s exactly who I work with. Your online plan is designed to fit around work, family and life — not the other way round.',
   },
   {
     q: 'Do you help with food too?',
