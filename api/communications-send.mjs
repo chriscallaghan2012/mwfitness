@@ -46,7 +46,7 @@ async function staffFor(token, id) {
 }
 async function resendEmail({ to, subject: title, html, text, key }) {
   if (!process.env.RESEND_API_KEY) throw new Error('RESEND_API_KEY is not configured.');
-  const from = process.env.RESEND_FROM_EMAIL || process.env.MAIL_FROM;
+  const from = process.env.RESEND_FROM_EMAIL;
   if (!from) throw new Error('RESEND_FROM_EMAIL must be set to a verified sender.');
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
