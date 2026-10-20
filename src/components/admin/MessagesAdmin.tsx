@@ -50,6 +50,9 @@ export function MessagesAdmin() {
         })))
         .select('id');
       if (insertError) throw insertError;
+      if (!data?.length || data.length !== athleteIds.length) {
+        throw new Error('The message was not saved for every selected recipient. Refresh the message list before trying again.');
+      }
 
       setBody('');
       await load();
