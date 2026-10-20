@@ -39,7 +39,7 @@ export function MessagesAdmin() {
     setError('');
     setStatus('');
     try {
-      const { data: sessionData, error: sessionError } = await neon.auth.getSession();
+      const { data: sessionData, error: sessionError } = await neon.auth.getSession({});
       if (sessionError || !sessionData?.user) throw new Error('Your staff session has expired. Sign in again.');
       const { data, error: insertError } = await neon
         .from('coach_messages')
@@ -57,7 +57,7 @@ export function MessagesAdmin() {
       setBody('');
       await load();
       try {
-        const accessToken = await neon.auth.getJWTToken?.(false);
+        const accessToken = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
         if (!accessToken) throw new Error('Could not obtain a Neon access token for push delivery.');
         const response = await fetch('/api/send-push', {
           method: 'POST',
