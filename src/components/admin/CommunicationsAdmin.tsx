@@ -33,6 +33,11 @@ export function CommunicationsAdmin() {
 
   const load = useCallback(async () => {
     if (!neon) {
+      setTemplates([]);
+      setRules([]);
+      setEvents([]);
+      setSelectedId('');
+      setDraft({});
       setError('Neon is not configured for this deployment.');
       setLoading(false);
       return;
@@ -60,6 +65,11 @@ export function CommunicationsAdmin() {
       setSelectedId((current) => nextTemplates.some((item) => item.id === current) ? current : nextTemplates[0]?.id ?? '');
       setNotice('');
     } catch {
+      setTemplates([]);
+      setRules([]);
+      setEvents([]);
+      setSelectedId('');
+      setDraft({});
       setError('Could not load the communications centre. Check the Neon connection and staff permissions.');
     } finally {
       setLoading(false);
@@ -77,7 +87,7 @@ export function CommunicationsAdmin() {
     try {
       const { data: session, error: sessionError } = await neon.auth.getSession();
       if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
-      const { error: saveError } = await neon.from('communication_templates').update({
+      const { data: savedRows, error: saveError } = await neon.from('communication_templates').update({
         name: String(draft.name ?? '').trim(),
         category: String(draft.category ?? 'service'),
         subject: String(draft.subject ?? ''),
@@ -88,8 +98,9 @@ export function CommunicationsAdmin() {
         version: Number(selected.version ?? 1) + 1,
         updated_by: session.user.id,
         updated_at: new Date().toISOString(),
-      }).eq('id', selected.id);
+      }).eq('id', selected.id).select('id');
       if (saveError) throw saveError;
+      if (!savedRows?.length) throw new Error('The template was not updated. Check your staff role and table permissions.');
       setNotice('Template saved. The version number has been incremented.');
       await load();
     } catch (saveError) {
