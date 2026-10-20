@@ -16,6 +16,7 @@ import { sendContactEmail, validatePayload } from './api/_mailer.mjs';
 import { saveWebsiteLead } from './api/_leads.mjs';
 import { createCheckoutSession } from './api/_stripe.mjs';
 import sendPush from './api/send-push.mjs';
+import testCommunication from './api/test-communication.mjs';
 import health from './api/health.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -54,6 +55,7 @@ app.post('/api/create-checkout', async (req, res) => {
 });
 
 app.post('/api/send-push', sendPush);
+app.post('/api/test-communication', testCommunication);
 
 // Serve the built site (optional, for a full local prod check).
 const dist = path.join(__dirname, 'dist');
