@@ -1,5 +1,5 @@
 // NutritionAdmin — global meal templates + per-customer nutrition plans.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, StatusPill, btn, btnGhost, card, inp } from './fields';
 import { MealSectionsEditor } from './MealSectionsEditor';
@@ -15,6 +15,7 @@ export function NutritionAdmin() {
   const [busy, setBusy] = useState(false);
   const [edit, setEdit] = useState<Row | null>(null);
   const [f, setF] = useState<Record<string, string>>({});
+  const planLoadRequest = useRef(0);
 
   const schema = () => (mode === 'templates' ? 'nutrition_templates' : 'nutrition_plans') as 'nutrition_templates' | 'nutrition_plans';
 
@@ -32,6 +33,7 @@ export function NutritionAdmin() {
     }
   };
   const loadPlans = async () => {
+    const requestId = ++planLoadRequest.current;
     if (!userId) {
       setRows([]);
       return;
@@ -41,15 +43,16 @@ export function NutritionAdmin() {
     setRows([]);
     try {
       const { data, error } = await neon.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false });
+      if (requestId !== planLoadRequest.current) return;
       if (error) { setMsg(`Could not load this client's nutrition plans: ${error.message}`); setRows([]); return; }
       setRows((data ?? []) as Row[]);
     } catch {
+      if (requestId !== planLoadRequest.current) return;
       setMsg('Could not reach this client’s nutrition plans. Check the connection and retry.');
       setRows([]);
     }
   };
   useEffect(() => {
-    void loadTemplates();
     if (!neon) { setMsg('Neon is not configured; clients cannot be loaded.'); return; }
     void neon.from('profiles').select('id,full_name,email').order('full_name').then((r) => {
       if (!r.error) setUsers((r.data ?? []) as Row[]);
@@ -58,8 +61,13 @@ export function NutritionAdmin() {
   }, []);
 
   useEffect(() => {
-    if (mode === 'templates') void loadTemplates();
-    else void loadPlans();
+    if (mode === 'templates') {
+      // Invalidate any client-plan request still in flight after changing tabs.
+      planLoadRequest.current += 1;
+      void loadTemplates();
+    } else {
+      void loadPlans();
+    }
   }, [mode, userId]);
 
   const saveRow = async () => {
