@@ -280,10 +280,12 @@ a[class*="bg-orange-500"]:hover {
 @media (prefers-reduced-motion: reduce) {
   article,
   [class*="bg-brand-card"],
+  [class*="bg-[#121419]"],
   [class*="bg-[#16181d]"],
   [class*="bg-[#131519]"],
   article::after,
   [class*="bg-brand-card"]::after,
+  [class*="bg-[#121419]"]::after,
   [class*="bg-[#16181d]"]::after,
   [class*="bg-[#131519]"]::after,
   button[class*="bg-[#ff5500]"]::after,
@@ -364,6 +366,46 @@ a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):no
 @media (prefers-reduced-motion: reduce) {
   .mw-electric-card,
   .mw-electric-card::after {
+    animation: none !important;
+  }
+}
+
+
+/* Explicitly cover the card/panel background used by online package cards and
+   content panels across the public pages. This class was missing from the
+   original shared selector, so those surfaces never received the electric edge. */
+[class*="bg-[#121419]"] {
+  position: relative;
+  isolation: isolate;
+  animation: mw-electric-pulse 4.8s ease-in-out infinite;
+}
+[class*="bg-[#121419]"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--mw-electric-angle),
+    transparent 0deg,
+    transparent 235deg,
+    rgba(255, 85, 0, 0.18) 260deg,
+    #ff5500 285deg,
+    #ffd0b8 292deg,
+    rgba(255, 85, 0, 0.12) 307deg,
+    transparent 330deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: mw-electric-travel 7s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="bg-[#121419]"],
+  [class*="bg-[#121419]"]::after {
     animation: none !important;
   }
 }
