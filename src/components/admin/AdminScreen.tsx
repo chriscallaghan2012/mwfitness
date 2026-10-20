@@ -301,31 +301,32 @@ export function AdminScreen() {
       // Live mode reads the shared Neon records. Do not fall back to demo rows
       // or invent revenue when live queries fail.
       const [usersResult, plansResult, membershipsResult, leadsResult, publicPtResult, publicOnlineResult] = await Promise.all([
-        neon.from('profiles').select('id,role,status', { count: 'exact' }),
-        neon.from('plans').select('id,status,active', { count: 'exact' }),
-        neon.from('memberships').select('id,status', { count: 'exact' }),
+        neon.from('profiles').select('id,role', { count: 'exact' }),
+        neon.from('plans').select('id,active', { count: 'exact' }),
+        neon.from('memberships').select('id,status,profile_id', { count: 'exact' }),
         neon.from('website_leads').select('id,status', { count: 'exact' }),
         loadPublicPlans('pt'),
         loadPublicPlans('online'),
       ]);
+      const publicResults = [publicPtResult, publicOnlineResult];
+      setPublicCatalogue(publicResults.flatMap((result) => result.plans));
+      setPublicCatalogueError(publicResults.find((result) => result.error)?.error ?? null);
       if (usersResult.error || plansResult.error || membershipsResult.error) {
         setError('We could not load the live dashboard totals from Neon. Check staff permissions and the profiles, plans and memberships table policies, then refresh.');
         setStats(null);
         return;
       }
-      const publicResults = [publicPtResult, publicOnlineResult];
-      setPublicCatalogue(publicResults.flatMap((result) => result.plans));
-      setPublicCatalogueError(publicResults.find((result) => result.error)?.error ?? null);
       const users = usersResult.data ?? [];
       const plans = plansResult.data ?? [];
       const memberships = membershipsResult.data ?? [];
       const leads = leadsResult.error ? [] : (leadsResult.data ?? []);
       const isActive = (value: unknown) => String(value ?? '').trim().toLowerCase() === 'active';
+      const activeMemberIds = new Set(memberships.filter((row) => isActive(row.status) && row.profile_id).map((row) => String(row.profile_id)));
       setStats({
         users: usersResult.count ?? users.length,
-        activeUsers: users.filter((row) => isActive(row.status)).length,
+        activeUsers: activeMemberIds.size,
         plans: plansResult.count ?? plans.length,
-        activePlans: plans.filter((row) => isActive(row.status) || row.active === true).length,
+        activePlans: plans.filter((row) => row.active === true).length,
         memberships: membershipsResult.count ?? memberships.length,
         activeMemberships: memberships.filter((row) => isActive(row.status)).length,
         leads: leadsResult.error ? null : (leadsResult.count ?? leads.length),
@@ -532,12 +533,12 @@ export function AdminScreen() {
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Member activation</p>
                 <div className="mt-3 flex items-center gap-4">
                   <div className="relative grid h-24 w-24 shrink-0 place-items-center">
-                    <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" role="img" aria-label={stats && stats.users ? `${Math.round((stats.activeUsers / stats.users) * 100)} percent of live profiles marked active` : 'No live profile activation data'}>
+                    <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" role="img" aria-label={stats && stats.users ? `${Math.round((stats.activeUsers / stats.users) * 100)} percent of live profiles with an active membership` : 'No live profile activation data'}>
                       <circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/[0.07]" />
                       <circle cx="50" cy="50" r="39" fill="none" stroke="#ff5500" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${stats && stats.users ? Math.min(1, stats.activeUsers / stats.users) * 245 : 0} 245`} />
                     </svg><span className="absolute text-lg font-semibold text-white">{stats && stats.users ? `${Math.round((stats.activeUsers / stats.users) * 100)}%` : '—'}</span>
                   </div>
-                  <div><p className="text-sm font-medium text-white">Profiles marked active</p><p className="mt-1 text-xs leading-5 text-zinc-500">{stats ? `${stats.activeUsers} of ${stats.users} live profiles` : 'Waiting for live profile data.'}</p><button type="button" onClick={() => setTab('users')} className="mt-3 text-xs font-semibold text-orange-300">Review users ↗</button></div>
+                  <div><p className="text-sm font-medium text-white">Profiles linked to active memberships</p><p className="mt-1 text-xs leading-5 text-zinc-500">{stats ? `${stats.activeUsers} of ${stats.users} live profiles linked to active memberships` : 'Waiting for live profile data.'}</p><button type="button" onClick={() => setTab('users')} className="mt-3 text-xs font-semibold text-orange-300">Review users ↗</button></div>
                 </div>
               </div>
               <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
