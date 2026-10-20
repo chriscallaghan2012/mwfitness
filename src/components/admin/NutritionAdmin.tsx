@@ -111,11 +111,18 @@ export function NutritionAdmin() {
     const body: Record<string, unknown> = { name: f.name.trim(), description: f.description?.trim() || null, targets, sections, active: f.active === 'true', day_type: f.day_type === 'non_training' ? 'non_training' : 'training' };
     if (mode === 'plans') body.profile_id = userId;
     try {
-      const { error } = edit && edit.id
-        ? await neon.from(schema()).update(body).eq('id', edit.id)
-        : await neon.from(schema()).insert(body);
-      setMsg(error ? `Failed: ${error.message}` : 'Saved ✓');
-      if (!error) { setEdit(null); if (mode === 'templates') await loadTemplates(); else await loadPlans(); }
+      const result = edit && edit.id
+        ? await neon.from(schema()).update(body).eq('id', edit.id).select('id')
+        : await neon.from(schema()).insert(body).select('id');
+      if (result.error) {
+        setMsg(`Failed: ${result.error.message}`);
+      } else if (!result.data?.length) {
+        setMsg('Nothing was saved. The record may no longer exist or your staff permissions may not allow this change.');
+      } else {
+        setMsg('Saved ✓');
+        setEdit(null);
+        if (mode === 'templates') await loadTemplates(); else await loadPlans();
+      }
     } catch {
       setMsg('Could not save this nutrition item. Check the connection and try again.');
     } finally { setBusy(false); }
