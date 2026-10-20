@@ -104,3 +104,6 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Android startup crash is **not confirmed fixed**; produce a fresh Android export/build and retest on the Play internal-test device.
 - [ ] Android CI remains blocked at `npm ci`: lockfile is missing `ajv@8.20.0`, `fast-uri@3.1.8`, `json-schema-traverse@1.0.0`, and `require-from-string@2.0.2`. The lockfile repair workflow is manual-only and has not been dispatched.
 - [ ] Run the website and Android manual verification workflows after the user authorises/runs them; no fresh lint, build, or device-test pass is claimed.
+
+- [x] Pricing root-cause investigation (read-only): the current production deployment is still on `main`, whose `src/lib/plans.ts` uses the old Supabase client and lacks the Neon `api/plans.mjs` endpoint present on this working branch. This deployment/code mismatch is consistent with the persistent unavailable-pricing message.
+- [ ] Before final release, verify active `public.plans` rows and public read access against the intended Neon branch; do not expose secret values or add hard-coded prices. The fix is not live until the approved merge/deploy.
