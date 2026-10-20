@@ -91,16 +91,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
             <div className="flex flex-wrap items-center gap-2 pt-6" aria-label="Jump to a section">
               <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mr-1">Jump to:</span>
-              <button className="cursor-pointer" onClick={() => scrollToId('about-mike')} className="bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+              <button onClick={() => scrollToId('about-mike')} className="cursor-pointer bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 About Mike
               </button>
-              <button className="cursor-pointer" onClick={() => scrollToId('how-it-works')} className="bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+              <button onClick={() => scrollToId('how-it-works')} className="cursor-pointer bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 How it works
               </button>
-              <button className="cursor-pointer" onClick={() => scrollToId('testimonials')} className="bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+              <button onClick={() => scrollToId('testimonials')} className="cursor-pointer bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 Real results
               </button>
-              <button className="cursor-pointer" onClick={() => scrollToId('packages-overview')} className="bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+              <button onClick={() => scrollToId('packages-overview')} className="cursor-pointer bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 Online coaching
               </button>
             </div>
@@ -258,7 +258,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               <ul className="mt-5 space-y-2.5 text-sm text-zinc-300">
                 {plan.features.slice(0, 3).map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}
               </ul>
-              <button className="cursor-pointer" onClick={() => onSelectScreen('online-coaching')} className="mt-7 bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
+              <button onClick={() => onSelectScreen('online-coaching')} className="cursor-pointer mt-7 bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
                 View plan &amp; checkout <ArrowRight className="w-4 h-4" />
               </button>
             </article>
