@@ -167,3 +167,13 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Implement event handlers for app push/in-app and scheduled automations. Those rules must remain disabled until each trigger is implemented and tested.
 - [ ] Run website TypeScript/build checks locally or in an approved manual workflow. No build pass is claimed; no GitHub Actions, deploy, Slack post or shared database migration was run.
 
+
+
+### Named Staff HQ administrators and password recovery
+- [x] Added `instantonlinesuccess@gmail.com` and `mwfitnessukonline@gmail.com` to the Staff HQ sign-in identity checks; these named accounts must have the `admin` profile role.
+- [x] Restricted the Staff HQ reset-request UI to the two named admin email addresses; reset tokens/passwords remain handled by Neon Auth.
+- [x] Added prepared migration `db/migrations/20261020_staff_admin_allowlist.sql` to promote matching existing profile rows to `admin`.
+- [ ] Create/verify both accounts in Neon Auth and ensure matching `public.profiles` rows exist.
+- [ ] Review and explicitly approve the admin-role migration before applying it to the shared Neon database.
+- [ ] Verify the Neon Auth email provider/reset link works on the live auth branch. Neon Auth's built-in provider can send reset links without Resend; use Resend for the separate communications suite, or configure a custom provider/webhook if branded auth emails are required.
+- [ ] No build, GitHub Actions workflow, deployment, or test email was run while this work was prepared.
