@@ -14,6 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { sendContactEmail, validatePayload } from './api/_mailer.mjs';
 import { saveWebsiteLead } from './api/_leads.mjs';
+import { sendAutomaticTemplate } from './api/_communications.mjs';
 import { createCheckoutSession } from './api/_stripe.mjs';
 import sendPush from './api/send-push.mjs';
 import testCommunication from './api/test-communication.mjs';
@@ -35,6 +36,9 @@ app.post('/api/send-mail', async (req, res) => {
     const lead = await saveWebsiteLead(validated);
     try {
       await sendContactEmail(validated);
+      const templateKey = validated.kind === 'book-call' ? 'consultation-confirmation' : validated.kind === 'waitlist' ? 'app-waitlist-acknowledgement' : 'website-enquiry-acknowledgement';
+      try { await sendAutomaticTemplate({ templateKey, lead: { ...validated, id: lead.id } }); }
+      catch (automationError) { console.error('MW Fitness lead saved; automatic acknowledgement failed:', automationError); }
       res.json({ ok: true, leadId: lead.id, emailSent: true });
     } catch (mailError) {
       console.error('MW Fitness lead saved; email notification failed:', mailError);
