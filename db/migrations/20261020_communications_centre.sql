@@ -75,7 +75,7 @@ CREATE INDEX IF NOT EXISTS communication_deliveries_email_idx ON public.communic
 CREATE TABLE IF NOT EXISTS public.communication_marketing_preferences (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
-  email text NOT NULL UNIQUE,
+  email text NOT NULL,
   marketing_email_consent boolean NOT NULL DEFAULT false,
   marketing_push_consent boolean NOT NULL DEFAULT false,
   consent_source text NOT NULL DEFAULT '',
@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS public.communication_marketing_preferences (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS communication_marketing_preferences_profile_idx ON public.communication_marketing_preferences (profile_id);
+CREATE UNIQUE INDEX IF NOT EXISTS communication_marketing_preferences_email_lower_key ON public.communication_marketing_preferences (lower(email));
 
 -- Only admin/coach profiles may use these tables through the authenticated Data API.
 -- Dispatch endpoints must independently validate the session and role on the server.
