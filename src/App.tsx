@@ -13,6 +13,7 @@ import { AppScreen } from './components/screens/AppScreen';
 import { ShwagScreen } from './components/screens/ShwagScreen';
 import { ContactScreen } from './components/screens/ContactScreen';
 import { PrivacyScreen } from './components/screens/PrivacyScreen';
+import { CookiePolicyScreen } from './components/screens/CookiePolicyScreen';
 import { AccountDeletionScreen } from './components/screens/AccountDeletionScreen';
 import { AdminScreen } from './components/admin/AdminScreen';
 
@@ -30,6 +31,7 @@ export default function App() {
       '/contact': 'contact',
       '/admin': 'admin',
       '/privacy': 'privacy',
+      '/cookies': 'cookies',
       '/delete-account': 'delete-account',
     };
     return routes[path] || 'home';
@@ -67,6 +69,7 @@ export default function App() {
       contact: '/contact',
       admin: '/admin',
       privacy: '/privacy',
+      cookies: '/cookies',
       'delete-account': '/delete-account',
     };
     const nextPath = routes[screen];
@@ -113,6 +116,7 @@ export default function App() {
         )}
         {currentScreen === 'admin' && <AdminScreen />}
         {currentScreen === 'privacy' && <PrivacyScreen onBack={() => { window.location.href = '/'; }} />}
+        {currentScreen === 'cookies' && <CookiePolicyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'delete-account' && <AccountDeletionScreen onBack={() => { window.location.href = '/'; }} />}
       </main>
 
