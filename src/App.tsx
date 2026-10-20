@@ -7,7 +7,6 @@ import { PhoneCall } from 'lucide-react';
 
 // Screens
 import { HomeScreen } from './components/screens/HomeScreen';
-import { OnlineCoachingScreen } from './components/screens/OnlineCoachingScreen';
 import { PackagesScreen } from './components/screens/PackagesScreen';
 import { AppScreen } from './components/screens/AppScreen';
 import { ShwagScreen } from './components/screens/ShwagScreen';
@@ -25,7 +24,7 @@ export default function App() {
     const routes: Record<string, ScreenId> = {
       '/': 'home',
       '/online-coaching': 'online-coaching',
-      '/packages': 'packages',
+      '/packages': 'online-coaching',
       '/app': 'app',
       '/shwag': 'shwag',
       '/contact': 'contact',
@@ -63,7 +62,7 @@ export default function App() {
     const routes: Record<ScreenId, string> = {
       home: '/',
       'online-coaching': '/online-coaching',
-      packages: '/packages',
+      packages: '/online-coaching',
       app: '/app',
       shwag: '/shwag',
       contact: '/contact',
@@ -72,11 +71,12 @@ export default function App() {
       cookies: '/cookies',
       'delete-account': '/delete-account',
     };
-    const nextPath = routes[screen];
+    const canonicalScreen: ScreenId = screen === 'packages' ? 'online-coaching' : screen;
+    const nextPath = routes[canonicalScreen];
     if (window.location.pathname !== nextPath || window.location.search) {
       window.history.pushState({}, '', nextPath);
     }
-    setCurrentScreen(screen);
+    setCurrentScreen(canonicalScreen);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -99,11 +99,8 @@ export default function App() {
         {currentScreen === 'home' && (
           <HomeScreen onSelectScreen={handleSelectScreen} onOpenBookCall={handleOpenBookCall} />
         )}
-        {currentScreen === 'online-coaching' && (
-          <OnlineCoachingScreen onSelectScreen={handleSelectScreen} />
-        )}
-        {currentScreen === 'packages' && (
-          <PackagesScreen onOpenBookCall={handleOpenBookCall} />
+        {(currentScreen === 'online-coaching' || currentScreen === 'packages') && (
+          <PackagesScreen onSelectScreen={handleSelectScreen} onOpenBookCall={handleOpenBookCall} />
         )}
         {currentScreen === 'app' && (
           <AppScreen onOpenBookCall={handleOpenBookCall} />
