@@ -42,9 +42,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
   };
 
   return (
-    <div className="space-y-16 md:space-y-24">
+    <div className="page-layout">
       {/* 1. HERO */}
-      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
+      <section className="page-hero relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0 z-0">
           <img
             src={IMAGES.HERO}
@@ -103,7 +103,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 Real results
               </button>
               <button onClick={() => scrollToId('packages-overview')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
-                1:1 packages
+                Online packages
               </button>
             </div>
 
@@ -123,12 +123,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
       <div style={{ marginTop: 0 }} className="home-ticker w-full bg-[#ff5500] text-black font-mono font-bold text-xs uppercase py-2.5 overflow-hidden whitespace-nowrap border-y border-black">
         <div className="inline-block animate-[marquee_20s_linear_infinite]">
-          <span className="mx-4">● 1-2-1 PERSONAL TRAINING</span>
+          <span className="mx-4">● ONLINE COACHING</span>
           <span className="mx-4">● ONLINE COACHING</span>
           <span className="mx-4">● NUTRITIONAL ADVICE</span>
           <span className="mx-4">● CALORIE-CONTROLLED MEAL PREP IDEAS</span>
           <span className="mx-4">● BMR & MACRO BREAKDOWNS</span>
-          <span className="mx-4">● PURE GYM HAZEL GROVE • STOCKPORT</span>
+          <span className="mx-4">● COACHING BUILT AROUND YOU</span>
           <span className="mx-4">● 1-2-1 PERSONAL TRAINING</span>
           <span className="mx-4">● ONLINE COACHING</span>
           <span className="mx-4">● NUTRITIONAL ADVICE</span>
@@ -161,9 +161,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
           {/* Intro */}
-          <div className="bg-[#121419] border border-[#20232b] p-6">
+          <div className="h-full bg-[#121419] border border-[#20232b] p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">
                 <UserCheck className="w-5 h-5" />
