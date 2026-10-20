@@ -57,9 +57,13 @@ export function UsersAdmin() {
         return;
       }
       payload.full_name = String(f.full_name).trim();
-      const { error } = await neon.from('profiles').update(payload).eq('id', edit.id);
-      if (error) {
-        setMsg(`Save failed: ${error.message}`);
+      const result = await neon.from('profiles').update(payload).eq('id', edit.id).select('id');
+      if (result.error) {
+        setMsg(`Save failed: ${result.error.message}`);
+        return;
+      }
+      if (!result.data?.length) {
+        setMsg('Nothing was saved. This profile may no longer exist or your staff permissions may not allow this change.');
         return;
       }
       setMsg('Client profile saved.');
