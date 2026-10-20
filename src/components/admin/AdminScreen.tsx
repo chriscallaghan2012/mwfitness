@@ -266,7 +266,7 @@ export function AdminScreen() {
   useEffect(() => {
     if (!neon) return;
     neon.auth
-      .getSession({})
+      .getSession({ query: {} })
       .then(async ({ data }) => {
         const user = data.user;
         if (!user) return;
