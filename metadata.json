@@ -1,6 +1,8 @@
 {
   "name": "MWFitnessUK",
-  "description": "MWFitnessUK - friendly 1-2-1 personal training and online coaching with Michael Whitworth in Stockport for busy people. Simple packages, nutrition support, an app coming soon and SHWAG merch.",
+  "description": "MWFitnessUK online coaching with personalised training plans, nutrition support and ongoing accountability for busy people. Train at home or in your gym.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
