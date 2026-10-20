@@ -35,5 +35,12 @@
       "source": "/delete-account",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/packages",
+      "destination": "/online-coaching",
+      "permanent": true
+    }
   ]
 }
