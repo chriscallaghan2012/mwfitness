@@ -14,7 +14,7 @@ const parse = (body) => {
   try { return JSON.parse(body); } catch { return null; }
 };
 const escapeHtml = (value) => String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-const render = (source, vars) => String(source || '').replace(/{{\s*([a-zA-Z0-9_]+)\s*}}/g, (_m, key) => String(vars[key] == null ? '' : vars[key]));
+const render = (source, vars, html = false) => String(source || '').replace(/{{\s*([a-zA-Z0-9_]+)\s*}}/g, (_m, key) => html ? escapeHtml(vars[key] == null ? '' : vars[key]) : String(vars[key] == null ? '' : vars[key]));
 const bearer = (req) => {
   const value = req.headers && (req.headers.authorization || req.headers.Authorization);
   const match = typeof value === 'string' ? value.match(/^Bearer\s+(.+)$/i) : null;
@@ -141,7 +141,7 @@ export default async function handler(req, res) {
       if (!insert.rows || !insert.rows.length) continue;
       const unsub = template.category === 'marketing' ? unsubscribeUrl(email) : '';
       const vars = { name: recipient.full_name || 'there', email, headline: template.name, body: template.text_body, subject: template.subject, preheader: template.preheader, app_url: process.env.PUBLIC_SITE_URL || '', admin_url: (process.env.PUBLIC_SITE_URL || '') + '/admin', unsubscribe_url: unsub, programme_name: '', workout_name: '', workout_time: '' };
-      const htmlBody = render(template.html_body, vars);
+      const htmlBody = render(template.html_body, vars, true);
       const textBody = render(template.text_body, vars) + (unsub ? '\n\nUnsubscribe: ' + unsub : '');
       try {
         const messageId = await resendEmail({ to: email, subject: render(template.subject, vars), html: branded(render(template.subject, vars), render(template.preheader, vars), htmlBody, unsub), text: textBody, key: idem });
