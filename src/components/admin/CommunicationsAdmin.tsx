@@ -140,7 +140,7 @@ export function CommunicationsAdmin() {
 
   const dispatchPreview = async () => {
     if (!neon || !selected) { setError('Select an enabled email template first.'); return; }
-    if (audience === 'individual' && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipientEmail.trim())) { setError('Enter a valid individual recipient email.'); return; }
+    if (audience === 'individual' && !/^[^\s@]+@[^\s@]+\\.[^\s@]+$/.test(recipientEmail.trim())) { setError('Enter a valid individual recipient email.'); return; }
     setDispatchBusy(true); setError(''); setNotice(''); setPreviewCount(null);
     try {
       const token = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
@@ -193,17 +193,17 @@ export function CommunicationsAdmin() {
   const count = (status: string) => events.filter((event) => event.status === status).length;
   const setField = (key: keyof Template, value: string) => updateDraft(key, value);
   const previewHtml = String(draft.html_body ?? '')
-    .replace(/{{\\s*name\\s*}}/g, 'Alex Morgan')
-    .replace(/{{\\s*email\\s*}}/g, 'alex@example.test')
-    .replace(/{{\\s*headline\\s*}}/g, String(draft.name || 'Email preview'))
-    .replace(/{{\\s*subject\\s*}}/g, String(draft.subject || 'Preview subject'))
-    .replace(/{{\\s*preheader\\s*}}/g, String(draft.preheader || 'Preview preheader'))
-    .replace(/{{\\s*body\\s*}}/g, 'This is sample preview text. Real recipient details are inserted when sent.')
-    .replace(/{{\\s*app_url\\s*}}/g, 'https://mwfitnessuk.com/app')
-    .replace(/{{\\s*admin_url\\s*}}/g, 'https://mwfitnessuk.com/admin')
-    .replace(/{{\\s*cta_url\\s*}}/g, 'https://mwfitnessuk.com')
-    .replace(/{{\\s*cta_label\\s*}}/g, 'Open MW Fitness')
-    .replace(/{{\\s*unsubscribe_url\\s*}}/g, 'https://mwfitnessuk.com/unsubscribe-preview');
+    .replace(/{{\s*name\s*}}/g, 'Alex Morgan')
+    .replace(/{{\s*email\s*}}/g, 'alex@example.test')
+    .replace(/{{\s*headline\s*}}/g, String(draft.name || 'Email preview'))
+    .replace(/{{\s*subject\s*}}/g, String(draft.subject || 'Preview subject'))
+    .replace(/{{\s*preheader\s*}}/g, String(draft.preheader || 'Preview preheader'))
+    .replace(/{{\s*body\s*}}/g, 'This is sample preview text. Real recipient details are inserted when sent.')
+    .replace(/{{\s*app_url\s*}}/g, 'https://mwfitnessuk.com/app')
+    .replace(/{{\s*admin_url\s*}}/g, 'https://mwfitnessuk.com/admin')
+    .replace(/{{\s*cta_url\s*}}/g, 'https://mwfitnessuk.com')
+    .replace(/{{\s*cta_label\s*}}/g, 'Open MW Fitness')
+    .replace(/{{\s*unsubscribe_url\s*}}/g, 'https://mwfitnessuk.com/unsubscribe-preview');
 
   return (
     <section className="space-y-5" aria-labelledby="communications-heading">
