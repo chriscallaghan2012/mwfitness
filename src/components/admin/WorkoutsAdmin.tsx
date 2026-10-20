@@ -58,13 +58,14 @@ export function WorkoutsAdmin() {
     if (days && (!Number.isInteger(days) || days < 1 || days > 7)) { setMsg('Days per week must be between 1 and 7.'); return; }
     if (!neon) { setMsg('Neon is not configured; workout templates cannot be created.'); return; }
     try {
-      const { error } = await neon.from('workout_templates').insert({
+      const result = await neon.from('workout_templates').insert({
         name: form.name.trim(),
         description: form.description ?? '',
         days_per_week: days || null,
         plan_id: form.plan_id || null,
-      });
-      if (error) { setMsg(`Could not add template: ${error.message}`); return; }
+      }).select('id');
+      if (result.error) { setMsg(`Could not add template: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('Workout template was not saved. Check staff permissions and retry.'); return; }
       setMsg('Workout template added.');
       setForm({});
       await load();
@@ -92,13 +93,14 @@ export function WorkoutsAdmin() {
     if (!userId || !sessForm.template_id) { setMsg('Choose a client and workout template first.'); return; }
     if (!neon) { setMsg('Neon is not configured; sessions cannot be scheduled.'); return; }
     try {
-      const { error } = await neon.from('workout_sessions').insert({
+      const result = await neon.from('workout_sessions').insert({
         profile_id: userId,
         template_id: sessForm.template_id,
         scheduled_on: sessForm.scheduled_on || null,
         status: 'planned',
-      });
-      if (error) { setMsg(`Could not schedule session: ${error.message}`); return; }
+      }).select('id');
+      if (result.error) { setMsg(`Could not schedule session: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('Workout session was not saved. Check staff permissions and retry.'); return; }
       setMsg('Workout session scheduled.');
       setSessForm({});
       await loadSessions(userId);
