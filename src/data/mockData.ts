@@ -2,8 +2,8 @@ import { PricingTier, Review, Testimonial } from '../types';
 
 export const SITE = {
   brand: 'MWFitnessUK',
-  byline: 'Personal training & online coaching for busy people',
-  town: 'Hazel Grove, Stockport',
+  byline: 'Online coaching for busy people',
+  town: 'Online coaching • Train anywhere',
 };
 
 export const IMAGES = {
@@ -27,11 +27,11 @@ export const CONTACT = {
 export const ABOUT = {
   greeting: "Hi, I'm Mike.",
   intro:
-    "I'm a personal trainer based at Pure Gym, Hazel Grove in Stockport. I help busy people get fit, feel stronger and build habits that actually last. No fancy jargon, no judgement — just clear guidance and support that fits around your life.",
+    "I help busy people get fitter, feel stronger and build habits that last through online coaching. No fancy jargon, no judgement — just clear guidance and support that fits around your life.",
   experience: [
-    'Years of experience coaching 1-2-1 and online clients of every age and ability',
-    'From complete beginners to people getting back into the gym after a long break',
-    'Hands-on help with training, nutrition and staying consistent week to week',
+    'Online coaching for people of every age and ability',
+    'Support for complete beginners and people returning to training',
+    'Practical training and nutrition guidance to help you stay consistent week to week',
   ],
   background:
     "I know what it's like to have a full-on week — work, family and not much spare time. That's exactly who I built MWFitnessUK around. Every plan I write is simple, realistic and made to fit around your life, not the other way round.",
@@ -56,7 +56,7 @@ export const HOW_IT_WORKS = [
   {
     step: '03',
     title: 'Train with support',
-    text: 'We work together — in person or online — with check-ins, tweaks and real accountability as you go.',
+    text: 'We work together online — with check-ins, plan updates and real accountability as you go.',
   },
 ];
 
