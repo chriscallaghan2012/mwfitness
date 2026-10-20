@@ -8,7 +8,6 @@ import { PhoneCall } from 'lucide-react';
 // Screens
 import { HomeScreen } from './components/screens/HomeScreen';
 import { OnlineCoachingScreen } from './components/screens/OnlineCoachingScreen';
-import { PackagesScreen } from './components/screens/PackagesScreen';
 import { AppScreen } from './components/screens/AppScreen';
 import { ShwagScreen } from './components/screens/ShwagScreen';
 import { ContactScreen } from './components/screens/ContactScreen';
@@ -25,7 +24,6 @@ export default function App() {
     const routes: Record<string, ScreenId> = {
       '/': 'home',
       '/online-coaching': 'online-coaching',
-      '/packages': 'packages',
       '/app': 'app',
       '/shwag': 'shwag',
       '/contact': 'contact',
@@ -34,7 +32,7 @@ export default function App() {
       '/cookies': 'cookies',
       '/delete-account': 'delete-account',
     };
-    return routes[path] || 'home';
+    return path === '/packages' ? 'online-coaching' : (routes[path] || 'home');
   };
 
   const [currentScreen, setCurrentScreen] = useState<ScreenId>(screenFromLocation);
@@ -54,7 +52,11 @@ export default function App() {
 
   // Keep real page URLs in sync with client-side navigation and browser back/forward.
   useEffect(() => {
-    const handlePopState = () => setCurrentScreen(screenFromLocation());
+    if (window.location.pathname.replace(/\/$/, '') === '/packages') window.history.replaceState({}, '', '/online-coaching');
+    const handlePopState = () => {
+      if (window.location.pathname.replace(/\/$/, '') === '/packages') window.history.replaceState({}, '', '/online-coaching');
+      setCurrentScreen(screenFromLocation());
+    }
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
@@ -63,7 +65,6 @@ export default function App() {
     const routes: Record<ScreenId, string> = {
       home: '/',
       'online-coaching': '/online-coaching',
-      packages: '/packages',
       app: '/app',
       shwag: '/shwag',
       contact: '/contact',
@@ -101,9 +102,6 @@ export default function App() {
         )}
         {currentScreen === 'online-coaching' && (
           <OnlineCoachingScreen onSelectScreen={handleSelectScreen} />
-        )}
-        {currentScreen === 'packages' && (
-          <PackagesScreen onOpenBookCall={handleOpenBookCall} />
         )}
         {currentScreen === 'app' && (
           <AppScreen onOpenBookCall={handleOpenBookCall} />
