@@ -337,6 +337,8 @@ export function AdminScreen() {
     } catch {
       setError('Could not reach the MW Fitness Neon backend. Live figures are unavailable until the connection is restored.');
       setStats(null);
+      setPublicCatalogue(null);
+      setPublicCatalogueError('Could not load the public website catalogue.');
     } finally {
       setStatsLoading(false);
     }
@@ -502,13 +504,6 @@ export function AdminScreen() {
         <div className="min-w-0 space-y-5">
 
 
-      {tab === 'overview' && (
-        <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-3">
-          <Stat label="Customers" value={demoMode ? demoRows.users.length : statsLoading ? undefined : stats?.users} />
-          <Stat label="Plans" value={demoMode ? demoRows.plans.length : statsLoading ? undefined : stats?.plans} />
-          <Stat label="Memberships" value={demoMode ? demoRows.memberships.length : statsLoading ? undefined : stats?.memberships} />
-        </div>
-      )}
       {tab === 'overview' && !demoMode && (
         <div className="space-y-4">
           <section className={`${card} !border-white/[0.08] !bg-[#131519]`}>
@@ -525,7 +520,7 @@ export function AdminScreen() {
                 { label: 'New enquiries', value: stats?.newLeads, hint: `${stats?.leads == null ? 'Lead data unavailable' : `${stats.leads} total website leads`}`, tab: 'leads' as Tab, icon: '!' },
               ].map((stat) => (
                 <button key={stat.label} type="button" onClick={() => setTab(stat.tab)} className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#1a1c21] to-[#111216] p-5 text-left transition hover:-translate-y-0.5 hover:border-orange-500/35">
-                  <span className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-xl border border-orange-500/15 bg-orange-500/[0.08] text-sm text-orange-300">{stat.icon}</span><span className="text-xs font-medium text-zinc-400">{stat.label}</span><span className="mt-3 block text-3xl font-semibold tracking-tight text-white">{statsLoading || stat.value === undefined ? '—' : stat.value}</span><span className="mt-2 block text-xs text-zinc-500">{stat.hint}</span>
+                  <span className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-xl border border-orange-500/15 bg-orange-500/[0.08] text-sm text-orange-300">{stat.icon}</span><span className="text-xs font-medium text-zinc-400">{stat.label}</span><span className="mt-3 block text-3xl font-semibold tracking-tight text-white">{statsLoading || stat.value == null ? '—' : stat.value}</span><span className="mt-2 block text-xs text-zinc-500">{stat.hint}</span>
                 </button>
               ))}
             </div>
