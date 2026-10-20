@@ -63,10 +63,7 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
                 <CalendarClock className="w-4 h-4 text-[#ff5500]" />
                 <span>Flexible online coaching</span>
               </div>
-              <div className="flex items-center gap-2 bg-[#14161d] border border-[#262a34] px-3.5 py-2.5 font-mono text-xs text-zinc-300">
-                <MapPin className="w-4 h-4 text-[#ff5500]" />
-                <span>{CONTACT.location}</span>
-              </div>
+
             </div>
           </div>
         </div>
