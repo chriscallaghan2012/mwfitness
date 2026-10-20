@@ -92,7 +92,7 @@ export default async function handler(req, res) {
         await database.query("update public.communication_deliveries set status='failed',error_message='Message could not be saved',updated_at=now() where idempotency_key=$1", [key]);
         continue;
       }
-      if (channel === 'in_app') { accepted++; continue; }
+      if (channel === 'in_app') { await database.query("update public.coach_messages set delivery_status='accepted' where id=$1", [messageId]); accepted++; continue; }
       try {
         const base = String(process.env.PUBLIC_SITE_URL || '').replace(/\/$/, '');
         if (!base) throw new Error('PUBLIC_SITE_URL is not configured for push delivery.');
