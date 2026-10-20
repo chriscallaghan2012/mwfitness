@@ -19,9 +19,9 @@ export const CONTACT = {
   instagramUrl: 'https://instagram.com/michael_whitworth85',
   facebookName: 'Michael Whitworth',
   facebookUrl: 'https://www.facebook.com/search/top?q=Michael%20Whitworth',
-  location: 'Pure Gym Hazel Grove, Stockport',
-  locationShort: 'Pure Gym Hazel Grove',
-  sessions: 'Morning, evening and weekend sessions',
+  location: 'Online coaching • Train anywhere',
+  locationShort: 'Train anywhere',
+  sessions: 'Flexible online coaching and check-ins',
 };
 
 export const ABOUT = {
@@ -88,13 +88,13 @@ export const PRICING_TIERS: PricingTier[] = [
     price: 120,
     originalPrice: 140,
     badge: 'NEW TO THE GYM',
-    description: '4 one-to-one sessions with Mike, plus simple nutrition advice to get you going.',
+    description: 'An online training plan with simple nutrition advice to get you going.',
     features: [
-      '4 x one-to-one PT sessions',
+      'Personalised online training plan',
       'Simple nutrition advice for your goals',
       'A plan tracked session by session',
-      'Morning, evening & weekend slots',
-      'At Pure Gym Hazel Grove, Stockport',
+      'Flexible online support',
+      'Train at home or in your gym',
     ],
     ctaText: 'Choose Bronze',
   },
@@ -273,8 +273,8 @@ export const FAQS = [
     a: 'Absolutely. Most of my clients started exactly where you are now. Every session is built around your level, and I\u2019ll show you exactly what to do, step by step.',
   },
   {
-    q: 'Where do sessions take place?',
-    a: 'In-person 1-2-1 sessions run at Pure Gym Hazel Grove, Stockport. If you prefer online coaching, I\u2019ll build your plan around whatever gym (or home) equipment you have.',
+    q: 'Where can I train with online coaching?',
+    a: 'Anywhere that suits you — at your gym or at home. Your plan is built around the equipment you have and the time available to you.',
   },
   {
     q: 'What if I have a busy week?',
