@@ -23,6 +23,7 @@ export function CommunicationsAdmin() {
   const [draft, setDraft] = useState<Partial<Template>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testSending, setTestSending] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [subject, setSubject] = useState('');
@@ -98,6 +99,30 @@ export function CommunicationsAdmin() {
     }
   };
 
+  const sendTest = async () => {
+    if (!neon || !selected) return;
+    setTestSending(true); setError(''); setNotice('');
+    try {
+      const { data: session, error: sessionError } = await neon.auth.getSession();
+      if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
+      const token = await neon.auth.getJWTToken?.(false);
+      if (!token) throw new Error('Could not obtain a Neon access token.');
+      const response = await fetch('/api/test-communication', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateKey: selected.template_key, confirmTest: true }),
+      });
+      const result = await response.json() as { ok?: boolean; recipient?: string; error?: string; note?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || 'Test email could not be sent.');
+      setNotice(`Test email accepted for your staff inbox (${result.recipient}). ${result.note ?? ''}`);
+      await load();
+    } catch (testError) {
+      setError(testError instanceof Error ? testError.message : 'Test email could not be sent.');
+    } finally {
+      setTestSending(false);
+    }
+  };
+
   const updateDraft = (key: keyof Template, value: unknown) => setDraft((current) => ({ ...current, [key]: value }));
   const count = (status: string) => events.filter((event) => event.status === status).length;
   const setField = (key: keyof Template, value: string) => updateDraft(key, value);
@@ -137,7 +162,7 @@ export function CommunicationsAdmin() {
               <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Plain-text fallback<textarea rows={5} className={inp} value={String(draft.text_body ?? '')} onChange={(e) => setField('text_body', e.target.value)} /></label>
             </div>
             <label className="flex items-center gap-2 text-xs text-zinc-300"><input type="checkbox" checked={Boolean(draft.enabled)} onChange={(e) => updateDraft('enabled', e.target.checked)} className="accent-orange-500" /> Template enabled for future use</label>
-            <div className="flex flex-wrap gap-2"><button type="button" onClick={() => void saveTemplate()} disabled={saving} className={btn}><Save className="h-3.5 w-3.5" />{saving ? 'Saving…' : 'Save new version'}</button><button type="button" onClick={() => setDraft({ ...selected })} className={btnGhost}>Discard edits</button></div>
+            <div className="flex flex-wrap gap-2"><button type="button" onClick={() => void saveTemplate()} disabled={saving} className={btn}><Save className="h-3.5 w-3.5" />{saving ? 'Saving…' : 'Save new version'}</button><button type="button" onClick={() => void sendTest()} disabled={testSending || saving || !selected.enabled} className={btnGhost}><Send className="h-3.5 w-3.5" />{testSending ? 'Sending test…' : 'Send test to me'}</button><button type="button" onClick={() => setDraft({ ...selected })} className={btnGhost}>Discard edits</button></div>
             <div className="overflow-hidden rounded-xl border border-white/10 bg-white p-3"><p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">HTML preview · static template only</p><iframe title="Email template preview" sandbox="" srcDoc={String(draft.html_body ?? '')} className="h-80 w-full bg-white" /></div>
           </div> : null}
         </div>}
