@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="160" viewBox="0 0 512 160">
+  <rect width="160" height="160" rx="18" fill="#121418" stroke="#FF5500" stroke-width="4"/>
+  <path d="M18 111V42h21l23 35 23-35h21v69H85V77L69 101h-14L39 77v34z" fill="#FF5500"/>
+  <path d="M100 111V42h22l18 27 18-27h2v69h-21V77l-6 9h-5l-6-9v34z" fill="#F3F4F6"/>
+  <text x="190" y="90" font-family="Bebas Neue, Impact, sans-serif" font-size="64" letter-spacing="2" fill="#F3F4F6">MW FITNESS</text>
+  <text x="192" y="126" font-family="JetBrains Mono, monospace" font-size="17" letter-spacing="4" fill="#FF5500">TRAIN • EAT • PROGRESS</text>
+</svg>

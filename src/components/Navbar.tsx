@@ -78,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center gap-3 text-left group focus:outline-none"
           >
             <div className="w-10 h-10 bg-[#16181d] border border-[#ff5500] flex items-center justify-center relative overflow-hidden group-hover:border-white transition-colors">
-              <div className="w-3 h-3 bg-[#ff5500] rotate-45 group-hover:scale-125 transition-transform duration-300"></div>
+              <span aria-hidden="true" className="font-display text-2xl leading-none tracking-tighter text-[#ff5500]">MW</span>
               <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#ff5500]/20 pointer-events-none"></div>
             </div>
             <div>
