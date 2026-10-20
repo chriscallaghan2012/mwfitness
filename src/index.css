@@ -280,10 +280,12 @@ a[class*="bg-orange-500"]:hover {
 @media (prefers-reduced-motion: reduce) {
   article,
   [class*="bg-brand-card"],
+  [class*="bg-[#121419]"],
   [class*="bg-[#16181d]"],
   [class*="bg-[#131519]"],
   article::after,
   [class*="bg-brand-card"]::after,
+  [class*="bg-[#121419]"]::after,
   [class*="bg-[#16181d]"]::after,
   [class*="bg-[#131519]"]::after,
   button[class*="bg-[#ff5500]"]::after,
