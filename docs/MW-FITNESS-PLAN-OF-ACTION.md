@@ -91,3 +91,16 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Test Stripe checkout in test mode and confirm success/cancel handling.
 - [ ] Run the configured manual GitHub Actions checks when a supported workflow-dispatch path is available.
 - [ ] Consolidate changes to a work branch only after the above code checks; no production merge or deployment without approval.
+
+## Communications centre + Android startup follow-up (2026-10-20)
+- [x] Communications centre shell added to Staff HQ with template editing, read-only automation rules/history, and a local-only broadcast draft; dispatch button remains disabled.
+- [x] Prepared communications schema and starter content on the working branch only: 13 email templates and 12 automation rules, all automation rules disabled. Migration has **not** been applied to shared/production Neon.
+- [x] Unsubscribe endpoint changed so GET renders a confirmation form without mutating preferences; the signed unsubscribe action occurs only on POST. Local Express server now parses the confirmation form.
+- [x] Test-email failure path records a failed delivery and bounded error message; it still requires live SMTP/Neon verification.
+- [x] Communications UI clears stale records on missing Neon/read failure and checks that template updates actually affect a row.
+- [ ] Verify unsubscribe GET has no DB side effects and POST suppresses only the signed email; verify SMTP success/failure state and table RLS before any live sends.
+- [ ] Build server-side audience preview, consent/suppression filtering, idempotent dispatch and provider delivery tracking before enabling broadcasts.
+- [x] Android entry point now has a visible startup-diagnostic fallback for module import failures instead of leaving only the native splash screen.
+- [ ] Android startup crash is **not confirmed fixed**; produce a fresh Android export/build and retest on the Play internal-test device.
+- [ ] Android CI remains blocked at `npm ci`: lockfile is missing `ajv@8.20.0`, `fast-uri@3.1.8`, `json-schema-traverse@1.0.0`, and `require-from-string@2.0.2`. The lockfile repair workflow is manual-only and has not been dispatched.
+- [ ] Run the website and Android manual verification workflows after the user authorises/runs them; no fresh lint, build, or device-test pass is claimed.
