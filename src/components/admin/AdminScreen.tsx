@@ -521,25 +521,41 @@ export function AdminScreen() {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: 'Client accounts', value: demoRows.users.length, hint: 'Across all coaching tiers', tab: 'users' as Tab },
-              { label: 'Live packages', value: demoRows.plans.filter((r) => r.status === 'Active').length, hint: 'Demo catalogue only', tab: 'plans' as Tab },
-              { label: 'Needs coach review', value: demoRows.checkins.filter((r) => r.status === 'Needs review' || r.status === 'Follow up required').length, hint: 'Check-ins to look at', tab: 'checkins' as Tab },
-              { label: 'New leads', value: demoRows.leads.filter((r) => r.status === 'New').length, hint: 'Awaiting first contact', tab: 'leads' as Tab },
+              { label: 'Total sign-ups', value: demoRows.users.length, hint: 'Sample accounts created', tab: 'users' as Tab, icon: '＋' },
+              { label: 'Active members', value: demoRows.users.filter((r) => r.status === 'Active').length, hint: 'Sample members marked active', tab: 'memberships' as Tab, icon: '●' },
+              { label: 'Packages on sale', value: demoRows.plans.filter((r) => r.status === 'Active').length, hint: 'Active sample packages', tab: 'plans' as Tab, icon: '↗' },
+              { label: 'Needs attention', value: demoRows.checkins.filter((r) => r.status === 'Needs review' || r.status === 'Follow up required').length + demoRows.leads.filter((r) => r.status === 'New').length, hint: 'Check-ins and new leads', tab: 'checkins' as Tab, icon: '!' },
             ].map((stat) => (
-              <button key={stat.label} type="button" onClick={() => setTab(stat.tab)} className="group rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5 text-left transition hover:border-orange-500/30 hover:bg-white/[0.055]">
-                <span className="text-xs text-zinc-400">{stat.label}</span>
+              <button key={stat.label} type="button" onClick={() => setTab(stat.tab)} className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#1a1c21] to-[#111216] p-5 text-left transition hover:-translate-y-0.5 hover:border-orange-500/35">
+                <span className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-xl border border-orange-500/15 bg-orange-500/[0.08] text-sm text-orange-300">{stat.icon}</span>
+                <span className="text-xs font-medium text-zinc-400">{stat.label}</span>
                 <span className="mt-3 block text-3xl font-semibold tracking-tight text-white">{stat.value}</span>
                 <span className="mt-2 block text-xs text-zinc-500">{stat.hint}</span>
               </button>
             ))}
           </div>
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]">
             <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
-              <div className="mb-4 flex items-center justify-between gap-3"><div><p className="text-xs text-zinc-500">WORKSPACE</p><h3 className="mt-1 text-lg font-semibold text-white">Manage your business</h3></div><span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-orange-300">Demo data</span></div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {TABS.filter((item) => item.id !== 'overview').map((item) => (
-                  <button key={item.id} type="button" onClick={() => setTab(item.id)} className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 py-3 text-left text-sm text-zinc-200 transition hover:border-orange-500/30 hover:bg-orange-500/[0.06]"><span>{item.label}</span><span className="text-xs text-zinc-600">↗</span></button>
-                ))}
+              <div className="mb-5 flex flex-wrap items-start justify-between gap-3"><div><p className="text-[10px] font-semibold tracking-[0.18em] text-orange-300">MEMBER MOMENTUM</p><h3 className="mt-1 text-lg font-semibold text-white">Your coaching business at a glance</h3><p className="mt-1 text-xs text-zinc-500">Illustrative sandbox metrics · not live business figures</p></div><span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-orange-300">Demo data</span></div>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                  <div className="relative grid h-24 w-24 shrink-0 place-items-center">
+                    <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" role="img" aria-label="60 percent of sample members are active"><circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/[0.07]" /><circle cx="50" cy="50" r="39" fill="none" stroke="#ff5500" strokeWidth="8" strokeLinecap="round" strokeDasharray="147 245" /></svg>
+                    <span className="absolute text-lg font-semibold text-white">60%</span>
+                  </div>
+                  <div><p className="text-sm font-medium text-white">Member activation</p><p className="mt-1 text-xs leading-5 text-zinc-500">{demoRows.users.filter((r) => r.status === 'Active').length} of {demoRows.users.length} sample accounts are active.</p><button type="button" onClick={() => setTab('users')} className="mt-3 text-xs font-semibold text-orange-300 hover:text-orange-200">View members ↗</button></div>
+                </div>
+                <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                  <div className="relative grid h-24 w-24 shrink-0 place-items-center">
+                    <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" role="img" aria-label="75 percent of sample plans are active"><circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/[0.07]" /><circle cx="50" cy="50" r="39" fill="none" stroke="#ff8a3d" strokeWidth="8" strokeLinecap="round" strokeDasharray="184 245" /></svg>
+                    <span className="absolute text-lg font-semibold text-white">75%</span>
+                  </div>
+                  <div><p className="text-sm font-medium text-white">Package readiness</p><p className="mt-1 text-xs leading-5 text-zinc-500">{demoRows.plans.filter((r) => r.status === 'Active').length} active sample packages in the catalogue.</p><button type="button" onClick={() => setTab('plans')} className="mt-3 text-xs font-semibold text-orange-300 hover:text-orange-200">Manage packages ↗</button></div>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-white/[0.06] bg-[#101114] p-4"><p className="text-xs text-zinc-500">Sample membership value</p><p className="mt-2 text-2xl font-semibold text-white">£404</p><p className="mt-1 text-[11px] text-zinc-600">Example amounts only; not actual revenue or recognised sales.</p></div>
+                <div className="rounded-xl border border-white/[0.06] bg-[#101114] p-4"><p className="text-xs text-zinc-500">New enquiries</p><p className="mt-2 text-2xl font-semibold text-white">{demoRows.leads.filter((r) => r.status === 'New').length}</p><p className="mt-1 text-[11px] text-zinc-600">Sample leads waiting for follow-up.</p><button type="button" onClick={() => setTab('leads')} className="mt-2 text-xs font-semibold text-orange-300">Open lead inbox ↗</button></div>
               </div>
             </section>
             <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
