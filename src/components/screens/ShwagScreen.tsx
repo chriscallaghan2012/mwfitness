@@ -4,13 +4,26 @@ import { postEnquiry } from '../../lib/mail';
 import { Shirt, CheckCircle, ArrowRight, Sparkles, ExternalLink, Instagram } from 'lucide-react';
 
 type SwagProduct = { id: string; slug: string; name: string; description: string; category: string; price: number; compare_at_price: number | null; image_url: string; product_url: string; sizes: string[]; stock_status: string };
+const FALLBACK_PRODUCTS: SwagProduct[] = SHWAG.products.map((product, index) => ({
+  id: 'fallback-' + index,
+  slug: product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+  name: product.name,
+  description: 'Price and availability on request. Send an enquiry to confirm current options and stock.',
+  category: 'apparel',
+  price: 0,
+  compare_at_price: null,
+  image_url: '',
+  product_url: '',
+  sizes: [],
+  stock_status: 'enquiry_only',
+}));
 
 interface ShwagScreenProps {
   onOpenBookCall: () => void;
 }
 
 export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
-  const [products, setProducts] = useState<SwagProduct[]>([]);
+  const [products, setProducts] = useState<SwagProduct[]>(FALLBACK_PRODUCTS);
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState('');
   useEffect(() => {
