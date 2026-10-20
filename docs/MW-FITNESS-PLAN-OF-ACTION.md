@@ -177,3 +177,14 @@ This file contains historical notes for both `mwfitness` (website / Staff HQ) an
 - [ ] Review and explicitly approve the admin-role migration before applying it to the shared Neon database.
 - [ ] Verify the Neon Auth email provider/reset link works on the live auth branch. Neon Auth's built-in provider can send reset links without Resend; use Resend for the separate communications suite, or configure a custom provider/webhook if branded auth emails are required.
 - [ ] No build, GitHub Actions workflow, deployment, or test email was run while this work was prepared.
+
+## Premium Staff HQ dashboard — draft PR #31 (2026-10-20)
+
+- [x] Remove the duplicated section-navigation grid from the demo overview; the sidebar remains the single navigation source.
+- [x] Add premium KPI cards and circular progress indicators to the demo overview. These values derive only from the fictional in-browser demo rows and remain visibly labelled as sample data.
+- [x] Upgrade shared Staff HQ card and table surfaces for a consistent charcoal/orange visual system.
+- [x] Add a distinct live overview that queries shared Neon records for profile, plan, membership and website-lead counts, active states and new enquiries. Live figures are not sourced from demo rows.
+- [x] Keep revenue and sales out of the live overview until a verified transaction source is available; website package prices or membership plan values must not be presented as money earned.
+- [ ] Verify the actual profile/plan/membership status fields against the live schema and ensure missing optional website_leads access is clearly distinguished from a true zero count.
+- [ ] Verify frontend default package/pricing configuration against the Neon plans table. If defaults are needed for an empty catalogue, show them as website catalogue defaults and do not insert them into Neon or count them as paid sales without explicit approval.
+- [ ] Build/typecheck and review desktop/mobile responsiveness plus live/demo switching. No build has been run and this PR remains unmerged.
