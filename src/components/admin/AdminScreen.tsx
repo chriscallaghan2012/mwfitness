@@ -257,7 +257,7 @@ export function AdminScreen() {
   const [signedIn, setSignedIn] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
-  const [stats, setStats] = useState<{ users: number; activeUsers: number; plans: number; activePlans: number; memberships: number; activeMemberships: number; leads: number; newLeads: number } | null>(null);
+  const [stats, setStats] = useState<{ users: number; activeUsers: number; plans: number; activePlans: number; memberships: number; activeMemberships: number; leads: number | null; newLeads: number | null } | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [demoRows, setDemoRows] = useState<Record<DemoTab, Row[]>>(createDemoRows);
   const [demoEditorOpen, setDemoEditorOpen] = useState(false);
@@ -318,8 +318,8 @@ export function AdminScreen() {
         activePlans: plans.filter((row) => isActive(row.status) || row.active === true).length,
         memberships: membershipsResult.count ?? memberships.length,
         activeMemberships: memberships.filter((row) => isActive(row.status)).length,
-        leads: leadsResult.error ? 0 : (leadsResult.count ?? leads.length),
-        newLeads: leads.filter((row) => String(row.status ?? '').toLowerCase() === 'new').length,
+        leads: leadsResult.error ? null : (leadsResult.count ?? leads.length),
+        newLeads: leadsResult.error ? null : leads.filter((row) => String(row.status ?? '').toLowerCase() === 'new').length,
       });
       setError(null);
     } catch {
@@ -510,7 +510,7 @@ export function AdminScreen() {
                 { label: 'Sign-ups / profiles', value: stats?.users, hint: 'Profiles in Neon', tab: 'users' as Tab, icon: '＋' },
                 { label: 'Active memberships', value: stats?.activeMemberships, hint: `${stats?.memberships ?? '—'} total membership records`, tab: 'memberships' as Tab, icon: '●' },
                 { label: 'Packages available', value: stats?.activePlans, hint: `${stats?.plans ?? '—'} total plans in Neon`, tab: 'plans' as Tab, icon: '↗' },
-                { label: 'New enquiries', value: stats?.newLeads, hint: `${stats?.leads ?? '—'} total website leads`, tab: 'leads' as Tab, icon: '!' },
+                { label: 'New enquiries', value: stats?.newLeads, hint: `${stats?.leads == null ? 'Lead data unavailable' : `${stats.leads} total website leads`}`, tab: 'leads' as Tab, icon: '!' },
               ].map((stat) => (
                 <button key={stat.label} type="button" onClick={() => setTab(stat.tab)} className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#1a1c21] to-[#111216] p-5 text-left transition hover:-translate-y-0.5 hover:border-orange-500/35">
                   <span className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-xl border border-orange-500/15 bg-orange-500/[0.08] text-sm text-orange-300">{stat.icon}</span><span className="text-xs font-medium text-zinc-400">{stat.label}</span><span className="mt-3 block text-3xl font-semibold tracking-tight text-white">{statsLoading || stat.value === undefined ? '—' : stat.value}</span><span className="mt-2 block text-xs text-zinc-500">{stat.hint}</span>
