@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import nodemailer from 'nodemailer';
+import { brandedEmail } from './_email-layout.mjs';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 let sqlClient;
@@ -115,7 +116,7 @@ export default async function handler(req, res) {
     const { transporter, from } = mailer();
     const info = await transporter.sendMail({
       from, to: staff.email, subject: `[TEST] ${rendered.subject}`.slice(0, 180),
-      html: rendered.html, text: rendered.text,
+      html: brandedEmail({ subject: rendered.subject, preheader: template.preheader, bodyHtml: rendered.html, preview: true }), text: rendered.text,
       headers: { 'X-MWFitness-Test': 'true', 'X-MWFitness-Event-ID': String(eventId) },
     });
     await sql`
