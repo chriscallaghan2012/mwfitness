@@ -64,7 +64,7 @@ export async function sendContactEmail(payload) {
 
   const to = process.env.MAIL_TO || 'mwfitnessukonline@gmail.com';
   if (process.env.RESEND_API_KEY) {
-    const from = process.env.RESEND_FROM_EMAIL || process.env.MAIL_FROM;
+    const from = process.env.RESEND_FROM_EMAIL;
     if (!from) throw new Error('RESEND_FROM_EMAIL must be set to a verified sender.');
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
