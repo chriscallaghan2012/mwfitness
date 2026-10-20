@@ -172,20 +172,29 @@ a {
   50% { box-shadow: 0 0 18px rgba(255, 85, 0, 0.09), 0 0 0 1px rgba(255, 85, 0, 0.18); }
 }
 
-/* Restrict the animated treatment to content cards, not every layout wrapper. */
+/* Apply the electric edge consistently to card surfaces throughout the public site and app screens.
+   Match semantic cards and rounded, background-backed panels without animating ordinary buttons. */
 article,
+.card,
+[class*="card-"],
+[class*="-card"],
 [class*="bg-brand-card"],
 [class*="bg-[#16181d]"],
-[class*="bg-[#131519]"] {
+[class*="bg-[#131519]"],
+:is(div, section, li, aside, a)[class*="rounded-"][class*="bg-"] {
   position: relative;
   isolation: isolate;
   animation: mw-electric-pulse 4.8s ease-in-out infinite;
 }
 
 article::after,
+.card::after,
+[class*="card-"]::after,
+[class*="-card"]::after,
 [class*="bg-brand-card"]::after,
 [class*="bg-[#16181d]"]::after,
-[class*="bg-[#131519]"]::after {
+[class*="bg-[#131519]"]::after,
+:is(div, section, li, aside, a)[class*="rounded-"][class*="bg-"]::after {
   content: "";
   position: absolute;
   inset: 0;
