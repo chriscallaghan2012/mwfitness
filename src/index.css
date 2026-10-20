@@ -321,7 +321,8 @@ a[class*="bg-orange-500"]:hover {
   animation: mw-electric-travel 7s linear infinite;
 }
 
-/* Keep button appearance steady on hover while retaining the moving shine. */
+/* Consistent orange hover states: cards turn orange at the edge; dark buttons turn orange,
+   while orange primary buttons invert to charcoal with white text and an orange outline. */
 button,
 a {
   cursor: pointer;
@@ -329,17 +330,29 @@ a {
 button:disabled {
   cursor: not-allowed;
 }
+.mw-electric-card:hover {
+  border-color: #ff5500 !important;
+}
+button:hover:not(:disabled),
+a[role="button"]:hover {
+  border-color: #ff5500 !important;
+}
 button[class*="bg-[#ff5500]"]:hover,
 a[class*="bg-[#ff5500]"]:hover,
 button[class*="bg-brand-orange"]:hover,
 a[class*="bg-brand-orange"]:hover,
 button[class*="bg-orange-500"]:hover,
 a[class*="bg-orange-500"]:hover {
-  background-color: #ff5500 !important;
-  box-shadow: none !important;
+  background-color: #0b0c0e !important;
+  color: #ffffff !important;
+  border: 1px solid #ff5500 !important;
+  box-shadow: 0 0 14px rgba(255, 85, 0, 0.18) !important;
 }
-.mw-electric-card:hover {
-  border-color: inherit;
+button:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):not([class*="bg-orange-500"]):hover:not(:disabled),
+a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):not([class*="bg-orange-500"]):hover {
+  background-color: #ff5500 !important;
+  color: #0b0c0e !important;
+  border-color: #ff5500 !important;
 }
 @media (prefers-reduced-motion: reduce) {
   .mw-electric-card,
