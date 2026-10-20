@@ -88,6 +88,10 @@ export default async function handler(req, res) {
     const isTest = body.action === 'test';
     const isSend = body.action === 'send';
     if (!isPreview && !isTest && !isSend) return res.status(400).json({ ok: false, error: 'Choose preview, test or send.' });
+    // Never dispatch marketing email unless recipients can unsubscribe via a signed, public URL.
+    if (isSend && template.category === 'marketing' && (!process.env.COMMUNICATIONS_UNSUBSCRIBE_SECRET || !process.env.PUBLIC_SITE_URL)) {
+      return res.status(503).json({ ok: false, error: 'Marketing email is disabled until the unsubscribe signing secret and public site URL are configured.' });
+    }
     let recipients = [];
     if (isTest) {
       if (body.confirmTest !== true || !EMAIL.test(String(staff.email || ''))) return res.status(400).json({ ok: false, error: 'Confirm a test send and ensure your staff profile has a valid email.' });
