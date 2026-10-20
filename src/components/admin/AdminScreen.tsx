@@ -453,7 +453,7 @@ export function AdminScreen() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
         <aside className="min-w-0">
           <p className="mb-2 hidden px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 lg:block">Workspace</p>
-<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:sticky lg:top-28 lg:flex lg:h-fit lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:sticky lg:top-6 lg:flex lg:h-fit lg:max-h-[calc(100vh-3rem)] lg:flex-col lg:gap-1 lg:overflow-y-auto lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -533,16 +533,16 @@ export function AdminScreen() {
               </button>
             ))}
           </div>
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.05fr_0.95fr]">
             <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
-              <div className="mb-4 flex items-center justify-between gap-3"><div><p className="text-xs text-zinc-500">WORKSPACE</p><h3 className="mt-1 text-lg font-semibold text-white">Manage your business</h3></div><span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-orange-300">Demo data</span></div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {TABS.filter((item) => item.id !== 'overview').map((item) => (
-                  <button key={item.id} type="button" onClick={() => setTab(item.id)} className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 py-3 text-left text-sm text-zinc-200 transition hover:border-orange-500/30 hover:bg-orange-500/[0.06]"><span>{item.label}</span><span className="text-xs text-zinc-600">↗</span></button>
-                ))}
+              <div className="mb-4 flex items-center justify-between gap-3"><div><p className="text-xs text-zinc-500">MEMBER MOMENTUM</p><h3 className="mt-1 text-lg font-semibold text-white">Coaching health</h3></div><span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-orange-300">Sample data</span></div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-black/20 p-4"><ProgressRing value={78} label="78%" tone="orange" /><div><p className="text-sm font-semibold text-white">Weekly adherence</p><p className="mt-1 text-xs leading-5 text-zinc-500">Illustrative completion across sample training plans.</p></div></div>
+                <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-black/20 p-4"><ProgressRing value={64} label="64%" tone="muted" /><div><p className="text-sm font-semibold text-white">Check-in completion</p><p className="mt-1 text-xs leading-5 text-zinc-500">Example of the weekly review rate once real records are connected.</p></div></div>
               </div>
+              <p className="mt-4 text-[11px] leading-5 text-zinc-500">These rings are design previews only. They are not live member analytics.</p>
             </section>
-            <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
+            <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}
               <p className="text-xs text-zinc-500">COACH PRIORITIES</p><h3 className="mt-1 text-lg font-semibold text-white">Needs attention</h3>
               <div className="mt-4 space-y-3">
                 {[
@@ -622,6 +622,16 @@ export function AdminScreen() {
         </div>
       </div>
       </div>
+    </div>
+  );
+}
+
+function ProgressRing({ value, label, tone = "orange" }: { value: number; label: string; tone?: "orange" | "muted" }) {
+  const safeValue = Math.max(0, Math.min(100, value));
+  const ringColor = tone === "orange" ? "#ff5500" : "#a1a1aa";
+  return (
+    <div className="relative grid h-[76px] w-[76px] shrink-0 place-items-center rounded-full" style={{ background: `conic-gradient(${ringColor} ${safeValue * 3.6}deg, rgba(255,255,255,0.08) 0deg)` }} role="img" aria-label={`${label} sample progress`}>
+      <div className="grid h-[60px] w-[60px] place-items-center rounded-full border border-white/[0.06] bg-[#15171b]"><span className="text-sm font-semibold text-white">{label}</span></div>
     </div>
   );
 }
