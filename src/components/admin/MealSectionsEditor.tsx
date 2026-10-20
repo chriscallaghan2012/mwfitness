@@ -31,7 +31,7 @@ function updateItem(
     const nextItems = items.map((item, currentIndex) => {
       if (currentIndex !== itemIndex || !item || typeof item !== 'object' || Array.isArray(item)) return item;
       const next = { ...(item as JsonRecord) };
-      if (key === 'calories' || key === 'protein') {
+      if (['calories', 'protein', 'carbs', 'fats', 'amount_grams', 'salt'].includes(key)) {
         if (!value.trim()) delete next[key];
         else {
           const number = Number(value);
@@ -105,10 +105,17 @@ export function MealSectionsEditor({ value, onChange }: { value: string; onChang
                       <input className={inp + ' mt-1'} value={String(food.sub ?? '')} onChange={(event) => commit(updateItem(sections, sectionIndex, itemIndex, 'sub', event.target.value))} />
                     </label>
                     <div className="mt-2 grid grid-cols-2 gap-2">
-                      {(['calories', 'protein'] as const).map((key) => (
+                      {([
+                        ['amount_grams', 'Amount (g)'],
+                        ['calories', 'Calories (kcal)'],
+                        ['protein', 'Protein (g)'],
+                        ['carbs', 'Carbs (g)'],
+                        ['fats', 'Fats (g)'],
+                        ['salt', 'Salt (g)'],
+                      ] as const).map(([key, label]) => (
                         <label key={key} className="text-xs text-zinc-400">
-                          {key === 'calories' ? 'Calories (kcal)' : 'Protein (g)'}
-                          <input type="number" min="0" step="1" className={inp + ' mt-1'} value={food[key] == null ? '' : String(food[key])} onChange={(event) => commit(updateItem(sections, sectionIndex, itemIndex, key, event.target.value))} />
+                          {label}
+                          <input type="number" min="0" step="0.1" className={inp + ' mt-1'} value={food[key] == null ? '' : String(food[key])} onChange={(event) => commit(updateItem(sections, sectionIndex, itemIndex, key, event.target.value))} />
                         </label>
                       ))}
                     </div>
@@ -119,7 +126,7 @@ export function MealSectionsEditor({ value, onChange }: { value: string; onChang
             <button
               type="button"
               className={btnGhost + ' mt-3'}
-              onClick={() => commit(sections.map((sectionItem, index) => index === sectionIndex ? { ...sectionItem, items: [...items, { name: '', sub: '', calories: 0, protein: 0 }] } : sectionItem))}
+              onClick={() => commit(sections.map((sectionItem, index) => index === sectionIndex ? { ...sectionItem, items: [...items, { name: '', sub: '', amount_grams: 0, calories: 0, protein: 0, carbs: 0, fats: 0, salt: 0 }] } : sectionItem))}
             >
               + Add food
             </button>
