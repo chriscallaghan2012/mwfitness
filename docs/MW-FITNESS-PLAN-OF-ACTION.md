@@ -217,3 +217,28 @@ This section supersedes older historical status notes above where they conflict 
 - [ ] Continue to keep shared Neon migrations un-applied until explicitly approved and tested on a disposable Neon branch.
 - [ ] No GitHub Actions, EAS build, Google Play submission, test email, or shared Neon database change was performed for this status update.
 - [ ] Neon remains the backend; do not introduce Supabase as a backend.
+
+
+## Website verification pass — 2026-10-20 (manual sandbox, no CI)
+
+### Build verification
+- [x] Cloned the website repository into an isolated Vercel sandbox at the current `main` revision; dependency installation via `npm ci` completed successfully.
+- [x] `npm run lint` passed. The repository's lint script is `tsc --noEmit`, so this confirms TypeScript checking, not a separate ESLint run.
+- [x] `npm run build` passed on `main`, PR #40's branch, and PR #41's branch.
+- [x] Both website-only draft PR branches passed `npm run lint` and `npm run build` in the sandbox.
+- [ ] No unit/integration test script is defined in `package.json`; build success is not a substitute for live CRUD/security tests.
+- [ ] Build emits existing dependency annotation warnings from Neon/Zod and a bundle-size warning for the ~660 kB minified JavaScript chunk. Build still completes successfully; assess code-splitting separately rather than masking the warning.
+- [ ] No GitHub Actions workflow, deployment, email, or database migration was run during this verification.
+
+### Read-only production endpoint checks
+- [x] `https://mwfitnessuk.com` returned HTTP 200 and served the current SPA shell.
+- [x] `/api/plans?kind=online` returned HTTP 200 with four online-coaching plans (Bronze, Silver, Gold, Platinum). This agrees with the user's confirmation that live online prices display correctly.
+- [ ] `/api/plans?kind=pt` returned HTTP 200 with an empty `plans` array. Investigate whether PT plans are expected in the current production database/catalogue before changing any pricing data. Do not claim the public online-pricing page is broken; its live endpoint is returning the four expected online plans.
+- [ ] `/api/products` returned HTTP 503 because the `swag_products` catalogue is not available in the live environment. The prepared migration `db/migrations/20261020_swag_products.sql` remains unapplied; review and test it in a disposable Neon branch before requesting approval for any shared-database change.
+- [x] `/cookies` returned HTTP 200 via the SPA rewrite.
+- [ ] These were HTTP/API checks only. They do not constitute interactive browser QA, visual hover verification, Staff HQ authentication checks, or live CRUD/RLS verification.
+
+### Communications safety PRs
+- [x] PR #40 branch (`fix/communications-preview-invalidation`) passes TypeScript and production build checks. It invalidates the cached recipient-count preview when template selection changes, template data refreshes, or template saving starts.
+- [x] PR #41 branch (`fix/marketing-unsubscribe-config-gate`) passes TypeScript and production build checks. It fails closed on marketing dispatch when the signed unsubscribe secret or public site URL is absent.
+- [ ] PR #40 and PR #41 remain unmerged. No live email was sent; no Neon migration was applied. Verify actual environment configuration and signed unsubscribe behaviour in a disposable/test environment before enabling marketing dispatch.
