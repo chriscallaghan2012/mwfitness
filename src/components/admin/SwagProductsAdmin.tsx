@@ -8,6 +8,7 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
   const [products, setProducts] = useState<Row[]>([]);
   const [draft, setDraft] = useState<Record<string, string | boolean>>(blank);
   const [editing, setEditing] = useState<Row | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -27,9 +28,9 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
   };
   useEffect(() => { void load(); }, []);
 
-  const startNew = () => { setEditing(null); setDraft({ ...blank }); setError(''); setNotice(''); };
+  const startNew = () => { setEditing(null); setDraft({ ...blank }); setFormOpen(true); setError(''); setNotice(''); };
   const startEdit = (row: Row) => {
-    setEditing(row);
+    setEditing(row); setFormOpen(true);
     setDraft({
       slug: String(row.slug || ''), name: String(row.name || ''), description: String(row.description || ''),
       category: String(row.category || 'apparel'), price: String(row.price ?? 0),
@@ -70,7 +71,7 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
       if (result.error) throw result.error;
       if (!result.data?.length) throw new Error('No row was saved. Check staff permissions and the product schema.');
       setNotice('Product saved to Neon. Public visibility is ' + (payload.active ? 'enabled' : 'disabled') + '.');
-      setEditing(null);
+      setEditing(null); setFormOpen(false); setDraft({ ...blank });
       await load();
     } catch (e) {
       setError(e instanceof Error ? 'Save failed: ' + e.message : 'Product could not be saved. Your draft remains available.');
@@ -113,8 +114,8 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
       { key: 'name', label: 'Product' }, { key: 'price_display', label: 'Price' }, { key: 'category', label: 'Category' },
       { key: 'stock', label: 'Stock' }, { key: 'visibility', label: 'Website', render: (row) => <button type="button" disabled={busy} className={btnGhost} onClick={() => void toggle(row)}>{row.active ? 'Visible · hide' : 'Hidden · show'}</button> },
     ]} />}
-    {editing !== null || String(draft.slug || '') !== '' || String(draft.name || '') !== '' ? <div className={card}>
-      <div className="mb-4 flex items-center justify-between"><h3 className="text-lg font-semibold text-white">{editing ? 'Edit product' : 'New product'}</h3><button type="button" className={btnGhost} onClick={() => { setEditing(null); setDraft({ ...blank }); }}>Cancel</button></div>
+    {formOpen ? <div className={card}>
+      <div className="mb-4 flex items-center justify-between"><h3 className="text-lg font-semibold text-white">{editing ? 'Edit product' : 'New product'}</h3><button type="button" className={btnGhost} onClick={() => { setEditing(null); setFormOpen(false); setDraft({ ...blank }); }}>Cancel</button></div>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-1.5 text-xs text-zinc-400">Name<input className={inp} value={String(draft.name || '')} onChange={(e) => set('name', e.target.value)} /></label>
         <label className="grid gap-1.5 text-xs text-zinc-400">URL slug<input className={inp} value={String(draft.slug || '')} onChange={(e) => set('slug', e.target.value)} placeholder="classic-t-shirt" /></label>
