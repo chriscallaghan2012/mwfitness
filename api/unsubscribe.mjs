@@ -40,7 +40,7 @@ export default async function handler(req, res) {
       insert into public.communication_marketing_preferences
         (email, marketing_email_consent, unsubscribed_at, suppression_reason, updated_at)
       values (${email}, false, now(), 'unsubscribe', now())
-      on conflict (email) do update set
+      on conflict (lower(email)) do update set
         marketing_email_consent = false,
         unsubscribed_at = now(),
         suppression_reason = 'unsubscribe',
