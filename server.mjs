@@ -20,6 +20,7 @@ import sendPush from './api/send-push.mjs';
 import testCommunication from './api/test-communication.mjs';
 import communicationsSend from './api/communications-send.mjs';
 import communicationsRules from './api/communications-rules.mjs';
+import communicationsNotifications from './api/communications-notifications.mjs';
 import unsubscribe from './api/unsubscribe.mjs';
 import health from './api/health.mjs';
 
@@ -63,6 +64,7 @@ app.post('/api/send-push', sendPush);
 app.post('/api/test-communication', testCommunication);
 app.post('/api/communications-send', communicationsSend);
 app.post('/api/communications-rules', communicationsRules);
+app.post('/api/communications-notifications', communicationsNotifications);
 app.all('/api/unsubscribe', unsubscribe);
 
 // Serve the built site (optional, for a full local prod check).
