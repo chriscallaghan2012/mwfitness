@@ -1,4 +1,4 @@
-import { PricingTier, Review, Testimonial } from '../types';
+import { Review, Testimonial } from '../types';
 
 export const SITE = {
   brand: 'MWFitnessUK',
@@ -79,75 +79,6 @@ export const ONLINE_COACHING = {
     { id: 'online-12-week', name: '12-week coaching', price: 399.99, description: 'Commit to the full transformation block and get the best value across 12 weeks.', badge: 'BEST VALUE' },
   ],
 };
-
-export const PRICING_TIERS: PricingTier[] = [
-  {
-    id: 'bronze',
-    name: 'Bronze',
-    tag: 'Great for getting started',
-    price: 120,
-    originalPrice: 140,
-    badge: 'NEW TO THE GYM',
-    description: 'An online training plan with simple nutrition advice to get you going.',
-    features: [
-      'Personalised online training plan',
-      'Simple nutrition advice for your goals',
-      'A plan tracked session by session',
-      'Flexible online support',
-      'Train at home or in your gym',
-    ],
-    ctaText: 'Choose Bronze',
-  },
-  {
-    id: 'silver',
-    name: 'Silver',
-    tag: 'Training + meal ideas',
-    price: 150,
-    originalPrice: 180,
-    badge: 'SAVE £30',
-    description: 'Everything in Bronze, plus easy meal prep ideas to keep your food on track all week.',
-    features: [
-      'Everything in Bronze',
-      'Easy, calorie-conscious meal prep ideas',
-      'Food plans that fit a busy week',
-      'Session-by-session support',
-    ],
-    ctaText: 'Choose Silver',
-  },
-  {
-    id: 'gold',
-    name: 'Gold',
-    tag: 'Full nutrition worked out',
-    price: 175,
-    originalPrice: 200,
-    badge: 'MOST POPULAR',
-    isPopular: true,
-    description: 'Everything in Silver, plus your calories and macros worked out for you — so you always know what to eat.',
-    features: [
-      'Everything in Silver',
-      'Your calories worked out for you',
-      'Your protein, carbs & fats made simple',
-      'No guessing around food ever again',
-    ],
-    ctaText: 'Choose Gold',
-  },
-  {
-    id: 'platinum',
-    name: 'Platinum',
-    tag: 'The complete package',
-    price: 200,
-    originalPrice: 250,
-    badge: 'EVERYTHING INCLUDED',
-    description: 'Everything in Gold, plus a weekly training plan for your other gym days. The full MWFitnessUK experience.',
-    features: [
-      'Everything in Gold',
-      'A weekly plan for your other gym days',
-      'Coaching between sessions when you need it',
-      'The complete MWFitnessUK package',
-    ],
-    ctaText: 'Choose Platinum',
-  },
-];
 
 export const REVIEWS: Review[] = [
   {
@@ -278,7 +209,7 @@ export const FAQS = [
   },
   {
     q: 'What if I have a busy week?',
-    a: 'That\u2019s exactly who I work with. Sessions run morning, evening and weekend, and plans are made to fit around work, kids and life — not the other way round.',
+    a: 'That\u2019s exactly who I work with. Your online plan is designed to fit around work, family and life — not the other way round.',
   },
   {
     q: 'Do you help with food too?',
