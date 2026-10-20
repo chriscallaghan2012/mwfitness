@@ -164,36 +164,46 @@ export function CommunicationsAdmin() {
   };
 
   const dispatchPreview = async () => {
-    if (!neon || !selected) { setError('Select an enabled email template first.'); return; }
-    if (audience === 'individual' && !/^[^\s@]+@[^\s@]+\\.[^\s@]+$/.test(recipientEmail.trim())) { setError('Enter a valid individual recipient email.'); return; }
+    if (!neon || (channel === 'email' && !selected)) { setError('Select an enabled email template first.'); return; }
+    if (audience === 'individual' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail.trim())) { setError('Enter the email address of an existing member.'); return; }
+    if (channel !== 'email' && (!subject.trim() || !message.trim())) { setError('Add a notification title and message.'); return; }
     setDispatchBusy(true); setError(''); setNotice(''); setPreviewCount(null);
     try {
       const token = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
       if (!token) throw new Error('Could not obtain a Neon access token. Sign in again.');
-      const response = await fetch('/api/communications-send', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'preview', templateKey: selected.template_key, audience, recipientEmail: recipientEmail.trim() }) });
+      const endpoint = channel === 'email' ? '/api/communications-send' : '/api/communications-notifications';
+      const payload = channel === 'email'
+        ? { action: 'preview', templateKey: selected?.template_key, audience, recipientEmail: recipientEmail.trim() }
+        : { action: 'preview', channel, title: subject.trim(), message: message.trim(), audience, recipientEmail: recipientEmail.trim() };
+      const response = await fetch(endpoint, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const result = await response.json() as { ok?: boolean; recipientCount?: number; error?: string };
       if (!response.ok || !result.ok) throw new Error(result.error || 'Could not preview the audience.');
       setPreviewCount(Number(result.recipientCount ?? 0));
-      setNotice('Audience preview ready: ' + Number(result.recipientCount ?? 0) + ' recipient(s). No email has been sent.');
+      setNotice('Audience preview ready: ' + Number(result.recipientCount ?? 0) + ' recipient(s). Nothing has been sent.');
     } catch (e) { setError(e instanceof Error ? e.message : 'Could not preview the audience.'); }
     finally { setDispatchBusy(false); }
   };
 
   const dispatchSend = async () => {
-    if (!neon || !selected || previewCount === null) { setError('Preview the recipient count before sending.'); return; }
+    if (!neon || (channel === 'email' && !selected) || previewCount === null) { setError('Preview the recipient count before sending.'); return; }
     if (previewCount < 1) { setError('There are no eligible recipients to send to.'); return; }
-    if (!window.confirm('Send this email to ' + previewCount + ' recipient(s)? This action cannot be recalled.')) return;
+    if (!window.confirm('Send this ' + channel.replace('_', ' ') + ' notification to ' + previewCount + ' recipient(s)? This action cannot be recalled.')) return;
     setDispatchBusy(true); setError(''); setNotice('');
     try {
       const token = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
       if (!token) throw new Error('Could not obtain a Neon access token. Sign in again.');
-      const response = await fetch('/api/communications-send', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send', templateKey: selected.template_key, audience, recipientEmail: recipientEmail.trim(), confirmSend: true, confirmCount: previewCount }) });
-      const result = await response.json() as { ok?: boolean; recipientCount?: number; accepted?: number; failed?: number; error?: string; eventId?: string };
-      if (!response.ok && response.status !== 207) throw new Error(result.error || 'Email send failed.');
-      setNotice('Email campaign recorded (' + (result.eventId || 'event saved') + '): ' + Number(result.accepted || 0) + ' accepted, ' + Number(result.failed || 0) + ' failed. Accepted means Resend accepted the message, not guaranteed inbox delivery.');
+      const endpoint = channel === 'email' ? '/api/communications-send' : '/api/communications-notifications';
+      const payload = channel === 'email'
+        ? { action: 'send', templateKey: selected?.template_key, audience, recipientEmail: recipientEmail.trim(), confirmSend: true, confirmCount: previewCount }
+        : { action: 'send', channel, title: subject.trim(), message: message.trim(), audience, recipientEmail: recipientEmail.trim(), confirmSend: true, confirmCount: previewCount };
+      const response = await fetch(endpoint, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const result = await response.json() as { ok?: boolean; recipientCount?: number; accepted?: number; failed?: number; noDevice?: number; error?: string; eventId?: string; note?: string };
+      if (!response.ok && response.status !== 207) throw new Error(result.error || 'Notification send failed.');
+      setNotice('Notification recorded (' + (result.eventId || 'event saved') + '): ' + Number(result.accepted || 0) + ' accepted, ' + Number(result.failed || 0) + ' failed, ' + Number(result.noDevice || 0) + ' without a registered device. ' + (result.note || ''));
       setPreviewCount(null);
+      if (channel !== 'email') { setSubject(''); setMessage(''); }
       await load();
-    } catch (e) { setError(e instanceof Error ? e.message : 'Email send failed.'); }
+    } catch (e) { setError(e instanceof Error ? e.message : 'Notification send failed.'); }
     finally { setDispatchBusy(false); }
   };
 
@@ -273,19 +283,25 @@ export function CommunicationsAdmin() {
       {!loading && section === 'automations' ? <div className={card}><div className="mb-4"><h3 className="text-base font-semibold text-white">Automation rules</h3><p className="mt-1 text-xs text-zinc-500">Website enquiry, consultation and app-waitlist acknowledgements can be enabled after the migration and Resend sender are configured. App/scheduled rules stay locked until their event handlers are implemented.</p></div><AdminTable rows={rules.map((rule) => ({ ...rule, state: rule.enabled ? 'Enabled' : 'Disabled', trigger: rule.trigger_key, template: rule.template_key }))} empty="No automation rules loaded. Apply the prepared communications migration after review." cols={[{key:'name',label:'Rule'},{key:'trigger',label:'Trigger'},{key:'channel',label:'Channel'},{key:'template',label:'Template'},{key:'state',label:'Control',render:(rule) => ['website-enquiry-acknowledgement','consultation-confirmation','app-waitlist-acknowledgement'].includes(String(rule.rule_key)) ? <button type="button" disabled={Boolean(ruleBusyKey)} onClick={() => void toggleRule(rule)} className={btnGhost}>{ruleBusyKey === rule.rule_key ? 'Saving…' : rule.enabled ? 'Enabled · disable' : 'Disabled · enable'}</button> : <span className="text-xs text-zinc-500">Locked · trigger pending</span>},{key:'delay_minutes',label:'Delay (min)'}]} /></div> : null}
       {!loading && section === 'history' ? <div className={card}><h3 className="mb-4 text-base font-semibold text-white">Notification &amp; email history</h3><AdminTable rows={events.map((event) => ({ ...event, time: event.created_at ? new Date(String(event.created_at)).toLocaleString('en-GB') : '—' }))} empty="No communication events recorded yet." cols={[{key:'time',label:'Created'},{key:'source',label:'Source'},{key:'channel',label:'Channel'},{key:'category',label:'Category'},{key:'subject',label:'Subject / message'},{key:'status',label:'Status'}]} /></div> : null}
       {!loading && section === 'compose' ? <div className={card}>
-        <div className="mb-4"><h3 className="text-base font-semibold text-white">Email composer</h3><p className="mt-1 text-xs text-zinc-500">Choose a saved template, preview the exact eligible recipient count, then confirm the send. Marketing sends are restricted to consented subscribers.</p></div>
+        <div className="mb-4"><h3 className="text-base font-semibold text-white">Email &amp; notification composer</h3><p className="mt-1 text-xs text-zinc-500">Send an individual message or reviewed broadcast. Always preview the current audience count before confirming a send.</p></div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Email template<select className={inp} value={selectedId} onChange={(e) => { setSelectedId(e.target.value); setPreviewCount(null); }}><option value="">Choose template…</option>{templates.filter((t) => t.enabled && t.channel === 'email').map((t) => <option key={t.id} value={t.id}>{t.name} · {t.category}</option>)}</select></label>
-          <label className="grid gap-1.5 text-xs text-zinc-400">Recipient type<select className={inp} value={audience} onChange={(e) => { setAudience(e.target.value); setPreviewCount(null); }}><option value="individual">One person / individual</option><option value="members">All members (transactional/service only)</option><option value="consented-marketing">Consented marketing subscribers</option></select></label>
-          {audience === 'individual' ? <label className="grid gap-1.5 text-xs text-zinc-400">Recipient email<input className={inp} type="email" value={recipientEmail} onChange={(e) => { setRecipientEmail(e.target.value); setPreviewCount(null); }} maxLength={254} placeholder="member@example.com" /></label> : <div className="rounded-xl border border-white/[0.07] bg-black/10 p-3 text-xs leading-5 text-zinc-400">The server rechecks audience eligibility at send time. Marketing recipients must have active recorded consent and no unsubscribe/suppression.</div>}
-          <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Selected template subject<input className={inp} value={String(selected?.subject || '')} readOnly /></label>
+          <label className="grid gap-1.5 text-xs text-zinc-400">Channel<select className={inp} value={channel} onChange={(e) => { setChannel(e.target.value); setPreviewCount(null); if (e.target.value !== 'email' && audience === 'consented-marketing') setAudience('members'); }}><option value="email">Branded email</option><option value="push">App push notification</option><option value="in_app">In-app member inbox</option></select></label>
+          <label className="grid gap-1.5 text-xs text-zinc-400">Audience<select className={inp} value={audience} onChange={(e) => { setAudience(e.target.value); setPreviewCount(null); }}><option value="individual">One member / individual</option><option value="members">All members (max 100 for app notifications)</option>{channel === 'email' ? <option value="consented-marketing">Consented marketing subscribers only</option> : null}</select></label>
+          {channel === 'email' ? <>
+            <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Email template<select className={inp} value={selectedId} onChange={(e) => { setSelectedId(e.target.value); setPreviewCount(null); }}><option value="">Choose template…</option>{templates.filter((t) => t.enabled && t.channel === 'email').map((t) => <option key={t.id} value={t.id}>{t.name} · {t.category}</option>)}</select></label>
+            <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Selected template subject<input className={inp} value={String(selected?.subject || '')} readOnly /></label>
+          </> : <>
+            <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Notification title<input className={inp} value={subject} onChange={(e) => { setSubject(e.target.value); setPreviewCount(null); }} maxLength={180} placeholder="What do members need to know?" /></label>
+            <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Message<textarea className={inp} rows={6} value={message} onChange={(e) => { setMessage(e.target.value); setPreviewCount(null); }} maxLength={2000} placeholder="Write the member notification…" /></label>
+          </>}
+          {audience === 'individual' ? <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Member email<input className={inp} type="email" value={recipientEmail} onChange={(e) => { setRecipientEmail(e.target.value); setPreviewCount(null); }} maxLength={254} placeholder="member@example.com" /><span className="text-[11px] text-zinc-500">For app notifications, this must match an existing member account.</span></label> : <p className="sm:col-span-2 rounded-xl border border-white/[0.07] bg-black/10 p-3 text-xs leading-5 text-zinc-400">{channel === 'email' && audience === 'consented-marketing' ? 'Only contacts with recorded active marketing consent are eligible; unsubscribed or suppressed addresses are excluded.' : 'The server recalculates and confirms the eligible member count at send time.'}</p>}
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <button type="button" disabled={dispatchBusy || !selected} onClick={() => void dispatchPreview()} className={btnGhost}>{dispatchBusy ? 'Checking…' : 'Preview recipient count'}</button>
-          <button type="button" disabled={dispatchBusy || previewCount === null || previewCount < 1 || !selected} onClick={() => void dispatchSend()} className={btn}><Send className="h-3.5 w-3.5" />{dispatchBusy ? 'Sending…' : previewCount === null ? 'Send email' : 'Send to ' + previewCount}</button>
+          <button type="button" disabled={dispatchBusy || (channel === 'email' && !selected)} onClick={() => void dispatchPreview()} className={btnGhost}>{dispatchBusy ? 'Checking…' : 'Preview recipient count'}</button>
+          <button type="button" disabled={dispatchBusy || previewCount === null || previewCount < 1 || (channel === 'email' && !selected)} onClick={() => void dispatchSend()} className={btn}><Send className="h-3.5 w-3.5" />{dispatchBusy ? 'Sending…' : previewCount === null ? 'Send notification' : 'Send to ' + previewCount}</button>
           {previewCount !== null ? <span className="text-xs text-orange-200">Preview: {previewCount} eligible recipient(s)</span> : null}
         </div>
-        <p className="mt-3 rounded-xl border border-orange-500/20 bg-orange-500/[0.05] p-3 text-xs leading-5 text-orange-100">A send requires staff authorization, an exact recipient-count confirmation, a saved enabled template and Resend credentials. Each recipient gets a separate idempotent send and an audit record. Test emails go only to the signed-in staff email.</p>
+        <p className="mt-3 rounded-xl border border-orange-500/20 bg-orange-500/[0.05] p-3 text-xs leading-5 text-orange-100">Every send requires staff authorization, a fresh exact recipient-count confirmation and an audit record. Marketing email is consent-filtered. Push delivery reports recipients without registered devices; the mobile app's token registration still needs to be completed separately.</p>
       </div> : null}
     </section>
   );
