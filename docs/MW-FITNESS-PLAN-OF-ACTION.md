@@ -122,3 +122,13 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Consolidated the online-plan-focused footer and direct privacy, cookie and account/data deletion links without the staff-login link or unverified insurance/qualification claims.
 - [x] Added the cookie policy screen, /cookies client route and Vercel SPA rewrite. The policy explicitly remains a draft until live cookies and third-party scripts are audited.
 - [ ] Reconcile the remaining stale open PRs against this consolidated branch before closing or merging them. Do not merge their branches wholesale because they diverged and may reintroduce compatibility aliases or older Neon code.
+
+
+## CRUD verification hardening — 2026-10-20
+
+- [x] Nutrition template/client-plan saves now require the API to return an affected row; a permission-filtered or missing-row update is no longer reported as saved.
+- [x] Package saves now verify an affected row for inserts and updates.
+- [x] Video library saves now validate non-negative whole-second duration, handle thrown network errors, reset the busy state in all cases, and verify a saved row before showing success.
+- [x] Staff profile edits now verify an affected row instead of treating a zero-row update as success.
+- [x] Added request sequencing to nutrition-plan and progress-log customer queries so a slower response for a previous customer cannot replace the current customer's rows.
+- [ ] These are source-level changes only until typecheck/build and interactive Neon CRUD checks pass. No GitHub Actions, local build, Neon migration or deployment has been run.
