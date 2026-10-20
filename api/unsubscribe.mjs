@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   }
   const email = String(req.query?.email ?? req.body?.email ?? '').trim().toLowerCase();
   const token = String(req.query?.token ?? req.body?.token ?? '');
-  if (!email || email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !validToken(email, token)) {
+  if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !validToken(email, token)) {
     return res.status(400).send('This unsubscribe link is invalid or has expired. Please contact MW Fitness for help.');
   }
 
