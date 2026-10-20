@@ -92,9 +92,11 @@ export function PlansAdmin() {
     if (!neon) { setMsg('Neon is not configured; no changes were made.'); return; }
     setBusy(true); setMsg('');
     try {
-      const { error } = await neon.from('plans').update({ active: !p.active }).eq('id', p.id);
-      setMsg(error ? `Could not update visibility: ${error.message}` : `${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);
-      if (!error) await load();
+      const result = await neon.from('plans').update({ active: !p.active }).eq('id', p.id).select('id');
+      if (result.error) { setMsg(`Could not update visibility: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('Visibility was not changed. The package may no longer exist or your staff permissions may not allow this change.'); return; }
+      setMsg(`${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);
+      await load();
     } catch {
       setMsg('Could not update plan visibility. Check the connection and retry.');
     } finally { setBusy(false); }
