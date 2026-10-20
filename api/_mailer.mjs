@@ -6,7 +6,7 @@
  *   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_TO
  *
  * SMTP_USER is the Gmail address the mail is sent FROM (use a Google App Password,
- * not your normal password). MAIL_TO defaults to mikeptonline@gmail.com.
+ * not your normal password). MAIL_TO defaults to mwfitnessukonline@gmail.com.
  */
 
 import nodemailer from 'nodemailer';
@@ -63,7 +63,7 @@ export async function sendContactEmail(payload) {
   const mail = renderEmail(data.kind, data);
 
   const { host, port, secure, auth } = smtpConfig();
-  const to = process.env.MAIL_TO || 'mikeptonline@gmail.com';
+  const to = process.env.MAIL_TO || 'mwfitnessukonline@gmail.com';
 
   const transporter = nodemailer.createTransport({ host, port, secure, auth });
   const info = await transporter.sendMail({
