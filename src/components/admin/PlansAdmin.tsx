@@ -29,7 +29,7 @@ export function PlansAdmin() {
 
   const blank = () => {
     setEdit({ id: '', active: true } as Row);
-    setF({ id: '', name: '', price: '', original_price: '', badge: '', kind: 'pt', cta_text: '', features: '[]', active: 'true' });
+    setF({ id: '', name: '', price: '', original_price: '', badge: '', kind: 'pt', cta_text: '', features: '', active: 'true' });
   };
 
   const save = async () => {
@@ -55,15 +55,10 @@ export function PlansAdmin() {
       kind: f.kind ?? 'pt',
       active: f.active === 'true',
     };
-    try {
-      const features = JSON.parse(f.features || '[]');
-      if (!Array.isArray(features) || features.some((item) => typeof item !== 'string')) throw new Error('Features must be an array of text values.');
-      body.features = features;
-    } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Features must be valid JSON (array of strings).');
-      setBusy(false);
-      return;
-    }
+    body.features = (f.features ?? '')
+      .split('\n')
+      .map((feature) => feature.trim())
+      .filter(Boolean);
     try {
       const { error } = edit?.id ? await neon.from('plans').update(body).eq('id', edit.id) : await neon.from('plans').insert(body);
       setMsg(error ? `Save failed: ${error.message}` : 'Package saved.');
@@ -126,7 +121,7 @@ export function PlansAdmin() {
             kind: String(p.kind ?? 'pt'),
             cta_text: String(p.cta_text ?? ''),
             description: String(p.description ?? ''),
-            features: JSON.stringify(p.features ?? [], null, 1),
+            features: Array.isArray(p.features) ? p.features.map(String).join('\n') : '',
             is_popular: p.is_popular ? 'true' : 'false',
             active: p.active ? 'true' : 'false',
           });
@@ -151,7 +146,7 @@ export function PlansAdmin() {
       />
       {edit && (
       <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className={`${card} w-full max-w-md max-h-[85vh] overflow-y-auto`}>
+        <div className={`${card} w-full max-w-2xl max-h-[85vh] overflow-y-auto`}>
           <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">{f.id ? `Edit plan — ${f.id}` : 'New plan'}</p>
           <div className="grid grid-cols-2 gap-2">
             <input className={inp} placeholder="id (e.g. bronze)" value={f.id ?? ''} disabled={Boolean(edit && edit.id)} onChange={(e) => setF({ ...f, id: e.target.value })} />
@@ -170,12 +165,17 @@ export function PlansAdmin() {
           <input className={`${inp} mt-2`} placeholder="short tag / subtitle" value={f.tag ?? ''} onChange={(e) => setF({ ...f, tag: e.target.value })} />
           <input className={`${inp} mt-2`} placeholder="description" value={f.description ?? ''} onChange={(e) => setF({ ...f, description: e.target.value })} />
           <input className={`${inp} mt-2`} placeholder="button text (e.g. Start coaching)" value={f.cta_text ?? ''} onChange={(e) => setF({ ...f, cta_text: e.target.value })} />
-          <textarea
-            className={`${inp} mt-2 min-h-20`}
-            placeholder={'features (JSON array, e.g. ["4 sessions", "plan tracked"])'}
-            value={f.features ?? '[]'}
-            onChange={(e) => setF({ ...f, features: e.target.value })}
-          />
+          <label className="mt-3 block text-xs text-zinc-400">
+            Package features (one per line)
+            <textarea
+              className={inp + ' mt-1 min-h-28'}
+              aria-label="Package features, one per line"
+              placeholder={'4 coaching sessions\nPersonalised plan\nProgress tracking'}
+              value={f.features ?? ''}
+              onChange={(e) => setF({ ...f, features: e.target.value })}
+            />
+            <span className="mt-1 block text-[10px] text-zinc-500">Each non-empty line becomes one feature on the public package card.</span>
+          </label>
           <div className="flex items-center gap-2 mt-3">
             <label className="text-[11px] text-zinc-500 uppercase">
               <input type="checkbox" checked={f.active === 'true'} onChange={(e) => setF({ ...f, active: e.target.checked ? 'true' : 'false' })} /> Active
