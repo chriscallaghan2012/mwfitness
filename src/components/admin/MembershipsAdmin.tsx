@@ -41,8 +41,9 @@ export function MembershipsAdmin() {
     setBusy(true);
     setMsg('');
     try {
-      const { error } = await neon.from('memberships').insert({ profile_id: form.profile_id, plan_id: form.plan_id, status: form.status ?? 'active' });
-      if (error) { setMsg(`Assignment failed: ${error.message}`); return; }
+      const result = await neon.from('memberships').insert({ profile_id: form.profile_id, plan_id: form.plan_id, status: form.status ?? 'active' }).select('id');
+      if (result.error) { setMsg(`Assignment failed: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('No membership was created. Check your staff permissions and try again.'); return; }
       setMsg('Plan assigned.');
       setForm({});
       await load();
@@ -56,8 +57,9 @@ export function MembershipsAdmin() {
   const remove = async (id: string) => {
     if (!neon) { setMsg('Neon is not configured; memberships cannot be removed.'); return; }
     try {
-      const { error } = await neon.from('memberships').delete().eq('id', id);
-      if (error) { setMsg(`Could not remove membership: ${error.message}`); return; }
+      const result = await neon.from('memberships').delete().eq('id', id).select('id');
+      if (result.error) { setMsg(`Could not remove membership: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('The membership was not removed. It may already be gone or your staff permissions may not allow this change.'); return; }
       setMsg('Membership removed.');
       await load();
     } catch (error) {
