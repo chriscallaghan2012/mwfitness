@@ -289,7 +289,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>
           ))}
         </div>
-        {plansLoading ? <p className="text-sm text-zinc-400 mt-4">Loading current packages…</p> : null}
+        {plansLoading ? <p className="text-sm text-zinc-400 mt-4">Loading online coaching plans…</p> : null}
         {!plansLoading && plansError ? <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p> : null}
       </section>
       {/* 4. ONLINE COACHING SPOTLIGHT */}
@@ -306,7 +306,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               onClick={() => onSelectScreen('online-coaching')}
               className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
             >
-              See online coaching plans
+              Explore online coaching
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
