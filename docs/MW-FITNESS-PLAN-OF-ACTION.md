@@ -242,3 +242,18 @@ This section supersedes older historical status notes above where they conflict 
 - [x] PR #40 branch (`fix/communications-preview-invalidation`) passes TypeScript and production build checks. It invalidates the cached recipient-count preview when template selection changes, template data refreshes, or template saving starts.
 - [x] PR #41 branch (`fix/marketing-unsubscribe-config-gate`) passes TypeScript and production build checks. It fails closed on marketing dispatch when the signed unsubscribe secret or public site URL is absent.
 - [ ] PR #40 and PR #41 remain unmerged. No live email was sent; no Neon migration was applied. Verify actual environment configuration and signed unsubscribe behaviour in a disposable/test environment before enabling marketing dispatch.
+
+
+## Website follow-up — security patch and current blockers (2026-10-20)
+
+- [x] Opened draft PR #42 to patch vulnerable compatible dependency resolutions in `package-lock.json` only; `package.json` ranges remain unchanged.
+- [x] Reinstalled from the committed lockfile in an isolated Vercel sandbox; `npm ci` passed.
+- [x] Full `npm audit --audit-level=high` now reports **0 vulnerabilities** on PR #42's branch.
+- [x] `npm run lint` / `tsc --noEmit` and `npm run build` passed on PR #42's branch.
+- [x] PR #40 (communications audience-preview invalidation) and PR #41 (fail-closed marketing unsubscribe configuration) each passed `npm run lint` and `npm run build` in the same isolated sandbox.
+- [ ] PR #40, #41 and #42 are still draft/unmerged; no CI was run. Keep the dependency/security changes off production until reviewed and approved.
+- [ ] Production HTTP check found `/api/plans?kind=online` returns four online packages, while `/api/plans?kind=pt` returns an empty list. Investigate the expected PT catalogue against current approved data; do not alter prices or production records based on assumption.
+- [ ] Production `/api/products` currently returns HTTP 503 because the swag catalogue is not available in the live database. The prepared swag migration is still unapplied; only review/test in a disposable Neon branch until explicitly approved.
+- [ ] Manual interactive browser QA (desktop/mobile, hover/focus, route navigation, forms), Staff HQ role checks, and Neon CRUD/RLS checks remain open. HTTP status checks and successful builds are not substitutes.
+- [ ] Existing successful builds still emit upstream Neon/Zod annotation warnings and a ~660 kB minified JavaScript chunk warning. Consider bundle splitting as a separate, measured improvement.
+- [ ] No GitHub Actions workflow, production deployment, shared Neon migration, or email send was run for this follow-up.
