@@ -1,6 +1,6 @@
 # MW Fitness — plan of action and test gates
 
-This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). Local testing and branch pushes only until Mike explicitly approves otherwise. Do not deploy, merge to main, run workflows/build submissions, or change the shared Neon database without approval.
+This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). Continue fixing the working branches and verify the changes before merging them to main. Do not deploy, run GitHub workflows/build submissions, or change the shared Neon database without explicit approval.
 
 ## Completed in this work batch
 - [x] Android nutrition day selector now loads and saves the selected calendar date rather than always reading/writing today's nutrition log.
@@ -35,7 +35,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] User approval still required before merge/deployment; this branch has not been merged to `main`.
 
 ## Must pass before any release
-1. **Website pricing** — use the local/staging browser console to capture the actual Neon query error; verify `VITE_NEON_AUTH_URL` and `VITE_NEON_DATA_API_URL` are present in the intended environment, and verify active `plans` rows plus anonymous SELECT/RLS/grants for public pricing. Do not hard-code a price fallback or mask missing live prices with demo values.
+1. **Website pricing** — user confirms public pricing currently displays correctly on the live site. Do not treat pricing as a live incident or change its data flow without a reproducible failure. Keep the Neon-backed implementation and never add hard-coded fallback prices.
 2. **Staff HQ access** — test real coach and admin accounts; confirm non-staff accounts are rejected; review RLS policies for every staff-read and write table. Keep demo mode browser-local and ensure it cannot write to Neon.
 3. **Staff HQ CRUD** — exercise create/edit/delete/assign flows for users, plans, memberships, nutrition, workouts, programmes, videos, check-ins, progress, messages, leads, and member activity. Verify validation, loading, empty, missing-schema, permission-denied, retry, and save-failure states.
 4. **Shared backend** — verify migration history and schema in a disposable Neon branch first. Never apply migrations to the shared production database as part of this task. Validate the nutrition tables/log unique key and the member activity tables/policies.
@@ -46,13 +46,12 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 
 ## Progress update — remaining tracks
 - [ ] Run website TypeScript/build/lint and Android Expo lint/typecheck locally; this environment has GitHub source access but no verified repository checkout/build output.
-- [ ] Verify the pricing query's actual runtime error from browser console and environment; logging has been added, but the underlying cause is not yet confirmed.
+- [x] Pricing status corrected: the user confirms prices display correctly on the live website. No pricing outage/root cause is asserted; retain the existing Neon-only implementation and only investigate again if a reproducible failure is reported.
 - [ ] Capture the Android launch crash trace from the installed test APK/device. Startup diagnostic handling exists, but the crash is not claimed fixed without the actual error.
 - [ ] Continue Staff HQ CRUD and authorization/RLS audit against disposable test data, including all save/delete paths; recent hardening now covers nutrition, plan catalogue, programme visibility, workout deletion, user, membership, progress/check-in and workout loading paths, but is not a complete permission audit.
 - [ ] Access control: product intent is one coach/operator with staff access and trainee accounts. The routine user editor no longer changes roles. Still verify that new sign-ups default to trainee access and deployed RLS prevents trainees from reading or writing other clients' records; do not apply the documented draft trigger to shared production without testing the deployed auth mapping.
 
 ## Known blocked items / not claimed complete
-- Pricing's underlying environment/database cause is not yet observable from repository source alone; browser console + intended Vercel/local env and Neon permissions must be checked.
 - The reported immediate Android launch crash requires a real crash trace to diagnose.
 - Video storage/upload, video-to-programme assignment, programme schema, and verified server-side Neon Auth account deletion need schema/API/security review before implementation or use.
 - No production database changes, merges to `main`, Vercel deployments, EAS builds, or Play submissions have been performed.
@@ -105,5 +104,4 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Android CI remains blocked at `npm ci`: lockfile is missing `ajv@8.20.0`, `fast-uri@3.1.8`, `json-schema-traverse@1.0.0`, and `require-from-string@2.0.2`. The lockfile repair workflow is manual-only and has not been dispatched.
 - [ ] Run the website and Android manual verification workflows after the user authorises/runs them; no fresh lint, build, or device-test pass is claimed.
 
-- [x] Pricing root-cause investigation (read-only): the current production deployment is still on `main`, whose `src/lib/plans.ts` uses the old Supabase client and lacks the Neon `api/plans.mjs` endpoint present on this working branch. This deployment/code mismatch is consistent with the persistent unavailable-pricing message.
-- [ ] Before final release, verify active `public.plans` rows and public read access against the intended Neon branch; do not expose secret values or add hard-coded prices. The fix is not live until the approved merge/deploy.
+- [x] Corrected an earlier inaccurate pricing diagnosis: the user confirms prices are working on the live site. The legacy `supabase` filename/variable names found on `main` are compatibility names around the Neon SDK, not evidence that the project uses Supabase as its backend. Do not describe pricing as broken or change working live pricing without fresh evidence.
