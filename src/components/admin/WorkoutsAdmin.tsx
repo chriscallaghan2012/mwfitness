@@ -1,5 +1,5 @@
 // WorkoutsAdmin — template exercises + per-customer session schedule.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
@@ -12,6 +12,7 @@ export function WorkoutsAdmin() {
   const [msg, setMsg] = useState('');
   const [form, setForm] = useState<Record<string, string>>({});
   const [sessForm, setSessForm] = useState<Record<string, string>>({});
+  const sessionLoadRequest = useRef(0);
 
   const load = async () => {
     if (!neon) { setMsg('Neon is not configured; live workouts cannot be loaded.'); setTemplates([]); setSessions([]); return; }
@@ -32,13 +33,18 @@ export function WorkoutsAdmin() {
     }
   };
   const loadSessions = async (profileId = userId) => {
+    const requestId = ++sessionLoadRequest.current;
     if (!profileId) { setSessions(null); return; }
     if (!neon) { setMsg('Neon is not configured; sessions cannot be loaded.'); setSessions([]); return; }
+    setSessions([]);
     try {
       const { data, error } = await neon.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', profileId).order('scheduled_on');
-      if (error) { setMsg(`Could not load sessions: ${error.message}`); return; }
+      if (requestId !== sessionLoadRequest.current) return;
+      if (error) { setMsg(`Could not load sessions: ${error.message}`); setSessions([]); return; }
       setSessions((data ?? []) as Row[]);
     } catch (error) {
+      if (requestId !== sessionLoadRequest.current) return;
+      setSessions([]);
       setMsg(`Could not load sessions: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
   };
