@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, StatusPill, btn, btnGhost, card, inp } from './fields';
+import { MealSectionsEditor } from './MealSectionsEditor';
 
 export function NutritionAdmin() {
   const [mode, setMode] = useState<'templates' | 'plans'>('templates');
@@ -68,10 +69,27 @@ export function NutritionAdmin() {
     let targets: Record<string, unknown> = {};
     let sections: unknown[] = [];
     try {
-      targets = JSON.parse(f.targets || '{}');
-      sections = JSON.parse(f.sections || '[]');
-    } catch {
-      setMsg('Targets / sections must be valid JSON.');
+      const parsedTargets: unknown = JSON.parse(f.targets || '{}');
+      const parsedSections: unknown = JSON.parse(f.sections || '[]');
+      if (!parsedTargets || typeof parsedTargets !== 'object' || Array.isArray(parsedTargets) || !Array.isArray(parsedSections)) {
+        throw new Error('Targets must be a JSON object and meal sections must be a JSON array.');
+      }
+      targets = { ...(parsedTargets as Record<string, unknown>) };
+      sections = parsedSections;
+      // Guided fields override only the standard nutrition targets. Any other
+      // metadata already stored in targets is preserved when saving.
+      for (const key of ['calories', 'protein', 'carbs', 'fats', 'water_ml']) {
+        const raw = f[key]?.trim() ?? '';
+        if (!raw) {
+          delete targets[key];
+          continue;
+        }
+        const number = Number(raw);
+        if (!Number.isFinite(number) || number < 0) throw new Error('Nutrition targets must be non-negative numbers.');
+        targets[key] = number;
+      }
+    } catch (error) {
+      setMsg(error instanceof Error ? error.message : 'Nutrition targets and meal sections are invalid.');
       setBusy(false);
       return;
     }
@@ -180,7 +198,12 @@ export function NutritionAdmin() {
           setF({
             name: String(r.name ?? ''),
             description: String(r.description ?? ''),
-            targets: JSON.stringify(r.targets ?? {}, null, 1),
+            targets: JSON.stringify(r.targets ?? {}),
+            calories: String((r.targets as Row)?.calories ?? ''),
+            protein: String((r.targets as Row)?.protein ?? ''),
+            carbs: String((r.targets as Row)?.carbs ?? ''),
+            fats: String((r.targets as Row)?.fats ?? ''),
+            water_ml: String((r.targets as Row)?.water_ml ?? ''),
             sections: JSON.stringify(r.sections ?? [], null, 1),
             active: r.active ? 'true' : 'false',
             day_type: String(r.day_type ?? 'training'),
@@ -197,7 +220,7 @@ export function NutritionAdmin() {
       <button
         onClick={() => {
           setEdit({ id: '', active: true } as Row);
-          setF({ name: '', description: '', targets: '{"calories":2000,"protein":150,"carbs":200,"fats":60,"water_ml":3500}', sections: '[]', active: 'true', day_type: 'training' });
+          setF({ name: '', description: '', targets: '{"calories":2000,"protein":150,"carbs":200,"fats":60,"water_ml":3500}', calories: '2000', protein: '150', carbs: '200', fats: '60', water_ml: '3500', sections: '[]', active: 'true', day_type: 'training' });
         }}
         className={btn}
       >
@@ -215,8 +238,28 @@ export function NutritionAdmin() {
             <option value="training">Training day</option>
             <option value="non_training">Non-training day</option>
           </select>
-          <textarea className={`${inp} mt-2 min-h-16`} placeholder='targets JSON {"calories":2000,"protein":150}' value={f.targets ?? '{}'} onChange={(e) => setF({ ...f, targets: e.target.value })} />
-          <textarea className={`${inp} mt-2 min-h-32`} placeholder='sections JSON [{"name":"BREAKFAST","items":[{"name":"…","sub":"…","calories":0,"protein":0}]}]' value={f.sections ?? '[]'} onChange={(e) => setF({ ...f, sections: e.target.value })} />
+          <p className="mb-1 mt-3 text-[11px] uppercase text-zinc-500">Daily targets</p>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              ['calories', 'Calories (kcal)'],
+              ['protein', 'Protein (g)'],
+              ['carbs', 'Carbs (g)'],
+              ['fats', 'Fats (g)'],
+              ['water_ml', 'Water (ml)'],
+            ] as const).map(([key, label]) => (
+              <label key={key} className="text-xs text-zinc-400">
+                {label}
+                <input type="number" min="0" step="1" className={inp + ' mt-1'} value={f[key] ?? ''} onChange={(e) => setF({ ...f, [key]: e.target.value })} />
+              </label>
+            ))}
+          </div>
+          <details className="mt-3">
+            <summary className="cursor-pointer text-xs text-zinc-500">Advanced target metadata (JSON)</summary>
+            <textarea className={inp + ' mt-2 min-h-24 font-mono text-xs'} aria-label="Advanced nutrition target metadata" value={f.targets ?? '{}'} onChange={(e) => setF({ ...f, targets: e.target.value })} />
+            <p className="mt-1 text-[10px] text-zinc-500">Unknown target fields are preserved when the guided fields are saved.</p>
+          </details>
+          <p className="mb-1 mt-4 text-[11px] uppercase text-zinc-500">Meal plan</p>
+          <MealSectionsEditor value={f.sections ?? '[]'} onChange={(value) => setF({ ...f, sections: value })} />
           <label className="text-[11px] text-zinc-500 uppercase flex items-center gap-2 mt-2">
             <input type="checkbox" checked={f.active === 'true'} onChange={(e) => setF({ ...f, active: e.target.checked ? 'true' : 'false' })} />
             Active
