@@ -1,5 +1,5 @@
 // CheckinsAdmin + ProgressAdmin — coach review of check-ins and weight logs.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, StatusPill, btn, btnGhost, inp } from './fields';
 
@@ -92,6 +92,7 @@ export function ProgressAdmin() {
   const [userId, setUserId] = useState('');
   const [weight, setWeight] = useState('');
   const [msg, setMsg] = useState('');
+  const loadRequest = useRef(0);
 
   useEffect(() => {
     if (!neon) { setMsg('Neon is not configured; progress records cannot be loaded.'); return; }
@@ -102,15 +103,18 @@ export function ProgressAdmin() {
   }, []);
 
   const load = async (profileId = userId) => {
+    const requestId = ++loadRequest.current;
     if (!profileId) { setRows(null); return; }
     if (!neon) { setMsg('Neon is not configured; progress records cannot be loaded.'); setRows([]); return; }
     // Never leave the previous customer's weigh-ins visible during a new query.
     setRows([]);
     try {
       const { data, error } = await neon.from('progress_logs').select('*').eq('profile_id', profileId).order('recorded_on', { ascending: false });
+      if (requestId !== loadRequest.current) return;
       if (error) { setMsg(`Could not load progress: ${error.message}`); setRows([]); }
       else { setRows((data ?? []) as Row[]); setMsg(''); }
     } catch (error) {
+      if (requestId !== loadRequest.current) return;
       setRows([]);
       setMsg(`Could not load progress: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
