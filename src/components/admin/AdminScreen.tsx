@@ -471,7 +471,7 @@ export function AdminScreen() {
     );
   }
   return (
-    <div className="w-full px-3 py-5 sm:px-5 lg:px-6 xl:px-8">
+    <div className="w-full px-3 pb-5 pt-1 sm:px-5 lg:px-6 xl:px-8">
       <div className="mx-auto w-full max-w-[1680px]">
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-bold text-white">MWFitnessUK HQ</h1>
@@ -591,7 +591,7 @@ export function AdminScreen() {
             <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-orange-300">Coach workspace · sandbox</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Your coaching command centre.</h2>
+                <h2 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Your coaching command centre.</h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-300">Explore a populated example workspace, edit records and test the management flows. Everything here is fictional and stays in this browser session.</p>
               </div>
               <button type="button" onClick={() => setTab('users')} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-black shadow-lg shadow-orange-950/30 transition hover:bg-orange-400">Open clients <span aria-hidden="true">↗</span></button>
@@ -652,7 +652,29 @@ export function AdminScreen() {
           </div>
         </div>
       )}
-      {demoMode && tab !== 'overview' && (
+      {demoMode && tab === 'communications' && (
+        <section className={`${card} !rounded-2xl !border-orange-500/20 !bg-[#131519] space-y-5`}>
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Live tools · sign-in required</p>
+            <h2 className="mt-2 text-xl font-semibold text-white">Email &amp; notifications</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">This is a demo workspace. We do not show fake email templates or pretend sample broadcasts are real. Exit demo and sign in to access the live communications centre.</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {[
+              { title: 'Email template studio', detail: 'Edit subject, preheader, HTML and plain text with a rendered preview and versioning.' },
+              { title: 'Individual email & broadcasts', detail: 'Select one member or an eligible audience, preview recipient counts and confirm before sending.' },
+              { title: 'Notifications', detail: 'Compose push and in-app notifications with explicit delivery outcomes.' },
+              { title: 'Automations', detail: 'Manage supported website acknowledgement triggers; unsupported app/scheduled triggers stay locked.' },
+              { title: 'Delivery history', detail: 'Review communication events and failures rather than invented sample records.' },
+            ].map((item) => <div key={item.title} className="rounded-xl border border-white/[0.07] bg-black/10 p-4"><h3 className="text-sm font-medium text-white">{item.title}</h3><p className="mt-2 text-xs leading-5 text-zinc-400">{item.detail}</p></div>)}
+          </div>
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-orange-500/15 bg-orange-500/[0.04] p-4">
+            <p className="flex-1 text-xs leading-5 text-zinc-400">Live communications data requires the reviewed communications schema and a verified sender configuration. No migration or email is triggered from demo mode.</p>
+            <button type="button" onClick={exitDemo} className={btn}>Exit demo and sign in</button>
+          </div>
+        </section>
+      )}
+      {demoMode && tab !== 'overview' && tab !== 'communications' && (
         <div className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519] space-y-5`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
