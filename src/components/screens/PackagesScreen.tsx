@@ -6,10 +6,9 @@ import { ScreenId } from '../../types';
 
 interface PackagesScreenProps {
   onSelectScreen: (screen: ScreenId) => void;
-  onOpenBookCall: (interest?: string) => void;
 }
 
-export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onSelectScreen, onOpenBookCall }) => {
+export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onSelectScreen }) => {
   const [plans, setPlans] = useState<PublicPlan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
   const [plansError, setPlansError] = useState<string | null>(null);
