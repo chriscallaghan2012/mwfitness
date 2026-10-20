@@ -100,7 +100,7 @@ export default function App() {
           <HomeScreen onSelectScreen={handleSelectScreen} onOpenBookCall={handleOpenBookCall} />
         )}
         {(currentScreen === 'online-coaching' || currentScreen === 'packages') && (
-          <PackagesScreen onSelectScreen={handleSelectScreen} onOpenBookCall={handleOpenBookCall} />
+          <PackagesScreen onSelectScreen={handleSelectScreen} />
         )}
         {currentScreen === 'app' && (
           <AppScreen onOpenBookCall={handleOpenBookCall} />
