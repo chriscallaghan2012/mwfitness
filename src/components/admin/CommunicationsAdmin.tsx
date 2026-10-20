@@ -34,6 +34,7 @@ export function CommunicationsAdmin() {
   const [previewCount, setPreviewCount] = useState<number | null>(null);
   const [dispatchBusy, setDispatchBusy] = useState(false);
   const [ruleBusyKey, setRuleBusyKey] = useState('');
+  const [creatingTemplate, setCreatingTemplate] = useState(false);
 
   const load = useCallback(async () => {
     if (!neon) {
@@ -138,6 +139,30 @@ export function CommunicationsAdmin() {
     }
   };
 
+  const createTemplate = async () => {
+    if (!neon) { setError('Neon is not configured.'); return; }
+    const name = window.prompt('Name for the new email template', 'New email template');
+    if (!name || !name.trim()) return;
+    const key = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 72);
+    if (key.length < 2) { setError('Choose a longer template name.'); return; }
+    setCreatingTemplate(true); setError(''); setNotice('');
+    try {
+      const { data: session, error: sessionError } = await neon.auth.getSession({ query: {} });
+      if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
+      const { data, error: insertError } = await neon.from('communication_templates').insert({
+        template_key: key, name: name.trim(), channel: 'email', category: 'service', subject: name.trim(),
+        preheader: '', html_body: '<h1 style="color:#17191d">' + name.trim() + '</h1><p>Write your email content here.</p>',
+        text_body: name.trim() + '\\n\\nWrite your email content here.', enabled: false, version: 1, updated_by: session.user.id,
+      }).select('id');
+      if (insertError) throw insertError;
+      if (!data?.length) throw new Error('Template was not created. Check the communications migration and staff permissions.');
+      await load();
+      setSelectedId(String(data[0].id));
+      setNotice('Draft template created and disabled. Review the content, preview it and save before enabling it.');
+    } catch (e) { setError(e instanceof Error ? e.message : 'Could not create a template.'); }
+    finally { setCreatingTemplate(false); }
+  };
+
   const dispatchPreview = async () => {
     if (!neon || !selected) { setError('Select an enabled email template first.'); return; }
     if (audience === 'individual' && !/^[^\s@]+@[^\s@]+\\.[^\s@]+$/.test(recipientEmail.trim())) { setError('Enter a valid individual recipient email.'); return; }
@@ -227,7 +252,7 @@ export function CommunicationsAdmin() {
         <div className={card}><h3 className="text-base font-semibold text-white">What this centre will control</h3><div className="mt-4 grid gap-3 md:grid-cols-2">{[{title:'Automated notifications',body:'Review trigger rules, message content, status and recipient-level delivery outcomes.'},{title:'Manual broadcasts',body:'Prepare announcements for a selected audience, with consent checks and a final send confirmation.'},{title:'Branded email studio',body:'Edit subject, preheader, HTML and plain-text fallback, then preview the email before publishing.'},{title:'Audit & delivery history',body:'Track queued, accepted, delivered, failed, bounced and unsubscribed deliveries.'}].map((item) => <div key={item.title} className="rounded-xl border border-white/[0.07] bg-black/10 p-4"><h4 className="text-sm font-medium text-white">{item.title}</h4><p className="mt-1 text-xs leading-5 text-zinc-400">{item.body}</p></div>)}</div></div>
       </> : null}
       {!loading && section === 'templates' ? <div className={card}>
-        <div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="text-base font-semibold text-white">Editable email templates</h3><p className="mt-1 text-xs text-zinc-500">Changes save to Neon and increment the template version. Saving does not send an email.</p></div>{selected ? <span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-[10px] uppercase text-orange-300">v{selected.version ?? 1}</span> : null}</div>
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="text-base font-semibold text-white">Editable email templates</h3><p className="mt-1 text-xs text-zinc-500">Changes save to Neon and increment the template version. Saving does not send an email.</p></div><div className="flex items-center gap-2">{selected ? <span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-[10px] uppercase text-orange-300">v{selected.version ?? 1}</span> : null}<button type="button" disabled={creatingTemplate} onClick={() => void createTemplate()} className={btnGhost}>{creatingTemplate ? "Creating…" : "+ New template"}</button></div></div>
         {templates.length === 0 ? <p className="mt-4 text-sm text-zinc-400">No live templates loaded. Apply the approved migration before editing templates.</p> : <div className="mt-4 grid gap-5 xl:grid-cols-[260px_minmax(0,1fr)]">
           <div className="space-y-2">{templates.map((template) => <button key={template.id} type="button" onClick={() => setSelectedId(template.id)} className={selectedId === template.id ? 'w-full rounded-xl border border-orange-500/40 bg-orange-500/[0.08] p-3 text-left' : 'w-full rounded-xl border border-white/[0.07] bg-black/10 p-3 text-left hover:border-white/20'}><span className="block text-sm font-medium text-white">{template.name}</span><span className="mt-1 block text-[10px] uppercase tracking-wider text-zinc-500">{template.category} · {template.enabled ? 'enabled' : 'disabled'}</span></button>)}</div>
           {selected ? <div className="min-w-0 space-y-4">
