@@ -257,3 +257,8 @@ This section supersedes older historical status notes above where they conflict 
 - [ ] Manual interactive browser QA (desktop/mobile, hover/focus, route navigation, forms), Staff HQ role checks, and Neon CRUD/RLS checks remain open. HTTP status checks and successful builds are not substitutes.
 - [ ] Existing successful builds still emit upstream Neon/Zod annotation warnings and a ~660 kB minified JavaScript chunk warning. Consider bundle splitting as a separate, measured improvement.
 - [ ] No GitHub Actions workflow, production deployment, shared Neon migration, or email send was run for this follow-up.
+
+
+### Read-only route smoke checks
+- [x] `/online-coaching`, `/shwag`, `/contact`, `/admin`, `/privacy`, `/cookies`, and `/delete-account` each returned HTTP 200 and the SPA HTML shell from production.
+- [ ] The route checks did not execute client-side JavaScript or verify page visuals/forms; complete real browser QA when a browser runner is available.
