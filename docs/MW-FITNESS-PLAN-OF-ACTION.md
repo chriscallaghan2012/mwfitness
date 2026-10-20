@@ -142,7 +142,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 
 ## Website completion track — Staff HQ, swag and Resend (2026-10-20)
 
-### Merged into `main` via PRs #22–#25 (not deployed; prepared migrations have not been applied)
+### Merged into `main` via PRs #22–#26 (not deployed; prepared migrations have not been applied)
 
 - [x] Added a server-side Resend dispatch endpoint for authenticated coach/admin users, with individual sends, member audiences, consent-filtered marketing audiences, exact recipient-count confirmation, per-recipient idempotency keys, and event/delivery audit rows.
 - [x] Routed Staff HQ test sends through Resend so a test can only target the signed-in staff member.
@@ -156,6 +156,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Seeded the four existing advertised products (Classic SHWAG T-Shirt, SHWAG Hoodie, SHWAG Gym Bag and SHWAG Water Bottle) as enquiry-only with no invented prices, sizes, images or stock claims; added an enquiry-only status to Staff HQ.
 - [x] Kept those existing SHWAG items visible as an enquiry-only fallback if the product API is unavailable before migration setup.
 - [x] Hardened Staff HQ programme CRUD/assignment/visibility and video delete/visibility actions with confirmed-row checks, error handling and busy-state guards.
+- [x] Added confirmed-row checks for lead-status updates and workout template/session inserts so the UI cannot report success when no row was saved.
 
 ### Required before real sends / production use
 
