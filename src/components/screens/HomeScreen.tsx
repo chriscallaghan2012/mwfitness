@@ -234,63 +234,41 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </section>
 
-      {/* 4. WHAT'S AVAILABLE */}
+      {/* 4. ONLINE COACHING PACKAGES — keep the homepage aligned with the live coaching catalogue */}
       <section id="packages-overview" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
-              [ WHAT'S AVAILABLE ]
-            </div>
-            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-              PACKAGES THAT FIT YOUR WEEK.
-            </h2>
+            <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ CHOOSE YOUR PLAN ]</div>
+            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">PACKAGES THAT FIT YOUR WEEK.</h2>
+            <p className="text-sm text-zinc-400 mt-3 max-w-2xl">The same online coaching packages, live prices and key benefits you'll find on our Online Coaching page.</p>
           </div>
-          <button
-            onClick={() => onSelectScreen('online-coaching')}
-            className="text-xs font-mono text-zinc-400 hover:text-white uppercase tracking-wider flex items-center gap-1.5 group"
-          >
-            <span>Explore online coaching</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <button onClick={() => onSelectScreen('online-coaching')} className="text-xs font-mono text-zinc-400 hover:text-white uppercase tracking-wider flex items-center gap-1.5 group shrink-0">
+            <span>Compare all plan details</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {plans.map((tier) => (
-            <div
-              key={tier.id}
-              className={`bg-[#121419] border p-6 flex flex-col relative group transition-all duration-300 ${
-                tier.is_popular ? 'border-[#ff5500] shadow-[0_0_20px_rgba(255,85,0,0.15)]' : 'border-[#20232b] hover:border-[#ff5500]/50'
-              }`}
-            >
-              {tier.is_popular && (
-                <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-2.5 py-1 font-bold">
-                  {tier.badge}
-                </span>
-              )}
-              <div className="text-3xl font-display text-[#ff5500] font-bold mb-2">{tier.name}</div>
-              <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-4">{tier.tag}</div>
-
-              <p className="text-xs font-sans text-zinc-400 leading-relaxed mb-4">{tier.description}</p>
-
-              <div className="mt-auto pt-2">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-display text-3xl text-white font-bold">£{tier.price.toLocaleString('en-GB')}</span>
-                  {tier.original_price && (
-                    <span className="text-xs font-mono text-zinc-500 line-through">£{tier.original_price.toLocaleString('en-GB')}</span>
-                  )}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
+          {plans.map((plan) => (
+            <article key={plan.id} className={'bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b] hover:border-[#ff5500]/50')}>
+              {plan.badge && <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">{plan.badge}</span>}
+              <div className="flex items-start justify-between gap-4">
+                <div><h3 className="font-display text-3xl text-white uppercase">{plan.name}</h3><p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">{plan.tag}</p></div>
+                <div className="text-right shrink-0">
+                  <div className="font-display text-3xl text-white">£{plan.price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  {plan.original_price !== null && <div className="text-xs font-mono text-zinc-500 line-through">£{plan.original_price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>}
                 </div>
-                <button
-                  onClick={() => onOpenBookCall(tier.name)}
-                  className="mt-2 w-full bg-[#16181d] border border-[#2b303d] hover:bg-[#ff5500] hover:text-black text-white font-mono text-xs font-bold py-2.5 uppercase tracking-wider transition-all"
-                >
-                  {tier.cta_text}
-                </button>
               </div>
-            </div>
+              <p className="text-sm text-zinc-400 leading-relaxed mt-4">{plan.description}</p>
+              <ul className="mt-5 space-y-2.5 text-sm text-zinc-300">
+                {plan.features.slice(0, 3).map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}
+              </ul>
+              <button onClick={() => onSelectScreen('online-coaching')} className="mt-7 bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
+                View plan &amp; checkout <ArrowRight className="w-4 h-4" />
+              </button>
+            </article>
           ))}
         </div>
-        {plansLoading ? <p className="text-sm text-zinc-400 mt-4">Loading online coaching plans…</p> : null}
-        {!plansLoading && plansError ? <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p> : null}
+        {plansLoading && <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p>}
+        {!plansLoading && plansError && <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p>}
       </section>
       {/* 4. ONLINE COACHING SPOTLIGHT */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
