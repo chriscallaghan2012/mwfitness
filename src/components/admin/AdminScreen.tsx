@@ -19,6 +19,7 @@ import { PasswordRecovery } from './PasswordRecovery';
 import { MemberActivityAdmin } from './MemberActivityAdmin';
 import { CommunicationsAdmin } from './CommunicationsAdmin';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
+import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
 type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'programmes' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads' | 'member-activity' | 'communications';
 
@@ -259,6 +260,8 @@ export function AdminScreen() {
   const [tab, setTab] = useState<Tab>('overview');
   const [stats, setStats] = useState<{ users: number; activeUsers: number; plans: number; activePlans: number; memberships: number; activeMemberships: number; leads: number | null; newLeads: number | null } | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [publicCatalogue, setPublicCatalogue] = useState<PublicPlan[] | null>(null);
+  const [publicCatalogueError, setPublicCatalogueError] = useState<string | null>(null);
   const [demoRows, setDemoRows] = useState<Record<DemoTab, Row[]>>(createDemoRows);
   const [demoEditorOpen, setDemoEditorOpen] = useState(false);
   const [demoEditId, setDemoEditId] = useState<string | null>(null);
@@ -289,23 +292,30 @@ export function AdminScreen() {
   const loadStats = async () => {
     if (!neon) {
       setStats(null);
+      setPublicCatalogue(null);
+      setPublicCatalogueError('Neon is not configured.');
       return;
     }
     setStatsLoading(true);
     try {
       // Live mode reads the shared Neon records. Do not fall back to demo rows
       // or invent revenue when live queries fail.
-      const [usersResult, plansResult, membershipsResult, leadsResult] = await Promise.all([
+      const [usersResult, plansResult, membershipsResult, leadsResult, publicPtResult, publicOnlineResult] = await Promise.all([
         neon.from('profiles').select('id,role,status', { count: 'exact' }),
         neon.from('plans').select('id,status,active', { count: 'exact' }),
         neon.from('memberships').select('id,status', { count: 'exact' }),
         neon.from('website_leads').select('id,status', { count: 'exact' }),
+        loadPublicPlans('pt'),
+        loadPublicPlans('online'),
       ]);
       if (usersResult.error || plansResult.error || membershipsResult.error) {
         setError('We could not load the live dashboard totals from Neon. Check staff permissions and the profiles, plans and memberships table policies, then refresh.');
         setStats(null);
         return;
       }
+      const publicResults = [publicPtResult, publicOnlineResult];
+      setPublicCatalogue(publicResults.flatMap((result) => result.plans));
+      setPublicCatalogueError(publicResults.find((result) => result.error)?.error ?? null);
       const users = usersResult.data ?? [];
       const plans = plansResult.data ?? [];
       const memberships = membershipsResult.data ?? [];
@@ -544,6 +554,23 @@ export function AdminScreen() {
               </div>
             </div>
             <p className="mt-4 text-xs leading-5 text-zinc-500">Revenue and sales are intentionally omitted until a verified transaction source is connected. Website package defaults are not counted as sales, and frontend/demo defaults are never substituted for live database records.</p>
+          </section>
+          <section className={`${card} !border-white/[0.08] !bg-[#131519]`}>
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+              <div><p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Public frontend feed</p><h3 className="mt-1 text-lg font-semibold text-white">Published website packages</h3><p className="mt-1 text-xs text-zinc-500">Read-only view of the same active Neon-backed catalogue the public pricing page requests.</p></div>
+              <button type="button" onClick={() => setTab('plans')} className={btnGhost}>Manage catalogue ↗</button>
+            </div>
+            {publicCatalogueError ? <p role="status" className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] p-3 text-sm text-amber-200">The public website catalogue could not be loaded: {publicCatalogueError} Prices are not being substituted with stale frontend examples.</p> : null}
+            {!publicCatalogueError && publicCatalogue === null ? <p className="text-sm text-zinc-500">Loading published website packages…</p> : null}
+            {!publicCatalogueError && publicCatalogue !== null && publicCatalogue.length === 0 ? <p className="rounded-xl border border-dashed border-white/[0.1] p-5 text-sm text-zinc-400">The public catalogue currently returns no active packages. Check Plans &amp; pricing before changing the published website data.</p> : null}
+            {!publicCatalogueError && publicCatalogue && publicCatalogue.length > 0 ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {publicCatalogue.map((plan) => <div key={plan.id} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
+                <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-sm font-semibold text-white">{plan.name}</p><p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-zinc-500">{plan.kind === 'pt' ? 'Personal training' : 'Online coaching'}{plan.tag ? ` · ${plan.tag}` : ''}</p></div><span className="shrink-0 rounded-lg border border-orange-500/20 bg-orange-500/[0.08] px-2.5 py-1.5 text-sm font-semibold text-orange-200">£{plan.price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                {plan.badge ? <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-orange-300">{plan.badge}</p> : null}
+                <p className="mt-2 line-clamp-2 text-xs leading-5 text-zinc-400">{plan.description || 'No description provided.'}</p>
+                <p className="mt-3 text-[10px] uppercase tracking-wider text-emerald-300">Published · active</p>
+              </div>)}
+            </div> : null}
           </section>
           <section className={`${card} !border-white/[0.08] !bg-[#131519]`}>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Quick actions</p><h3 className="mt-1 text-lg font-semibold text-white">Run your coaching business</h3>
