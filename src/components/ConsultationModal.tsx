@@ -208,7 +208,6 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
                 <label className="block text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">Interested in</label>
                 <select value={interest} onChange={(e) => setInterest(e.target.value)} className={inputClass}>
                   <option value="Not sure yet">Not sure yet</option>
-                  <option value="1-2-1 Personal Training">1-2-1 Personal Training</option>
                   <option value="Online Coaching">Online Coaching</option>
                   <option value="The App">The App</option>
                   <option value="SHWAG merch">SHWAG merch</option>
