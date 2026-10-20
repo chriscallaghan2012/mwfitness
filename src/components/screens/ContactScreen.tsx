@@ -75,7 +75,7 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
       {/* 2. CONTACT DETAILS + FORM */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 md:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Details */}
           <div className="lg:col-span-2 space-y-4">
