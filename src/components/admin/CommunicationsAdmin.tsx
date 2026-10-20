@@ -33,6 +33,7 @@ export function CommunicationsAdmin() {
   const [recipientEmail, setRecipientEmail] = useState('');
   const [previewCount, setPreviewCount] = useState<number | null>(null);
   const [dispatchBusy, setDispatchBusy] = useState(false);
+  const [ruleBusyKey, setRuleBusyKey] = useState('');
 
   const load = useCallback(async () => {
     if (!neon) {
@@ -171,6 +172,23 @@ export function CommunicationsAdmin() {
     finally { setDispatchBusy(false); }
   };
 
+  const toggleRule = async (rule: Row) => {
+    const supported = ['website-enquiry-acknowledgement', 'consultation-confirmation', 'app-waitlist-acknowledgement'];
+    if (!supported.includes(String(rule.rule_key))) { setError('This app or scheduled trigger is not wired yet, so it cannot be enabled.'); return; }
+    if (!neon) { setError('Neon is not configured.'); return; }
+    setRuleBusyKey(String(rule.rule_key)); setError(''); setNotice('');
+    try {
+      const token = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
+      if (!token) throw new Error('Could not obtain a Neon access token. Sign in again.');
+      const response = await fetch('/api/communications-rules', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ ruleKey: rule.rule_key, enabled: !rule.enabled }) });
+      const result = await response.json() as { ok?: boolean; error?: string; note?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || 'Could not update the automation.');
+      setNotice(String(rule.name) + ' ' + (!rule.enabled ? 'enabled' : 'disabled') + '. ' + (result.note || ''));
+      await load();
+    } catch (e) { setError(e instanceof Error ? e.message : 'Could not update the automation.'); }
+    finally { setRuleBusyKey(''); }
+  };
+
   const updateDraft = (key: keyof Template, value: unknown) => setDraft((current) => ({ ...current, [key]: value }));
   const count = (status: string) => events.filter((event) => event.status === status).length;
   const setField = (key: keyof Template, value: string) => updateDraft(key, value);
@@ -215,7 +233,7 @@ export function CommunicationsAdmin() {
           </div> : null}
         </div>}
       </div> : null}
-      {!loading && section === 'automations' ? <div className={card}><div className="mb-4"><h3 className="text-base font-semibold text-white">Automation rules</h3><p className="mt-1 text-xs text-zinc-500">Rules are intentionally read-only and disabled until each server-side trigger, consent check and delivery path has passed end-to-end tests.</p></div><AdminTable rows={rules.map((rule) => ({ ...rule, state: rule.enabled ? 'Enabled' : 'Disabled', trigger: rule.trigger_key, template: rule.template_key }))} empty="No automation rules loaded." cols={[{key:'name',label:'Rule'},{key:'trigger',label:'Trigger'},{key:'channel',label:'Channel'},{key:'template',label:'Template'},{key:'state',label:'State'},{key:'delay_minutes',label:'Delay (min)'}]} /></div> : null}
+      {!loading && section === 'automations' ? <div className={card}><div className="mb-4"><h3 className="text-base font-semibold text-white">Automation rules</h3><p className="mt-1 text-xs text-zinc-500">Website enquiry, consultation and app-waitlist acknowledgements can be enabled after the migration and Resend sender are configured. App/scheduled rules stay locked until their event handlers are implemented.</p></div><AdminTable rows={rules.map((rule) => ({ ...rule, state: rule.enabled ? 'Enabled' : 'Disabled', trigger: rule.trigger_key, template: rule.template_key }))} empty="No automation rules loaded. Apply the prepared communications migration after review." cols={[{key:'name',label:'Rule'},{key:'trigger',label:'Trigger'},{key:'channel',label:'Channel'},{key:'template',label:'Template'},{key:'state',label:'Control',render:(rule) => ['website-enquiry-acknowledgement','consultation-confirmation','app-waitlist-acknowledgement'].includes(String(rule.rule_key)) ? <button type="button" disabled={Boolean(ruleBusyKey)} onClick={() => void toggleRule(rule)} className={btnGhost}>{ruleBusyKey === rule.rule_key ? 'Saving…' : rule.enabled ? 'Enabled · disable' : 'Disabled · enable'}</button> : <span className="text-xs text-zinc-500">Locked · trigger pending</span>},{key:'delay_minutes',label:'Delay (min)'}]} /></div> : null}
       {!loading && section === 'history' ? <div className={card}><h3 className="mb-4 text-base font-semibold text-white">Notification &amp; email history</h3><AdminTable rows={events.map((event) => ({ ...event, time: event.created_at ? new Date(String(event.created_at)).toLocaleString('en-GB') : '—' }))} empty="No communication events recorded yet." cols={[{key:'time',label:'Created'},{key:'source',label:'Source'},{key:'channel',label:'Channel'},{key:'category',label:'Category'},{key:'subject',label:'Subject / message'},{key:'status',label:'Status'}]} /></div> : null}
       {!loading && section === 'compose' ? <div className={card}>
         <div className="mb-4"><h3 className="text-base font-semibold text-white">Email composer</h3><p className="mt-1 text-xs text-zinc-500">Choose a saved template, preview the exact eligible recipient count, then confirm the send. Marketing sends are restricted to consented subscribers.</p></div>
