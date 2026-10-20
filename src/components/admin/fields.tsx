@@ -8,7 +8,7 @@ export const btn =
   'inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-semibold text-black shadow-sm shadow-orange-950/20 transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.99]';
 export const btnGhost =
   'inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.025] px-3.5 py-2.5 text-xs font-medium text-zinc-300 transition hover:border-white/[0.18] hover:bg-white/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-50';
-export const card = 'rounded-2xl border border-white/[0.08] bg-[#14161a] p-5 shadow-sm shadow-black/10';
+export const card = 'rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#17191d] to-[#121417] p-5 shadow-lg shadow-black/10';
 
 export type Row = Record<string, any>;
 
@@ -72,11 +72,11 @@ export function AdminTable({
     );
   }
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101215]">
+    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#14161a] to-[#101114] shadow-lg shadow-black/10">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="bg-white/[0.025]">
-            <tr className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <thead className="bg-white/[0.035]">
+            <tr className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
               {cols.map((column) => (
                 <th key={column.key} className="whitespace-nowrap px-4 py-3.5">
                   {column.label}
@@ -87,9 +87,9 @@ export function AdminTable({
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={String(row.id)} className="border-t border-white/[0.055] transition hover:bg-white/[0.025]">
+              <tr key={String(row.id)} className="border-t border-white/[0.06] transition-colors hover:bg-orange-500/[0.035]">
                 {cols.map((column) => (
-                  <td key={column.key} className="max-w-[360px] px-4 py-3.5 align-middle text-zinc-300">
+                  <td key={column.key} className="max-w-[360px] px-4 py-4 align-middle text-zinc-300">
                     {column.render ? column.render(row) : String(row[column.key] ?? '—')}
                   </td>
                 ))}
