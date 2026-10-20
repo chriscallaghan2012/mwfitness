@@ -14,13 +14,26 @@ function validToken(email, token) {
   const actual = Buffer.from(token, 'hex');
   return expected.length === actual.length && timingSafeEqual(expected, actual);
 }
+const page = (title, body) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} · MW Fitness</title></head><body style="margin:0;background:#121418;color:#f5f5f5;font:16px/1.6 system-ui;padding:48px 20px"><main style="max-width:560px;margin:auto"><p style="color:#ff5500;font-weight:700;letter-spacing:.15em">MW FITNESS</p>${body}</main></body></html>`;
 export default async function handler(req, res) {
+  if (req.method !== 'GET' && req.method !== 'POST') {
+    res.setHeader('Allow', 'GET, POST');
+    return res.status(405).send('Method not allowed.');
+  }
   const email = String(req.query?.email ?? req.body?.email ?? '').trim().toLowerCase();
   const token = String(req.query?.token ?? req.body?.token ?? '');
-  if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !validToken(email, token)) {
+  if (!email || email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !validToken(email, token)) {
     return res.status(400).send('This unsubscribe link is invalid or has expired. Please contact MW Fitness for help.');
   }
-  if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).send('Method not allowed.');
+
+  // GET must be read-only: mail security scanners often follow links automatically.
+  // The explicit confirmation form submits the signed values by POST.
+  if (req.method === 'GET') {
+    const safeEmail = email.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const safeToken = token.toLowerCase();
+    return res.status(200).setHeader('Content-Type', 'text/html; charset=utf-8').send(page('Confirm unsubscribe', `<h1>Unsubscribe from marketing emails?</h1><p>Confirm that you no longer want MW Fitness marketing emails sent to <strong>${safeEmail}</strong>.</p><form method="post" action="/api/unsubscribe"><input type="hidden" name="email" value="${safeEmail}"><input type="hidden" name="token" value="${safeToken}"><button type="submit" style="background:#ff5500;color:#111;padding:12px 18px;border:0;border-radius:8px;font-weight:700;cursor:pointer">Confirm unsubscribe</button></form><p>Opening this page has not changed your preferences.</p>`));
+  }
+
   try {
     const sql = getSql();
     await sql`
@@ -33,10 +46,7 @@ export default async function handler(req, res) {
         suppression_reason = 'unsubscribe',
         updated_at = now()
     `;
-    if (req.method === 'GET') {
-      return res.status(200).setHeader('Content-Type', 'text/html; charset=utf-8').send('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unsubscribed · MW Fitness</title></head><body style="margin:0;background:#121418;color:#f5f5f5;font:16px system-ui;padding:48px 20px"><main style="max-width:560px;margin:auto"><p style="color:#ff5500;font-weight:700">MW FITNESS</p><h1>You’re unsubscribed</h1><p>You will no longer receive MW Fitness marketing emails at this address. Essential service messages may still be sent where appropriate.</p></main></body></html>');
-    }
-    return res.status(200).json({ ok: true, unsubscribed: true });
+    return res.status(200).setHeader('Content-Type', 'text/html; charset=utf-8').send(page('You are unsubscribed', '<h1>You’re unsubscribed</h1><p>You will no longer receive MW Fitness marketing emails at this address. Essential service messages may still be sent where appropriate.</p>'));
   } catch {
     return res.status(503).send('We could not process your unsubscribe right now. Please try again later.');
   }
