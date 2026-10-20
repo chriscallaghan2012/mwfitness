@@ -3,15 +3,16 @@ import { Bell, Mail, RefreshCw, Save, Send, ShieldCheck } from 'lucide-react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-type Section = 'overview' | 'templates' | 'automations' | 'history' | 'compose';
+type Section = 'overview' | 'templates' | 'automations' | 'history' | 'compose' | 'notifications';
 type Template = Row & { id: string; template_key: string; name: string; channel: string; category: string; subject: string; preheader: string; html_body: string; text_body: string; enabled: boolean; version: number };
 
 const sections: { id: Section; label: string; icon: typeof Bell }[] = [
   { id: 'overview', label: 'Overview', icon: Bell },
   { id: 'templates', label: 'Email templates', icon: Mail },
   { id: 'automations', label: 'Automations', icon: RefreshCw },
-  { id: 'history', label: 'Notification history', icon: ShieldCheck },
-  { id: 'compose', label: 'Manual broadcast', icon: Send },
+  { id: 'history', label: 'Delivery history', icon: ShieldCheck },
+  { id: 'compose', label: 'Broadcasts & individual', icon: Send },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
 ];
 
 export function CommunicationsAdmin() {
@@ -252,7 +253,7 @@ export function CommunicationsAdmin() {
           <button type="button" onClick={() => void load()} disabled={loading} className={btnGhost}><RefreshCw className="h-3.5 w-3.5" />{loading ? 'Refreshing…' : 'Refresh data'}</button>
         </div>
         <div className="relative mt-5 flex flex-wrap gap-2">
-          {sections.map((item) => { const Icon = item.icon; return <button key={item.id} type="button" onClick={() => setSection(item.id)} aria-pressed={section === item.id} className={section === item.id ? 'inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3.5 py-2.5 text-xs font-semibold text-black' : 'inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/10 px-3.5 py-2.5 text-xs text-zinc-300 hover:bg-white/5'}><Icon className="h-3.5 w-3.5" />{item.label}</button>; })}
+          {sections.map((item) => { const Icon = item.icon; return <button key={item.id} type="button" onClick={() => { setSection(item.id); if (item.id === 'compose') setChannel('email'); if (item.id === 'notifications') setChannel('push'); }} aria-pressed={section === item.id} className={section === item.id ? 'inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3.5 py-2.5 text-xs font-semibold text-black' : 'inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/10 px-3.5 py-2.5 text-xs text-zinc-300 hover:bg-white/5'}><Icon className="h-3.5 w-3.5" />{item.label}</button>; })}
         </div>
       </div>
       {error ? <p role="alert" className="rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-300">{error}</p> : null}
@@ -285,10 +286,10 @@ export function CommunicationsAdmin() {
       </div> : null}
       {!loading && section === 'automations' ? <div className={card}><div className="mb-4"><h3 className="text-base font-semibold text-white">Automation rules</h3><p className="mt-1 text-xs text-zinc-500">Website enquiry, consultation and app-waitlist acknowledgements can be enabled after the migration and Resend sender are configured. App/scheduled rules stay locked until their event handlers are implemented.</p></div><AdminTable rows={rules.map((rule) => ({ ...rule, state: rule.enabled ? 'Enabled' : 'Disabled', trigger: rule.trigger_key, template: rule.template_key }))} empty="No automation rules loaded. Apply the prepared communications migration after review." cols={[{key:'name',label:'Rule'},{key:'trigger',label:'Trigger'},{key:'channel',label:'Channel'},{key:'template',label:'Template'},{key:'state',label:'Control',render:(rule) => ['website-enquiry-acknowledgement','consultation-confirmation','app-waitlist-acknowledgement'].includes(String(rule.rule_key)) ? <button type="button" disabled={Boolean(ruleBusyKey)} onClick={() => void toggleRule(rule)} className={btnGhost}>{ruleBusyKey === rule.rule_key ? 'Saving…' : rule.enabled ? 'Enabled · disable' : 'Disabled · enable'}</button> : <span className="text-xs text-zinc-500">Locked · trigger pending</span>},{key:'delay_minutes',label:'Delay (min)'}]} /></div> : null}
       {!loading && section === 'history' ? <div className={card}><h3 className="mb-4 text-base font-semibold text-white">Notification &amp; email history</h3><AdminTable rows={events.map((event) => ({ ...event, time: event.created_at ? new Date(String(event.created_at)).toLocaleString('en-GB') : '—' }))} empty="No communication events recorded yet." cols={[{key:'time',label:'Created'},{key:'source',label:'Source'},{key:'channel',label:'Channel'},{key:'category',label:'Category'},{key:'subject',label:'Subject / message'},{key:'status',label:'Status'}]} /></div> : null}
-      {!loading && section === 'compose' ? <div className={card}>
-        <div className="mb-4"><h3 className="text-base font-semibold text-white">Email &amp; notification composer</h3><p className="mt-1 text-xs text-zinc-500">Send an individual message or reviewed broadcast. Always preview the current audience count before confirming a send.</p></div>
+      {!loading && (section === 'compose' || section === 'notifications') ? <div className={card}>
+        <div className="mb-4"><h3 className="text-base font-semibold text-white">{section === 'notifications' ? 'Push & in-app notifications' : 'Individual email & broadcasts'}</h3><p className="mt-1 text-xs text-zinc-500">{section === 'notifications' ? 'Compose a member push or in-app notification. Preview the recipient count and confirm before sending.' : 'Send an email to one member or a reviewed audience. Preview the current recipient count before confirming.'}</p></div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1.5 text-xs text-zinc-400">Channel<select className={inp} value={channel} onChange={(e) => { setChannel(e.target.value); setPreviewCount(null); if (e.target.value !== 'email' && audience === 'consented-marketing') setAudience('members'); }}><option value="email">Branded email</option><option value="push">App push notification</option><option value="in_app">In-app member inbox</option></select></label>
+          <label className="grid gap-1.5 text-xs text-zinc-400">Channel<select className={inp} value={channel} onChange={(e) => { setChannel(e.target.value); setPreviewCount(null); if (e.target.value !== 'email' && audience === 'consented-marketing') setAudience('members'); }}>{section === 'notifications' ? <><option value="push">App push notification</option><option value="in_app">In-app member inbox</option></> : <option value="email">Branded email</option>}</select></label>
           <label className="grid gap-1.5 text-xs text-zinc-400">Audience<select className={inp} value={audience} onChange={(e) => { setAudience(e.target.value); setPreviewCount(null); }}><option value="individual">One member / individual</option><option value="members">All members (max 100 for app notifications)</option>{channel === 'email' ? <option value="consented-marketing">Consented marketing subscribers only</option> : null}</select></label>
           {channel === 'email' ? <>
             <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Email template<select className={inp} value={selectedId} onChange={(e) => { setSelectedId(e.target.value); setPreviewCount(null); }}><option value="">Choose template…</option>{templates.filter((t) => t.enabled && t.channel === 'email').map((t) => <option key={t.id} value={t.id}>{t.name} · {t.category}</option>)}</select></label>
