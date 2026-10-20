@@ -644,9 +644,10 @@ export function AdminScreen() {
 
 function Stat({ label, value }: { label: string; value?: number }) {
   return (
-    <div className="rounded-xl bg-[#16181d] border border-zinc-700 p-3">
-      <p className="text-2xl font-bold text-white">{value ?? '—'}</p>
-      <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-wider mt-1">{label}</p>
+    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#1b1d22] to-[#121316] p-4 transition hover:border-orange-500/25 sm:p-5">
+      <div className="pointer-events-none absolute -right-6 -top-8 h-24 w-24 rounded-full bg-orange-500/[0.06] blur-2xl transition group-hover:bg-orange-500/[0.12]" />
+      <p className="relative text-2xl font-semibold tracking-tight text-white sm:text-3xl">{value ?? '—'}</p>
+      <p className="relative mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">{label}</p>
     </div>
   );
 }
