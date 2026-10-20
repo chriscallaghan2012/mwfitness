@@ -151,7 +151,7 @@ export function CommunicationsAdmin() {
       if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
       const { data, error: insertError } = await neon.from('communication_templates').insert({
         template_key: key, name: name.trim(), channel: 'email', category: 'service', subject: name.trim(),
-        preheader: '', html_body: '<h1 style="color:#17191d">' + name.trim() + '</h1><p>Write your email content here.</p>',
+        preheader: '', html_body: '<h1 style="color:#17191d">New email template</h1><p>Write your email content here.</p>',
         text_body: name.trim() + '\n\nWrite your email content here.', enabled: false, version: 1, updated_by: session.user.id,
       }).select('id');
       if (insertError) throw insertError;
