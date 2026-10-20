@@ -190,3 +190,30 @@ This file contains historical notes for both `mwfitness` (website / Staff HQ) an
 - [x] If the public catalogue feed fails, display an explicit unavailable state instead of silently substituting old frontend examples. Website package prices are catalogue data, not sales or revenue.
 - [ ] Verify the live profile/plan/membership queries and public catalogue feed against an authorized test environment; ensure missing optional website_leads access is clearly distinguished from a true zero count.
 - [ ] Build/typecheck and review desktop/mobile responsiveness plus live/demo switching. No build has been run and this PR remains unmerged.
+
+
+## Current project hub update — 2026-10-20 (latest status)
+
+This section supersedes older historical status notes above where they conflict with current merged PR/deployment state.
+
+### Website and Staff HQ — latest
+- [x] Staff HQ premium dashboard PR #31 is merged to `main`: duplicate navigation removed from the overview, sidebar is the single navigation source, premium KPI cards/circular progress indicators added, and live data remains separate from browser-local demo data.
+- [x] Homepage design updates merged: electric orange card edge/pulse treatment, homepage packages aligned with the live online coaching catalogue, and matching card treatment for “Training Made Simple” / “Three Simple Steps”.
+- [x] Button interaction polish merged: pointer cursor, stable hover treatment, shine only on hover, and consistent orange/dark contrast.
+- [x] Fixed the homepage package-card JSX syntax issue and removed duplicate `className` attributes.
+- [x] PR #39 merged: card borders turn orange on hover; dark buttons turn orange with black text and orange borders; orange primary buttons invert to a dark background with white text and an orange border.
+- [x] Vercel production deployment for commit `3a1cd7fd749d114b7f9c88a5dc5cf811b70c61b5` is **READY** and aliases include `https://mwfitnessuk.com` and `https://www.mwfitnessuk.com`.
+- [x] User confirms live website pricing displays correctly. Do not reopen pricing as an incident without a reproducible failure.
+- [ ] Still required: capture and record fresh website typecheck/build/lint output and manually inspect the live desktop/mobile hover states. Vercel READY confirms deployment state, not a complete browser QA or CRUD pass.
+
+### Mobile app — latest
+- [x] User confirms the mobile app now loads again.
+- [ ] Keep mobile app work separate from the website repository.
+- [ ] Still required before release: local Expo/typecheck/lint, Android build and on-device launch checks, repair/verify the Android lockfile/CI dependency state, verify Neon Auth and RLS, exercise app ↔ Staff HQ data round-trips, test notifications, and verify Stripe checkout in test mode.
+- [ ] Do not claim the Android build, full app integration, or release gates have passed until actual logs/test evidence are captured.
+
+### Communications and safety
+- [x] Posted a website-specific update to Slack `#website`, an app-specific update to `#app`, and the combined project status to `#mw-fitness-main` on 2026-10-20.
+- [ ] Continue to keep shared Neon migrations un-applied until explicitly approved and tested on a disposable Neon branch.
+- [ ] No GitHub Actions, EAS build, Google Play submission, test email, or shared Neon database change was performed for this status update.
+- [ ] Neon remains the backend; do not introduce Supabase as a backend.
