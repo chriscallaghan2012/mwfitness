@@ -2,9 +2,6 @@ name: MW Fitness Website — Full Verification
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - work/mwfitness-routes-hero-stripes-neon
 
 permissions:
   contents: read
@@ -18,7 +15,7 @@ jobs:
     name: Install, TypeScript and production build
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout working branch
+      - name: Checkout selected ref
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
