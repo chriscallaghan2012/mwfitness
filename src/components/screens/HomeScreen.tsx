@@ -75,16 +75,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              <button
-                onClick={() => onOpenBookCall()}
-                className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+              <button className="cursor-pointer" onClick={() => onOpenBookCall()}
+                className="bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
               >
                 <PhoneCall className="w-4 h-4" />
                 <span>Book a free call</span>
               </button>
-              <button
-                onClick={() => onSelectScreen('online-coaching')}
-                className="bg-[#16181d] border border-[#2b303d] hover:border-[#ff5500] text-white font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 transition-colors"
+              <button className="cursor-pointer" onClick={() => onSelectScreen('online-coaching')}
+                className="bg-[#16181d] border border-[#2b303d] text-white font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 transition-colors"
               >
                 <span>Explore online plans</span>
                 <ArrowRight className="w-4 h-4" />
@@ -93,16 +91,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
             <div className="flex flex-wrap items-center gap-2 pt-6" aria-label="Jump to a section">
               <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mr-1">Jump to:</span>
-              <button onClick={() => scrollToId('about-mike')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+              <button className="cursor-pointer" onClick={() => scrollToId('about-mike')} className="bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 About Mike
               </button>
-              <button onClick={() => scrollToId('how-it-works')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+              <button className="cursor-pointer" onClick={() => scrollToId('how-it-works')} className="bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 How it works
               </button>
-              <button onClick={() => scrollToId('testimonials')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+              <button className="cursor-pointer" onClick={() => scrollToId('testimonials')} className="bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 Real results
               </button>
-              <button onClick={() => scrollToId('packages-overview')} className="bg-[#16181d] border border-[#262930] hover:border-[#ff5500] text-zinc-300 hover:text-white text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
+              <button className="cursor-pointer" onClick={() => scrollToId('packages-overview')} className="bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 Online coaching
               </button>
             </div>
@@ -152,9 +150,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </h2>
             <div aria-hidden="true" className="industrial-stripe industrial-stripe--marker" />
           </div>
-          <button
-            onClick={() => onOpenBookCall()}
-            className="text-xs font-mono text-zinc-400 hover:text-white uppercase tracking-wider flex items-center gap-1.5 group"
+          <button className="cursor-pointer" onClick={() => onOpenBookCall()}
+            className="text-xs font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 group"
           >
             <span>Say hello</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -163,7 +160,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
           {/* Intro */}
-          <div className="h-full bg-[#121419] border border-[#20232b] p-6">
+          <div className="mw-electric-card h-full bg-[#121419] border border-[#20232b] p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">
                 <UserCheck className="w-5 h-5" />
@@ -186,7 +183,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </div>
 
           {/* Background */}
-          <div className="bg-[#121419] border border-[#20232b] p-6">
+          <div className="mw-electric-card bg-[#121419] border border-[#20232b] p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">
                 <Award className="w-5 h-5" />
@@ -211,7 +208,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>
           </div>
 {/* Qualifications */}
-          <div className="bg-[#121419] border border-[#20232b] p-6 relative hover:border-[#ff5500]/50 transition-all duration-300 group">
+          <div className="mw-electric-card bg-[#121419] border border-[#20232b] p-6 relative group">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">
                 <GraduationCap className="w-5 h-5" />
@@ -242,13 +239,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">PACKAGES THAT FIT YOUR WEEK.</h2>
             <p className="text-sm text-zinc-400 mt-3 max-w-2xl">The same online coaching packages, live prices and key benefits you'll find on our Online Coaching page.</p>
           </div>
-          <button onClick={() => onSelectScreen('online-coaching')} className="text-xs font-mono text-zinc-400 hover:text-white uppercase tracking-wider flex items-center gap-1.5 group shrink-0">
+          <button className="cursor-pointer" onClick={() => onSelectScreen('online-coaching')} className="text-xs font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 group shrink-0">
             <span>Compare all plan details</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
           {plans.map((plan) => (
-            <article key={plan.id} className={'bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b] hover:border-[#ff5500]/50')}>
+            <article key={plan.id} className={'bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]
               {plan.badge && <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">{plan.badge}</span>}
               <div className="flex items-start justify-between gap-4">
                 <div><h3 className="font-display text-3xl text-white uppercase">{plan.name}</h3><p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">{plan.tag}</p></div>
@@ -261,7 +258,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               <ul className="mt-5 space-y-2.5 text-sm text-zinc-300">
                 {plan.features.slice(0, 3).map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}
               </ul>
-              <button onClick={() => onSelectScreen('online-coaching')} className="mt-7 bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
+              <button className="cursor-pointer" onClick={() => onSelectScreen('online-coaching')} className="mt-7 bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
                 View plan &amp; checkout <ArrowRight className="w-4 h-4" />
               </button>
             </article>
@@ -272,7 +269,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
       {/* 4. ONLINE COACHING SPOTLIGHT */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden border border-[#ff5500]/60 bg-[#171920] p-8 md:p-12">
+        <div className="mw-electric-card relative overflow-hidden border border-[#ff5500]/60 bg-[#171920] p-8 md:p-12">
           <div className="absolute inset-y-0 right-0 w-1/3 bg-[#ff5500]/10 skew-x-[-18deg] translate-x-1/4 pointer-events-none"></div>
           <div className="relative z-10 max-w-3xl space-y-4">
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest">[ TRAIN ANYWHERE ]</div>
@@ -280,9 +277,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <p className="text-sm sm:text-base font-sans text-zinc-300 leading-relaxed max-w-2xl">
               Get a plan built around your life, your equipment and your goals, with weekly check-ins and direct support from Mike.
             </p>
-            <button
-              onClick={() => onSelectScreen('online-coaching')}
-              className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+            <button className="cursor-pointer" onClick={() => onSelectScreen('online-coaching')}
+              className="bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
             >
               Explore online coaching
               <ArrowRight className="w-4 h-4" />
@@ -304,7 +300,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {HOW_IT_WORKS.map((step) => (
-            <div key={step.step} className="bg-[#121419] border border-[#20232b] p-6 relative group hover:border-[#ff5500]/50 transition-all duration-300">
+            <div key={step.step} className="mw-electric-card bg-[#121419] border border-[#20232b] p-6 relative group">
               <div className="text-4xl font-display text-[#ff5500] font-bold mb-3">{step.step}</div>
               <h3 className="font-display text-2xl text-white uppercase tracking-wider mb-2">{step.title}</h3>
               <p className="text-sm font-sans text-zinc-400 leading-relaxed">{step.text}</p>
@@ -326,7 +322,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t) => (
-            <div key={t.id} className="bg-[#121419] border border-[#20232b] p-6">
+            <div key={t.id} className="mw-electric-card bg-[#121419] border border-[#20232b] p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center font-display text-white text-sm font-bold">
                   {t.avatarText}
@@ -348,7 +344,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
       {/* 7. CLOSING CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="mw-electric-card relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="space-y-3 max-w-2xl">
@@ -365,16 +361,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </div>
 
           <div className="flex flex-col gap-3 shrink-0">
-            <button
-              onClick={() => onOpenBookCall()}
-              className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-sm uppercase px-8 py-4 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+            <button className="cursor-pointer" onClick={() => onOpenBookCall()}
+              className="bg-[#ff5500] text-black font-mono font-bold text-sm uppercase px-8 py-4 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
             >
               <PhoneCall className="w-4 h-4" />
               Book a free call
             </button>
-            <button
-              onClick={() => onSelectScreen('contact')}
-              className="bg-[#16181d] border border-[#2b303d] hover:border-[#ff5500] text-white font-mono font-bold text-xs uppercase px-6 py-2.5 transition-colors"
+            <button className="cursor-pointer" onClick={() => onSelectScreen('contact')}
+              className="bg-[#16181d] border border-[#2b303d] text-white font-mono font-bold text-xs uppercase px-6 py-2.5 transition-colors"
             >
               Or send a message
             </button>

@@ -276,3 +276,62 @@ a[class*="bg-orange-500"]:hover {
     animation: none !important;
   }
 }
+
+
+/* Consistent electric edges for homepage content cards, including the About and Steps grids. */
+.mw-electric-card {
+  position: relative;
+  isolation: isolate;
+  animation: mw-electric-pulse 4.8s ease-in-out infinite;
+}
+.mw-electric-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--mw-electric-angle),
+    transparent 0deg,
+    transparent 235deg,
+    rgba(255, 85, 0, 0.18) 260deg,
+    #ff5500 285deg,
+    #ffd0b8 292deg,
+    rgba(255, 85, 0, 0.12) 307deg,
+    transparent 330deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: mw-electric-travel 7s linear infinite;
+}
+
+/* Keep button appearance steady on hover while retaining the moving shine. */
+button,
+a {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+button[class*="bg-[#ff5500]"]:hover,
+a[class*="bg-[#ff5500]"]:hover,
+button[class*="bg-brand-orange"]:hover,
+a[class*="bg-brand-orange"]:hover,
+button[class*="bg-orange-500"]:hover,
+a[class*="bg-orange-500"]:hover {
+  background-color: #ff5500 !important;
+  box-shadow: none !important;
+}
+.mw-electric-card:hover {
+  border-color: inherit;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mw-electric-card,
+  .mw-electric-card::after {
+    animation: none !important;
+  }
+}
