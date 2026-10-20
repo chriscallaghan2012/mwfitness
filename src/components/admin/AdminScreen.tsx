@@ -19,6 +19,7 @@ import { PasswordRecovery } from './PasswordRecovery';
 import { MemberActivityAdmin } from './MemberActivityAdmin';
 import { CommunicationsAdmin } from './CommunicationsAdmin';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
+import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
 type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'programmes' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads' | 'member-activity' | 'communications';
 
@@ -257,8 +258,10 @@ export function AdminScreen() {
   const [signedIn, setSignedIn] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
-  const [stats, setStats] = useState<{ users: number; plans: number; memberships: number } | null>(null);
+  const [stats, setStats] = useState<{ users: number; activeUsers: number; plans: number; activePlans: number; memberships: number; activeMemberships: number; leads: number | null; newLeads: number | null } | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [publicCatalogue, setPublicCatalogue] = useState<PublicPlan[] | null>(null);
+  const [publicCatalogueError, setPublicCatalogueError] = useState<string | null>(null);
   const [demoRows, setDemoRows] = useState<Record<DemoTab, Row[]>>(createDemoRows);
   const [demoEditorOpen, setDemoEditorOpen] = useState(false);
   const [demoEditId, setDemoEditId] = useState<string | null>(null);
@@ -289,25 +292,53 @@ export function AdminScreen() {
   const loadStats = async () => {
     if (!neon) {
       setStats(null);
+      setPublicCatalogue(null);
+      setPublicCatalogueError('Neon is not configured.');
       return;
     }
     setStatsLoading(true);
     try {
-      const [u, p, m] = await Promise.all([
-        neon.from('profiles').select('id', { count: 'exact', head: true }),
-        neon.from('plans').select('id', { count: 'exact', head: true }),
-        neon.from('memberships').select('id', { count: 'exact', head: true }),
+      // Live mode reads the shared Neon records. Do not fall back to demo rows
+      // or invent revenue when live queries fail.
+      const [usersResult, plansResult, membershipsResult, leadsResult, publicPtResult, publicOnlineResult] = await Promise.all([
+        neon.from('profiles').select('id,role', { count: 'exact' }).eq('role', 'athlete'),
+        neon.from('plans').select('id,active', { count: 'exact' }),
+        neon.from('memberships').select('id,status,profile_id', { count: 'exact' }),
+        neon.from('website_leads').select('id,status', { count: 'exact' }),
+        loadPublicPlans('pt'),
+        loadPublicPlans('online'),
       ]);
-      if (u.error || p.error || m.error) {
-        setError('We could not load the live dashboard totals. Check your staff permissions and Neon table policies, then try again.');
+      const publicResults = [publicPtResult, publicOnlineResult];
+      setPublicCatalogue(publicResults.flatMap((result) => result.plans));
+      setPublicCatalogueError(publicResults.find((result) => result.error)?.error ?? null);
+      if (usersResult.error || plansResult.error || membershipsResult.error) {
+        setError('We could not load the live dashboard totals from Neon. Check staff permissions and the profiles, plans and memberships table policies, then refresh.');
         setStats(null);
         return;
       }
-      setStats({ users: u.count ?? 0, plans: p.count ?? 0, memberships: m.count ?? 0 });
+      const users = usersResult.data ?? [];
+      const plans = plansResult.data ?? [];
+      const memberships = membershipsResult.data ?? [];
+      const leads = leadsResult.error ? [] : (leadsResult.data ?? []);
+      const isActive = (value: unknown) => String(value ?? '').trim().toLowerCase() === 'active';
+      const athleteIds = new Set(users.map((row) => String(row.id)));
+      const activeMemberIds = new Set(memberships.filter((row) => isActive(row.status) && row.profile_id && athleteIds.has(String(row.profile_id))).map((row) => String(row.profile_id)));
+      setStats({
+        users: usersResult.count ?? users.length,
+        activeUsers: activeMemberIds.size,
+        plans: plansResult.count ?? plans.length,
+        activePlans: plans.filter((row) => row.active === true).length,
+        memberships: membershipsResult.count ?? memberships.length,
+        activeMemberships: memberships.filter((row) => isActive(row.status)).length,
+        leads: leadsResult.error ? null : (leadsResult.count ?? leads.length),
+        newLeads: leadsResult.error ? null : leads.filter((row) => String(row.status ?? '').toLowerCase() === 'new').length,
+      });
       setError(null);
     } catch {
-      setError('Could not reach the MW Fitness backend. Check your connection and try again.');
+      setError('Could not reach the MW Fitness Neon backend. Live figures are unavailable until the connection is restored.');
       setStats(null);
+      setPublicCatalogue(null);
+      setPublicCatalogueError('Could not load the public website catalogue.');
     } finally {
       setStatsLoading(false);
     }
@@ -473,37 +504,84 @@ export function AdminScreen() {
         <div className="min-w-0 space-y-5">
 
 
-      {tab === 'overview' && (
-        <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-3">
-          <Stat label="Customers" value={demoMode ? demoRows.users.length : statsLoading ? undefined : stats?.users} />
-          <Stat label="Plans" value={demoMode ? demoRows.plans.length : statsLoading ? undefined : stats?.plans} />
-          <Stat label="Memberships" value={demoMode ? demoRows.memberships.length : statsLoading ? undefined : stats?.memberships} />
-        </div>
-      )}
       {tab === 'overview' && !demoMode && (
-        <div className={`${card} mb-4 text-sm text-zinc-300`}>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3">
-            <div>
-              <p className="font-mono text-[10px] uppercase text-zinc-500">Backend status</p>
-              <p className="mt-1 font-semibold text-white">{statsLoading ? 'Checking live data…' : stats ? 'Connected to MW Fitness Neon' : 'Live data needs attention'}</p>
-              <p className="mt-1 text-xs text-zinc-500">Dashboard totals come from the shared database used by the website and mobile app.</p>
+        <div className="space-y-4">
+          <section className={`${card} !border-white/[0.08] !bg-[#131519]`}>
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <div><p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Live business overview</p><h2 className="mt-1 text-xl font-semibold text-white">MW Fitness performance</h2><p className="mt-1 text-xs text-zinc-500">Live counts from Neon. No demo records are used in this view.</p></div>
+              <div className="flex items-center gap-2"><span className={`h-2 w-2 rounded-full ${stats ? 'bg-emerald-400' : 'bg-amber-400'}`} /><span className="text-xs text-zinc-400">{statsLoading ? 'Refreshing live data…' : stats ? 'Neon data loaded' : 'Live data unavailable'}</span><button type="button" onClick={() => void loadStats()} disabled={statsLoading} className={btnGhost}>{statsLoading ? 'Refreshing…' : 'Refresh'}</button></div>
             </div>
-            <button type="button" onClick={() => void loadStats()} disabled={statsLoading} className={`${btnGhost} disabled:cursor-wait disabled:opacity-50`}>
-              {statsLoading ? 'Refreshing…' : 'Refresh totals'}
-            </button>
-          </div>
-          {error ? <p role="alert" className="mb-4 border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-300">{error}</p> : null}
-          <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Quick start</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Create customer accounts in <b>Users → Add customer</b> using a unique temporary password; share it securely.</li>
-            <li>Update client profile details, membership tier and coaching notes: <b>Users → Edit</b>.</li>
-            <li>Assign a plan: <b>Memberships</b>.</li>
-            <li>Next, give the customer a diet: <b>Nutrition → Meal templates → assign</b>.</li>
-            <li>Schedule sessions: <b>Workouts</b>; review check-ins: <b>Check-ins</b>; log weigh-ins: <b>Progress</b>.</li>
-          </ul>
-          <p className="mt-3 text-zinc-500">
-            The mobile app reads all of this from the same Neon database after the customer signs in.
-          </p>
+            {error ? <p role="alert" className="mb-4 rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-300">{error}</p> : null}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {[
+                { label: 'Sign-ups / profiles', value: stats?.users, hint: 'Profiles in Neon', tab: 'users' as Tab, icon: '＋' },
+                { label: 'Active memberships', value: stats?.activeMemberships, hint: `${stats?.memberships ?? '—'} total membership records`, tab: 'memberships' as Tab, icon: '●' },
+                { label: 'Packages available', value: stats?.activePlans, hint: `${stats?.plans ?? '—'} total plans in Neon`, tab: 'plans' as Tab, icon: '↗' },
+                { label: 'New enquiries', value: stats?.newLeads, hint: `${stats?.leads == null ? 'Lead data unavailable' : `${stats.leads} total website leads`}`, tab: 'leads' as Tab, icon: '!' },
+              ].map((stat) => (
+                <button key={stat.label} type="button" onClick={() => setTab(stat.tab)} className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#1a1c21] to-[#111216] p-5 text-left transition hover:-translate-y-0.5 hover:border-orange-500/35">
+                  <span className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-xl border border-orange-500/15 bg-orange-500/[0.08] text-sm text-orange-300">{stat.icon}</span><span className="text-xs font-medium text-zinc-400">{stat.label}</span><span className="mt-3 block text-3xl font-semibold tracking-tight text-white">{statsLoading || stat.value == null ? '—' : stat.value}</span><span className="mt-2 block text-xs text-zinc-500">{stat.hint}</span>
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
+              <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Active member coverage</p>
+                <div className="mt-3 flex items-center gap-4">
+                  <div className="relative grid h-24 w-24 shrink-0 place-items-center">
+                    <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" role="img" aria-label={stats && stats.users ? `${Math.round((stats.activeUsers / stats.users) * 100)} percent of live profiles with an active membership` : 'No live active-member data'}>
+                      <circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/[0.07]" />
+                      <circle cx="50" cy="50" r="39" fill="none" stroke="#ff5500" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${stats && stats.users ? Math.min(1, stats.activeUsers / stats.users) * 245 : 0} 245`} />
+                    </svg><span className="absolute text-lg font-semibold text-white">{stats && stats.users ? `${Math.round((stats.activeUsers / stats.users) * 100)}%` : '—'}</span>
+                  </div>
+                  <div><p className="text-sm font-medium text-white">Active members</p><p className="mt-1 text-xs leading-5 text-zinc-500">{stats ? `${stats.activeUsers} of ${stats.users} live profiles linked to active memberships` : 'Waiting for live profile data.'}</p><button type="button" onClick={() => setTab('users')} className="mt-3 text-xs font-semibold text-orange-300">Review members ↗</button></div>
+                </div>
+              </div>
+              <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Package readiness</p>
+                <div className="mt-3 flex items-center gap-4">
+                  <div className="relative grid h-24 w-24 shrink-0 place-items-center">
+                    <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" role="img" aria-label={stats && stats.plans ? `${Math.round((stats.activePlans / stats.plans) * 100)} percent of live plans active` : 'No live plan data'}>
+                      <circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/[0.07]" />
+                      <circle cx="50" cy="50" r="39" fill="none" stroke="#ff8a3d" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${stats && stats.plans ? Math.min(1, stats.activePlans / stats.plans) * 245 : 0} 245`} />
+                    </svg><span className="absolute text-lg font-semibold text-white">{stats && stats.plans ? `${Math.round((stats.activePlans / stats.plans) * 100)}%` : '—'}</span>
+                  </div>
+                  <div><p className="text-sm font-medium text-white">Active plans</p><p className="mt-1 text-xs leading-5 text-zinc-500">{stats ? `${stats.activePlans} of ${stats.plans} live plans active` : 'Waiting for live plan data.'}</p><button type="button" onClick={() => setTab('plans')} className="mt-3 text-xs font-semibold text-orange-300">Manage plans ↗</button></div>
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 text-xs leading-5 text-zinc-500">Revenue and sales are intentionally omitted until a verified transaction source is connected. Website package defaults are not counted as sales, and frontend/demo defaults are never substituted for live database records.</p>
+          </section>
+          <section className={`${card} !border-white/[0.08] !bg-[#131519]`}>
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+              <div><p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Public frontend feed</p><h3 className="mt-1 text-lg font-semibold text-white">Published website packages</h3><p className="mt-1 text-xs text-zinc-500">Read-only view of the same active Neon-backed catalogue the public pricing page requests.</p></div>
+              <button type="button" onClick={() => setTab('plans')} className={btnGhost}>Manage catalogue ↗</button>
+            </div>
+            {publicCatalogueError ? <p role="status" className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] p-3 text-sm text-amber-200">The public website catalogue could not be loaded: {publicCatalogueError} Prices are not being substituted with stale frontend examples.</p> : null}
+            {!publicCatalogueError && publicCatalogue === null ? <p className="text-sm text-zinc-500">Loading published website packages…</p> : null}
+            {!publicCatalogueError && publicCatalogue !== null && publicCatalogue.length === 0 ? <p className="rounded-xl border border-dashed border-white/[0.1] p-5 text-sm text-zinc-400">The public catalogue currently returns no active packages. Check Plans &amp; pricing before changing the published website data.</p> : null}
+            {!publicCatalogueError && publicCatalogue && publicCatalogue.length > 0 ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {publicCatalogue.map((plan) => <div key={plan.id} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
+                <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-sm font-semibold text-white">{plan.name}</p><p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-zinc-500">{plan.kind === 'pt' ? 'Personal training' : 'Online coaching'}{plan.tag ? ` · ${plan.tag}` : ''}</p></div><span className="shrink-0 rounded-lg border border-orange-500/20 bg-orange-500/[0.08] px-2.5 py-1.5 text-sm font-semibold text-orange-200">£{plan.price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                {plan.badge ? <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-orange-300">{plan.badge}</p> : null}
+                <p className="mt-2 line-clamp-2 text-xs leading-5 text-zinc-400">{plan.description || 'No description provided.'}</p>
+                <p className="mt-3 text-[10px] uppercase tracking-wider text-emerald-300">Published · active</p>
+              </div>)}
+            </div> : null}
+          </section>
+          <section className={`${card} !border-white/[0.08] !bg-[#131519]`}>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Quick actions</p><h3 className="mt-1 text-lg font-semibold text-white">Run your coaching business</h3>
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+              {[
+                { label: 'Review members', detail: 'Profiles and coaching tiers', tab: 'users' as Tab },
+                { label: 'Manage plans & pricing', detail: 'Published packages and prices', tab: 'plans' as Tab },
+                { label: 'Assign memberships', detail: 'Membership status and renewals', tab: 'memberships' as Tab },
+                { label: 'Review check-ins', detail: 'Member feedback and follow-ups', tab: 'checkins' as Tab },
+                { label: 'Review progress', detail: 'Weight and progress logs', tab: 'progress' as Tab },
+                { label: 'Open website leads', detail: 'New enquiries and contact requests', tab: 'leads' as Tab },
+              ].map((item) => <button key={item.label} type="button" onClick={() => setTab(item.tab)} className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-4 text-left transition hover:border-orange-500/25 hover:bg-orange-500/[0.04]"><span className="block text-sm font-medium text-white">{item.label} <span className="text-orange-300">↗</span></span><span className="mt-1 block text-xs text-zinc-500">{item.detail}</span></button>)}
+            </div>
+          </section>
         </div>
       )}
       {demoMode && tab === 'overview' && (
@@ -521,25 +599,41 @@ export function AdminScreen() {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: 'Client accounts', value: demoRows.users.length, hint: 'Across all coaching tiers', tab: 'users' as Tab },
-              { label: 'Live packages', value: demoRows.plans.filter((r) => r.status === 'Active').length, hint: 'Demo catalogue only', tab: 'plans' as Tab },
-              { label: 'Needs coach review', value: demoRows.checkins.filter((r) => r.status === 'Needs review' || r.status === 'Follow up required').length, hint: 'Check-ins to look at', tab: 'checkins' as Tab },
-              { label: 'New leads', value: demoRows.leads.filter((r) => r.status === 'New').length, hint: 'Awaiting first contact', tab: 'leads' as Tab },
+              { label: 'Total sign-ups', value: demoRows.users.length, hint: 'Sample accounts created', tab: 'users' as Tab, icon: '＋' },
+              { label: 'Active members', value: demoRows.users.filter((r) => r.status === 'Active').length, hint: 'Sample members marked active', tab: 'memberships' as Tab, icon: '●' },
+              { label: 'Packages on sale', value: demoRows.plans.filter((r) => r.status === 'Active').length, hint: 'Active sample packages', tab: 'plans' as Tab, icon: '↗' },
+              { label: 'Needs attention', value: demoRows.checkins.filter((r) => r.status === 'Needs review' || r.status === 'Follow up required').length + demoRows.leads.filter((r) => r.status === 'New').length, hint: 'Check-ins and new leads', tab: 'checkins' as Tab, icon: '!' },
             ].map((stat) => (
-              <button key={stat.label} type="button" onClick={() => setTab(stat.tab)} className="group rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5 text-left transition hover:border-orange-500/30 hover:bg-white/[0.055]">
-                <span className="text-xs text-zinc-400">{stat.label}</span>
+              <button key={stat.label} type="button" onClick={() => setTab(stat.tab)} className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#1a1c21] to-[#111216] p-5 text-left transition hover:-translate-y-0.5 hover:border-orange-500/35">
+                <span className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-xl border border-orange-500/15 bg-orange-500/[0.08] text-sm text-orange-300">{stat.icon}</span>
+                <span className="text-xs font-medium text-zinc-400">{stat.label}</span>
                 <span className="mt-3 block text-3xl font-semibold tracking-tight text-white">{stat.value}</span>
                 <span className="mt-2 block text-xs text-zinc-500">{stat.hint}</span>
               </button>
             ))}
           </div>
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]">
             <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
-              <div className="mb-4 flex items-center justify-between gap-3"><div><p className="text-xs text-zinc-500">WORKSPACE</p><h3 className="mt-1 text-lg font-semibold text-white">Manage your business</h3></div><span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-orange-300">Demo data</span></div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {TABS.filter((item) => item.id !== 'overview').map((item) => (
-                  <button key={item.id} type="button" onClick={() => setTab(item.id)} className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 py-3 text-left text-sm text-zinc-200 transition hover:border-orange-500/30 hover:bg-orange-500/[0.06]"><span>{item.label}</span><span className="text-xs text-zinc-600">↗</span></button>
-                ))}
+              <div className="mb-5 flex flex-wrap items-start justify-between gap-3"><div><p className="text-[10px] font-semibold tracking-[0.18em] text-orange-300">MEMBER MOMENTUM</p><h3 className="mt-1 text-lg font-semibold text-white">Your coaching business at a glance</h3><p className="mt-1 text-xs text-zinc-500">Illustrative sandbox metrics · not live business figures</p></div><span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-orange-300">Demo data</span></div>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                  <div className="relative grid h-24 w-24 shrink-0 place-items-center">
+                    <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" role="img" aria-label={`${Math.round((demoRows.users.filter((r) => r.status === "Active").length / Math.max(demoRows.users.length, 1)) * 100)} percent of sample members are active`}><circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/[0.07]" /><circle cx="50" cy="50" r="39" fill="none" stroke="#ff5500" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(demoRows.users.filter((r) => r.status === "Active").length / Math.max(demoRows.users.length, 1)) * 245} 245`} /></svg>
+                    <span className="absolute text-lg font-semibold text-white">{Math.round((demoRows.users.filter((r) => r.status === "Active").length / Math.max(demoRows.users.length, 1)) * 100)}%</span>
+                  </div>
+                  <div><p className="text-sm font-medium text-white">Member activation</p><p className="mt-1 text-xs leading-5 text-zinc-500">{demoRows.users.filter((r) => r.status === 'Active').length} of {demoRows.users.length} sample accounts are active.</p><button type="button" onClick={() => setTab('users')} className="mt-3 text-xs font-semibold text-orange-300 hover:text-orange-200">View members ↗</button></div>
+                </div>
+                <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                  <div className="relative grid h-24 w-24 shrink-0 place-items-center">
+                    <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" role="img" aria-label={`${Math.round((demoRows.plans.filter((r) => r.status === "Active").length / Math.max(demoRows.plans.length, 1)) * 100)} percent of sample plans are active`}><circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/[0.07]" /><circle cx="50" cy="50" r="39" fill="none" stroke="#ff8a3d" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(demoRows.plans.filter((r) => r.status === "Active").length / Math.max(demoRows.plans.length, 1)) * 245} 245`} /></svg>
+                    <span className="absolute text-lg font-semibold text-white">{Math.round((demoRows.plans.filter((r) => r.status === "Active").length / Math.max(demoRows.plans.length, 1)) * 100)}%</span>
+                  </div>
+                  <div><p className="text-sm font-medium text-white">Package readiness</p><p className="mt-1 text-xs leading-5 text-zinc-500">{demoRows.plans.filter((r) => r.status === 'Active').length} active sample packages in the catalogue.</p><button type="button" onClick={() => setTab('plans')} className="mt-3 text-xs font-semibold text-orange-300 hover:text-orange-200">Manage packages ↗</button></div>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-white/[0.06] bg-[#101114] p-4"><p className="text-xs text-zinc-500">Sample membership value</p><p className="mt-2 text-2xl font-semibold text-white">£{demoRows.memberships.filter((r) => r.status === "Active").reduce((sum, r) => sum + (Number(r.amount) || 0), 0).toLocaleString("en-GB")}</p><p className="mt-1 text-[11px] text-zinc-600">Illustrative recurring value from active sample memberships; not actual revenue.</p></div>
+                <div className="rounded-xl border border-white/[0.06] bg-[#101114] p-4"><p className="text-xs text-zinc-500">New enquiries</p><p className="mt-2 text-2xl font-semibold text-white">{demoRows.leads.filter((r) => r.status === 'New').length}</p><p className="mt-1 text-[11px] text-zinc-600">Sample leads waiting for follow-up.</p><button type="button" onClick={() => setTab('leads')} className="mt-2 text-xs font-semibold text-orange-300">Open lead inbox ↗</button></div>
               </div>
             </section>
             <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
@@ -622,15 +716,6 @@ export function AdminScreen() {
         </div>
       </div>
       </div>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value?: number }) {
-  return (
-    <div className="rounded-xl bg-[#16181d] border border-zinc-700 p-3">
-      <p className="text-2xl font-bold text-white">{value ?? '—'}</p>
-      <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-wider mt-1">{label}</p>
     </div>
   );
 }
