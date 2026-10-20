@@ -142,7 +142,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 
 ## Website completion track — Staff HQ, swag and Resend (2026-10-20)
 
-### Implemented on `work/staff-hq-email-suite-swag-2026-10` (not yet merged, deployed, or database-applied)
+### Merged into `main` via PRs #22–#25 (not deployed; prepared migrations have not been applied)
 
 - [x] Added a server-side Resend dispatch endpoint for authenticated coach/admin users, with individual sends, member audiences, consent-filtered marketing audiences, exact recipient-count confirmation, per-recipient idempotency keys, and event/delivery audit rows.
 - [x] Routed Staff HQ test sends through Resend so a test can only target the signed-in staff member.
@@ -153,6 +153,9 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Made the existing website enquiry alert prefer Resend when `RESEND_API_KEY` and a verified `RESEND_FROM_EMAIL` are configured; SMTP remains a fallback.
 - [x] Added the public Neon-backed swag catalogue endpoint, a Staff HQ product editor (name, slug, description, category, price, compare-at price, image/order URL, sizes, stock status, visibility and sort order), and connected the public SHWAG cards to the catalogue API.
 - [x] Added a prepared `swag_products` migration with public read access only for active products and staff-only writes.
+- [x] Seeded the four existing advertised products (Classic SHWAG T-Shirt, SHWAG Hoodie, SHWAG Gym Bag and SHWAG Water Bottle) as enquiry-only with no invented prices, sizes, images or stock claims; added an enquiry-only status to Staff HQ.
+- [x] Kept those existing SHWAG items visible as an enquiry-only fallback if the product API is unavailable before migration setup.
+- [x] Hardened Staff HQ programme CRUD/assignment/visibility and video delete/visibility actions with confirmed-row checks, error handling and busy-state guards.
 
 ### Required before real sends / production use
 
