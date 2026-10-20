@@ -62,15 +62,31 @@ export function VideosAdmin() {
     }
   };
   const remove = async (row: Row) => {
-    if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
-    if (!window.confirm(`Delete “${String(row.title)}” from the video library?`)) return;
-    const { error } = await neon!.from('coaching_videos').delete().eq('id', row.id);
-    if (error) setMessage(`Delete failed: ${error.message}`); else { setMessage('Video deleted.'); await load(); }
+    if (!neon || schemaMissing) { setMessage('Live video storage is not configured; no changes were made.'); return; }
+    if (busy) return;
+    if (!window.confirm('Delete "' + String(row.title) + '" from the video library?')) return;
+    setBusy(true); setMessage('');
+    try {
+      const result = await neon.from('coaching_videos').delete().eq('id', row.id).select('id');
+      if (result.error) { setMessage('Delete failed: ' + result.error.message); return; }
+      if (!result.data?.length) { setMessage('The video was not deleted. Refresh the list and check staff permissions.'); return; }
+      setMessage('Video deleted.'); await load();
+    } catch (error) {
+      setMessage('Could not delete video: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    } finally { setBusy(false); }
   };
   const toggle = async (row: Row) => {
-    if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
-    const { error } = await neon!.from('coaching_videos').update({ active: !row.active }).eq('id', row.id);
-    if (error) setMessage(`Update failed: ${error.message}`); else await load();
+    if (!neon || schemaMissing) { setMessage('Live video storage is not configured; no changes were made.'); return; }
+    if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      const result = await neon.from('coaching_videos').update({ active: !row.active }).eq('id', row.id).select('id');
+      if (result.error) { setMessage('Visibility update failed: ' + result.error.message); return; }
+      if (!result.data?.length) { setMessage('Video visibility was not changed. Refresh the list and check staff permissions.'); return; }
+      setMessage('Video visibility updated.'); await load();
+    } catch (error) {
+      setMessage('Could not update video visibility: ' + (error instanceof Error ? error.message : 'Unexpected error'));
+    } finally { setBusy(false); }
   };
 
   return (
@@ -83,7 +99,7 @@ export function VideosAdmin() {
         { key: 'title', label: 'Video', render: (r) => <div><p className="font-medium text-white">{String(r.title)}</p><p className="text-xs text-zinc-500">{String(r.category ?? 'General')} · {String(r.level ?? 'All levels')}</p></div> },
         { key: 'duration_seconds', label: 'Duration', render: (r) => r.duration_seconds ? `${Math.floor(Number(r.duration_seconds) / 60)}:${String(Number(r.duration_seconds) % 60).padStart(2, '0')}` : '—' },
         { key: 'video_url', label: 'Source', render: (r) => <a className="max-w-48 truncate text-orange-300 underline" href={String(r.video_url)} target="_blank" rel="noreferrer">Open video</a> },
-        { key: 'active', label: 'App visibility', render: (r) => <button className={btnGhost} onClick={() => void toggle(r)}>{r.active ? 'Visible' : 'Hidden'}</button> },
+        { key: 'active', label: 'App visibility', render: (r) => <button className={btnGhost} disabled={busy || schemaMissing} onClick={() => void toggle(r)}>{r.active ? 'Visible' : 'Hidden'}</button> },
       ]} />
       {edit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setEdit(null); }}>
