@@ -112,3 +112,13 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [x] Corrected unsubscribe email validation to use standard whitespace and domain-separator matching. The previous regex was over-escaped and could reject valid addresses or validate incorrectly; only the signed token can change a marketing preference, and GET remains read-only.
 - [x] Improved Android fatal-runtime diagnostics so a fatal error after the root React component mounts triggers a visible error screen instead of only updating an unused module-level string.
 - [ ] Re-run website TypeScript/build/lint and Android lockfile repair + typecheck/lint/Android export before treating these changes as verified. The repository integrations available in this session do not provide a local checkout/build runner, and no GitHub Actions workflow has been dispatched.
+
+
+## Admin form and compliance consolidation — 2026-10-20
+
+- [x] Added a guided meal/food editor to Staff HQ nutrition forms, including add/remove meal and food actions, portion notes, calories and protein. Existing per-section/per-food metadata is retained when editing; malformed section data remains repairable through the JSON fallback.
+- [x] Added guided numeric nutrition target fields while preserving unknown target metadata, plus a wider responsive editor modal.
+- [x] Replaced the package feature JSON array editor with one feature per line; each non-empty line saves as one public feature.
+- [x] Consolidated the online-plan-focused footer and direct privacy, cookie and account/data deletion links without the staff-login link or unverified insurance/qualification claims.
+- [x] Added the cookie policy screen, /cookies client route and Vercel SPA rewrite. The policy explicitly remains a draft until live cookies and third-party scripts are audited.
+- [ ] Reconcile the remaining stale open PRs against this consolidated branch before closing or merging them. Do not merge their branches wholesale because they diverged and may reintroduce compatibility aliases or older Neon code.
