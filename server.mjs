@@ -16,12 +16,15 @@ import { sendContactEmail, validatePayload } from './api/_mailer.mjs';
 import { saveWebsiteLead } from './api/_leads.mjs';
 import { createCheckoutSession } from './api/_stripe.mjs';
 import sendPush from './api/send-push.mjs';
+import testCommunication from './api/test-communication.mjs';
+import unsubscribe from './api/unsubscribe.mjs';
 import health from './api/health.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.use(express.json({ limit: '64kb' }));
+app.use(express.urlencoded({ extended: false, limit: '8kb' }));
 
 app.get('/api/health', health);
 
@@ -54,6 +57,8 @@ app.post('/api/create-checkout', async (req, res) => {
 });
 
 app.post('/api/send-push', sendPush);
+app.post('/api/test-communication', testCommunication);
+app.all('/api/unsubscribe', unsubscribe);
 
 // Serve the built site (optional, for a full local prod check).
 const dist = path.join(__dirname, 'dist');

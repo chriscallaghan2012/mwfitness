@@ -1,6 +1,6 @@
 # MW Fitness — plan of action and test gates
 
-This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). Local testing and branch pushes only until Mike explicitly approves otherwise. Do not deploy, merge to main, run workflows/build submissions, or change the shared Neon database without approval.
+This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). Continue fixing the working branches and verify the changes before merging them to main. Do not deploy, run GitHub workflows/build submissions, or change the shared Neon database without explicit approval.
 
 ## Completed in this work batch
 - [x] Android nutrition day selector now loads and saves the selected calendar date rather than always reading/writing today's nutrition log.
@@ -35,7 +35,7 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] User approval still required before merge/deployment; this branch has not been merged to `main`.
 
 ## Must pass before any release
-1. **Website pricing** — use the local/staging browser console to capture the actual Neon query error; verify `VITE_NEON_AUTH_URL` and `VITE_NEON_DATA_API_URL` are present in the intended environment, and verify active `plans` rows plus anonymous SELECT/RLS/grants for public pricing. Do not hard-code a price fallback or mask missing live prices with demo values.
+1. **Website pricing** — user confirms public pricing currently displays correctly on the live site. Do not treat pricing as a live incident or change its data flow without a reproducible failure. Keep the Neon-backed implementation and never add hard-coded fallback prices.
 2. **Staff HQ access** — test real coach and admin accounts; confirm non-staff accounts are rejected; review RLS policies for every staff-read and write table. Keep demo mode browser-local and ensure it cannot write to Neon.
 3. **Staff HQ CRUD** — exercise create/edit/delete/assign flows for users, plans, memberships, nutrition, workouts, programmes, videos, check-ins, progress, messages, leads, and member activity. Verify validation, loading, empty, missing-schema, permission-denied, retry, and save-failure states.
 4. **Shared backend** — verify migration history and schema in a disposable Neon branch first. Never apply migrations to the shared production database as part of this task. Validate the nutrition tables/log unique key and the member activity tables/policies.
@@ -46,13 +46,95 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 
 ## Progress update — remaining tracks
 - [ ] Run website TypeScript/build/lint and Android Expo lint/typecheck locally; this environment has GitHub source access but no verified repository checkout/build output.
-- [ ] Verify the pricing query's actual runtime error from browser console and environment; logging has been added, but the underlying cause is not yet confirmed.
+- [x] Pricing status corrected: the user confirms prices display correctly on the live website. No pricing outage/root cause is asserted; retain the existing Neon-only implementation and only investigate again if a reproducible failure is reported.
 - [ ] Capture the Android launch crash trace from the installed test APK/device. Startup diagnostic handling exists, but the crash is not claimed fixed without the actual error.
 - [ ] Continue Staff HQ CRUD and authorization/RLS audit against disposable test data, including all save/delete paths; recent hardening now covers nutrition, plan catalogue, programme visibility, workout deletion, user, membership, progress/check-in and workout loading paths, but is not a complete permission audit.
 - [ ] Access control: product intent is one coach/operator with staff access and trainee accounts. The routine user editor no longer changes roles. Still verify that new sign-ups default to trainee access and deployed RLS prevents trainees from reading or writing other clients' records; do not apply the documented draft trigger to shared production without testing the deployed auth mapping.
 
 ## Known blocked items / not claimed complete
-- Pricing's underlying environment/database cause is not yet observable from repository source alone; browser console + intended Vercel/local env and Neon permissions must be checked.
 - The reported immediate Android launch crash requires a real crash trace to diagnose.
 - Video storage/upload, video-to-programme assignment, programme schema, and verified server-side Neon Auth account deletion need schema/API/security review before implementation or use.
 - No production database changes, merges to `main`, Vercel deployments, EAS builds, or Play submissions have been performed.
+
+
+## Neon-only live-data audit — 2026-10-19
+
+### Prepared implementation (not merged, deployed, or applied to the shared database)
+
+- [x] Renamed the website client to `src/lib/neon.ts` and moved website/admin imports to the shared `neon` client.
+- [x] Replaced the legacy auth adapter with Neon SDK's native `BetterAuthVanillaAdapter`; website staff sign-in and password recovery now use Neon/Better Auth methods.
+- [x] Updated Android sign-in and session restoration to the native Neon Auth response shape.
+- [x] Added a read-only `GET /api/plans?kind=pt|online` endpoint that reads active public plans through the server-side Neon connection and never returns Stripe price IDs.
+- [x] Changed the public website plan loader to use that endpoint, so public pricing no longer depends on browser-side anonymous Data API access.
+- [x] Updated the Android nutrition loader to map existing `nutrition_plans.targets/sections` JSON into the meal UI instead of querying absent normalized meal tables.
+- [x] Prepared a migration adding training/non-training plan types, daily meal-completion logs, and the RLS policies needed for member replies in coach conversations.
+- [x] Replaced the Android messages preview flow with Neon-backed conversation loading and message inserts; demo mode remains explicitly local.
+- [x] Removed misleading Staff HQ success labels for actions that are not connected to live services.
+
+### Verified from the live Neon schema
+
+- [x] The public `plans` table has six active rows: two online-coaching plans and four PT plans.
+- [x] Anonymous/public SELECT privileges and read policies exist for `plans`.
+- [x] The Vercel Neon Auth/Data API environment URLs point at the same Neon endpoint used by the configured Data API.
+- [x] The Vercel `DATABASE_URL` points at the same Neon project and `mwfitness` database.
+- [x] The live database currently has the existing `nutrition_plans`, `nutrition_templates`, `nutrition_logs`, `coach_messages`, and `device_push_tokens` tables. It does not have `nutrition_plan_days`, `nutrition_plan_meals`, `nutrition_plan_foods`, or `nutrition_daily_logs`.
+- [x] `coach_messages` and `device_push_tokens` currently contain no rows; no Android device-token registration flow exists yet.
+
+### Release gates still open
+
+- [ ] Run website lint/build and Android TypeScript/lint/Android export against the complete repositories. No successful build is claimed yet.
+- [ ] Apply `db/migrations/20261019_mobile_nutrition_live.sql` only after review/approval; it has not been executed against shared Neon.
+- [ ] Add the SDK-57-compatible Expo Notifications dependency, Android permission/token registration, token persistence, and notification-tap handling.
+- [ ] Verify that a member can send a message, Staff HQ can read/reply, and a registered device receives the push notification.
+- [ ] Verify `/api/plans?kind=online` and `/api/plans?kind=pt` in the deployed environment; the public domain could not be reached from this execution environment, so the endpoint has not been exercised over HTTP.
+- [ ] Test Stripe checkout in test mode and confirm success/cancel handling.
+- [ ] Run the configured manual GitHub Actions checks when a supported workflow-dispatch path is available.
+- [ ] Consolidate changes to a work branch only after the above code checks; no production merge or deployment without approval.
+
+## Communications centre + Android startup follow-up (2026-10-20)
+- [x] Communications centre shell added to Staff HQ with template editing, read-only automation rules/history, and a local-only broadcast draft; dispatch button remains disabled.
+- [x] Prepared communications schema and starter content on the working branch only: 13 email templates and 12 automation rules, all automation rules disabled. Migration has **not** been applied to shared/production Neon.
+- [x] Unsubscribe endpoint changed so GET renders a confirmation form without mutating preferences; the signed unsubscribe action occurs only on POST. Local Express server now parses the confirmation form.
+- [x] Test-email failure path records a failed delivery and bounded error message; it still requires live SMTP/Neon verification.
+- [x] Communications UI clears stale records on missing Neon/read failure and checks that template updates actually affect a row.
+- [ ] Verify unsubscribe GET has no DB side effects and POST suppresses only the signed email; verify SMTP success/failure state and table RLS before any live sends.
+- [ ] Build server-side audience preview, consent/suppression filtering, idempotent dispatch and provider delivery tracking before enabling broadcasts.
+- [x] Android entry point now has a visible startup-diagnostic fallback for module import failures instead of leaving only the native splash screen.
+- [ ] Android startup crash is **not confirmed fixed**; produce a fresh Android export/build and retest on the Play internal-test device.
+- [ ] Android CI remains blocked at `npm ci`: lockfile is missing `ajv@8.20.0`, `fast-uri@3.1.8`, `json-schema-traverse@1.0.0`, and `require-from-string@2.0.2`. The lockfile repair workflow is manual-only and has not been dispatched.
+- [ ] Run the website and Android manual verification workflows after the user authorises/runs them; no fresh lint, build, or device-test pass is claimed.
+
+- [x] Corrected an earlier inaccurate pricing diagnosis: the user confirms prices are working on the live site. The legacy `supabase` filename/variable names found on `main` are compatibility names around the Neon SDK, not evidence that the project uses Supabase as its backend. Do not describe pricing as broken or change working live pricing without fresh evidence.
+
+
+## Additional static fixes — 2026-10-20
+
+- [x] Corrected unsubscribe email validation to use standard whitespace and domain-separator matching. The previous regex was over-escaped and could reject valid addresses or validate incorrectly; only the signed token can change a marketing preference, and GET remains read-only.
+- [x] Improved Android fatal-runtime diagnostics so a fatal error after the root React component mounts triggers a visible error screen instead of only updating an unused module-level string.
+- [ ] Re-run website TypeScript/build/lint and Android lockfile repair + typecheck/lint/Android export before treating these changes as verified. The repository integrations available in this session do not provide a local checkout/build runner, and no GitHub Actions workflow has been dispatched.
+
+
+## Admin form and compliance consolidation — 2026-10-20
+
+- [x] Added a guided meal/food editor to Staff HQ nutrition forms, including add/remove meal and food actions, portion notes, calories and protein. Existing per-section/per-food metadata is retained when editing; malformed section data remains repairable through the JSON fallback.
+- [x] Added guided numeric nutrition target fields while preserving unknown target metadata, plus a wider responsive editor modal.
+- [x] Replaced the package feature JSON array editor with one feature per line; each non-empty line saves as one public feature.
+- [x] Consolidated the online-plan-focused footer and direct privacy, cookie and account/data deletion links without the staff-login link or unverified insurance/qualification claims.
+- [x] Added the cookie policy screen, /cookies client route and Vercel SPA rewrite. The policy explicitly remains a draft until live cookies and third-party scripts are audited.
+- [ ] Reconcile the remaining stale open PRs against this consolidated branch before closing or merging them. Do not merge their branches wholesale because they diverged and may reintroduce compatibility aliases or older Neon code.
+
+
+## CRUD verification hardening — 2026-10-20
+
+- [x] Nutrition template/client-plan saves now require the API to return an affected row; a permission-filtered or missing-row update is no longer reported as saved.
+- [x] Package saves now verify an affected row for inserts and updates.
+- [x] Video library saves now validate non-negative whole-second duration, handle thrown network errors, reset the busy state in all cases, and verify a saved row before showing success.
+- [x] Staff profile edits now verify an affected row instead of treating a zero-row update as success.
+- [x] Added request sequencing to nutrition-plan and progress-log customer queries so a slower response for a previous customer cannot replace the current customer's rows.
+- [ ] These are source-level changes only until typecheck/build and interactive Neon CRUD checks pass. No GitHub Actions, local build, Neon migration or deployment has been run.
+
+
+- [x] Extended the guided food editor to capture gram amounts, calories, protein, carbohydrates, fats and salt so the mobile macro overview can receive the full set of values from Staff HQ.
+- [x] Changed marketing preference uniqueness and unsubscribe upserts to be case-insensitive, avoiding duplicate suppression records for differently-cased versions of the same email address.
+
+- [x] Extended affected-row verification to package visibility toggles, workout template deletion/session status, membership assignment/removal, progress weigh-in creation/deletion, and multi-recipient coach-message inserts.

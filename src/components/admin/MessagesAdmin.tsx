@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, btn, inp } from './fields';
 
 export function MessagesAdmin() {
@@ -12,10 +12,10 @@ export function MessagesAdmin() {
   const [error, setError] = useState('');
 
   const load = async () => {
-    if (!supabase) return;
+    if (!neon) return;
     const [profilesResult, messagesResult] = await Promise.all([
-      supabase.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name'),
-      supabase.from('coach_messages').select('id,athlete_profile_id,sender_profile_id,body,delivery_status,created_at').order('created_at', { ascending: false }).limit(100),
+      neon.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name'),
+      neon.from('coach_messages').select('id,athlete_profile_id,sender_profile_id,body,delivery_status,created_at').order('created_at', { ascending: false }).limit(100),
     ]);
     if (profilesResult.error || messagesResult.error) {
       setError(profilesResult.error?.message ?? messagesResult.error?.message ?? 'Could not load messages.');
@@ -29,7 +29,7 @@ export function MessagesAdmin() {
   useEffect(() => { void load(); }, []);
 
   const send = async () => {
-    if (!supabase || !body.trim()) return;
+    if (!neon || !body.trim()) return;
     const athleteIds = recipient === 'all' ? athletes.map((athlete) => String(athlete.id)) : recipient ? [recipient] : [];
     if (!athleteIds.length) {
       setError('Choose an athlete or all athletes.');
@@ -39,24 +39,29 @@ export function MessagesAdmin() {
     setError('');
     setStatus('');
     try {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session) throw new Error('Your staff session has expired. Sign in again.');
-      const { data, error: insertError } = await supabase
+      const { data: sessionData, error: sessionError } = await neon.auth.getSession({ query: {} });
+      if (sessionError || !sessionData?.user) throw new Error('Your staff session has expired. Sign in again.');
+      const { data, error: insertError } = await neon
         .from('coach_messages')
         .insert(athleteIds.map((athlete_profile_id) => ({
           athlete_profile_id,
-          sender_profile_id: sessionData.session!.user.id,
+          sender_profile_id: sessionData.user.id,
           body: body.trim(),
         })))
         .select('id');
       if (insertError) throw insertError;
+      if (!data?.length || data.length !== athleteIds.length) {
+        throw new Error('The message was not saved for every selected recipient. Refresh the message list before trying again.');
+      }
 
       setBody('');
       await load();
       try {
+        const accessToken = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
+        if (!accessToken) throw new Error('Could not obtain a Neon access token for push delivery.');
         const response = await fetch('/api/send-push', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${sessionData.session.access_token}`, 'Content-Type': 'application/json' },
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ messageIds: (data ?? []).map((message) => message.id) }),
         });
         const result = await response.json() as { accepted?: number; failed?: number; noDevice?: number; error?: string };

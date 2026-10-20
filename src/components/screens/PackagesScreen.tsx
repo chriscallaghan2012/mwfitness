@@ -74,6 +74,8 @@ export const PackagesScreen: React.FC<PackagesScreenProps> = ({ onOpenBookCall }
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       </section>
 
+      <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
+
       {/* 2. THE PACKAGES */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10">

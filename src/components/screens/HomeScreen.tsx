@@ -21,6 +21,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       setPlans(result.plans.slice(0, 3));
       setPlansError(result.error);
       setPlansLoading(false);
+    }, (cause: unknown) => {
+      if (!active) return;
+      console.error('[MW Fitness] Home pricing request failed:', cause);
+      setPlans([]);
+      setPlansError('Pricing is temporarily unavailable. Please contact Mike for current options.');
+      setPlansLoading(false);
     });
     return () => { active = false; };
   }, []);
@@ -131,6 +137,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           <span className="mx-4">● PURE GYM HAZEL GROVE • STOCKPORT</span>
         </div>
       </div>
+
+      <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
       {/* 3. ABOUT MIKE */}
       <section id="about-mike" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -3,7 +3,7 @@
 // Same shared Neon project as the mobile app.
 import { FormEvent, useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { UsersAdmin } from './UsersAdmin';
 import { PlansAdmin } from './PlansAdmin';
 import { MembershipsAdmin } from './MembershipsAdmin';
@@ -17,9 +17,10 @@ import { VideosAdmin } from './VideosAdmin';
 import { ProgrammesAdmin } from './ProgrammesAdmin';
 import { PasswordRecovery } from './PasswordRecovery';
 import { MemberActivityAdmin } from './MemberActivityAdmin';
+import { CommunicationsAdmin } from './CommunicationsAdmin';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'programmes' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads' | 'member-activity';
+type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'programmes' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads' | 'member-activity' | 'communications';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -36,6 +37,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'messages', label: 'Messages' },
   { id: 'leads', label: 'Website leads' },
   { id: 'member-activity', label: 'Member activity' },
+  { id: 'communications', label: 'Notifications & email' },
 ];
 
 type DemoTab = Exclude<Tab, 'overview'>;
@@ -99,6 +101,10 @@ const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; 
   'member-activity': {
     columns: [{ key: 'member', label: 'Member' }, { key: 'activity', label: 'Activity' }, { key: 'status', label: 'Status' }],
     rows: [{ id: 'demo-activity-1', member: 'Alex Morgan', activity: 'Steps', value: '9,200 steps', date: '2026-10-18', status: 'Complete', notes: 'Daily target achieved.' }, { id: 'demo-activity-2', member: 'Jamie Reed', activity: 'Cardio', value: '25 min cycling', date: '2026-10-18', status: 'Complete', notes: 'Moderate effort.' }, { id: 'demo-activity-3', member: 'Taylor Brooks', activity: 'Hydration', value: '1.8 L / 2.5 L', date: '2026-10-18', status: 'In progress', notes: 'Remind to drink through the afternoon.' }, { id: 'demo-activity-4', member: 'Morgan Ellis', activity: 'Workout', value: 'Upper body session', date: '2026-10-17', status: 'Missed', notes: 'Follow-up recommended.' }],
+  },
+  communications: {
+    columns: [{ key: 'name', label: 'Workspace' }, { key: 'status', label: 'Status' }, { key: 'detail', label: 'Details' }],
+    rows: [{ id: 'demo-communications-1', name: 'Notification centre', status: 'Planned', detail: 'Automation rules, broadcasts and delivery history' }, { id: 'demo-communications-2', name: 'Branded email studio', status: 'Planned', detail: 'Editable versioned templates and HTML preview' }],
   },
   leads: {
     columns: [{ key: 'name', label: 'Name' }, { key: 'email', label: 'Email' }, { key: 'interest', label: 'Interested in' }, { key: 'status', label: 'Status' }],
@@ -219,6 +225,11 @@ const DEMO_FIELDS: Record<DemoTab, DemoField[]> = {
     { key: 'followUp', label: 'Follow-up date', type: 'date' },
     { key: 'notes', label: 'Notes', type: 'textarea' },
   ],
+  communications: [
+    { key: 'name', label: 'Workspace', placeholder: 'Communications centre' },
+    { key: 'status', label: 'Status', type: 'select', options: ['Planned', 'In progress', 'Blocked', 'Ready for testing'] },
+    { key: 'detail', label: 'Details', type: 'textarea' },
+  ],
   'member-activity': [
     { key: 'member', label: 'Member', placeholder: 'Client name' },
     { key: 'activity', label: 'Activity', type: 'select', options: ['Steps', 'Cardio', 'Hydration', 'Workout', 'Sleep', 'Nutrition log'] },
@@ -253,15 +264,15 @@ export function AdminScreen() {
   const [forgotMode, setForgotMode] = useState(false);
 
   useEffect(() => {
-    if (!supabase) return;
-    supabase.auth
-      .getSession()
+    if (!neon) return;
+    neon.auth
+      .getSession({ query: {} })
       .then(async ({ data }) => {
-        const user = data.session?.user;
+        const user = data.user;
         if (!user) return;
-        const { data: profile, error } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+        const { data: profile, error } = await neon.from('profiles').select('role').eq('id', user.id).maybeSingle();
         if (error || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
-          await supabase.auth.signOut();
+          await neon.auth.signOut({});
           return;
         }
         setEmail(user.email ?? '');
@@ -272,16 +283,16 @@ export function AdminScreen() {
   }, []);
 
   const loadStats = async () => {
-    if (!supabase) {
+    if (!neon) {
       setStats(null);
       return;
     }
     setStatsLoading(true);
     try {
       const [u, p, m] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('plans').select('id', { count: 'exact', head: true }),
-        supabase.from('memberships').select('id', { count: 'exact', head: true }),
+        neon.from('profiles').select('id', { count: 'exact', head: true }),
+        neon.from('plans').select('id', { count: 'exact', head: true }),
+        neon.from('memberships').select('id', { count: 'exact', head: true }),
       ]);
       if (u.error || p.error || m.error) {
         setError('We could not load the live dashboard totals. Check your staff permissions and Neon table policies, then try again.');
@@ -301,17 +312,17 @@ export function AdminScreen() {
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    if (!supabase) {
+    if (!neon) {
       setError('Live sign-in is unavailable until the website Neon settings are configured.');
       return;
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      const { data, error } = await neon.auth.signIn.email({ email: email.trim(), password });
       if (error) throw error;
-      const { data: profile, error: profileError } = await supabase.from('profiles').select('role').eq('id', data.user!.id).maybeSingle();
+      const { data: profile, error: profileError } = await neon.from('profiles').select('role').eq('id', data.user!.id).maybeSingle();
       if (profileError || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
-        await supabase.auth.signOut();
+        await neon.auth.signOut({});
         setError('This account does not have admin access.');
         return;
       }
@@ -327,7 +338,7 @@ export function AdminScreen() {
   };
 
   const signOut = () => {
-    void supabase?.auth.signOut();
+    void neon?.auth.signOut({});
     setSignedIn(false);
     setDemoMode(false);
     setTab('overview');
@@ -405,7 +416,7 @@ export function AdminScreen() {
             <input type="email" value={email} onChange={(ev) => setEmail(ev.target.value)} placeholder="you@mwfitness.co.uk" className="w-full bg-[#121315] border border-zinc-700 rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-[#ff5500]" />
             <input type="password" value={password} onChange={(ev) => setPassword(ev.target.value)} placeholder="Password" className="w-full bg-[#121315] border border-zinc-700 rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-[#ff5500]" />
             {error && <p className="text-sm text-red-400">{error}</p>}
-            <button type="submit" disabled={loading || !supabase} className="w-full bg-[#ff5500] hover:bg-[#ff6a1f] disabled:opacity-50 text-black font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg active:scale-[0.98]">
+            <button type="submit" disabled={loading || !neon} className="w-full bg-[#ff5500] hover:bg-[#ff6a1f] disabled:opacity-50 text-black font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg active:scale-[0.98]">
               {loading ? 'Signing in…' : 'Sign in to HQ'}
             </button>
           </form>
@@ -568,6 +579,7 @@ export function AdminScreen() {
       {!demoMode && tab === 'messages' && <MessagesAdmin />}
       {!demoMode && tab === 'leads' && <LeadsAdmin />}
       {!demoMode && tab === 'member-activity' && <MemberActivityAdmin />}
+      {!demoMode && tab === 'communications' && <CommunicationsAdmin />}
       {demoEditorOpen && demoMode && tab !== 'overview' ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/75 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDemoEditorOpen(false); }}>
           <form onSubmit={saveDemoRow} role="dialog" aria-modal="true" aria-labelledby="demo-editor-title" className="my-auto max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl border border-zinc-700 bg-[#121315] p-5 shadow-2xl">

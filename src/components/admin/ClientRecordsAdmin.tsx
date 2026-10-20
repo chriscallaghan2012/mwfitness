@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btnGhost, card, inp } from './fields';
 
-type Dataset = 'checkins' | 'progress_logs' | 'nutrition_logs' | 'workout_sessions' | 'coach_messages';
+type Dataset = 'checkins' | 'progress_logs' | 'nutrition_logs' | 'nutrition_daily_logs' | 'workout_sessions' | 'coach_messages';
 
 const DATASETS: { id: Dataset; label: string; dateKey: string; description: string }[] = [
   { id: 'checkins', label: 'Check-ins', dateKey: 'checkin_date', description: 'Weekly wellbeing submissions from the mobile app.' },
   { id: 'progress_logs', label: 'Progress', dateKey: 'recorded_on', description: 'Weight and progress records submitted in the app.' },
   { id: 'nutrition_logs', label: 'Nutrition logs', dateKey: 'logged_on', description: 'Daily calories, protein and water entries.' },
+  { id: 'nutrition_daily_logs', label: 'Nutrition completion', dateKey: 'log_date', description: 'Meal completion and day-complete records saved by the mobile nutrition screen.' },
   { id: 'workout_sessions', label: 'Workout sessions', dateKey: 'scheduled_on', description: 'Scheduled and completed sessions.' },
   { id: 'coach_messages', label: 'Messages', dateKey: 'created_at', description: 'Coach messages associated with this client.' },
 ];
@@ -27,7 +28,7 @@ export function ClientRecordsAdmin() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    void supabase?.from('profiles').select('id,full_name,email,role,member_tier,since,current_weight,start_weight,goal_weight').order('full_name')
+    void neon?.from('profiles').select('id,full_name,email,role,member_tier,since,current_weight,start_weight,goal_weight').order('full_name')
       .then(({ data, error }) => {
         if (error) setMessage('Could not load clients. Check staff permissions and database policies.');
         else setUsers((data ?? []) as Row[]);
@@ -35,7 +36,7 @@ export function ClientRecordsAdmin() {
   }, []);
 
   useEffect(() => {
-    if (!supabase || !userId) {
+    if (!neon || !userId) {
       setRows(null); setProfile(null); setMemberships([]); setNutritionPlans([]);
       return;
     }
@@ -45,9 +46,9 @@ export function ClientRecordsAdmin() {
     const selected = users.find((user) => user.id === userId) ?? null;
     setProfile(selected);
     Promise.all([
-      supabase.from(dataset).select('*').eq(dataset === 'coach_messages' ? 'athlete_profile_id' : 'profile_id', userId).order(DATASETS.find((item) => item.id === dataset)?.dateKey ?? 'created_at', { ascending: false }),
-      supabase.from('memberships').select('*, plans(name,price,kind)').eq('profile_id', userId).order('created_at', { ascending: false }),
-      supabase.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
+      neon.from(dataset).select('*').eq(dataset === 'coach_messages' ? 'athlete_profile_id' : 'profile_id', userId).order(DATASETS.find((item) => item.id === dataset)?.dateKey ?? 'created_at', { ascending: false }),
+      neon.from('memberships').select('*, plans(name,price,kind)').eq('profile_id', userId).order('created_at', { ascending: false }),
+      neon.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
     ]).then(([records, membershipResult, nutritionResult]) => {
       if (cancelled) return;
       if (records.error) {
@@ -63,13 +64,13 @@ export function ClientRecordsAdmin() {
   }, [userId, dataset, users, refreshTick]);
 
   useEffect(() => {
-    if (!supabase || !userId) {
+    if (!neon || !userId) {
       setProgressPhotos([]);
       setPhotosMessage('');
       return;
     }
     let cancelled = false;
-    supabase.from('progress_photos')
+    neon.from('progress_photos')
       .select('id,recorded_on,caption,mime_type,photo_data,created_at')
       .eq('profile_id', userId)
       .order('recorded_on', { ascending: false })
@@ -107,6 +108,11 @@ export function ClientRecordsAdmin() {
       { key: 'logged_on', label: 'Date', render: (r: Row) => ShortDate(String(r.logged_on ?? '')) },
       { key: 'calories', label: 'Calories' }, { key: 'protein_grams', label: 'Protein (g)' }, { key: 'water_liters', label: 'Water (L)' },
     ];
+    if (dataset === 'nutrition_daily_logs') return [
+      { key: 'log_date', label: 'Date', render: (r: Row) => ShortDate(String(r.log_date ?? '')) },
+      { key: 'day_type', label: 'Day type' }, { key: 'completed_day', label: 'Day complete', render: (r: Row) => r.completed_day ? 'Yes' : 'No' },
+      { key: 'completed_meal_ids', label: 'Completed meal IDs', render: (r: Row) => Array.isArray(r.completed_meal_ids) ? r.completed_meal_ids.join(', ') || 'None' : '—' },
+    ];
     if (dataset === 'workout_sessions') return [
       { key: 'scheduled_on', label: 'Scheduled', render: (r: Row) => ShortDate(String(r.scheduled_on ?? '')) },
       { key: 'template_id', label: 'Workout template' }, { key: 'status', label: 'Status' }, { key: 'completed_on', label: 'Completed' }, { key: 'notes', label: 'Session notes' },
@@ -121,7 +127,7 @@ export function ClientRecordsAdmin() {
     <div className="space-y-4">
       <div className={card}>
         <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-orange-300">App data explorer</p>
-        <p className="mb-4 text-sm text-zinc-400">Inspect submissions synced from the mobile app. This is read-only scaffolding; it does not change the app's dummy data or write into client records.</p>
+        <p className="mb-4 text-sm text-zinc-400">Inspect live submissions from the mobile app through the shared Neon database. This view is read-only; manage plans and assignments in their dedicated admin tabs.</p>
         <label className="mb-1 block text-xs text-zinc-400">Client</label>
         <select className={inp} value={userId} onChange={(event) => setUserId(event.target.value)}>
           <option value="">Choose a client…</option>

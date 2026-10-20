@@ -1,6 +1,5 @@
 // Shared Neon Auth + Data API client for the MW Fitness website and staff panel.
-// The legacy filename/export is retained during the migration to keep imports stable.
-import { createClient, SupabaseAuthAdapter } from '@neondatabase/neon-js';
+import { createClient, BetterAuthVanillaAdapter } from '@neondatabase/neon-js';
 
 const authUrl = import.meta.env.VITE_NEON_AUTH_URL ?? '';
 const dataApiUrl = import.meta.env.VITE_NEON_DATA_API_URL ?? '';
@@ -10,7 +9,7 @@ export const isNeonConfigured = Boolean(authUrl && dataApiUrl);
 export const neon = isNeonConfigured
   ? createClient({
       auth: {
-        adapter: SupabaseAuthAdapter(),
+        adapter: BetterAuthVanillaAdapter(),
         url: authUrl,
         // Public pages (including pricing) must be able to query public Neon rows
         // before a visitor signs in. Database grants/RLS still govern what is readable.
@@ -22,6 +21,3 @@ export const neon = isNeonConfigured
     })
   : null;
 
-// Compatibility alias while components are moved to the shared Neon client.
-export const supabase = neon;
-export const isSupabaseConfigured = isNeonConfigured;

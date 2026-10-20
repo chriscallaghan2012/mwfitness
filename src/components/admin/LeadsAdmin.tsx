@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, StatusPill, btnGhost, card, inp } from './fields';
 
 const STATUSES = ['new', 'contacted', 'qualified', 'converted', 'closed'];
@@ -12,14 +12,14 @@ export function LeadsAdmin() {
   const [notice, setNotice] = useState('');
 
   const load = useCallback(async () => {
-    if (!supabase) {
+    if (!neon) {
       setError('The Neon backend is not configured for this deployment.');
       setLoading(false);
       return;
     }
     setLoading(true);
     try {
-      const query = supabase
+      const query = neon
         .from('website_leads')
         .select('id,kind,name,email,phone,interest,goal,message,page,status,created_at,times')
         .order('created_at', { ascending: false })
@@ -43,10 +43,10 @@ export function LeadsAdmin() {
   useEffect(() => { void load(); }, [load]);
 
   const updateStatus = async (lead: Row, status: string) => {
-    if (!supabase) return;
+    if (!neon) return;
     setNotice('');
     try {
-      const { error: updateError } = await supabase.from('website_leads').update({ status }).eq('id', lead.id);
+      const { error: updateError } = await neon.from('website_leads').update({ status }).eq('id', lead.id);
       if (updateError) {
         setError('Status could not be saved. Check staff permissions and try again.');
         return;

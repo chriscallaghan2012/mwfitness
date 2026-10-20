@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
 const EMPTY: Record<string, string> = { title: '', description: '', category: 'Technique', video_url: '', thumbnail_url: '', duration_seconds: '', level: 'All levels', active: 'true' };
@@ -10,12 +10,12 @@ export function VideosAdmin() {
   const [form, setForm] = useState<Record<string, string>>(EMPTY);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
-  const [schemaMissing, setSchemaMissing] = useState(!supabase);
+  const [schemaMissing, setSchemaMissing] = useState(!neon);
 
   const load = async () => {
-    if (!supabase) { setSchemaMissing(true); setRows([]); setMessage('Neon is not configured for this website environment.'); return; }
+    if (!neon) { setSchemaMissing(true); setRows([]); setMessage('Neon is not configured for this website environment.'); return; }
     try {
-    const { data, error } = await supabase.from('coaching_videos').select('*').order('created_at', { ascending: false });
+    const { data, error } = await neon.from('coaching_videos').select('*').order('created_at', { ascending: false });
     if (error) {
       setRows([]);
       setSchemaMissing(/does not exist|not found|schema cache|could not find/i.test(error.message));
@@ -40,33 +40,43 @@ export function VideosAdmin() {
     setForm({ title: String(row.title ?? ''), description: String(row.description ?? ''), category: String(row.category ?? 'Technique'), video_url: String(row.video_url ?? ''), thumbnail_url: String(row.thumbnail_url ?? ''), duration_seconds: String(row.duration_seconds ?? ''), level: String(row.level ?? 'All levels'), active: row.active ? 'true' : 'false' });
   };
   const save = async () => {
-    if (!supabase) { setMessage('Live database access is not configured; no changes were saved.'); return; }
+    if (!neon) { setMessage('Live database access is not configured; no changes were saved.'); return; }
     if (!form.title.trim() || !form.video_url.trim()) { setMessage('A title and video URL are required.'); return; }
     try { new URL(form.video_url); } catch { setMessage('Enter a valid video URL.'); return; }
     if (form.thumbnail_url.trim()) { try { new URL(form.thumbnail_url); } catch { setMessage('Thumbnail must be a valid URL.'); return; } }
+    const duration = form.duration_seconds.trim() ? Number(form.duration_seconds) : null;
+    if (duration !== null && (!Number.isInteger(duration) || duration < 0)) { setMessage('Duration must be a non-negative whole number of seconds.'); return; }
     setBusy(true); setMessage('');
-    const body = { title: form.title.trim(), description: form.description.trim() || null, category: form.category.trim() || 'General', video_url: form.video_url.trim(), thumbnail_url: form.thumbnail_url.trim() || null, duration_seconds: form.duration_seconds ? Number(form.duration_seconds) : null, level: form.level.trim() || 'All levels', active: form.active === 'true' };
-    const result = edit?.id ? await supabase!.from('coaching_videos').update(body).eq('id', edit.id) : await supabase!.from('coaching_videos').insert(body);
-    setBusy(false);
-    if (result.error) { setMessage(`Save failed: ${result.error.message}`); return; }
-    setEdit(null); setMessage('Video saved.'); await load();
+    const body = { title: form.title.trim(), description: form.description.trim() || null, category: form.category.trim() || 'General', video_url: form.video_url.trim(), thumbnail_url: form.thumbnail_url.trim() || null, duration_seconds: duration, level: form.level.trim() || 'All levels', active: form.active === 'true' };
+    try {
+      const result = edit?.id
+        ? await neon.from('coaching_videos').update(body).eq('id', edit.id).select('id')
+        : await neon.from('coaching_videos').insert(body).select('id');
+      if (result.error) { setMessage(`Save failed: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMessage('Nothing was saved. The video may no longer exist or your staff permissions may not allow this change.'); return; }
+      setEdit(null); setMessage('Video saved.'); await load();
+    } catch {
+      setMessage('Could not save this video. Check the connection and try again.');
+    } finally {
+      setBusy(false);
+    }
   };
   const remove = async (row: Row) => {
-    if (!supabase) { setMessage('Live database access is not configured; no changes were made.'); return; }
+    if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete “${String(row.title)}” from the video library?`)) return;
-    const { error } = await supabase!.from('coaching_videos').delete().eq('id', row.id);
+    const { error } = await neon!.from('coaching_videos').delete().eq('id', row.id);
     if (error) setMessage(`Delete failed: ${error.message}`); else { setMessage('Video deleted.'); await load(); }
   };
   const toggle = async (row: Row) => {
-    if (!supabase) { setMessage('Live database access is not configured; no changes were made.'); return; }
-    const { error } = await supabase!.from('coaching_videos').update({ active: !row.active }).eq('id', row.id);
+    if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
+    const { error } = await neon!.from('coaching_videos').update({ active: !row.active }).eq('id', row.id);
     if (error) setMessage(`Update failed: ${error.message}`); else await load();
   };
 
   return (
     <div className="space-y-4">
       <div className={card}>
-        <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-mono text-[10px] uppercase text-orange-300">Coaching content</p><h2 className="mt-1 text-lg font-semibold text-white">Video library</h2><p className="mt-1 max-w-2xl text-sm text-zinc-400">Prepare exercise demos, technique explainers and coaching videos for the future app library. This does not change the app's current dummy content.</p></div><button className={btn} onClick={openNew} disabled={schemaMissing}>+ Add video</button></div>
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-mono text-[10px] uppercase text-orange-300">Coaching content</p><h2 className="mt-1 text-lg font-semibold text-white">Video library</h2><p className="mt-1 max-w-2xl text-sm text-zinc-400">Publish exercise demos and coaching videos for the member app. The app reader is prepared, but live publishing remains blocked until the reviewed coaching_videos migration and permissions are installed.</p></div><button className={btn} onClick={openNew} disabled={schemaMissing}>+ Add video</button></div>
         {message && <p role="status" className="mt-4 rounded-lg border border-zinc-800 bg-black/20 p-3 text-xs text-orange-200">{message}</p>}
       </div>
       <AdminTable rows={rows ?? []} empty={schemaMissing ? 'Live video storage is awaiting its migration.' : 'No videos added yet.'} onEdit={openEdit} onDelete={remove} cols={[

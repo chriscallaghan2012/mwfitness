@@ -1,6 +1,6 @@
 // WorkoutsAdmin — template exercises + per-customer session schedule.
-import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { useEffect, useRef, useState } from 'react';
+import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
 export function WorkoutsAdmin() {
@@ -12,14 +12,15 @@ export function WorkoutsAdmin() {
   const [msg, setMsg] = useState('');
   const [form, setForm] = useState<Record<string, string>>({});
   const [sessForm, setSessForm] = useState<Record<string, string>>({});
+  const sessionLoadRequest = useRef(0);
 
   const load = async () => {
-    if (!supabase) { setMsg('Neon is not configured; live workouts cannot be loaded.'); setTemplates([]); setSessions([]); return; }
+    if (!neon) { setMsg('Neon is not configured; live workouts cannot be loaded.'); setTemplates([]); setSessions([]); return; }
     try {
       const [templateResult, userResult, planResult] = await Promise.all([
-        supabase.from('workout_templates').select('*, plans(name)').order('name'),
-        supabase.from('profiles').select('id,full_name').order('full_name'),
-        supabase.from('plans').select('id,name').order('name'),
+        neon.from('workout_templates').select('*, plans(name)').order('name'),
+        neon.from('profiles').select('id,full_name').order('full_name'),
+        neon.from('plans').select('id,name').order('name'),
       ]);
       if (templateResult.error) setMsg(`Could not load workout templates: ${templateResult.error.message}`);
       else setTemplates((templateResult.data ?? []) as Row[]);
@@ -32,13 +33,18 @@ export function WorkoutsAdmin() {
     }
   };
   const loadSessions = async (profileId = userId) => {
+    const requestId = ++sessionLoadRequest.current;
     if (!profileId) { setSessions(null); return; }
-    if (!supabase) { setMsg('Neon is not configured; sessions cannot be loaded.'); setSessions([]); return; }
+    if (!neon) { setMsg('Neon is not configured; sessions cannot be loaded.'); setSessions([]); return; }
+    setSessions([]);
     try {
-      const { data, error } = await supabase.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', profileId).order('scheduled_on');
-      if (error) { setMsg(`Could not load sessions: ${error.message}`); return; }
+      const { data, error } = await neon.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', profileId).order('scheduled_on');
+      if (requestId !== sessionLoadRequest.current) return;
+      if (error) { setMsg(`Could not load sessions: ${error.message}`); setSessions([]); return; }
       setSessions((data ?? []) as Row[]);
     } catch (error) {
+      if (requestId !== sessionLoadRequest.current) return;
+      setSessions([]);
       setMsg(`Could not load sessions: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
   };
@@ -50,9 +56,9 @@ export function WorkoutsAdmin() {
     if (!form.name?.trim()) { setMsg('Enter a workout template name.'); return; }
     const days = Number(form.days_per_week || 0);
     if (days && (!Number.isInteger(days) || days < 1 || days > 7)) { setMsg('Days per week must be between 1 and 7.'); return; }
-    if (!supabase) { setMsg('Neon is not configured; workout templates cannot be created.'); return; }
+    if (!neon) { setMsg('Neon is not configured; workout templates cannot be created.'); return; }
     try {
-      const { error } = await supabase.from('workout_templates').insert({
+      const { error } = await neon.from('workout_templates').insert({
         name: form.name.trim(),
         description: form.description ?? '',
         days_per_week: days || null,
@@ -68,13 +74,15 @@ export function WorkoutsAdmin() {
   };
 
   const removeTemplate = async (row: Row) => {
-    if (!supabase) { setMsg('Neon is not configured; no changes were made.'); return; }
+    if (!neon) { setMsg('Neon is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete workout template “${String(row.name)}”? Scheduled sessions may prevent deletion.`)) return;
     setMsg('');
     try {
-      const { error } = await supabase.from('workout_templates').delete().eq('id', row.id);
-      setMsg(error ? `Delete failed: ${error.message}` : 'Template deleted.');
-      if (!error) await load();
+      const result = await neon.from('workout_templates').delete().eq('id', row.id).select('id');
+      if (result.error) { setMsg(`Delete failed: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('The template was not deleted. It may already be gone or your staff permissions may not allow this change.'); return; }
+      setMsg('Template deleted.');
+      await load();
     } catch (error) {
       setMsg(`Delete failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
@@ -82,9 +90,9 @@ export function WorkoutsAdmin() {
 
   const addSession = async () => {
     if (!userId || !sessForm.template_id) { setMsg('Choose a client and workout template first.'); return; }
-    if (!supabase) { setMsg('Neon is not configured; sessions cannot be scheduled.'); return; }
+    if (!neon) { setMsg('Neon is not configured; sessions cannot be scheduled.'); return; }
     try {
-      const { error } = await supabase.from('workout_sessions').insert({
+      const { error } = await neon.from('workout_sessions').insert({
         profile_id: userId,
         template_id: sessForm.template_id,
         scheduled_on: sessForm.scheduled_on || null,
@@ -100,11 +108,12 @@ export function WorkoutsAdmin() {
   };
 
   const flipStatus = async (s: Row) => {
-    if (!supabase) { setMsg('Neon is not configured; session status cannot be updated.'); return; }
+    if (!neon) { setMsg('Neon is not configured; session status cannot be updated.'); return; }
     const status = s.status === 'completed' ? 'planned' : 'completed';
     try {
-      const { error } = await supabase.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id);
-      if (error) { setMsg(`Could not update session: ${error.message}`); return; }
+      const result = await neon.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id).select('id');
+      if (result.error) { setMsg(`Could not update session: ${result.error.message}`); return; }
+      if (!result.data?.length) { setMsg('The session was not updated. It may no longer exist or your staff permissions may not allow this change.'); return; }
       setMsg(`Session marked ${status}.`);
       await loadSessions(userId);
     } catch (error) {

@@ -1,25 +1,35 @@
-name: Staff HQ verification
+name: MW Fitness Website — Full Verification
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - work/mwfitness-routes-hero-stripes-neon
 
 permissions:
   contents: read
 
+concurrency:
+  group: mw-fitness-website-full-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    name: Install, TypeScript and production build
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout working branch
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - name: Install locked dependencies
         run: npm ci
-      - name: Lint and type checks
+      - name: TypeScript and lint checks
         run: npm run lint
       - name: Production build
         run: npm run build

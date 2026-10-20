@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { neon } from '../../lib/neon';
 
 type MetricRow = { profile_id: string; metric_date: string; water_litres: number | string; steps: number };
 type CardioRow = { id: string; profile_id: string; completed_at: string; activity: string; duration_minutes: number; average_heart_rate: number | null };
@@ -40,7 +40,7 @@ export function MemberActivityAdmin() {
   const [error, setError] = useState('');
 
   const refresh = useCallback(async () => {
-    if (!supabase) {
+    if (!neon) {
       setError('The shared Neon data connection is not configured.');
       setLoading(false);
       return;
@@ -49,9 +49,9 @@ export function MemberActivityAdmin() {
     setError('');
     try {
       const [metricsResult, cardioResult, supplementResult] = await Promise.all([
-        supabase.from('daily_metrics').select('profile_id,metric_date,water_litres,steps').order('metric_date', { ascending: false }).limit(25),
-        supabase.from('cardio_logs').select('id,profile_id,completed_at,activity,duration_minutes,average_heart_rate').order('completed_at', { ascending: false }).limit(25),
-        supabase.from('supplement_plans').select('id,profile_id,name,dosage_string,timing,active').order('created_at', { ascending: false }).limit(25),
+        neon.from('daily_metrics').select('profile_id,metric_date,water_litres,steps').order('metric_date', { ascending: false }).limit(25),
+        neon.from('cardio_logs').select('id,profile_id,completed_at,activity,duration_minutes,average_heart_rate').order('completed_at', { ascending: false }).limit(25),
+        neon.from('supplement_plans').select('id,profile_id,name,dosage_string,timing,active').order('created_at', { ascending: false }).limit(25),
       ]);
       const failed = [metricsResult.error, cardioResult.error, supplementResult.error].filter(Boolean);
       if (failed.length) {

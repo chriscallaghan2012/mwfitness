@@ -1,5 +1,3 @@
-import { supabase } from './supabase';
-
 export interface PublicPlan {
   id: string;
   name: string;
@@ -14,38 +12,43 @@ export interface PublicPlan {
   kind: 'pt' | 'online';
 }
 
+const UNAVAILABLE = 'Pricing is temporarily unavailable. Please contact Mike for current options.';
+
 export async function loadPublicPlans(kind: PublicPlan['kind']): Promise<{ plans: PublicPlan[]; error: string | null }> {
-  if (!supabase) {
-    return { plans: [], error: 'Pricing is temporarily unavailable. Please contact Mike for current options.' };
+  try {
+    const response = await fetch(`/api/plans?kind=${encodeURIComponent(kind)}`, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      console.error('[MW Fitness] Public pricing endpoint returned status:', response.status);
+      return { plans: [], error: UNAVAILABLE };
+    }
+    const payload = await response.json() as { plans?: unknown };
+    if (!Array.isArray(payload.plans)) {
+      console.error('[MW Fitness] Public pricing endpoint returned an invalid payload.');
+      return { plans: [], error: UNAVAILABLE };
+    }
+    const plans = payload.plans.map((row) => {
+      const plan = row as Partial<PublicPlan>;
+      return {
+        id: String(plan.id ?? ''),
+        name: String(plan.name ?? ''),
+        tag: String(plan.tag ?? ''),
+        price: Number(plan.price ?? 0),
+        original_price: plan.original_price == null ? null : Number(plan.original_price),
+        badge: plan.badge ?? null,
+        is_popular: Boolean(plan.is_popular),
+        description: String(plan.description ?? ''),
+        features: Array.isArray(plan.features) ? plan.features.filter((feature): feature is string => typeof feature === 'string') : [],
+        cta_text: String(plan.cta_text ?? 'Get started'),
+        kind,
+      } satisfies PublicPlan;
+    }).filter((plan) => plan.id && plan.name && Number.isFinite(plan.price) && plan.price >= 0);
+    return { plans, error: null };
+  } catch (cause) {
+    console.error('[MW Fitness] Public pricing request failed:', cause instanceof Error ? cause.message : 'Unknown request error');
+    return { plans: [], error: UNAVAILABLE };
   }
-
-  const { data, error } = await supabase
-    .from('plans')
-    .select('id,name,tag,price,original_price,badge,is_popular,description,features,cta_text,kind')
-    .eq('active', true)
-    .eq('kind', kind)
-    .order('price');
-
-  if (error) {
-    // Keep customer-facing copy generic, but retain the actual Neon error in
-    // the browser console so a local/staging check can identify grants, schema,
-    // or environment problems without exposing backend details to visitors.
-    console.error('[MW Fitness] Public pricing query failed:', error.message);
-    return { plans: [], error: 'Pricing is temporarily unavailable. Please contact Mike for current options.' };
-  }
-
-  const plans = (data ?? []).map((row) => ({
-    ...row,
-    tag: row.tag ?? '',
-    original_price: row.original_price == null ? null : Number(row.original_price),
-    price: Number(row.price),
-    badge: row.badge ?? null,
-    is_popular: Boolean(row.is_popular),
-    description: row.description ?? '',
-    features: Array.isArray(row.features) ? row.features.filter((feature): feature is string => typeof feature === 'string') : [],
-    cta_text: row.cta_text ?? 'Get started',
-    kind,
-  })) as PublicPlan[];
-
-  return { plans, error: null };
 }
