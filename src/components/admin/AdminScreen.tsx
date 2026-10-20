@@ -266,13 +266,13 @@ export function AdminScreen() {
   useEffect(() => {
     if (!neon) return;
     neon.auth
-      .getSession()
+      .getSession({})
       .then(async ({ data }) => {
-        const user = data.session?.user;
+        const user = data.user;
         if (!user) return;
         const { data: profile, error } = await neon.from('profiles').select('role').eq('id', user.id).maybeSingle();
         if (error || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
-          await neon.auth.signOut();
+          await neon.auth.signOut({});
           return;
         }
         setEmail(user.email ?? '');
@@ -322,7 +322,7 @@ export function AdminScreen() {
       if (error) throw error;
       const { data: profile, error: profileError } = await neon.from('profiles').select('role').eq('id', data.user!.id).maybeSingle();
       if (profileError || (profile?.role !== 'admin' && profile?.role !== 'coach')) {
-        await neon.auth.signOut();
+        await neon.auth.signOut({});
         setError('This account does not have admin access.');
         return;
       }
@@ -338,7 +338,7 @@ export function AdminScreen() {
   };
 
   const signOut = () => {
-    void neon?.auth.signOut();
+    void neon?.auth.signOut({});
     setSignedIn(false);
     setDemoMode(false);
     setTab('overview');
