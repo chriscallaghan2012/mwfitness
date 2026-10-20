@@ -2,6 +2,9 @@ name: MW Fitness Neon verification
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - work/mwfitness-routes-hero-stripes-neon
 
 permissions:
   contents: read
