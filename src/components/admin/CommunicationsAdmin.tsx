@@ -192,6 +192,18 @@ export function CommunicationsAdmin() {
   const updateDraft = (key: keyof Template, value: unknown) => setDraft((current) => ({ ...current, [key]: value }));
   const count = (status: string) => events.filter((event) => event.status === status).length;
   const setField = (key: keyof Template, value: string) => updateDraft(key, value);
+  const previewHtml = String(draft.html_body ?? '')
+    .replace(/{{\\s*name\\s*}}/g, 'Alex Morgan')
+    .replace(/{{\\s*email\\s*}}/g, 'alex@example.test')
+    .replace(/{{\\s*headline\\s*}}/g, String(draft.name || 'Email preview'))
+    .replace(/{{\\s*subject\\s*}}/g, String(draft.subject || 'Preview subject'))
+    .replace(/{{\\s*preheader\\s*}}/g, String(draft.preheader || 'Preview preheader'))
+    .replace(/{{\\s*body\\s*}}/g, 'This is sample preview text. Real recipient details are inserted when sent.')
+    .replace(/{{\\s*app_url\\s*}}/g, 'https://mwfitnessuk.com/app')
+    .replace(/{{\\s*admin_url\\s*}}/g, 'https://mwfitnessuk.com/admin')
+    .replace(/{{\\s*cta_url\\s*}}/g, 'https://mwfitnessuk.com')
+    .replace(/{{\\s*cta_label\\s*}}/g, 'Open MW Fitness')
+    .replace(/{{\\s*unsubscribe_url\\s*}}/g, 'https://mwfitnessuk.com/unsubscribe-preview');
 
   return (
     <section className="space-y-5" aria-labelledby="communications-heading">
@@ -229,7 +241,7 @@ export function CommunicationsAdmin() {
             </div>
             <label className="flex items-center gap-2 text-xs text-zinc-300"><input type="checkbox" checked={Boolean(draft.enabled)} onChange={(e) => updateDraft('enabled', e.target.checked)} className="accent-orange-500" /> Template enabled for future use</label>
             <div className="flex flex-wrap gap-2"><button type="button" onClick={() => void saveTemplate()} disabled={saving} className={btn}><Save className="h-3.5 w-3.5" />{saving ? 'Saving…' : 'Save new version'}</button><button type="button" onClick={() => void sendTest()} disabled={testSending || saving || !selected.enabled} className={btnGhost}><Send className="h-3.5 w-3.5" />{testSending ? 'Sending test…' : 'Send test to me'}</button><button type="button" onClick={() => setDraft({ ...selected })} className={btnGhost}>Discard edits</button></div>
-            <div className="overflow-hidden rounded-xl border border-white/10 bg-white p-3"><p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">HTML preview · static template only</p><iframe title="Email template preview" sandbox="" srcDoc={String(draft.html_body ?? '')} className="h-80 w-full bg-white" /></div>
+            <div className="overflow-hidden rounded-xl border border-white/10 bg-white p-3"><p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">HTML preview · static template only</p><iframe title="Email template preview" sandbox="" srcDoc={previewHtml} className="h-80 w-full bg-white" /></div>
           </div> : null}
         </div>}
       </div> : null}
