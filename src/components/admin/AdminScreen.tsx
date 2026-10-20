@@ -471,9 +471,9 @@ export function AdminScreen() {
     );
   }
   return (
-    <div className="min-h-[60vh] w-full px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-7xl">
-      <div className="flex flex-wrap items-center gap-3 mb-2">
+    <div className="w-full px-3 py-5 sm:px-5 lg:px-6 xl:px-8">
+      <div className="mx-auto w-full max-w-[1680px]">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-bold text-white">MWFitnessUK HQ</h1>
         {demoMode ? <span className="border border-orange-500/50 bg-orange-500/10 px-2 py-1 text-[10px] font-mono font-bold uppercase text-orange-300">Demo · sample data</span> : <span className="text-xs text-zinc-400">signed in as {email}</span>}
         <button onClick={demoMode ? exitDemo : signOut} className="text-xs text-zinc-500 underline">
@@ -481,10 +481,10 @@ export function AdminScreen() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <aside className="min-w-0">
-          <p className="mb-2 hidden px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 lg:block">Workspace</p>
-<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:sticky lg:top-28 lg:flex lg:h-fit lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[224px_minmax(0,1fr)] xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-6">
+        <aside className="min-w-0 self-start">
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:sticky lg:top-24 lg:flex lg:h-fit lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
+        <p className="hidden px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 lg:block">Workspace</p>
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -501,7 +501,7 @@ export function AdminScreen() {
         ))}
       </div>
         </aside>
-        <div className="min-w-0 space-y-5">
+        <div className="min-w-0 space-y-4">
 
 
       {tab === 'overview' && !demoMode && (
