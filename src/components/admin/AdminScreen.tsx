@@ -480,7 +480,7 @@ export function AdminScreen() {
           <MetricCard label="Available plans" value={demoMode ? String(demoRows.plans.filter((r) => r.status === "Active").length) : statsLoading ? "…" : String(stats?.plans ?? "—")} detail="Plan catalogue count" icon={<CreditCard className="h-4 w-4" />} />
           <div className="relative overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/[0.12] via-[#17191d] to-[#111317] p-5 shadow-lg shadow-black/10"><div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-orange-500/10 blur-2xl" /><div className="relative flex items-start justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-400">Revenue tracked</p><p className="mt-3 text-xl font-semibold tracking-tight text-white">Not connected</p><p className="mt-1 text-xs leading-5 text-zinc-500">Verified Stripe payment totals are not wired into this dashboard yet.</p></div><span className="grid h-9 w-9 place-items-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-orange-300"><CircleDollarSign className="h-4 w-4" /></span></div></div>
         </div>
-      )})}
+      )}
       {tab === 'overview' && !demoMode && (
         <div className={`${card} mb-4 text-sm text-zinc-300`}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3">
@@ -543,7 +543,7 @@ export function AdminScreen() {
               </div>
               <p className="mt-4 text-[11px] leading-5 text-zinc-500">These rings are design previews only. They are not live member analytics.</p>
             </section>
-            <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}
+            <section className={`${card} !rounded-2xl !border-white/[0.08] !bg-[#131519]`}>
               <p className="text-xs text-zinc-500">COACH PRIORITIES</p><h3 className="mt-1 text-lg font-semibold text-white">Needs attention</h3>
               <div className="mt-4 space-y-3">
                 {[
