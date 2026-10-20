@@ -228,7 +228,7 @@ export function NutritionAdmin() {
       </button>
       {edit && (
       <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className={`${card} w-full max-w-md max-h-[85vh] overflow-y-auto`}>
+        <div className={`${card} w-full max-w-3xl max-h-[90vh] overflow-y-auto`}>
           <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">
             {mode === 'templates' ? 'Meal template' : 'Nutrition plan'}{f.name ? ` — ${f.name}` : ''}
           </p>
