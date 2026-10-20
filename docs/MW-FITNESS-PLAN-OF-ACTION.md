@@ -136,3 +136,5 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 
 - [x] Extended the guided food editor to capture gram amounts, calories, protein, carbohydrates, fats and salt so the mobile macro overview can receive the full set of values from Staff HQ.
 - [x] Changed marketing preference uniqueness and unsubscribe upserts to be case-insensitive, avoiding duplicate suppression records for differently-cased versions of the same email address.
+
+- [x] Extended affected-row verification to package visibility toggles, workout template deletion/session status, membership assignment/removal, progress weigh-in creation/deletion, and multi-recipient coach-message inserts.
