@@ -176,7 +176,6 @@ a {
    Match semantic cards and rounded, background-backed panels without animating ordinary buttons. */
 article,
 .card,
-[class*="card-"],
 [class*="-card"],
 [class*="bg-brand-card"],
 [class*="bg-[#16181d]"],
@@ -189,7 +188,6 @@ article,
 
 article::after,
 .card::after,
-[class*="card-"]::after,
 [class*="-card"]::after,
 [class*="bg-brand-card"]::after,
 [class*="bg-[#16181d]"]::after,
