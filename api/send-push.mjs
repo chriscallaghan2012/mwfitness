@@ -102,7 +102,7 @@ export default async function handler(req, res) {
         continue;
       }
       for (const row of tokens) {
-        const parts = String(message.body || '').split('\\n\\n');
+        const parts = String(message.body || '').split('\n\n');
         const hasCustomTitle = parts.length > 1;
         const notificationTitle = hasCustomTitle ? parts.shift().slice(0, 180) : 'New message from your coach';
         pushQueue.push({
@@ -110,7 +110,7 @@ export default async function handler(req, res) {
           payload: {
             to: row.expo_push_token,
             title: notificationTitle,
-            body: hasCustomTitle ? parts.join('\\n\\n') : message.body,
+            body: hasCustomTitle ? parts.join('\n\n') : message.body,
             sound: 'default',
             channelId: 'coach-messages',
             data: { messageId: message.id },
