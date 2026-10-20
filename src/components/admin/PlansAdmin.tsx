@@ -60,9 +60,16 @@ export function PlansAdmin() {
       .map((feature) => feature.trim())
       .filter(Boolean);
     try {
-      const { error } = edit?.id ? await neon.from('plans').update(body).eq('id', edit.id) : await neon.from('plans').insert(body);
-      setMsg(error ? `Save failed: ${error.message}` : 'Package saved.');
-      if (!error) { setEdit(null); await load(); }
+      const result = edit?.id ? await neon.from('plans').update(body).eq('id', edit.id).select('id') : await neon.from('plans').insert(body).select('id');
+      if (result.error) {
+        setMsg(`Save failed: ${result.error.message}`);
+      } else if (!result.data?.length) {
+        setMsg('Nothing was saved. The package may no longer exist or your staff permissions may not allow this change.');
+      } else {
+        setMsg('Package saved.');
+        setEdit(null);
+        await load();
+      }
     } catch {
       setMsg('Could not save this package. Check the connection and retry.');
     } finally { setBusy(false); }
