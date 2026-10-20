@@ -26,8 +26,9 @@ export function CheckinsAdmin() {
     if (notes === null) return;
     if (!neon) { setCheckinMsg('Neon is not configured; check-ins cannot be updated.'); return; }
     try {
-      const { error } = await neon.from('checkins').update({ status: 'reviewed', coach_notes: notes || null, coach_prescription: notes || null }).eq('id', r.id);
-      if (error) { setCheckinMsg('Could not save review: ' + error.message); return; }
+      const result = await neon.from('checkins').update({ status: 'reviewed', coach_notes: notes || null, coach_prescription: notes || null }).eq('id', r.id).select('id');
+      if (result.error) { setCheckinMsg('Could not save review: ' + result.error.message); return; }
+      if (!result.data?.length) { setCheckinMsg('The check-in was not updated. It may no longer exist or your staff permissions may not allow this change.'); return; }
       setCheckinMsg('Check-in review saved.');
       await load();
     } catch (error) {
@@ -38,8 +39,9 @@ export function CheckinsAdmin() {
   const remove = async (id: string) => {
     if (!neon) { setCheckinMsg('Neon is not configured; check-ins cannot be deleted.'); return; }
     try {
-      const { error } = await neon.from('checkins').delete().eq('id', id);
-      if (error) { setCheckinMsg('Could not delete check-in: ' + error.message); return; }
+      const result = await neon.from('checkins').delete().eq('id', id).select('id');
+      if (result.error) { setCheckinMsg('Could not delete check-in: ' + result.error.message); return; }
+      if (!result.data?.length) { setCheckinMsg('The check-in was not deleted. It may already be gone or your staff permissions may not allow this change.'); return; }
       setCheckinMsg('Check-in deleted.');
       await load();
     } catch (error) {
