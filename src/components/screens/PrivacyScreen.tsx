@@ -26,8 +26,8 @@ export const PrivacyScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => (
       <section><h2 className="mb-2 text-xl font-semibold text-white">Your choices and rights</h2><p>Depending on your circumstances and applicable law, you may be able to request access to, correction of, or deletion of your personal information, or object to or restrict some processing. You can request account or data deletion at <a className="text-[#ff7547] underline underline-offset-4" href="/delete-account">mwfitnessuk.com/delete-account</a>. We may need to verify your identity and retain some records where the law requires it.</p></section>
       <section><h2 className="mb-2 text-xl font-semibold text-white">Children</h2><p>MW Fitness is intended for adults. Please contact us if you believe a child has provided personal information without appropriate permission.</p></section>
       <section><h2 className="mb-2 text-xl font-semibold text-white">Changes to this policy</h2><p>We may update this policy as our services change. The latest version will be published on this page with its updated date.</p></section>
-      <section className="border-t border-zinc-800 pt-6"><h2 className="mb-2 text-xl font-semibold text-white">Contact</h2><p>For privacy questions or requests, contact Michael Whitworth at <a className="inline-flex items-center gap-2 text-[#ff7547] underline underline-offset-4" href="mailto:mikeptonline@gmail.com"><Mail className="h-4 w-4" /> mikeptonline@gmail.com</a>.</p></section>
-      <p className="text-sm text-zinc-500">This page provides information about current service practices and is not legal advice. Please review it for accuracy before using it as the final policy for your business.</p>
+      <section className="border-t border-zinc-800 pt-6"><h2 className="mb-2 text-xl font-semibold text-white">Contact</h2><p>For privacy questions or requests, contact Michael Whitworth at <a className="inline-flex items-center gap-2 text-[#ff7547] underline underline-offset-4" href="mailto:mwfitnessukonline@gmail.com"><Mail className="h-4 w-4" /> mwfitnessukonline@gmail.com</a>.</p></section>
+      
     </div>
   </section>
 );
