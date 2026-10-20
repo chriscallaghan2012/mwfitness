@@ -30,6 +30,9 @@ export function CommunicationsAdmin() {
   const [message, setMessage] = useState('');
   const [channel, setChannel] = useState('email');
   const [audience, setAudience] = useState('members');
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [previewCount, setPreviewCount] = useState<number | null>(null);
+  const [dispatchBusy, setDispatchBusy] = useState(false);
 
   const load = useCallback(async () => {
     if (!neon) {
@@ -118,20 +121,54 @@ export function CommunicationsAdmin() {
       if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
       const token = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
       if (!token) throw new Error('Could not obtain a Neon access token.');
-      const response = await fetch('/api/test-communication', {
+      const response = await fetch('/api/communications-send', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateKey: selected.template_key, confirmTest: true }),
+        body: JSON.stringify({ action: 'test', templateKey: selected.template_key, confirmTest: true }),
       });
-      const result = await response.json() as { ok?: boolean; recipient?: string; error?: string; note?: string };
+      const result = await response.json() as { ok?: boolean; recipient?: string; error?: string; note?: string; accepted?: number };
       if (!response.ok || !result.ok) throw new Error(result.error || 'Test email could not be sent.');
-      setNotice(`Test email accepted for your staff inbox (${result.recipient}). ${result.note ?? ''}`);
+      setNotice(`Test email accepted for your staff inbox (${session.user.email ?? 'signed-in staff account'}). ${result.note ?? ''}`);
       await load();
     } catch (testError) {
       setError(testError instanceof Error ? testError.message : 'Test email could not be sent.');
     } finally {
       setTestSending(false);
     }
+  };
+
+  const dispatchPreview = async () => {
+    if (!neon || !selected) { setError('Select an enabled email template first.'); return; }
+    if (audience === 'individual' && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipientEmail.trim())) { setError('Enter a valid individual recipient email.'); return; }
+    setDispatchBusy(true); setError(''); setNotice(''); setPreviewCount(null);
+    try {
+      const token = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
+      if (!token) throw new Error('Could not obtain a Neon access token. Sign in again.');
+      const response = await fetch('/api/communications-send', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'preview', templateKey: selected.template_key, audience, recipientEmail: recipientEmail.trim() }) });
+      const result = await response.json() as { ok?: boolean; recipientCount?: number; error?: string };
+      if (!response.ok || !result.ok) throw new Error(result.error || 'Could not preview the audience.');
+      setPreviewCount(Number(result.recipientCount ?? 0));
+      setNotice('Audience preview ready: ' + Number(result.recipientCount ?? 0) + ' recipient(s). No email has been sent.');
+    } catch (e) { setError(e instanceof Error ? e.message : 'Could not preview the audience.'); }
+    finally { setDispatchBusy(false); }
+  };
+
+  const dispatchSend = async () => {
+    if (!neon || !selected || previewCount === null) { setError('Preview the recipient count before sending.'); return; }
+    if (previewCount < 1) { setError('There are no eligible recipients to send to.'); return; }
+    if (!window.confirm('Send this email to ' + previewCount + ' recipient(s)? This action cannot be recalled.')) return;
+    setDispatchBusy(true); setError(''); setNotice('');
+    try {
+      const token = await (neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> }).getJWTToken?.(false);
+      if (!token) throw new Error('Could not obtain a Neon access token. Sign in again.');
+      const response = await fetch('/api/communications-send', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send', templateKey: selected.template_key, audience, recipientEmail: recipientEmail.trim(), confirmSend: true, confirmCount: previewCount }) });
+      const result = await response.json() as { ok?: boolean; recipientCount?: number; accepted?: number; failed?: number; error?: string; eventId?: string };
+      if (!response.ok && response.status !== 207) throw new Error(result.error || 'Email send failed.');
+      setNotice('Email campaign recorded (' + (result.eventId || 'event saved') + '): ' + Number(result.accepted || 0) + ' accepted, ' + Number(result.failed || 0) + ' failed. Accepted means Resend accepted the message, not guaranteed inbox delivery.');
+      setPreviewCount(null);
+      await load();
+    } catch (e) { setError(e instanceof Error ? e.message : 'Email send failed.'); }
+    finally { setDispatchBusy(false); }
   };
 
   const updateDraft = (key: keyof Template, value: unknown) => setDraft((current) => ({ ...current, [key]: value }));
@@ -181,15 +218,19 @@ export function CommunicationsAdmin() {
       {!loading && section === 'automations' ? <div className={card}><div className="mb-4"><h3 className="text-base font-semibold text-white">Automation rules</h3><p className="mt-1 text-xs text-zinc-500">Rules are intentionally read-only and disabled until each server-side trigger, consent check and delivery path has passed end-to-end tests.</p></div><AdminTable rows={rules.map((rule) => ({ ...rule, state: rule.enabled ? 'Enabled' : 'Disabled', trigger: rule.trigger_key, template: rule.template_key }))} empty="No automation rules loaded." cols={[{key:'name',label:'Rule'},{key:'trigger',label:'Trigger'},{key:'channel',label:'Channel'},{key:'template',label:'Template'},{key:'state',label:'State'},{key:'delay_minutes',label:'Delay (min)'}]} /></div> : null}
       {!loading && section === 'history' ? <div className={card}><h3 className="mb-4 text-base font-semibold text-white">Notification &amp; email history</h3><AdminTable rows={events.map((event) => ({ ...event, time: event.created_at ? new Date(String(event.created_at)).toLocaleString('en-GB') : '—' }))} empty="No communication events recorded yet." cols={[{key:'time',label:'Created'},{key:'source',label:'Source'},{key:'channel',label:'Channel'},{key:'category',label:'Category'},{key:'subject',label:'Subject / message'},{key:'status',label:'Status'}]} /></div> : null}
       {!loading && section === 'compose' ? <div className={card}>
-        <div className="mb-4"><h3 className="text-base font-semibold text-white">Manual broadcast composer</h3><p className="mt-1 text-xs text-zinc-500">Compose and review a draft. Dispatch remains locked until secure server-side sending, audience preview, consent filtering and unsubscribe handling are implemented and tested.</p></div>
+        <div className="mb-4"><h3 className="text-base font-semibold text-white">Email composer</h3><p className="mt-1 text-xs text-zinc-500">Choose a saved template, preview the exact eligible recipient count, then confirm the send. Marketing sends are restricted to consented subscribers.</p></div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-1.5 text-xs text-zinc-400">Channel<select className={inp} value={channel} onChange={(e) => setChannel(e.target.value)}><option value="email">Branded email</option><option value="push">App push notification</option><option value="in_app">In-app announcement</option></select></label>
-          <label className="grid gap-1.5 text-xs text-zinc-400">Audience<select className={inp} value={audience} onChange={(e) => setAudience(e.target.value)}><option value="members">All active members (planned)</option><option value="coaches">Coaches (planned)</option><option value="waitlist">App waitlist (planned)</option><option value="consented-marketing">Consented marketing subscribers only (planned)</option></select></label>
-          <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Subject / notification title<input className={inp} value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={180} placeholder="What do members need to know?" /></label>
-          <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Message<textarea className={inp} rows={7} maxLength={5000} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Write the announcement…" /></label>
+          <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Email template<select className={inp} value={selectedId} onChange={(e) => { setSelectedId(e.target.value); setPreviewCount(null); }}><option value="">Choose template…</option>{templates.filter((t) => t.enabled && t.channel === 'email').map((t) => <option key={t.id} value={t.id}>{t.name} · {t.category}</option>)}</select></label>
+          <label className="grid gap-1.5 text-xs text-zinc-400">Recipient type<select className={inp} value={audience} onChange={(e) => { setAudience(e.target.value); setPreviewCount(null); }}><option value="individual">One person / individual</option><option value="members">All members (transactional/service only)</option><option value="consented-marketing">Consented marketing subscribers</option></select></label>
+          {audience === 'individual' ? <label className="grid gap-1.5 text-xs text-zinc-400">Recipient email<input className={inp} type="email" value={recipientEmail} onChange={(e) => { setRecipientEmail(e.target.value); setPreviewCount(null); }} maxLength={254} placeholder="member@example.com" /></label> : <div className="rounded-xl border border-white/[0.07] bg-black/10 p-3 text-xs leading-5 text-zinc-400">The server rechecks audience eligibility at send time. Marketing recipients must have active recorded consent and no unsubscribe/suppression.</div>}
+          <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Selected template subject<input className={inp} value={String(selected?.subject || '')} readOnly /></label>
         </div>
-        <div className="mt-4 flex flex-wrap items-center gap-3"><button type="button" disabled className={btn}><Send className="h-3.5 w-3.5" />Send broadcast (locked)</button><button type="button" className={btnGhost} onClick={() => { setSubject(''); setMessage(''); }}>Clear draft</button><span className="text-xs text-zinc-500">{message.length}/5000 · draft is local only</span></div>
-        <p className="mt-3 rounded-xl border border-orange-500/20 bg-orange-500/[0.05] p-3 text-xs leading-5 text-orange-200">No message is sent by this screen. A real send button will only be enabled after server-side authorization, recipient counts, consent/suppression checks, idempotency and provider delivery tracking are complete.</p>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button type="button" disabled={dispatchBusy || !selected} onClick={() => void dispatchPreview()} className={btnGhost}>{dispatchBusy ? 'Checking…' : 'Preview recipient count'}</button>
+          <button type="button" disabled={dispatchBusy || previewCount === null || previewCount < 1 || !selected} onClick={() => void dispatchSend()} className={btn}><Send className="h-3.5 w-3.5" />{dispatchBusy ? 'Sending…' : previewCount === null ? 'Send email' : 'Send to ' + previewCount}</button>
+          {previewCount !== null ? <span className="text-xs text-orange-200">Preview: {previewCount} eligible recipient(s)</span> : null}
+        </div>
+        <p className="mt-3 rounded-xl border border-orange-500/20 bg-orange-500/[0.05] p-3 text-xs leading-5 text-orange-100">A send requires staff authorization, an exact recipient-count confirmation, a saved enabled template and Resend credentials. Each recipient gets a separate idempotent send and an audit record. Test emails go only to the signed-in staff email.</p>
       </div> : null}
     </section>
   );
