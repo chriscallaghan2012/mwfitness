@@ -49,6 +49,7 @@ export function CommunicationsAdmin() {
     }
     setLoading(true);
     setError('');
+    setPreviewCount(null);
     try {
       const [t, r, e] = await Promise.all([
         neon.from('communication_templates').select('id,template_key,name,channel,category,subject,preheader,html_body,text_body,enabled,version,updated_at').order('name'),
