@@ -83,11 +83,15 @@ export default async function handler(req, res) {
     for (const recipient of recipients) {
       const bodyText = title + '\n\n' + message;
       const key = String(eventId) + ':' + String(recipient.id);
-      const inserted = await database.query('insert into public.coach_messages (athlete_profile_id,sender_profile_id,body) values ($1,$2,$3) returning id', [recipient.id, userId, bodyText]);
-      const messageId = inserted.rows && inserted.rows[0] && inserted.rows[0].id;
-      if (!messageId) { failed++; continue; }
       const delivery = await database.query('insert into public.communication_deliveries (event_id,recipient_profile_id,recipient_email,recipient_name,status,provider,idempotency_key) values ($1,$2,$3,$4,$5,$6,$7) on conflict (idempotency_key) do nothing returning id', [eventId, recipient.id, recipient.email || '', recipient.full_name || '', channel === 'in_app' ? 'accepted' : 'queued', channel === 'push' ? 'expo' : 'in_app', key]);
       if (!delivery.rows || !delivery.rows[0]) continue;
+      const inserted = await database.query('insert into public.coach_messages (athlete_profile_id,sender_profile_id,body) values ($1,$2,$3) returning id', [recipient.id, userId, bodyText]);
+      const messageId = inserted.rows && inserted.rows[0] && inserted.rows[0].id;
+      if (!messageId) {
+        failed++;
+        await database.query("update public.communication_deliveries set status='failed',error_message='Message could not be saved',updated_at=now() where idempotency_key=$1", [key]);
+        continue;
+      }
       if (channel === 'in_app') { accepted++; continue; }
       try {
         const base = String(process.env.PUBLIC_SITE_URL || '').replace(/\/$/, '');
