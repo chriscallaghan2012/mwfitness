@@ -154,3 +154,125 @@ a {
 .page-layout > .home-ticker + .industrial-stripe--divider {
   margin-block-start: 0;
 }
+
+
+/* Electric orange edge: slow travelling highlight with a restrained pulse. */
+@property --mw-electric-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes mw-electric-travel {
+  to { --mw-electric-angle: 360deg; }
+}
+
+@keyframes mw-electric-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(255, 85, 0, 0), 0 0 0 1px rgba(255, 85, 0, 0.08); }
+  50% { box-shadow: 0 0 18px rgba(255, 85, 0, 0.09), 0 0 0 1px rgba(255, 85, 0, 0.18); }
+}
+
+/* Restrict the animated treatment to content cards, not every layout wrapper. */
+article,
+[class*="bg-brand-card"],
+[class*="bg-[#16181d]"],
+[class*="bg-[#131519]"] {
+  position: relative;
+  isolation: isolate;
+  animation: mw-electric-pulse 4.8s ease-in-out infinite;
+}
+
+article::after,
+[class*="bg-brand-card"]::after,
+[class*="bg-[#16181d]"]::after,
+[class*="bg-[#131519]"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--mw-electric-angle),
+    transparent 0deg,
+    transparent 235deg,
+    rgba(255, 85, 0, 0.18) 260deg,
+    #ff5500 285deg,
+    #ffd0b8 292deg,
+    rgba(255, 85, 0, 0.12) 307deg,
+    transparent 330deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: mw-electric-travel 7s linear infinite;
+}
+
+/* Orange primary actions get a moving light sweep and high-contrast black label. */
+button[class*="bg-[#ff5500]"],
+a[class*="bg-[#ff5500]"],
+button[class*="bg-brand-orange"],
+a[class*="bg-brand-orange"],
+button[class*="bg-orange-500"],
+a[class*="bg-orange-500"] {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  color: #000 !important;
+  background-color: #ff5500 !important;
+  transition: background-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+button[class*="bg-[#ff5500]"]::after,
+a[class*="bg-[#ff5500]"]::after,
+button[class*="bg-brand-orange"]::after,
+a[class*="bg-brand-orange"]::after,
+button[class*="bg-orange-500"]::after,
+a[class*="bg-orange-500"]::after {
+  content: "";
+  position: absolute;
+  inset: -40% auto -40% -65%;
+  width: 38%;
+  pointer-events: none;
+  transform: skewX(-22deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.68), rgba(255,255,255,0.12), transparent);
+  animation: mw-button-shine 3.6s ease-in-out infinite;
+}
+
+@keyframes mw-button-shine {
+  0%, 12% { left: -65%; opacity: 0; }
+  22% { opacity: 1; }
+  52% { left: 135%; opacity: 0.9; }
+  53%, 100% { left: 135%; opacity: 0; }
+}
+
+button[class*="bg-[#ff5500]"]:hover,
+a[class*="bg-[#ff5500]"]:hover,
+button[class*="bg-brand-orange"]:hover,
+a[class*="bg-brand-orange"]:hover,
+button[class*="bg-orange-500"]:hover,
+a[class*="bg-orange-500"]:hover {
+  background-color: #ff6a1f !important;
+  box-shadow: 0 0 22px rgba(255, 85, 0, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  article,
+  [class*="bg-brand-card"],
+  [class*="bg-[#16181d]"],
+  [class*="bg-[#131519]"],
+  article::after,
+  [class*="bg-brand-card"]::after,
+  [class*="bg-[#16181d]"]::after,
+  [class*="bg-[#131519]"]::after,
+  button[class*="bg-[#ff5500]"]::after,
+  a[class*="bg-[#ff5500]"]::after,
+  button[class*="bg-brand-orange"]::after,
+  a[class*="bg-brand-orange"]::after,
+  button[class*="bg-orange-500"]::after,
+  a[class*="bg-orange-500"]::after {
+    animation: none !important;
+  }
+}
