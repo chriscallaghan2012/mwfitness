@@ -17,7 +17,7 @@ const unsub = (email) => {
 const wrap = (subject, preheader, html) => '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(subject) + '</title></head><body style="margin:0;background:#f1f2f4;font:15px/1.65 Arial,sans-serif;color:#20242a"><div style="display:none;max-height:0;overflow:hidden">' + esc(preheader || subject) + '</div><table role="presentation" width="100%"><tr><td align="center" style="padding:24px 12px"><table role="presentation" width="600" style="max-width:600px;width:100%;background:#fff"><tr><td style="height:6px;background:#ff5500"></td></tr><tr><td style="padding:24px;background:#121418;color:#fff;font-size:22px;font-weight:bold">MW FITNESS <span style="color:#ff5500">UK</span></td></tr><tr><td style="padding:30px">' + html + '</td></tr><tr><td style="padding:20px 30px;background:#f8f8f8;color:#686d76;font-size:12px">MW Fitness UK · Online coaching and nutrition support.</td></tr></table></td></tr></table></body></html>';
 
 export async function sendAutomaticTemplate({ templateKey, lead }) {
-  if (!process.env.RESEND_API_KEY || !(process.env.RESEND_FROM_EMAIL || process.env.MAIL_FROM)) return { sent: false, reason: 'Resend sender is not configured.' };
+  if (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM_EMAIL) return { sent: false, reason: 'Resend API key and verified sender are not configured.' };
   const email = String(lead.email || '').trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { sent: false, reason: 'No valid recipient email.' };
   const database = getSql();
@@ -46,7 +46,7 @@ export async function sendAutomaticTemplate({ templateKey, lead }) {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + process.env.RESEND_API_KEY, 'Content-Type': 'application/json', 'Idempotency-Key': idem },
-      body: JSON.stringify({ from: process.env.RESEND_FROM_EMAIL || process.env.MAIL_FROM, to: [email], reply_to: process.env.MAIL_TO || undefined, subject, html, text }),
+      body: JSON.stringify({ from: process.env.RESEND_FROM_EMAIL, to: [email], reply_to: process.env.MAIL_TO || undefined, subject, html, text }),
     });
     const provider = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(provider.message || provider.error || 'Resend rejected the automatic email.');
