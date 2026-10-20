@@ -75,14 +75,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              <button className="cursor-pointer" onClick={() => onOpenBookCall()}
-                className="bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+              <button onClick={() => onOpenBookCall()}
+                className="cursor-pointer bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
               >
                 <PhoneCall className="w-4 h-4" />
                 <span>Book a free call</span>
               </button>
-              <button className="cursor-pointer" onClick={() => onSelectScreen('online-coaching')}
-                className="bg-[#16181d] border border-[#2b303d] text-white font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 transition-colors"
+              <button onClick={() => onSelectScreen('online-coaching')}
+                className="cursor-pointer bg-[#16181d] border border-[#2b303d] text-white font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 transition-colors"
               >
                 <span>Explore online plans</span>
                 <ArrowRight className="w-4 h-4" />
@@ -150,8 +150,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </h2>
             <div aria-hidden="true" className="industrial-stripe industrial-stripe--marker" />
           </div>
-          <button className="cursor-pointer" onClick={() => onOpenBookCall()}
-            className="text-xs font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 group"
+          <button onClick={() => onOpenBookCall()}
+            className="cursor-pointer text-xs font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 group"
           >
             <span>Say hello</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -245,7 +245,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
           {plans.map((plan) => (
-            <article key={plan.id} className={'bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]
+            <article key={plan.id} className={'mw-electric-card bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]')}
               {plan.badge && <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">{plan.badge}</span>}
               <div className="flex items-start justify-between gap-4">
                 <div><h3 className="font-display text-3xl text-white uppercase">{plan.name}</h3><p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">{plan.tag}</p></div>
@@ -277,8 +277,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <p className="text-sm sm:text-base font-sans text-zinc-300 leading-relaxed max-w-2xl">
               Get a plan built around your life, your equipment and your goals, with weekly check-ins and direct support from Mike.
             </p>
-            <button className="cursor-pointer" onClick={() => onSelectScreen('online-coaching')}
-              className="bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+            <button onClick={() => onSelectScreen('online-coaching')}
+              className="cursor-pointer bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
             >
               Explore online coaching
               <ArrowRight className="w-4 h-4" />
@@ -361,14 +361,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </div>
 
           <div className="flex flex-col gap-3 shrink-0">
-            <button className="cursor-pointer" onClick={() => onOpenBookCall()}
-              className="bg-[#ff5500] text-black font-mono font-bold text-sm uppercase px-8 py-4 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+            <button onClick={() => onOpenBookCall()}
+              className="cursor-pointer bg-[#ff5500] text-black font-mono font-bold text-sm uppercase px-8 py-4 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
             >
               <PhoneCall className="w-4 h-4" />
               Book a free call
             </button>
-            <button className="cursor-pointer" onClick={() => onSelectScreen('contact')}
-              className="bg-[#16181d] border border-[#2b303d] text-white font-mono font-bold text-xs uppercase px-6 py-2.5 transition-colors"
+            <button onClick={() => onSelectScreen('contact')}
+              className="cursor-pointer bg-[#16181d] border border-[#2b303d] text-white font-mono font-bold text-xs uppercase px-6 py-2.5 transition-colors"
             >
               Or send a message
             </button>
