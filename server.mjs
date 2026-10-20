@@ -35,16 +35,13 @@ app.post('/api/send-mail', async (req, res) => {
   try {
     const validated = validatePayload(req.body);
     const lead = await saveWebsiteLead(validated);
-    try {
-      await sendContactEmail(validated);
-      const templateKey = validated.kind === 'book-call' ? 'consultation-confirmation' : validated.kind === 'waitlist' ? 'app-waitlist-acknowledgement' : 'website-enquiry-acknowledgement';
-      try { await sendAutomaticTemplate({ templateKey, lead: { ...validated, id: lead.id } }); }
-      catch (automationError) { console.error('MW Fitness lead saved; automatic acknowledgement failed:', automationError); }
-      res.json({ ok: true, leadId: lead.id, emailSent: true });
-    } catch (mailError) {
-      console.error('MW Fitness lead saved; email notification failed:', mailError);
-      res.json({ ok: true, leadId: lead.id, emailSent: false, notice: 'Your request has been received. Email notifications are temporarily unavailable.' });
-    }
+    let emailSent = false;
+    try { await sendContactEmail(validated); emailSent = true; }
+    catch (mailError) { console.error('MW Fitness lead saved; staff email notification failed:', mailError); }
+    const templateKey = validated.kind === 'book-call' ? 'consultation-confirmation' : validated.kind === 'waitlist' ? 'app-waitlist-acknowledgement' : 'website-enquiry-acknowledgement';
+    try { await sendAutomaticTemplate({ templateKey, lead: { ...validated, id: lead.id } }); }
+    catch (automationError) { console.error('MW Fitness lead saved; automatic acknowledgement failed:', automationError); }
+    res.json({ ok: true, leadId: lead.id, emailSent, notice: emailSent ? undefined : 'Your request has been received. Email notifications are temporarily unavailable.' });
   } catch (err) {
     const status = /Missing|valid|Please|too long/i.test(err.message || '') ? 400 : 500;
     res.status(status).json({ ok: false, error: status === 400 ? err.message : 'We could not save your request. Please try again in a moment.' });
