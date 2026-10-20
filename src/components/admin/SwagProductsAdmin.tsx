@@ -62,7 +62,7 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
       price, compare_at_price: compare, image_url: String(draft.image_url || '').trim(),
       product_url: String(draft.product_url || '').trim(), sizes: String(draft.sizes || '').split(',').map((s) => s.trim()).filter(Boolean),
       stock_status: String(draft.stock_status || 'available'), active: Boolean(draft.active),
-      sort_order: Number.parseInt(String(draft.sort_order || '100'), 10) || 100, updated_at: new Date().toISOString(),
+      sort_order: Number.isFinite(Number.parseInt(String(draft.sort_order || '100'), 10)) ? Number.parseInt(String(draft.sort_order || '100'), 10) : 100, updated_at: new Date().toISOString(),
     };
     try {
       const result = editing
