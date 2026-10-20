@@ -130,6 +130,11 @@ export default async function handler(req, res) {
     if (eventId) {
       try {
         const sql = getSql();
+        await sql`update public.communication_deliveries
+          set status = 'failed', error_code = 'test_send_failed',
+              error_message = ${String(error?.message || 'Test send failed').slice(0, 500)},
+              attempts = attempts + 1, updated_at = now()
+          where event_id = ${eventId} and status = 'queued'`;
         await sql`update public.communication_events set status = 'failed', completed_at = now() where id = ${eventId}`;
       } catch { /* keep original error */ }
     }
