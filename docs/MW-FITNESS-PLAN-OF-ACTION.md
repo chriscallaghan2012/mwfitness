@@ -105,3 +105,10 @@ This checklist tracks work across `mwfitness` (website / Staff HQ) and `MW-FITNE
 - [ ] Run the website and Android manual verification workflows after the user authorises/runs them; no fresh lint, build, or device-test pass is claimed.
 
 - [x] Corrected an earlier inaccurate pricing diagnosis: the user confirms prices are working on the live site. The legacy `supabase` filename/variable names found on `main` are compatibility names around the Neon SDK, not evidence that the project uses Supabase as its backend. Do not describe pricing as broken or change working live pricing without fresh evidence.
+
+
+## Additional static fixes — 2026-10-20
+
+- [x] Corrected unsubscribe email validation to use standard whitespace and domain-separator matching. The previous regex was over-escaped and could reject valid addresses or validate incorrectly; only the signed token can change a marketing preference, and GET remains read-only.
+- [x] Improved Android fatal-runtime diagnostics so a fatal error after the root React component mounts triggers a visible error screen instead of only updating an unused module-level string.
+- [ ] Re-run website TypeScript/build/lint and Android lockfile repair + typecheck/lint/Android export before treating these changes as verified. The repository integrations available in this session do not provide a local checkout/build runner, and no GitHub Actions workflow has been dispatched.
