@@ -482,9 +482,9 @@ export function AdminScreen() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <aside className="min-w-0">
-          <p className="mb-2 hidden px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 lg:block">Workspace</p>
-<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:sticky lg:top-28 lg:flex lg:h-fit lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
+        <aside className="min-w-0 self-start">
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:sticky lg:top-24 lg:flex lg:h-fit lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
+        <p className="hidden px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 lg:block">Workspace</p>
         {TABS.map((t) => (
           <button
             key={t.id}
