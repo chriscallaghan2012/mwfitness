@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { MapPin, Mail, Instagram, Facebook, PhoneCall, CheckCircle, ArrowRight, Clock } from 'lucide-react';
-import { StoreBadges } from '../StoreBadges';
 
 interface ContactScreenProps {
   onOpenBookCall: () => void;
@@ -71,10 +70,6 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
             </p>
           </div>
         </div>
-      
-      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
-        <StoreBadges compact />
-      </div>
     </section>
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />

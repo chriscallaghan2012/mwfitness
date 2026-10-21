@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { APP_FEATURES, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { Smartphone, CheckCircle, ArrowRight, Scale, TrendingUp, Utensils, Dumbbell, Instagram, PhoneCall } from 'lucide-react';
-import { StoreBadges } from '../StoreBadges';
 
 interface AppScreenProps {
   onOpenBookCall?: () => void;
@@ -70,10 +69,6 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
             </div>
           </div>
         </div>
-      
-      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
-        <StoreBadges compact />
-      </div>
     </section>
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
