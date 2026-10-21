@@ -369,32 +369,30 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
 
       {/* CLOSING CTA */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-4 md:pb-24">
-        <div className="mw-electric-card relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
-
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-xs font-mono text-[#ff5500] uppercase tracking-widest">
-              <span className="w-2 h-2 bg-[#ff5500]"></span>
+      <section className="mx-auto w-full max-w-7xl px-4 pb-16 pt-4 sm:px-6 md:pb-20 lg:px-8">
+        <div className="mw-electric-card relative mx-auto flex w-full max-w-4xl flex-col items-center overflow-hidden border border-[#2a2f3a] bg-gradient-to-b from-[#171920] to-[#121418] px-5 py-8 text-center sm:px-8 md:py-10">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 rounded-full bg-[#ff5500]/10 blur-3xl"></div>
+          <div className="relative w-full max-w-2xl space-y-3">
+            <div className="inline-flex items-center justify-center gap-2 text-xs font-mono uppercase tracking-widest text-[#ff5500]">
+              <span className="h-2 w-2 bg-[#ff5500]"></span>
               <span>Ready when you are</span>
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+            <h2 className="border-b border-dashed border-[#454954] pb-4 font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">
               LET'S GET STARTED.
             </h2>
-            <p className="text-sm font-sans text-zinc-300 leading-relaxed max-w-xl">
+            <p className="mx-auto max-w-xl text-sm font-sans leading-relaxed text-zinc-300">
               One quick chat is all it takes. We'll talk about where you are, where you want to be and the simplest way to get there. No commitment, no pressure.
             </p>
           </div>
-
-          <div className="flex flex-col gap-3 shrink-0">
+          <div className="relative mt-6 flex w-full max-w-sm flex-col items-center gap-2.5 sm:flex-row sm:justify-center">
             <button onClick={() => onOpenBookCall()}
-              className="cursor-pointer bg-[#ff5500] text-black font-mono font-bold text-sm uppercase px-8 py-4 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
+              className="flex w-full max-w-[220px] cursor-pointer items-center justify-center gap-2 bg-[#ff5500] px-5 py-3 font-mono text-xs font-bold uppercase text-black shadow-[0_0_20px_rgba(255,85,0,0.25)] transition-colors active:scale-95"
             >
-              <PhoneCall className="w-4 h-4" />
+              <PhoneCall className="h-4 w-4" />
               Book a free call
             </button>
             <button onClick={() => onSelectScreen('contact')}
-              className="cursor-pointer bg-[#16181d] border border-[#2b303d] text-white font-mono font-bold text-xs uppercase px-6 py-2.5 transition-colors"
+              className="w-full max-w-[220px] cursor-pointer border border-[#2b303d] bg-[#16181d] px-5 py-3 font-mono text-[11px] font-bold uppercase text-white transition-colors hover:border-[#ff5500]"
             >
               Or send a message
             </button>
