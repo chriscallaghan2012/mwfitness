@@ -114,8 +114,9 @@ export function AdminTable({
             value={search}
             onChange={(event) => { setSearch(event.target.value); setPage(0); }}
             placeholder={searchPlaceholder}
-            className="w-full rounded-lg border border-white/[0.1] bg-[#0b0c0e] py-2.5 pl-9 pr-3 text-xs text-white outline-none placeholder:text-zinc-600 focus:border-orange-400/70 focus:ring-2 focus:ring-orange-400/10"
+            className="w-full rounded-lg border border-white/[0.1] bg-[#0b0c0e] py-2.5 pl-9 pr-14 text-xs text-white outline-none placeholder:text-zinc-600 focus:border-orange-400/70 focus:ring-2 focus:ring-orange-400/10"
           />
+          {search ? <button type="button" onClick={() => { setSearch(""); setPage(0); }} className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-[10px] text-zinc-400 hover:bg-white/10 hover:text-white">Clear</button> : null}
           <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">⌕</span>
         </label>
         <label className="flex shrink-0 items-center gap-2 text-[11px] text-zinc-500">
