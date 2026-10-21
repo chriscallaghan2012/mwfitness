@@ -102,13 +102,6 @@ section[id] {
   background-color: #121418;
   color: #f3f4f6;
 }
-.staff-hq summary::-webkit-details-marker {
-  display: none;
-}
-.staff-hq summary::marker {
-  content: "";
-}
-
 /* Consistent keyboard focus and mobile-safe spacing. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid #ff5500;
