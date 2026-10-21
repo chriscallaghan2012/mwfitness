@@ -71,6 +71,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
           </div>
         </div>
     </section>
+    <div aria-hidden="true" className="hero-dashed-divider" />
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
