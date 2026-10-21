@@ -103,10 +103,6 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
             );
           })}
         </div>
-        <div className="mt-8 flex flex-col items-start gap-3 border-t border-[#22252e] pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <div><p className="font-mono text-xs uppercase tracking-widest text-zinc-300">App availability</p><p className="mt-1 text-sm text-zinc-500">Official store links will be added when each listing is published.</p></div>
-          <StoreBadges />
-        </div>
       </section>
 
       {/* 3. WAITLIST */}
