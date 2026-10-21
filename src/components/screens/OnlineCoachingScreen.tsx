@@ -4,11 +4,6 @@ import { ONLINE_COACHING } from '../../data/mockData';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { ArrowRight, Check, CreditCard, MessageCircle, Video } from 'lucide-react';
 
-// Package grid: three cards across on large screens; when the final row would
-// hold exactly two cards, those two split the row evenly (half and half).
-const planCardSpan = (index: number, total: number): string =>
-  total % 3 === 2 && index >= total - 2 ? 'lg:col-span-3' : 'lg:col-span-2';
-
 interface OnlineCoachingScreenProps { onSelectScreen: (screen: ScreenId) => void; onCheckout: (plan: PublicPlan) => void; }
 
 export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSelectScreen, onCheckout }) => {
@@ -30,7 +25,6 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
   }, []);
 
   const formatPrice = (value: number) => `£${value.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  const comparisonFeatures = Array.from(new Set(plans.flatMap((plan) => plan.features)));
 
   return <div className="page-layout">
     <section className="page-hero relative min-h-[40vh] flex items-center overflow-hidden border-b border-[#262930]">
