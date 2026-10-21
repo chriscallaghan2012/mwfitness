@@ -104,7 +104,7 @@ export function LeadsAdmin() {
           <p className="mt-1 text-xs text-zinc-500">Contact forms, free-call requests, app waitlist and SHWAG enquiries are stored in the shared Neon database.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <select aria-label="Filter leads by status" className={inp} value={filter} onChange={(event) => setFilter(event.target.value)}>
+          <select aria-label="Filter leads by status" className="w-full min-w-[150px] max-w-full rounded-xl border border-white/[0.1] bg-[#0e1013] px-3.5 py-3 text-sm text-white outline-none transition focus:border-orange-400/70 focus:ring-2 focus:ring-orange-400/10 sm:w-44" value={filter} onChange={(event) => setFilter(event.target.value)}>
             <option value="all">All statuses</option>
             {STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
           </select>
