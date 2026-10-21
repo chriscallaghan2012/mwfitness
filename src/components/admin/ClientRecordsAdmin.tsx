@@ -24,6 +24,8 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember }: { in
   const [profile, setProfile] = useState<Row | null>(null);
   const [memberships, setMemberships] = useState<Row[]>([]);
   const [nutritionPlans, setNutritionPlans] = useState<Row[]>([]);
+  const [membershipsError, setMembershipsError] = useState('');
+  const [nutritionError, setNutritionError] = useState('');
   const [progressPhotos, setProgressPhotos] = useState<Row[]>([]);
   const [photosMessage, setPhotosMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -41,6 +43,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember }: { in
   useEffect(() => {
     if (!neon || !userId) {
       setRows(null); setProfile(null); setMemberships([]); setNutritionPlans([]);
+      setMembershipsError(''); setNutritionError('');
       return;
     }
     let cancelled = false;
@@ -58,6 +61,8 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember }: { in
         setRows([]);
         setMessage('Could not read this app data set. Confirm the table exists and staff RLS permissions are applied.');
       } else setRows((records.data ?? []) as Row[]);
+      setMembershipsError(membershipResult.error ? 'Membership records could not be loaded. Check the schema and staff access.' : '');
+      setNutritionError(nutritionResult.error ? 'Nutrition plans could not be loaded. Check the schema and staff access.' : '');
       setMemberships((membershipResult.data ?? []) as Row[]);
       setNutritionPlans((nutritionResult.data ?? []) as Row[]);
     }).catch(() => {
@@ -163,9 +168,9 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember }: { in
         <>
           <div className={card}>
             <p className="mb-2 font-mono text-[10px] uppercase text-zinc-500">Memberships</p>
-            {memberships.length ? <div className="space-y-2">{memberships.map((item) => <div key={String(item.id)} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-800 p-3"><div><p className="text-sm font-medium text-white">{String(item.plans?.name ?? item.plan_id)}</p><p className="text-xs text-zinc-500">{String(item.status)} · {item.current_period_end ? `ends ${ShortDate(String(item.current_period_end))}` : 'no end date recorded'}</p></div><span className="text-sm text-orange-300">{item.plans?.price != null ? `£${Number(item.plans.price).toFixed(2)}` : '—'}</span></div>)}</div> : <p className="text-sm text-zinc-500">No memberships found.</p>}
+            {membershipsError ? <p role="alert" className="text-sm text-amber-200">{membershipsError}</p> : memberships.length ? <div className="space-y-2">{memberships.map((item) => <div key={String(item.id)} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-800 p-3"><div><p className="text-sm font-medium text-white">{String(item.plans?.name ?? item.plan_id)}</p><p className="text-xs text-zinc-500">{String(item.status)} · {item.current_period_end ? `ends ${ShortDate(String(item.current_period_end))}` : 'no end date recorded'}</p></div><span className="text-sm text-orange-300">{item.plans?.price != null ? `£${Number(item.plans.price).toFixed(2)}` : '—'}</span></div>)}</div> : <p className="text-sm text-zinc-500">No memberships found.</p>}
             <p className="mb-2 mt-5 font-mono text-[10px] uppercase text-zinc-500">Assigned nutrition plans</p>
-            {nutritionPlans.length ? nutritionPlans.map((plan) => <div key={String(plan.id)} className="mb-2 rounded-lg border border-zinc-800 p-3"><p className="text-sm font-medium text-white">{String(plan.name)}</p><p className="mt-1 text-xs text-zinc-400">{String((plan.targets as Row)?.calories ?? '—')} kcal · {(plan.targets as Row)?.protein ?? '—'}g protein · {plan.active ? 'Active' : 'Inactive'}</p></div>) : <p className="text-sm text-zinc-500">No nutrition plans assigned.</p>}
+            {nutritionError ? <p role="alert" className="text-sm text-amber-200">{nutritionError}</p> : nutritionPlans.length ? nutritionPlans.map((plan) => <div key={String(plan.id)} className="mb-2 rounded-lg border border-zinc-800 p-3"><p className="text-sm font-medium text-white">{String(plan.name)}</p><p className="mt-1 text-xs text-zinc-400">{String((plan.targets as Row)?.calories ?? '—')} kcal · {(plan.targets as Row)?.protein ?? '—'}g protein · {plan.active ? 'Active' : 'Inactive'}</p></div>) : <p className="text-sm text-zinc-500">No nutrition plans assigned.</p>}
           </div>
           <div className={card}>
             <div className="mb-3">

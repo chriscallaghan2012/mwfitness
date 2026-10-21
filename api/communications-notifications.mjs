@@ -61,10 +61,10 @@ export default async function handler(req, res) {
     if (audience === 'individual') {
       const email = String(body.recipientEmail || '').trim().toLowerCase();
       if (!EMAIL.test(email)) return res.status(400).json({ ok: false, error: 'Enter the email address of an existing member.' });
-      const result = await database.query("select id,email,full_name from public.profiles where lower(email)=lower($1) and role='athlete' limit 1", [email]);
+      const result = await database.query("select id,email,full_name from public.profiles where lower(email)=lower($1) and role='athlete' and notifications_enabled is true limit 1", [email]);
       recipients = result.rows || [];
     } else if (audience === 'members') {
-      const result = await database.query("select id,email,full_name from public.profiles where role='athlete' and email is not null order by id limit 101");
+      const result = await database.query("select id,email,full_name from public.profiles where role='athlete' and email is not null and notifications_enabled is true order by id limit 101");
       recipients = (result.rows || []).filter((row) => EMAIL.test(String(row.email || '')));
       if (recipients.length > 100) return res.status(400).json({ ok: false, error: 'This notification audience exceeds 100 members. Narrow the audience and send in smaller reviewed batches.' });
     } else {
