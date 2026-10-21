@@ -197,9 +197,9 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               <div className="relative aspect-square w-full bg-[#16181d] border border-[#262930] flex items-center justify-center mb-4 overflow-hidden">
                 <Icon className="w-12 h-12 text-[#ff5500]/40" />
               </div>
+              <span className="mb-3 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-[#ff5500]">Coming soon</span>
               <h3 className="font-display text-xl text-white uppercase tracking-wider mb-1">{name}</h3>
               <p className="text-sm text-zinc-400 leading-relaxed mb-3">{tagline}</p>
-              <span className="mb-3 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-[#ff5500]">Coming soon</span>
               <p className="font-mono text-lg text-zinc-500 mb-1">Price TBC</p>
               <p className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-4">Launching with the first SHWAG drop</p>
               <div className="mt-auto w-full">
