@@ -489,8 +489,8 @@ export function AdminScreen() {
       </div>
 
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[224px_minmax(0,1fr)] xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-6">
-        <aside className="min-w-0 self-start lg:sticky lg:top-36 xl:top-28 lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto lg:overscroll-contain">
-<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
+        <aside className="min-w-0 self-start lg:sticky lg:top-[4rem] lg:h-[calc(100vh-6rem)] lg:overflow-y-auto lg:overscroll-contain">
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:h-full lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
         <p className="hidden px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 lg:block">Workspace</p>
         {TABS.map((t) => (
           <button

@@ -22,6 +22,7 @@ import type { PublicPlan } from './lib/plans';
 import { AccountDeletionScreen } from './components/screens/AccountDeletionScreen';
 import { MemberAccountScreen } from './components/screens/MemberAccountScreen';
 import { AdminScreen } from './components/admin/AdminScreen';
+import { AdminTopBar, AdminBottomBar } from './components/admin/AdminChrome';
 
 export default function App() {
   const screenFromLocation = (): ScreenId => {
@@ -114,12 +115,17 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0c0e] text-[#f3f4f6] font-sans selection:bg-[#ff5500] selection:text-black">
-      {/* Sticky Navigation */}
-      <Navbar
-        currentScreen={currentScreen}
-        onSelectScreen={handleSelectScreen}
-        onOpenBookCall={() => handleOpenBookCall()}
-      />
+      {/* Sticky Navigation (hidden on the Staff HQ dashboard route) */}
+      {currentScreen !== 'admin' && (
+        <Navbar
+          currentScreen={currentScreen}
+          onSelectScreen={handleSelectScreen}
+          onOpenBookCall={() => handleOpenBookCall()}
+        />
+      )}
+
+      {/* Compact dashboard top bar (Staff HQ only) */}
+      {currentScreen === 'admin' && <AdminTopBar />}
 
       {/* Main Content Area */}
       <main className="flex-1 w-full">
@@ -149,14 +155,19 @@ export default function App() {
         {currentScreen === 'delete-account' && <AccountDeletionScreen onBack={() => { window.location.href = '/'; }} />}
       </main>
 
-      {/* Footer */}
-      <Footer
-        onSelectScreen={handleSelectScreen}
-        onOpenBookCall={() => handleOpenBookCall()}
-      />
+      {/* Footer (hidden on the Staff HQ dashboard route) */}
+      {currentScreen !== 'admin' && (
+        <Footer
+          onSelectScreen={handleSelectScreen}
+          onOpenBookCall={() => handleOpenBookCall()}
+        />
+      )}
+
+      {/* Compact dashboard footer (Staff HQ only) */}
+      {currentScreen === 'admin' && <AdminBottomBar />}
 
       {/* Sticky mobile CTA (appears after scrolling past the hero) */}
-      {showMobileCta && (
+      {showMobileCta && currentScreen !== 'admin' && (
         <div className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-[#0b0c0e]/95 backdrop-blur-md border-t border-[#ff5500]/40">
           <div className="flex items-center justify-between gap-3 px-4 py-3">
             <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Ready when you are</span>
