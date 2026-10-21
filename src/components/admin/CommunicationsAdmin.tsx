@@ -247,7 +247,6 @@ export function CommunicationsAdmin() {
   return (
     <section className="space-y-5" aria-labelledby="communications-heading">
       <div className="relative overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-br from-[#21170f] via-[#15171b] to-[#111216] p-5 sm:p-7">
-        <div className="pointer-events-none absolute -right-12 -top-20 h-56 w-56 rounded-full bg-orange-500/10 blur-3xl" />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div><p className="font-mono text-[10px] uppercase tracking-[0.22em] text-orange-300">Staff HQ · communications</p><h2 id="communications-heading" className="mt-2 text-2xl font-semibold text-white">Notification &amp; email studio</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-300">One place for automated messages, member broadcasts, branded email templates and delivery history.</p></div>
           <button type="button" onClick={() => void load()} disabled={loading} className={btnGhost}><RefreshCw className="h-3.5 w-3.5" />{loading ? 'Refreshing…' : 'Refresh data'}</button>
