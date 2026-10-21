@@ -75,7 +75,7 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
             </div>
             <p className={'mt-4 text-sm leading-relaxed text-zinc-400 ' + (featured ? 'max-w-4xl md:min-h-10' : 'min-h-[4.5rem]')}>{plan.description}</p>
             <ul className={'mt-5 grid flex-1 content-start gap-y-2.5 ' + (featured ? 'grid-cols-1 md:grid-cols-2 md:gap-x-8' : 'grid-cols-1')}>{featureList.map((feature) => renderFeature(plan, feature))}</ul>
-            <button onClick={() => onCheckout(plan)} className="mt-auto mt-7 flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-3.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
+            <button onClick={() => onCheckout(plan)} className="mt-auto flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-3.5 pt-7 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
               Book Now <ArrowRight className="h-4 w-4" />
             </button>
           </article>
@@ -87,7 +87,7 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
       })()}
       {plansLoading && <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p>}{!plansLoading && plansError && <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p>}
     </section>
-    {plans.length > 0 && <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div className="border-b border-[#22252e] pb-4 mb-8"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT'S INCLUDED ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Compare your options.</h2></div><div className="overflow-x-auto border border-[#20232b] bg-[#121419]"><table className="w-full min-w-[560px] text-sm"><thead><tr className="border-b border-[#1b1e26] bg-[#16181d]"><th className="p-4 text-left text-xs font-mono text-zinc-400 uppercase tracking-wider">What's included</th>{plans.map((plan) => <th key={plan.id} className="p-4 text-center"><div className="font-display text-xl text-white uppercase">{plan.name}</div><div className="text-[11px] font-mono text-[#ff5500]">{formatPrice(plan.price)}</div></th>)}</tr></thead><tbody className="divide-y divide-[#1b1e26]">{comparisonFeatures.map((feature) => <tr key={feature}><td className="p-4 font-medium text-white">{feature}</td>{plans.map((plan) => <td key={plan.id} className="p-4 text-center">{plan.features.includes(feature) ? <Check className="inline w-4 h-4 text-emerald-400" /> : <span className="text-zinc-600">—</span>}</td>)}</tr>)}</tbody></table></div></section>}
+
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8"><div className="mw-electric-card mx-auto flex max-w-4xl flex-col items-center border border-[#2a2f3a] bg-[#121419] p-8 text-center md:p-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-2">[ QUESTIONS ]</div><h2 className="font-display text-3xl text-white uppercase">Need help choosing?</h2><p className="mx-auto max-w-xl text-sm text-zinc-400 mt-2">Contact Mike if you have a question about online coaching before buying.</p><button onClick={() => onSelectScreen('contact')} className="mt-6 inline-flex items-center justify-center gap-2 border border-[#ff5500] px-6 py-3.5 font-mono font-bold text-xs uppercase text-white hover:bg-[#ff5500] hover:text-black">Contact Mike <ArrowRight className="w-4 h-4" /></button></div></section>
   </div>;
 };
