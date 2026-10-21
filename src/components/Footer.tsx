@@ -2,6 +2,7 @@ import React from 'react';
 import { ScreenId } from '../types';
 import { CONTACT } from '../data/mockData';
 import { MapPin, Mail, Instagram, Facebook, PhoneCall } from 'lucide-react';
+import { StoreBadges } from './StoreBadges';
 
 interface FooterProps {
   onSelectScreen: (screen: ScreenId) => void;
@@ -11,7 +12,9 @@ interface FooterProps {
 const NAV_LINKS: { id: ScreenId; label: string }[] = [
   { id: 'home', label: 'Home' },
   { id: 'online-coaching', label: 'Online coaching plans' },
+  { id: 'nutrition', label: 'Nutrition & digital guides' },
   { id: 'app', label: 'The App' },
+  { id: 'reviews', label: 'Reviews & testimonials' },
   { id: 'contact', label: 'Contact' },
 ];
 
@@ -27,6 +30,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
           </div>
           <p className="text-xs font-mono text-zinc-400 max-w-sm leading-relaxed">Online coaching built around real life, with training and nutrition support wherever you train.</p>
           <button onClick={() => onSelectScreen('online-coaching')} className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs py-2.5 px-4 uppercase tracking-wider">Explore online coaching <span aria-hidden="true">→</span></button>
+          <div className="pt-2"><p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">The app is coming soon</p><StoreBadges compact /></div>
         </div>
         <div className="space-y-3">
           <h2 className="font-mono text-xs text-white uppercase tracking-wider font-bold">Explore</h2>
