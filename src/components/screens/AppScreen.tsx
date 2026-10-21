@@ -70,7 +70,11 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
             </div>
           </div>
         </div>
-      </section>
+      
+      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
+        <StoreBadges compact />
+      </div>
+    </section>
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
