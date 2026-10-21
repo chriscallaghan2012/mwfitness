@@ -21,7 +21,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
     let active = true;
     void loadPublicPlans('online').then((result) => {
       if (!active) return;
-      setPlans(result.plans.slice(0, 3));
+      setPlans(result.plans.slice(0, 4));
       setPlansError(result.error);
       setPlansLoading(false);
     }, (cause: unknown) => {
@@ -129,6 +129,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       
       </div>
     </section>
+    <div aria-hidden="true" className="hero-dashed-divider" />
 
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
       <div style={{ marginTop: 0 }} className="home-ticker w-full bg-[#ff5500] text-black font-mono font-bold text-xs uppercase py-2.5 overflow-hidden whitespace-nowrap border-y border-black">
@@ -279,7 +280,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <span>Compare all plan details</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
           {plans.map((plan) => (
             <article key={plan.id} className={'mw-electric-card bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]')}>
               {plan.badge && <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">{plan.badge}</span>}
@@ -292,7 +293,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </div>
               <p className="text-sm text-zinc-400 leading-relaxed mt-4">{plan.description}</p>
               <ul className="mt-5 space-y-2.5 text-sm text-zinc-300">
-                {plan.features.slice(0, 3).map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}
+                {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}
               </ul>
               <button onClick={() => onSelectScreen('online-coaching')} className="cursor-pointer mt-7 bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
                 View plan &amp; checkout <ArrowRight className="w-4 h-4" />
