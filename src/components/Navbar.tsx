@@ -6,6 +6,8 @@ import {
   ChevronRight,
   Flame,
   Dumbbell,
+  Apple,
+  Star,
   Smartphone,
   Shirt,
   PhoneCall,
@@ -21,9 +23,11 @@ interface NavbarProps {
 const NAV_ITEMS: { id: ScreenId; label: string; code: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'home', label: 'Home', code: '01', icon: Flame },
   { id: 'online-coaching', label: 'Online coaching', code: '02', icon: Dumbbell },
-  { id: 'app', label: 'The App', code: '03', icon: Smartphone },
-  { id: 'shwag', label: 'SHWAG', code: '04', icon: Shirt },
-  { id: 'contact', label: 'Contact', code: '05', icon: PhoneCall },
+  { id: 'nutrition', label: 'Nutrition', code: '03', icon: Apple },
+  { id: 'app', label: 'The App', code: '04', icon: Smartphone },
+  { id: 'reviews', label: 'Reviews', code: '05', icon: Star },
+  { id: 'shwag', label: 'SHWAG', code: '06', icon: Shirt },
+  { id: 'contact', label: 'Contact', code: '07', icon: PhoneCall },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({

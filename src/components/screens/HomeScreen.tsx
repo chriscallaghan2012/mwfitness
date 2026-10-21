@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ScreenId } from '../../types';
 import { IMAGES, ABOUT, TESTIMONIALS, HOW_IT_WORKS, CONTACT } from '../../data/mockData';
-import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, GraduationCap } from 'lucide-react';
+import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, GraduationCap, Smartphone, Scale, TrendingUp, Utensils, Dumbbell, ChevronLeft, ChevronRight } from 'lucide-react';
+import { StoreBadges } from '../StoreBadges';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
 interface HomeScreenProps {
@@ -13,6 +14,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
   const [plans, setPlans] = useState<PublicPlan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
   const [plansError, setPlansError] = useState<string | null>(null);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [reviewsPaused, setReviewsPaused] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -30,6 +33,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
     });
     return () => { active = false; };
   }, []);
+
+  useEffect(() => {
+    if (reviewsPaused || TESTIMONIALS.length < 2) return;
+    const timer = window.setInterval(() => setReviewIndex((index) => (index + 1) % TESTIMONIALS.length), 5000);
+    return () => window.clearInterval(timer);
+  }, [reviewsPaused]);
 
   const scrollToId = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -88,6 +97,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
+
+            <div className="pt-2 space-y-2"><p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">MWFitnessUK app — coming soon</p><StoreBadges /></div>
 
             <div className="flex flex-wrap items-center gap-2 pt-6" aria-label="Jump to a section">
               <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mr-1">Jump to:</span>
@@ -309,40 +320,58 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </section>
 
-      {/* 6. TESTIMONIALS */}
-      <section id="testimonials" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-[#22252e] pb-4 mb-10">
-          <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
-            [ WHAT PEOPLE SAY ]
+      {/* 6. THE APP */}
+      <section className="relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
+        <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+        <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#ff5500]/10 blur-3xl" />
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-16 sm:px-6 md:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+          <div className="space-y-5">
+            <div className="inline-flex items-center gap-2 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Smartphone className="h-4 w-4" /> Your training, in your pocket</div>
+            <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-tight text-white sm:text-5xl">The MWFitnessUK<br /><span className="text-[#ff5500]">app is on the way.</span></h2>
+            <p className="max-w-xl text-sm leading-relaxed text-zinc-300 sm:text-base">A clearer way to keep your training, nutrition and progress together. The app is being developed to make consistency easier between check-ins — with the important details in one place, wherever you train.</p>
+            <ul className="space-y-2.5 text-sm text-zinc-300">
+              {['Daily weigh-ins and progress history','Food logging and nutrition habits','Training sessions and lift tracking','Progress photos, measurements and coach check-ins'].map((item) => <li key={item} className="flex items-start gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" />{item}</li>)}
+            </ul>
+            <div className="pt-2"><p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-zinc-500">Store listings will be linked once published</p><StoreBadges /></div>
+            <button onClick={() => onSelectScreen('app')} className="cursor-pointer inline-flex items-center gap-2 border border-[#ff5500] px-5 py-3 font-mono text-xs font-bold uppercase text-white transition-colors hover:bg-[#ff5500] hover:text-black">Explore the app <ArrowRight className="h-4 w-4" /></button>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            REAL PEOPLE. REAL RESULTS.
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t) => (
-            <div key={t.id} className="mw-electric-card bg-[#121419] border border-[#20232b] p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center font-display text-white text-sm font-bold">
-                  {t.avatarText}
-                </div>
-                <div>
-                  <div className="text-sm font-sans text-white font-medium">{t.name}</div>
-                  <div className="text-[11px] font-mono text-[#ff5500] uppercase tracking-wider">{t.metric}</div>
-                </div>
-              </div>
-              <p className="text-sm font-sans text-zinc-300 leading-relaxed">"{t.quote}"</p>
-              <div className="flex items-center gap-1.5 mt-4">
-                {renderStars(5)}
-                <span className="text-[11px] font-mono text-zinc-500 ml-1">{t.programme}</span>
-              </div>
-            </div>
-          ))}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[
+              { icon: Scale, title: 'Daily weigh-ins', text: 'Spot trends over time instead of focusing on one number.' },
+              { icon: TrendingUp, title: 'Progress tracking', text: 'Keep measurements, photos and milestones together.' },
+              { icon: Utensils, title: 'Food & nutrition', text: 'Log meals and build awareness of everyday habits.' },
+              { icon: Dumbbell, title: 'Training log', text: 'Keep workouts and performance moving forward.' },
+            ].map(({ icon: Icon, title, text }) => <div key={title} className="mw-electric-card border border-[#252a34] bg-[#15171d]/90 p-5">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center border border-[#ff5500]/60 bg-[#ff5500]/10 text-[#ff5500]"><Icon className="h-5 w-5" /></div><h3 className="mb-2 font-display text-xl uppercase text-white">{title}</h3><p className="text-sm leading-relaxed text-zinc-400">{text}</p>
+            </div>)}
+          </div>
         </div>
       </section>
 
-      {/* 7. CLOSING CTA */}
+      {/* 7. TESTIMONIALS */}
+      <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[#22252e] pb-5 sm:flex-row sm:items-end">
+          <div><div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2><p className="mt-3 max-w-xl text-sm text-zinc-400">Stories from people building stronger routines with support that fits around real life.</p></div>
+          <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
+        </div>
+        <div className="mw-electric-card overflow-hidden border border-[#252a34] bg-[#121419] p-6 sm:p-9" onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
+          <div className="mb-6 flex items-center justify-between"><div className="flex gap-1.5">{renderStars(5)}</div><span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Member stories · auto-moving</span></div>
+          <div className="overflow-hidden">
+            <div className="flex transition-transform duration-700 ease-in-out motion-reduce:transition-none" style={{ transform: `translateX(-${reviewIndex * 100}%)` }}>
+              {TESTIMONIALS.map((t) => <article key={t.id} className="w-full min-w-full shrink-0 px-1">
+                <div className="mb-4 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center border border-[#ff5500] bg-[#ff5500]/10 font-display text-sm font-bold text-white">{t.avatarText}</div><div><p className="font-display text-xl uppercase text-white">{t.name}</p><p className="font-mono text-[10px] uppercase tracking-wider text-[#ff5500]">{t.metric}</p></div></div>
+                <p className="max-w-4xl text-lg leading-relaxed text-zinc-200 sm:text-2xl">“{t.quote}”</p><p className="mt-5 font-mono text-[10px] uppercase tracking-widest text-zinc-500">{t.programme}</p>
+              </article>)}
+            </div>
+          </div>
+          <div className="mt-8 flex items-center justify-between border-t border-[#252a34] pt-5">
+            <div className="flex items-center gap-2">{TESTIMONIALS.map((t, index) => <button key={t.id} aria-label={`Show review ${index + 1}`} aria-current={reviewIndex === index ? 'true' : undefined} onClick={() => setReviewIndex(index)} className={`h-1.5 cursor-pointer rounded-full transition-all ${reviewIndex === index ? 'w-8 bg-[#ff5500]' : 'w-3 bg-zinc-700 hover:bg-zinc-500'}`} />)}</div>
+            <div className="flex gap-2"><button aria-label="Previous review" onClick={() => setReviewIndex((index) => (index - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronLeft className="h-4 w-4" /></button><button aria-label="Next review" onClick={() => setReviewIndex((index) => (index + 1) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronRight className="h-4 w-4" /></button></div>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. CLOSING CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="mw-electric-card relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
