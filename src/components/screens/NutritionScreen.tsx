@@ -13,10 +13,10 @@ const DIGITAL_IDEAS = [
 
 export const NutritionScreen: React.FC<NutritionScreenProps> = ({ onSelectScreen }) => (
   <div className="page-layout">
-    <section className="page-hero relative overflow-hidden border-b border-[#262930]">
+    <section className="page-hero relative min-h-[40vh] flex items-center overflow-hidden border-b border-[#262930]">
       <div className="absolute inset-0 bg-grid-pattern opacity-30" />
       <div className="absolute -right-20 -top-24 h-96 w-96 rounded-full bg-[#ff5500]/10 blur-3xl" />
-      <div className="relative mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 md:py-28">
+      <div className="relative mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8 md:py-16">
         <div className="max-w-3xl space-y-6">
           <div className="inline-flex items-center gap-2 border border-[#ff5500]/60 bg-[#16181e]/90 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Sparkles className="h-3.5 w-3.5" /> Nutrition & digital guides</div>
           <h1 className="font-display text-5xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-7xl">Make good habits<br /><span className="text-[#ff5500]">easier to keep.</span></h1>
