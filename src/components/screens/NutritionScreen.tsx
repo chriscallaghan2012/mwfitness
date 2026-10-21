@@ -17,21 +17,21 @@ export const NutritionScreen: React.FC<NutritionScreenProps> = ({ onSelectScreen
     <section className="page-hero relative min-h-[40vh] flex items-center overflow-hidden border-b border-[#262930]">
       <div className="absolute inset-0 bg-grid-pattern opacity-30" />
       <div className="absolute -right-20 -top-24 h-96 w-96 rounded-full bg-[#ff5500]/10 blur-3xl" />
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[minmax(0,1fr)_220px] lg:px-8">
-        <div className="w-full max-w-3xl space-y-6">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[minmax(0,1fr)_500px] lg:px-8">
+        <div className="mx-auto w-full max-w-3xl space-y-6 text-center">
           <div className="inline-flex items-center gap-2 border border-[#ff5500]/60 bg-[#16181e]/90 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Sparkles className="h-3.5 w-3.5" /> Nutrition & digital guides</div>
           <h1 className="font-display text-5xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-7xl">Make good habits<br /><span className="text-[#ff5500]">easier to keep.</span></h1>
           <p className="max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg">Practical nutrition guides, meal-prep systems and printable planners — built for real routines, not perfect ones. Buy once, keep your files and revisit them whenever you need.</p>
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex flex-wrap justify-center gap-4 pt-3">
             <button onClick={() => document.getElementById('digital-guides')?.scrollIntoView({ behavior: 'smooth' })} className="cursor-pointer inline-flex items-center gap-2 bg-[#ff5500] px-6 py-3.5 font-mono text-xs font-bold uppercase text-black">Explore digital guides <ArrowRight className="h-4 w-4" /></button>
             <button onClick={() => onSelectScreen('online-coaching')} className="cursor-pointer border border-zinc-700 bg-[#16181d] px-6 py-3.5 font-mono text-xs font-bold uppercase text-white hover:border-[#ff5500]">Explore coaching</button>
           </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-2 pt-2 text-xs text-zinc-500"><span className="inline-flex items-center gap-2"><Download className="h-4 w-4 text-[#ff5500]" /> Downloadable formats</span><span className="inline-flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-[#ff5500]" /> Planned secure purchase library</span></div>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 pt-3 text-xs text-zinc-500"><span className="inline-flex items-center gap-2"><Download className="h-4 w-4 text-[#ff5500]" /> Downloadable formats</span><span className="inline-flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-[#ff5500]" /> Planned secure purchase library</span></div>
 
         </div>
     
-      <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-end">
-        <div className="w-full max-w-[220px]"><StoreBadges compact stacked /></div>
+      <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-center">
+        <div className="w-full max-w-[360px]"><StoreBadges stacked /></div>
       </div>
       </div>
     </section>
