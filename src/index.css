@@ -435,3 +435,8 @@ a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):no
   margin: 0 !important;
   flex: 0 0 auto;
 }
+
+.page-layout > .hero-dashed-divider {
+  margin-block-start: 0 !important;
+  margin-block-end: 0 !important;
+}
