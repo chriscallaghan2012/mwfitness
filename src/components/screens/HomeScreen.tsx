@@ -127,7 +127,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </div>
         </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
-      </section>
+      
+      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
+        <StoreBadges compact />
+      </div>
+    </section>
 
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
       <div style={{ marginTop: 0 }} className="home-ticker w-full bg-[#ff5500] text-black font-mono font-bold text-xs uppercase py-2.5 overflow-hidden whitespace-nowrap border-y border-black">
