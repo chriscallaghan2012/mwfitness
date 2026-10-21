@@ -301,6 +301,30 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         {plansLoading && <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p>}
         {!plansLoading && plansError && <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p>}
       </section>
+      {/* TESTIMONIALS */}
+      <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[#22252e] pb-5 sm:flex-row sm:items-end">
+          <div><div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2><p className="mt-3 max-w-xl text-sm text-zinc-400">Stories from people building stronger routines with support that fits around real life.</p></div>
+          <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
+        </div>
+        <div className="mw-electric-card overflow-hidden border border-[#252a34] bg-[#121419] p-6 sm:p-9" onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
+          <div className="mb-6 flex items-center justify-between"><div className="flex gap-1.5">{renderStars(5)}</div><span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Member stories · auto-moving</span></div>
+          <div className="overflow-hidden">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+              {orderedTestimonials.map((t) => <article key={t.id} className="min-w-0 px-1 transition-all duration-700 ease-in-out md:px-0">
+                <div className="mb-4 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center border border-[#ff5500] bg-[#ff5500]/10 font-display text-sm font-bold text-white">{t.avatarText}</div><div><p className="font-display text-xl uppercase text-white">{t.name}</p><p className="font-mono text-[10px] uppercase tracking-wider text-[#ff5500]">{t.metric}</p></div></div>
+                <p className="max-w-4xl text-lg leading-relaxed text-zinc-200 sm:text-2xl">“{t.quote}”</p><p className="mt-5 font-mono text-[10px] uppercase tracking-widest text-zinc-500">{t.programme}</p>
+              </article>)}
+            </div>
+          </div>
+          <div className="mt-8 flex items-center justify-between border-t border-[#252a34] pt-5">
+            <div className="flex items-center gap-2">{TESTIMONIALS.map((t, index) => <button key={t.id} aria-label={`Show review ${index + 1}`} aria-current={reviewIndex === index ? 'true' : undefined} onClick={() => setReviewIndex(index)} className={`h-1.5 cursor-pointer rounded-full transition-all ${reviewIndex === index ? 'w-8 bg-[#ff5500]' : 'w-3 bg-zinc-700 hover:bg-zinc-500'}`} />)}</div>
+            <div className="flex gap-2"><button aria-label="Previous review" onClick={() => setReviewIndex((index) => (index - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronLeft className="h-4 w-4" /></button><button aria-label="Next review" onClick={() => setReviewIndex((index) => (index + 1) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronRight className="h-4 w-4" /></button></div>
+          </div>
+        </div>
+      </section>
+
+
       {/* THE APP */}
       <section className="home-app-section relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
         <div className="absolute inset-0 bg-grid-pattern opacity-20" />
@@ -328,29 +352,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             ].map(({ icon: Icon, title, text }) => <div key={title} className="mw-electric-card border border-[#252a34] bg-[#15171d]/90 p-5">
               <div className="mb-4 flex h-10 w-10 items-center justify-center border border-[#ff5500]/60 bg-[#ff5500]/10 text-[#ff5500]"><Icon className="h-5 w-5" /></div><h3 className="mb-2 font-display text-xl uppercase text-white">{title}</h3><p className="text-sm leading-relaxed text-zinc-400">{text}</p>
             </div>)}
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[#22252e] pb-5 sm:flex-row sm:items-end">
-          <div><div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2><p className="mt-3 max-w-xl text-sm text-zinc-400">Stories from people building stronger routines with support that fits around real life.</p></div>
-          <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
-        </div>
-        <div className="mw-electric-card overflow-hidden border border-[#252a34] bg-[#121419] p-6 sm:p-9" onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
-          <div className="mb-6 flex items-center justify-between"><div className="flex gap-1.5">{renderStars(5)}</div><span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Member stories · auto-moving</span></div>
-          <div className="overflow-hidden">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
-              {orderedTestimonials.map((t) => <article key={t.id} className="min-w-0 px-1 transition-all duration-700 ease-in-out md:px-0">
-                <div className="mb-4 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center border border-[#ff5500] bg-[#ff5500]/10 font-display text-sm font-bold text-white">{t.avatarText}</div><div><p className="font-display text-xl uppercase text-white">{t.name}</p><p className="font-mono text-[10px] uppercase tracking-wider text-[#ff5500]">{t.metric}</p></div></div>
-                <p className="max-w-4xl text-lg leading-relaxed text-zinc-200 sm:text-2xl">“{t.quote}”</p><p className="mt-5 font-mono text-[10px] uppercase tracking-widest text-zinc-500">{t.programme}</p>
-              </article>)}
-            </div>
-          </div>
-          <div className="mt-8 flex items-center justify-between border-t border-[#252a34] pt-5">
-            <div className="flex items-center gap-2">{TESTIMONIALS.map((t, index) => <button key={t.id} aria-label={`Show review ${index + 1}`} aria-current={reviewIndex === index ? 'true' : undefined} onClick={() => setReviewIndex(index)} className={`h-1.5 cursor-pointer rounded-full transition-all ${reviewIndex === index ? 'w-8 bg-[#ff5500]' : 'w-3 bg-zinc-700 hover:bg-zinc-500'}`} />)}</div>
-            <div className="flex gap-2"><button aria-label="Previous review" onClick={() => setReviewIndex((index) => (index - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronLeft className="h-4 w-4" /></button><button aria-label="Next review" onClick={() => setReviewIndex((index) => (index + 1) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronRight className="h-4 w-4" /></button></div>
           </div>
         </div>
       </section>
