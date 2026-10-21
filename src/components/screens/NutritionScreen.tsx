@@ -37,6 +37,7 @@ export const NutritionScreen: React.FC<NutritionScreenProps> = ({ onSelectScreen
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
     <Ticker />
+    <div aria-hidden="true" className="hero-dashed-divider" />
     <section id="digital-guides" className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8 md:py-20">
       <div className="mb-10 flex flex-col justify-between gap-4 border-b border-[#22252e] pb-5 md:flex-row md:items-end">
         <div><div className="mb-2 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ THE DIGITAL SHELF ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Useful. Clear. Yours to keep.</h2></div>
