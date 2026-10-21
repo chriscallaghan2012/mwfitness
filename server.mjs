@@ -23,6 +23,8 @@ import communicationsRules from './api/communications-rules.mjs';
 import communicationsNotifications from './api/communications-notifications.mjs';
 import unsubscribe from './api/unsubscribe.mjs';
 import health from './api/health.mjs';
+import plans from './api/plans.mjs';
+import products from './api/products.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -31,6 +33,8 @@ app.use(express.json({ limit: '64kb' }));
 app.use(express.urlencoded({ extended: false, limit: '8kb' }));
 
 app.get('/api/health', health);
+app.get('/api/plans', plans);
+app.get('/api/products', products);
 
 app.post('/api/send-mail', async (req, res) => {
   try {

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
-export function UsersAdmin() {
+export function UsersAdmin({ onOpenProfile }: { onOpenProfile: (profileId: string) => void }) {
   const [users, setUsers] = useState<Row[] | null>(null);
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
@@ -121,6 +121,7 @@ export function UsersAdmin() {
           { key: 'member_tier', label: 'Tier' },
           { key: 'current_weight', label: 'KG' },
           { key: 'since', label: 'Since', render: (r) => <span className="text-zinc-500">{ShortDate(r.since as string)}</span> },
+          { key: 'profile', label: 'Profile', render: (r) => <button type="button" className={btnGhost} onClick={() => onOpenProfile(String(r.id))}>Open profile</button> },
         ]}
       />
       {edit && (

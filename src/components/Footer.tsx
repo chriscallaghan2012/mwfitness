@@ -16,6 +16,7 @@ const NAV_LINKS: { id: ScreenId; label: string }[] = [
   { id: 'app', label: 'The App' },
   { id: 'reviews', label: 'Reviews & testimonials' },
   { id: 'contact', label: 'Contact' },
+  { id: 'account', label: 'Member account' },
 ];
 
 export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }) => (

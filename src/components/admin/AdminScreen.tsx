@@ -258,6 +258,8 @@ export function AdminScreen() {
   const [signedIn, setSignedIn] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
+  const [selectedClientId, setSelectedClientId] = useState('');
+  const [selectedMessageClientId, setSelectedMessageClientId] = useState('');
   const [stats, setStats] = useState<{ users: number; activeUsers: number; plans: number; activePlans: number; memberships: number; activeMemberships: number; leads: number | null; newLeads: number | null } | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [publicCatalogue, setPublicCatalogue] = useState<PublicPlan[] | null>(null);
@@ -460,10 +462,10 @@ export function AdminScreen() {
             <button type="button" onClick={() => { setForgotMode(true); setError(null); }} className="text-sm text-zinc-400 underline hover:text-white">Forgot password?</button>
           </div>
           <div className="mt-5 border-t border-zinc-800 pt-4">
-            <button type="button" onClick={openDemo} className="w-full border border-orange-500/50 bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg">
-              Preview sample admin data
+            <button type="button" onClick={openDemo} className="w-full border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-mono font-bold text-xs uppercase px-4 py-3 rounded-lg">
+              Preview Demo Mode (Local Sandbox)
             </button>
-            <p className="text-xs text-zinc-500 text-center mt-2">Try sample edits safely. Changes stay in this browser session and are never saved or sent.</p>
+            <p className="text-xs text-zinc-500 text-center mt-2">Sample data only. Changes stay in this browser session and are never saved to the database.</p>
           </div>
         </div>
         </div>
@@ -475,7 +477,13 @@ export function AdminScreen() {
       <div className="mx-auto w-full max-w-[1680px]">
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-bold text-white">MWFitnessUK HQ</h1>
-        {demoMode ? <span className="border border-orange-500/50 bg-orange-500/10 px-2 py-1 text-[10px] font-mono font-bold uppercase text-orange-300">Demo · sample data</span> : <span className="text-xs text-zinc-400">signed in as {email}</span>}
+        {demoMode ? (
+          <span className="rounded-md border border-amber-500/60 bg-amber-500/15 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-300">
+            DEMO MODE · Sample Data · Local Only
+          </span>
+        ) : (
+          <span className="text-xs text-zinc-400">signed in as {email}</span>
+        )}
         <button onClick={demoMode ? exitDemo : signOut} className="text-xs text-zinc-500 underline">
           {demoMode ? 'Exit demo' : 'Sign out'}
         </button>
@@ -508,8 +516,8 @@ export function AdminScreen() {
         <div className="space-y-4">
           <section className={`${card} !border-white/[0.08] !bg-[#131519]`}>
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-              <div><p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Live business overview</p><h2 className="mt-1 text-xl font-semibold text-white">MW Fitness performance</h2><p className="mt-1 text-xs text-zinc-500">Live counts from Neon. No demo records are used in this view.</p></div>
-              <div className="flex items-center gap-2"><span className={`h-2 w-2 rounded-full ${stats ? 'bg-emerald-400' : 'bg-amber-400'}`} /><span className="text-xs text-zinc-400">{statsLoading ? 'Refreshing live data…' : stats ? 'Neon data loaded' : 'Live data unavailable'}</span><button type="button" onClick={() => void loadStats()} disabled={statsLoading} className={btnGhost}>{statsLoading ? 'Refreshing…' : 'Refresh'}</button></div>
+              <div><p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Business overview</p><h2 className="mt-1 text-xl font-semibold text-white">MW Fitness performance</h2><p className="mt-1 text-xs text-zinc-500">Totals from Neon database records.</p></div>
+              <div className="flex items-center gap-2"><span className={`h-2 w-2 rounded-full ${stats ? 'bg-emerald-400' : 'bg-amber-400'}`} /><span className="text-xs text-zinc-400">{statsLoading ? 'Refreshing…' : stats ? 'Neon connected' : 'Data unavailable'}</span><button type="button" onClick={() => void loadStats()} disabled={statsLoading} className={btnGhost}>{statsLoading ? 'Refreshing…' : 'Refresh'}</button></div>
             </div>
             {error ? <p role="alert" className="mb-4 rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-300">{error}</p> : null}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -686,8 +694,8 @@ export function AdminScreen() {
           {demoNotice ? <p role="status" className="text-xs text-orange-200">{demoNotice}</p> : null}
         </div>
       )}
-      {!demoMode && tab === 'users' && <UsersAdmin />}
-      {!demoMode && tab === 'client-records' && <ClientRecordsAdmin />}
+      {!demoMode && tab === 'users' && <UsersAdmin onOpenProfile={(profileId) => { setSelectedClientId(profileId); setTab('client-records'); }} />}
+      {!demoMode && tab === 'client-records' && <ClientRecordsAdmin initialUserId={selectedClientId} onMessageMember={(profileId) => { setSelectedMessageClientId(profileId); setTab('messages'); }} />}
       {!demoMode && tab === 'plans' && <PlansAdmin />}
       {!demoMode && tab === 'memberships' && <MembershipsAdmin />}
       {!demoMode && tab === 'nutrition' && <NutritionAdmin />}
@@ -696,7 +704,7 @@ export function AdminScreen() {
       {!demoMode && tab === 'videos' && <VideosAdmin />}
       {!demoMode && tab === 'checkins' && <CheckinsAdmin />}
       {!demoMode && tab === 'progress' && <ProgressAdmin />}
-      {!demoMode && tab === 'messages' && <MessagesAdmin />}
+      {!demoMode && tab === 'messages' && <MessagesAdmin initialAthleteId={selectedMessageClientId} />}
       {!demoMode && tab === 'leads' && <LeadsAdmin />}
       {!demoMode && tab === 'member-activity' && <MemberActivityAdmin />}
       {!demoMode && tab === 'communications' && <CommunicationsAdmin />}

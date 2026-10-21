@@ -93,6 +93,7 @@ export function ProgressAdmin() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [userId, setUserId] = useState('');
   const [weight, setWeight] = useState('');
+  const [note, setNote] = useState('');
   const [msg, setMsg] = useState('');
   const loadRequest = useRef(0);
 
@@ -135,11 +136,13 @@ export function ProgressAdmin() {
         profile_id: userId,
         weight: parsedWeight,
         recorded_on: new Date().toISOString().slice(0, 10),
+        note: note.trim() || null,
       }).select('id');
       if (result.error) { setMsg(`Failed: ${result.error.message}`); return; }
       if (!result.data?.length) { setMsg('The weigh-in was not saved. Check your staff permissions and try again.'); return; }
       setMsg('Weigh-in logged.');
       setWeight('');
+      setNote('');
       await load(userId);
     } catch (error) {
       setMsg(`Failed: ${error instanceof Error ? error.message : 'Unexpected error'}`);
@@ -171,6 +174,7 @@ export function ProgressAdmin() {
           ))}
         </select>
         {userId && <input className={inp} placeholder="weight kg" value={weight} onChange={(e) => setWeight(e.target.value)} />}
+        {userId && <input className={inp} placeholder="Progress note for member" value={note} onChange={(e) => setNote(e.target.value)} />}
         {userId && (
           <button onClick={add} className={btn}>
             Log weigh-in

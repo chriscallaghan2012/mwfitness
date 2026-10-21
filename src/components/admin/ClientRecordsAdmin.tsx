@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { neon } from '../../lib/neon';
 import { AdminTable, Row, ShortDate, btnGhost, card, inp } from './fields';
 
-type Dataset = 'checkins' | 'progress_logs' | 'nutrition_logs' | 'nutrition_daily_logs' | 'workout_sessions' | 'coach_messages';
+type Dataset = 'checkins' | 'progress_logs' | 'nutrition_logs' | 'nutrition_daily_logs' | 'workout_sessions' | 'coach_messages' | 'daily_metrics' | 'cardio_logs' | 'supplement_plans';
 
 const DATASETS: { id: Dataset; label: string; dateKey: string; description: string }[] = [
   { id: 'checkins', label: 'Check-ins', dateKey: 'checkin_date', description: 'Weekly wellbeing submissions from the mobile app.' },
@@ -11,11 +11,14 @@ const DATASETS: { id: Dataset; label: string; dateKey: string; description: stri
   { id: 'nutrition_daily_logs', label: 'Nutrition completion', dateKey: 'log_date', description: 'Meal completion and day-complete records saved by the mobile nutrition screen.' },
   { id: 'workout_sessions', label: 'Workout sessions', dateKey: 'scheduled_on', description: 'Scheduled and completed sessions.' },
   { id: 'coach_messages', label: 'Messages', dateKey: 'created_at', description: 'Coach messages associated with this client.' },
+  { id: 'daily_metrics', label: 'Water & steps', dateKey: 'metric_date', description: 'Daily hydration and step totals saved by the mobile app.' },
+  { id: 'cardio_logs', label: 'Cardio', dateKey: 'completed_at', description: 'Cardio sessions logged by the member.' },
+  { id: 'supplement_plans', label: 'Supplements', dateKey: 'created_at', description: 'Coach-assigned supplement plan history.' },
 ];
 
-export function ClientRecordsAdmin() {
+export function ClientRecordsAdmin({ initialUserId = '', onMessageMember }: { initialUserId?: string; onMessageMember: (profileId: string) => void }) {
   const [users, setUsers] = useState<Row[]>([]);
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState(initialUserId);
   const [dataset, setDataset] = useState<Dataset>('checkins');
   const [rows, setRows] = useState<Row[] | null>(null);
   const [profile, setProfile] = useState<Row | null>(null);
@@ -46,7 +49,7 @@ export function ClientRecordsAdmin() {
     const selected = users.find((user) => user.id === userId) ?? null;
     setProfile(selected);
     Promise.all([
-      neon.from(dataset).select('*').eq(dataset === 'coach_messages' ? 'athlete_profile_id' : 'profile_id', userId).order(DATASETS.find((item) => item.id === dataset)?.dateKey ?? 'created_at', { ascending: false }),
+      neon.from(dataset).select(dataset === 'workout_sessions' ? '*, workout_templates(name)' : '*').eq(dataset === 'coach_messages' ? 'athlete_profile_id' : 'profile_id', userId).order(DATASETS.find((item) => item.id === dataset)?.dateKey ?? 'created_at', { ascending: false }),
       neon.from('memberships').select('*, plans(name,price,kind)').eq('profile_id', userId).order('created_at', { ascending: false }),
       neon.from('nutrition_plans').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
     ]).then(([records, membershipResult, nutritionResult]) => {
@@ -115,7 +118,18 @@ export function ClientRecordsAdmin() {
     ];
     if (dataset === 'workout_sessions') return [
       { key: 'scheduled_on', label: 'Scheduled', render: (r: Row) => ShortDate(String(r.scheduled_on ?? '')) },
-      { key: 'template_id', label: 'Workout template' }, { key: 'status', label: 'Status' }, { key: 'completed_on', label: 'Completed' }, { key: 'notes', label: 'Session notes' },
+      { key: 'template', label: 'Workout', render: (r: Row) => String(r.workout_templates?.name ?? r.template_id ?? '—') }, { key: 'status', label: 'Status' }, { key: 'completed_on', label: 'Completed', render: (r: Row) => ShortDate(String(r.completed_on ?? '')) }, { key: 'notes', label: 'Session notes', render: (r: Row) => typeof r.notes === 'object' ? JSON.stringify(r.notes) : String(r.notes ?? '—') },
+    ];
+    if (dataset === 'daily_metrics') return [
+      { key: 'metric_date', label: 'Date', render: (r: Row) => ShortDate(String(r.metric_date ?? '')) },
+      { key: 'water_litres', label: 'Water (L)' }, { key: 'steps', label: 'Steps' },
+    ];
+    if (dataset === 'cardio_logs') return [
+      { key: 'completed_at', label: 'Completed', render: (r: Row) => ShortDate(String(r.completed_at ?? '')) },
+      { key: 'activity', label: 'Activity' }, { key: 'duration_minutes', label: 'Minutes' }, { key: 'average_heart_rate', label: 'Avg HR' }, { key: 'notes', label: 'Notes' },
+    ];
+    if (dataset === 'supplement_plans') return [
+      { key: 'name', label: 'Supplement' }, { key: 'dosage_string', label: 'Dosage' }, { key: 'timing', label: 'Timing' }, { key: 'active', label: 'Active', render: (r: Row) => r.active ? 'Yes' : 'No' },
     ];
     return [
       { key: 'created_at', label: 'Sent', render: (r: Row) => ShortDate(String(r.created_at ?? '')) },
@@ -126,8 +140,10 @@ export function ClientRecordsAdmin() {
   return (
     <div className="space-y-4">
       <div className={card}>
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-orange-300">App data explorer</p>
-        <p className="mb-4 text-sm text-zinc-400">Inspect live submissions from the mobile app through the shared Neon database. This view is read-only; manage plans and assignments in their dedicated admin tabs.</p>
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div><p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-orange-300">Member profile &amp; app history</p><p className="text-sm text-zinc-400">Review saved member records from the shared Neon database. Manage plans and assignments in their dedicated admin tabs.</p></div>
+          {userId ? <button type="button" className={btnGhost} onClick={() => onMessageMember(userId)}>Message member</button> : null}
+        </div>
         <label className="mb-1 block text-xs text-zinc-400">Client</label>
         <select className={inp} value={userId} onChange={(event) => setUserId(event.target.value)}>
           <option value="">Choose a client…</option>

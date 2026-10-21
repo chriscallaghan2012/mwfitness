@@ -16,11 +16,13 @@ import { ContactScreen } from './components/screens/ContactScreen';
 import { PrivacyScreen } from './components/screens/PrivacyScreen';
 import { CookiePolicyScreen } from './components/screens/CookiePolicyScreen';
 import { AccountDeletionScreen } from './components/screens/AccountDeletionScreen';
+import { MemberAccountScreen } from './components/screens/MemberAccountScreen';
 import { AdminScreen } from './components/admin/AdminScreen';
 
 export default function App() {
   const screenFromLocation = (): ScreenId => {
-    if (new URLSearchParams(window.location.search).get('auth') === 'reset-password') return 'admin';
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('auth') === 'reset-password') return searchParams.get('member') === '1' ? 'account' : 'admin';
     const rawPath = window.location.pathname;
     const path = rawPath.length > 1 && rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath;
     const routes: Record<string, ScreenId> = {
@@ -32,6 +34,7 @@ export default function App() {
       '/shwag': 'shwag',
       '/contact': 'contact',
       '/admin': 'admin',
+      '/account': 'account',
       '/privacy': 'privacy',
       '/cookies': 'cookies',
       '/delete-account': 'delete-account',
@@ -75,6 +78,7 @@ export default function App() {
       shwag: '/shwag',
       contact: '/contact',
       admin: '/admin',
+      account: '/account',
       privacy: '/privacy',
       cookies: '/cookies',
       'delete-account': '/delete-account',
@@ -121,6 +125,7 @@ export default function App() {
           <ContactScreen onOpenBookCall={handleOpenBookCall} />
         )}
         {currentScreen === 'admin' && <AdminScreen />}
+        {currentScreen === 'account' && <MemberAccountScreen onSelectScreen={handleSelectScreen} />}
         {currentScreen === 'privacy' && <PrivacyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'cookies' && <CookiePolicyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'delete-account' && <AccountDeletionScreen onBack={() => { window.location.href = '/'; }} />}

@@ -13,10 +13,10 @@ const timeLabel = (value: string) => {
 };
 const initials = (value: string) => value.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'M';
 
-export function MessagesAdmin() {
+export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: string }) {
   const [athletes, setAthletes] = useState<Row[]>([]);
   const [messages, setMessages] = useState<Row[]>([]);
-  const [selectedId, setSelectedId] = useState('');
+  const [selectedId, setSelectedId] = useState(initialAthleteId);
   const [search, setSearch] = useState('');
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
@@ -88,7 +88,7 @@ export function MessagesAdmin() {
     try {
       const { data: session, error: sessionError } = await neon.auth.getSession({ query: {} });
       if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
-      const result = await neon.from('coach_messages').insert({ athlete_profile_id: selectedId, sender_profile_id: session.user.id, body, delivery_status: 'sent' });
+      const result = await neon.from('coach_messages').insert({ athlete_profile_id: selectedId, sender_profile_id: session.user.id, body });
       if (result.error) throw result.error;
       setDraft(''); setNotice('Reply sent'); await load(true);
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Your reply could not be sent.'); }
