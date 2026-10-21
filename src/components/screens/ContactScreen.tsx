@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Ticker } from '../Ticker';
 import { CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { MapPin, Mail, Instagram, Facebook, PhoneCall, CheckCircle, ArrowRight, Clock } from 'lucide-react';
@@ -73,6 +74,7 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
         </div>
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
+    <Ticker />
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
