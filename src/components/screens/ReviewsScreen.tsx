@@ -21,9 +21,9 @@ export const ReviewsScreen: React.FC<ReviewsScreenProps> = ({ onSelectScreen }) 
       </div>
       </div>
     </section>
-    <div aria-hidden="true" className="hero-dashed-divider" />
+    <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
     <Ticker />
-    <div aria-hidden="true" className="hero-dashed-divider" />
+    <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
     <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8 md:py-20">
       <div className="mb-10 border-b border-[#22252e] pb-5"><div className="mb-2 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real progress.</h2></div>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
