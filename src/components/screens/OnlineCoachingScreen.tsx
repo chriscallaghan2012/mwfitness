@@ -53,15 +53,16 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
         const oneOff = plans.find((plan) => plan.id === 'online-4-week-once');
         const tiers = plans.filter((plan) => plan.id !== 'online-4-week-once');
         const featureList = Array.from(new Set(plans.flatMap((plan) => plan.features)));
-        const renderFeature = (plan: PublicPlan, feature: string) => {
+        const renderFeature = (plan: PublicPlan, feature: string, comparison = true) => {
           const included = plan.features.includes(feature);
+          if (!included && !comparison) return null;
           return <li key={feature} className="flex min-h-9 items-start gap-2.5 text-sm leading-relaxed">
             {included ? <Check aria-label="Included" className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" /> : <span aria-label="Not included" className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-zinc-500"><span aria-hidden="true" className="text-base leading-none">×</span></span>}
             <span className={included ? 'text-zinc-200' : 'text-zinc-400'}>{feature}</span>
           </li>;
         };
         const renderCard = (plan: PublicPlan, featured = false) => (
-          <article key={plan.id} className={'relative flex h-full flex-col border p-6 transition-all duration-300 md:p-7 ' + (featured ? 'border-[#ff5500]/70 bg-gradient-to-br from-[#1c1714] via-[#121419] to-[#121419] shadow-[0_0_28px_rgba(255,85,0,0.10)]' : plan.is_popular ? 'border-[#ff5500] bg-[#151419] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b] bg-[#121419]')}>
+          <article key={plan.id} className={'relative flex h-full flex-col border transition-all duration-300 ' + (featured ? 'p-5 md:p-5 border-[#30313a] bg-[#121419]' : plan.is_popular ? 'p-6 md:p-7 border-[#ff5500] bg-[#151419] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'p-6 md:p-7 border-[#20232b] bg-[#121419]')}>
             {(featured || plan.is_popular || plan.badge) && <span className="absolute right-0 top-0 bg-[#ff5500] px-3 py-1.5 font-mono text-[10px] font-bold uppercase text-black">{featured ? 'One-off coaching' : (plan.is_popular ? 'Most popular' : plan.badge)}</span>}
             <div className={'flex flex-col justify-between gap-3 pr-2 ' + (featured ? 'md:flex-row md:items-center' : 'min-h-[6.5rem]')}>
               <div className="min-w-0"><h3 className="flex min-h-[3.25rem] items-center font-display text-xl uppercase leading-tight text-white md:text-xl">{plan.name}</h3><p className="mt-1 min-h-4 text-xs font-mono uppercase tracking-wider text-zinc-500">{plan.tag}</p></div>
