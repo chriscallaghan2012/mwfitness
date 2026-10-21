@@ -8,6 +8,8 @@ import { PhoneCall } from 'lucide-react';
 // Screens
 import { HomeScreen } from './components/screens/HomeScreen';
 import { OnlineCoachingScreen } from './components/screens/OnlineCoachingScreen';
+import { NutritionScreen } from './components/screens/NutritionScreen';
+import { ReviewsScreen } from './components/screens/ReviewsScreen';
 import { AppScreen } from './components/screens/AppScreen';
 import { ShwagScreen } from './components/screens/ShwagScreen';
 import { ContactScreen } from './components/screens/ContactScreen';
@@ -24,6 +26,8 @@ export default function App() {
     const routes: Record<string, ScreenId> = {
       '/': 'home',
       '/online-coaching': 'online-coaching',
+      '/nutrition': 'nutrition',
+      '/reviews': 'reviews',
       '/app': 'app',
       '/shwag': 'shwag',
       '/contact': 'contact',
@@ -65,6 +69,8 @@ export default function App() {
     const routes: Record<ScreenId, string> = {
       home: '/',
       'online-coaching': '/online-coaching',
+      nutrition: '/nutrition',
+      reviews: '/reviews',
       app: '/app',
       shwag: '/shwag',
       contact: '/contact',
@@ -103,6 +109,8 @@ export default function App() {
         {currentScreen === 'online-coaching' && (
           <OnlineCoachingScreen onSelectScreen={handleSelectScreen} />
         )}
+        {currentScreen === 'nutrition' && <NutritionScreen onSelectScreen={handleSelectScreen} />}
+        {currentScreen === 'reviews' && <ReviewsScreen onSelectScreen={handleSelectScreen} />}
         {currentScreen === 'app' && (
           <AppScreen onOpenBookCall={handleOpenBookCall} />
         )}
