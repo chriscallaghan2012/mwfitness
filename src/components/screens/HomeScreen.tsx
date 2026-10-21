@@ -67,7 +67,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           <div className="absolute inset-0 bg-grid-pattern opacity-40"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 w-full">
+        <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12 lg:px-8 lg:py-20">
           <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
@@ -125,12 +125,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </span>
             </div>
           </div>
+          <div className="flex justify-center lg:justify-end lg:self-center">
+            <StoreBadges compact />
+          </div>
         </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
-      
-      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
-        <StoreBadges compact />
-      </div>
     </section>
 
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
@@ -333,8 +332,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       <section className="home-app-section relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
         <div className="absolute inset-0 bg-grid-pattern opacity-20" />
         <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#ff5500]/10 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div className="space-y-5 pt-2 lg:pt-8">
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-8 sm:px-6 md:py-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+          <div className="space-y-5">
             <div className="inline-flex items-center gap-2 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Smartphone className="h-4 w-4" /> Your training, in your pocket</div>
             <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-tight text-white sm:text-5xl">The MWFitnessUK<br /><span className="text-[#ff5500]">app is on the way.</span></h2>
             <p className="max-w-xl text-sm leading-relaxed text-zinc-300 sm:text-base">A clearer way to keep your training, nutrition and progress together. The app is being developed to make consistency easier between check-ins — with the important details in one place, wherever you train.</p>
