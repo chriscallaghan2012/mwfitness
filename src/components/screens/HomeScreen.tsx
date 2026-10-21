@@ -130,7 +130,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       
       </div>
     </section>
-    <div aria-hidden="true" className="hero-dashed-divider" />
+    <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
       <div style={{ marginTop: 0 }} className="home-ticker w-full bg-[#ff5500] text-black font-mono font-bold text-xs uppercase py-2.5 overflow-hidden whitespace-nowrap border-y border-black">
@@ -150,7 +150,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </div>
 
-      <div aria-hidden="true" className="hero-dashed-divider" />
+      <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
       {/* 3. ABOUT MIKE */}
       <section id="about-mike" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
