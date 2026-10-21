@@ -168,9 +168,9 @@ export function AdminTable({
               {filteredRows.length !== rows.length ? ' · ' + rows.length + ' total' : ''}
             </span>
             <div className="flex items-center gap-2">
-              <button type="button" className={btnGhost} disabled={currentPage === 0} onClick={() => setPage((value) => Math.max(0, value - 1))}>Previous</button>
+              <button type="button" className={btnGhost} disabled={currentPage === 0} onClick={() => setPage(Math.max(0, currentPage - 1))}>Previous</button>
               <span className="min-w-20 text-center text-[11px] text-zinc-400">Page {currentPage + 1} of {pageCount}</span>
-              <button type="button" className={btnGhost} disabled={currentPage >= pageCount - 1} onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}>Next</button>
+              <button type="button" className={btnGhost} disabled={currentPage >= pageCount - 1} onClick={() => setPage(Math.min(pageCount - 1, currentPage + 1))}>Next</button>
             </div>
           </div>
         </>
