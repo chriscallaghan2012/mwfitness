@@ -365,8 +365,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               { icon: TrendingUp, title: 'Progress tracking', text: 'Keep measurements, photos and milestones together.' },
               { icon: Utensils, title: 'Food & nutrition', text: 'Log meals and build awareness of everyday habits.' },
               { icon: Dumbbell, title: 'Training log', text: 'Keep workouts and performance moving forward.' },
-            ].map(({ icon: Icon, title, text }) => <div key={title} className="mw-electric-card border border-[#252a34] bg-[#15171d]/90 p-5 text-left">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center border border-[#ff5500]/70 bg-[#ff5500]/10 text-[#ff5500]"><Icon className="h-5 w-5" /></div><h3 className="mb-2 font-display text-xl uppercase text-white">{title}</h3><p className="text-sm leading-relaxed text-zinc-400">{text}</p>
+            ].map(({ icon: Icon, title, text }) => <div key={title} className="mw-electric-card border border-[#252a34] bg-[#15171d]/90 p-5 text-center">
+              <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center border border-[#ff5500]/70 bg-[#ff5500]/10 text-[#ff5500]"><Icon className="h-5 w-5" /></div><h3 className="mb-2 font-display text-xl uppercase text-white">{title}</h3><p className="text-sm leading-relaxed text-zinc-400">{text}</p>
             </div>)}
           </div>
         </div>
