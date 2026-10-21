@@ -250,7 +250,7 @@ export function AdminScreen() {
     );
   }
   return (
-    <div className="w-full px-3 pb-5 pt-1 sm:px-5 lg:px-6 xl:px-8">
+    <div className="staff-hq w-full px-3 pb-5 pt-1 sm:px-5 lg:px-6 xl:px-8">
       <div className="mx-auto w-full max-w-[1680px]">
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-bold text-white">MWFitnessUK HQ</h1>
