@@ -38,14 +38,14 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
   return (
     <div className="page-layout">
       {/* 1. HERO */}
-      <section className="page-hero relative min-h-[55vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
+      <section className="page-hero relative min-h-[40vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[#0b0c0e]"></div>
           <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
           <div className="absolute -right-20 -top-20 w-96 h-96 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full">
           <div className="max-w-3xl space-y-6 text-center mx-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
