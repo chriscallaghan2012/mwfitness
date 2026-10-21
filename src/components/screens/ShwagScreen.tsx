@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Ticker } from '../Ticker';
 import { SHWAG, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { Shirt, HardHat, CheckCircle, ArrowRight, Sparkles, ExternalLink, Instagram } from 'lucide-react';
@@ -96,6 +97,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
         </div>
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
+    <Ticker />
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
