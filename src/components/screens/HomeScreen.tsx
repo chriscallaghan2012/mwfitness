@@ -352,7 +352,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </ul>
             <button onClick={() => onSelectScreen('app')} className="cursor-pointer inline-flex items-center gap-2 border border-[#ff5500] px-5 py-3 font-mono text-xs font-bold uppercase text-white transition-colors hover:bg-[#ff5500] hover:text-black">Explore the app <ArrowRight className="h-4 w-4" /></button>
             <div className="mx-auto w-full max-w-[360px] space-y-2 pt-1">
-              <p className="text-left font-mono text-[10px] uppercase tracking-widest text-zinc-500">Store listings will link here once published</p>
               <StoreBadges leftAlign />
             </div>
           </div>
