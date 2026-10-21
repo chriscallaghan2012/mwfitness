@@ -4,6 +4,7 @@ import { ONLINE_COACHING } from '../../data/mockData';
 import { createCheckoutSession } from '../../lib/stripe';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { ArrowRight, Check, CreditCard, MessageCircle, Video } from 'lucide-react';
+import { StoreBadges } from '../StoreBadges';
 
 interface OnlineCoachingScreenProps { onSelectScreen: (screen: ScreenId) => void; }
 
@@ -49,7 +50,8 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest"><span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse" />[ ONLINE COACHING ]</div>
         <h1 className="font-display text-5xl sm:text-7xl md:text-8xl text-white uppercase leading-[0.9] font-black">Your plan.<span className="block text-[#ff5500]">Your schedule.</span></h1>
         <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">{ONLINE_COACHING.intro}</p>
-        <button onClick={() => document.getElementById('online-plans')?.scrollIntoView({ behavior: 'smooth' })} className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2">Explore coaching plans <ArrowRight className="w-4 h-4" /></button>
+        <button onClick={() => document.getElementById('online-plans')?.scrollIntoView({ behavior: 'smooth' })} className="cursor-pointer bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2">Explore coaching plans <ArrowRight className="w-4 h-4" /></button>
+        <div className="mt-6 space-y-3"><p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p><StoreBadges /></div>
       </div></div>
     </section>
     <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
