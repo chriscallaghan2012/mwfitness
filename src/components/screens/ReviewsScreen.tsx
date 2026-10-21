@@ -13,15 +13,15 @@ export const ReviewsScreen: React.FC<ReviewsScreenProps> = ({ onSelectScreen }) 
   return <div className="page-layout">
     <section className="page-hero relative min-h-[40vh] flex items-center overflow-hidden border-b border-[#262930]">
       <div className="absolute inset-0 bg-grid-pattern opacity-30" /><div className="absolute -right-20 -top-24 h-96 w-96 rounded-full bg-[#ff5500]/10 blur-3xl" />
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[minmax(0,1fr)_220px] lg:px-8"><div className="w-full max-w-3xl space-y-6">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[minmax(0,1fr)_500px] lg:px-8"><div className="mx-auto w-full max-w-3xl space-y-6 text-center">
         <div className="mb-5 inline-flex items-center gap-2 border border-[#ff5500]/60 bg-[#16181e]/90 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Star className="h-3.5 w-3.5" /> Member stories</div>
         <h1 className="font-display text-5xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-7xl">Progress looks<br /><span className="text-[#ff5500]">different on everyone.</span></h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg">Read the stories and feedback shared by people working towards stronger, healthier routines with MWFitnessUK.</p>
-        <button onClick={() => onSelectScreen('online-coaching')} className="mt-7 inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-6 py-3.5 font-mono text-xs font-bold uppercase text-black">Find your plan <ArrowRight className="h-4 w-4" /></button>
+        <button onClick={() => onSelectScreen('online-coaching')} className="mt-7 inline-flex cursor-pointer items-center justify-center gap-3 bg-[#ff5500] px-8 py-4 font-mono text-sm font-bold uppercase text-black">Find your plan <ArrowRight className="h-4 w-4" /></button>
       </div>
     
-      <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-end">
-        <div className="w-full max-w-[220px]"><StoreBadges compact stacked /></div>
+      <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-center">
+        <div className="w-full max-w-[360px]"><StoreBadges stacked /></div>
       </div>
       </div>
     </section>
