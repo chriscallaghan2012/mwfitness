@@ -1,6 +1,6 @@
 // Small shared helpers for the staff admin panel.
 import { FormEvent, ReactNode, useState } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
 
 export const inp =
   'w-full min-w-0 rounded-xl border border-white/[0.1] bg-[#0e1013] px-3.5 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-orange-400/70 focus:ring-2 focus:ring-orange-400/10';
@@ -182,8 +182,8 @@ export function AdminTable({
     <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#121418] to-[#0f1013] shadow-lg shadow-black/10">
       {collapsible ? (
         <button type="button" aria-expanded={!collapsed} onClick={() => setCollapsed((value) => !value)} className="flex w-full items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-3.5 text-left hover:bg-white/[0.025]">
-          <span className="text-sm font-semibold text-white">{sectionTitle ?? 'Records'} <span className="ml-2 text-xs font-normal text-zinc-500">{rows.length}</span></span>
-          <span aria-hidden="true" className="text-zinc-400">{collapsed ? '＋' : '−'}</span>
+          <span className="min-w-0 text-sm font-semibold text-white">{sectionTitle ?? 'Records'} <span className="ml-2 text-xs font-normal text-zinc-500">{rows.length}</span></span>
+          <ChevronDown aria-hidden="true" className={`ml-3 h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 ${collapsed ? '-rotate-90' : 'rotate-0'}`} />
         </button>
       ) : null}
       {(!collapsible || !collapsed) ? tableContent : null}
