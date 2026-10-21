@@ -29,10 +29,10 @@ export const NutritionScreen: React.FC<NutritionScreenProps> = ({ onSelectScreen
           <div className="flex flex-wrap gap-x-5 gap-y-2 pt-2 text-xs text-zinc-500"><span className="inline-flex items-center gap-2"><Download className="h-4 w-4 text-[#ff5500]" /> Downloadable formats</span><span className="inline-flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-[#ff5500]" /> Planned secure purchase library</span></div>
 
         </div>
-      </div>
     
       <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-end">
         <div className="w-full max-w-[220px]"><StoreBadges compact stacked /></div>
+      </div>
       </div>
     </section>
     <section id="digital-guides" className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8 md:py-20">
