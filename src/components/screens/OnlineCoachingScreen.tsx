@@ -39,6 +39,7 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
     <Ticker />
+    <div aria-hidden="true" className="hero-dashed-divider" />
     <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="border-b border-[#22252e] pb-4 mb-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT YOU GET ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Coaching built around real life.</h2></div>
