@@ -3,11 +3,12 @@ import React from 'react';
 interface StoreBadgesProps {
   compact?: boolean;
   stacked?: boolean;
+  leftAlign?: boolean;
   appStoreUrl?: string;
   googlePlayUrl?: string;
 }
 
-export const StoreBadges: React.FC<StoreBadgesProps> = ({ compact = false, stacked = false, appStoreUrl, googlePlayUrl }) => {
+export const StoreBadges: React.FC<StoreBadgesProps> = ({ compact = false, stacked = false, leftAlign = false, appStoreUrl, googlePlayUrl }) => {
   const resolvedAppStoreUrl = appStoreUrl ?? import.meta.env.VITE_APP_STORE_URL;
   const resolvedGooglePlayUrl = googlePlayUrl ?? import.meta.env.VITE_GOOGLE_PLAY_URL;
   const badgeClass = `inline-flex min-h-[64px] min-w-[190px] items-center justify-start gap-3 rounded-xl border border-zinc-700 bg-black px-4 py-2.5 text-left transition-colors hover:border-[#ff5500]/70 ${compact ? 'min-w-0' : ''} ${stacked ? 'w-full' : ''}`;
