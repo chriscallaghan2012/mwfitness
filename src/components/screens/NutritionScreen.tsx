@@ -17,8 +17,8 @@ export const NutritionScreen: React.FC<NutritionScreenProps> = ({ onSelectScreen
     <section className="page-hero relative min-h-[40vh] flex items-center overflow-hidden border-b border-[#262930]">
       <div className="absolute inset-0 bg-grid-pattern opacity-30" />
       <div className="absolute -right-20 -top-24 h-96 w-96 rounded-full bg-[#ff5500]/10 blur-3xl" />
-      <div className="relative mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8 md:py-16">
-        <div className="max-w-3xl space-y-6">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[minmax(0,1fr)_220px] lg:px-8">
+        <div className="w-full max-w-3xl space-y-6">
           <div className="inline-flex items-center gap-2 border border-[#ff5500]/60 bg-[#16181e]/90 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Sparkles className="h-3.5 w-3.5" /> Nutrition & digital guides</div>
           <h1 className="font-display text-5xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-7xl">Make good habits<br /><span className="text-[#ff5500]">easier to keep.</span></h1>
           <p className="max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg">Practical nutrition guides, meal-prep systems and printable planners — built for real routines, not perfect ones. Buy once, keep your files and revisit them whenever you need.</p>
@@ -31,8 +31,8 @@ export const NutritionScreen: React.FC<NutritionScreenProps> = ({ onSelectScreen
         </div>
       </div>
     
-      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
-        <StoreBadges compact />
+      <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-end">
+        <div className="w-full max-w-[220px]"><StoreBadges compact stacked /></div>
       </div>
     </section>
     <section id="digital-guides" className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8 md:py-20">
