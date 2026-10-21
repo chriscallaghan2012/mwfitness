@@ -184,7 +184,7 @@ export function NutritionAdmin() {
       </div>
       {msg && <p className="text-xs text-zinc-400 mb-2">{msg}</p>}
       {mode === 'plans' && (
-        <div className="flex flex-wrap items-end gap-3 mb-4">
+        <div className="mb-4 grid grid-cols-1 items-end gap-2 sm:grid-cols-[minmax(0,1.25fr)_minmax(0,1.1fr)_auto]">
           <select className={inp} value={userId} onChange={(e) => { setEdit(null); setUserId(e.target.value); }}>
             <option value="">Customer…</option>
             {users.map((u) => (
