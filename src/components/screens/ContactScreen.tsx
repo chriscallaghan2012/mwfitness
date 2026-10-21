@@ -53,7 +53,8 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
             className="w-full h-full object-cover object-center filter brightness-60 contrast-125"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e] via-[#0b0c0e]/60 to-transparent"></div>
-          <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0b0c0e] via-[#0b0c0e]/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-grid-pattern opacity-40"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
