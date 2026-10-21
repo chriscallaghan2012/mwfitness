@@ -127,9 +127,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       
-      <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-center">
-          <div className="w-full max-w-[360px]"><StoreBadges stacked /></div>
-        </div>
       </div>
     </section>
 
