@@ -183,14 +183,14 @@ export function MemberActivityAdmin() {
       { label: 'Date', render: (r) => r.metric_date },
       { label: 'Water', render: (r) => `${Number(r.water_litres).toFixed(2)} L` },
       { label: 'Steps', render: (r) => Number(r.steps || 0).toLocaleString('en-GB') },
-    ]} /></section>
+    ]} /></div></details>
     <details className={panel}><summary className="cursor-pointer list-none"><span className="font-semibold text-white">Cardio sessions</span><span className="mt-1 block text-xs text-zinc-500">Latest 25 completed sessions · expand to search</span></summary><div className="mt-3"><RecordTable rows={cardio} rowKey={(r) => r.id} empty={loading ? 'Loading…' : 'No cardio sessions have been logged yet.'} columns={[
       { label: 'Member ID', render: (r) => r.profile_id.slice(0, 8) + '…' },
       { label: 'Completed', render: (r) => new Date(r.completed_at).toLocaleString('en-GB') },
       { label: 'Activity', render: (r) => r.activity },
       { label: 'Duration', render: (r) => `${r.duration_minutes} min` },
       { label: 'Avg. HR', render: (r) => r.average_heart_rate ? `${r.average_heart_rate} bpm` : '—' },
-    ]} /></section>
+    ]} /></div></details>
     <details className={panel}><summary className="cursor-pointer list-none"><span className="font-semibold text-white">Supplement plans</span><span className="mt-1 block text-xs text-zinc-500">Coach-assigned records · expand to search</span></summary><div className="mt-3"><RecordTable rows={supplements} rowKey={(r) => r.id} empty={loading ? 'Loading…' : 'No supplement plans have been assigned yet.'} columns={[
       { label: 'Member ID', render: (r) => r.profile_id.slice(0, 8) + '…' },
       { label: 'Supplement', render: (r) => r.name },
