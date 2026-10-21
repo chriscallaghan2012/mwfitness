@@ -43,9 +43,9 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
   const comparisonFeatures = Array.from(new Set(plans.flatMap((plan) => plan.features)));
 
   return <div className="page-layout">
-    <section className="page-hero relative min-h-[58vh] flex items-center overflow-hidden border-b border-[#262930]">
+    <section className="page-hero relative min-h-[40vh] flex items-center overflow-hidden border-b border-[#262930]">
       <div className="absolute inset-0"><img src="/images/main-hero.jpg" alt="Online coaching at MWFitnessUK" className="w-full h-full object-cover filter brightness-50 contrast-125" /><div className="absolute inset-0 bg-gradient-to-r from-[#0b0c0e] via-[#0b0c0e]/75 to-transparent" /><div className="absolute inset-0 bg-grid-pattern opacity-30" /></div>
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full"><div className="max-w-3xl space-y-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full"><div className="max-w-3xl space-y-6">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest"><span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse" />[ ONLINE COACHING ]</div>
         <h1 className="font-display text-5xl sm:text-7xl md:text-8xl text-white uppercase leading-[0.9] font-black">Your plan.<span className="block text-[#ff5500]">Your schedule.</span></h1>
         <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">{ONLINE_COACHING.intro}</p>
