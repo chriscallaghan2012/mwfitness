@@ -2,6 +2,7 @@ import React from 'react';
 import { ScreenId, Review } from '../../types';
 import { REVIEWS, TESTIMONIALS } from '../../data/mockData';
 import { ArrowRight, Star, Quote } from 'lucide-react';
+import { StoreBadges } from '../StoreBadges';
 
 interface ReviewsScreenProps { onSelectScreen: (screen: ScreenId) => void; }
 
@@ -18,6 +19,10 @@ export const ReviewsScreen: React.FC<ReviewsScreenProps> = ({ onSelectScreen }) 
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg">Read the stories and feedback shared by people working towards stronger, healthier routines with MWFitnessUK.</p>
         <button onClick={() => onSelectScreen('online-coaching')} className="mt-7 inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-6 py-3.5 font-mono text-xs font-bold uppercase text-black">Find your plan <ArrowRight className="h-4 w-4" /></button>
       </div></div>
+    
+      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
+        <StoreBadges compact />
+      </div>
     </section>
     <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8 md:py-20">
       <div className="mb-10 border-b border-[#22252e] pb-5"><div className="mb-2 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real progress.</h2></div>
