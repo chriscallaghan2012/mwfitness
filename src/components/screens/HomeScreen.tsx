@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScreenId } from '../../types';
-import { IMAGES, ABOUT, TESTIMONIALS, HOW_IT_WORKS, CONTACT, APP_FEATURES } from '../../data/mockData';
+import { IMAGES, ABOUT, TESTIMONIALS, HOW_IT_WORKS, CONTACT } from '../../data/mockData';
 import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, GraduationCap, Smartphone, Scale, TrendingUp, Utensils, Dumbbell, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StoreBadges } from '../StoreBadges';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
@@ -351,7 +351,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       {/* 7. TESTIMONIALS */}
       <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[#22252e] pb-5 sm:flex-row sm:items-end">
-          <div><div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2><p className="mt-3 max-w-xl text-sm text-zinc-400">Stories from people building stronger routines with support that fits around real life.</p></div>
+          <div><div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2><p className="mt-3 max-w-xl text-sm text-zinc-400">Stories from people building stronger routines with support that fits around real life.</p></div>
           <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
         </div>
         <div className="mw-electric-card overflow-hidden border border-[#252a34] bg-[#121419] p-6 sm:p-9" onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
