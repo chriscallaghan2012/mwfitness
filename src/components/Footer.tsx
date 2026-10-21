@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
   <footer className="bg-[#0b0c0e] border-t border-[#20232a] text-zinc-400 font-sans text-xs">
     <div className="h-1.5 w-full bg-[repeating-linear-gradient(45deg,#ff5500,#ff5500_15px,#121418_15px,#121418_30px)]" />
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr_1fr_auto] gap-8 mb-8 items-start">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#16181d] border border-[#ff5500] flex items-center justify-center"><span aria-hidden="true" className="font-display text-xl leading-none tracking-tighter text-[#ff5500]">MW</span></div>
@@ -30,7 +30,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
           </div>
           <p className="text-xs font-mono text-zinc-400 max-w-sm leading-relaxed">Online coaching built around real life, with training and nutrition support wherever you train.</p>
           <button onClick={() => onSelectScreen('online-coaching')} className="bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs py-2.5 px-4 uppercase tracking-wider">Explore online coaching <span aria-hidden="true">→</span></button>
-          <div className="pt-2"><p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">The app is coming soon</p><StoreBadges compact /></div>
+          
         </div>
         <div className="space-y-3">
           <h2 className="font-mono text-xs text-white uppercase tracking-wider font-bold">Explore</h2>
@@ -47,6 +47,11 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
             <div className="flex items-center gap-2"><Facebook className="w-3.5 h-3.5 text-[#ff5500] shrink-0" /><a href={CONTACT.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500]">{CONTACT.facebookName}</a></div>
           </div>
           <button onClick={onOpenBookCall} className="mt-2 inline-flex items-center gap-2 text-xs font-mono text-zinc-300 hover:text-[#ff5500]"><PhoneCall className="w-3.5 h-3.5" /> Book a free call</button>
+        </div>
+        <div className="space-y-3 lg:text-right">
+          <h2 className="font-mono text-xs text-white uppercase tracking-wider font-bold">Get the app</h2>
+          <p className="max-w-xs text-xs leading-relaxed text-zinc-500 lg:ml-auto">App listings will link directly here when published.</p>
+          <div className="flex justify-start lg:justify-end"><StoreBadges compact /></div>
         </div>
       </div>
       <div className="border-t border-[#1c1f26] pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px] text-zinc-500">
