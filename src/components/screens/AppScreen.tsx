@@ -68,10 +68,6 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               Currently in development — join the waitlist to be first in
             </div>
-            <div className="mt-6 space-y-3">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
-              <StoreBadges />
-            </div>
           </div>
         </div>
       </section>
@@ -102,6 +98,10 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
               </div>
             );
           })}
+        </div>
+        <div className="mt-8 flex flex-col items-start gap-3 border-t border-[#22252e] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div><p className="font-mono text-xs uppercase tracking-widest text-zinc-300">App availability</p><p className="mt-1 text-sm text-zinc-500">Official store links will be added when each listing is published.</p></div>
+          <StoreBadges />
         </div>
       </section>
 
