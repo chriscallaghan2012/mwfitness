@@ -3,11 +3,12 @@ import React from 'react';
 interface StoreBadgesProps {
   compact?: boolean;
   stacked?: boolean;
+  leftAlign?: boolean;
   appStoreUrl?: string;
   googlePlayUrl?: string;
 }
 
-export const StoreBadges: React.FC<StoreBadgesProps> = ({ compact = false, stacked = false, appStoreUrl, googlePlayUrl }) => {
+export const StoreBadges: React.FC<StoreBadgesProps> = ({ compact = false, stacked = false, leftAlign = false, appStoreUrl, googlePlayUrl }) => {
   const resolvedAppStoreUrl = appStoreUrl ?? import.meta.env.VITE_APP_STORE_URL;
   const resolvedGooglePlayUrl = googlePlayUrl ?? import.meta.env.VITE_GOOGLE_PLAY_URL;
   const badgeClass = `inline-flex min-h-[64px] min-w-[190px] items-center justify-start gap-3 rounded-xl border border-zinc-700 bg-black px-4 py-2.5 text-left transition-colors hover:border-[#ff5500]/70 ${compact ? 'min-w-0' : ''} ${stacked ? 'w-full' : ''}`;
@@ -15,7 +16,7 @@ export const StoreBadges: React.FC<StoreBadgesProps> = ({ compact = false, stack
   const playIcon = <svg aria-hidden="true" viewBox="0 0 24 24" className={compact ? 'h-5 w-5' : 'h-8 w-8'}><path d="M3.2 2.6c-.4.3-.6.8-.6 1.5v15.8c0 .7.2 1.2.6 1.5L12 13 3.2 2.6Z" fill="#34A853"/><path d="m14.1 10.9-2.1 2.1 2.1 2.1 5.1-2.9c.7-.4.7-1 0-1.4l-5.1-2.9-2.1 2.1 2.1.9Z" fill="#4285F4"/><path d="M3.2 2.6 14.1 10.9 12 13 3.2 21.4c.3.1.7 0 1.1-.2l12.9-7.3L3.2 2.6Z" fill="#FBBC04"/><path d="M3.2 21.4 14.1 13l3.1 1.8L4.3 22.1c-.4.2-.8 0-1.1-.7Z" fill="#EA4335"/></svg>;
   const apple = <>{appleIcon}<span className="block text-left"><span className="block text-[10px] leading-tight text-zinc-300">{resolvedAppStoreUrl ? 'Download on the' : 'Coming soon to the'}</span><span className={`block font-semibold leading-tight text-white ${compact ? 'text-xs' : 'text-base'}`}>App Store</span></span></>;
   const google = <>{playIcon}<span className="block text-left"><span className="block text-[10px] leading-tight text-zinc-300">{resolvedGooglePlayUrl ? 'Get it on' : compact ? 'COMING SOON' : 'Coming soon on'}</span><span className={`block font-semibold leading-tight text-white ${compact ? 'text-xs' : 'text-base'}`}>Google Play</span></span></>;
-  return <div className={`flex ${stacked ? 'flex-col items-stretch' : 'flex-wrap items-center justify-center'} gap-3`} aria-label="MWFitnessUK app store availability">
+  return <div className={stacked ? 'flex flex-col items-stretch gap-3' : leftAlign ? 'flex flex-wrap items-center justify-start gap-3' : 'flex flex-wrap items-center justify-center gap-3'} aria-label="MWFitnessUK app store availability">
     {resolvedAppStoreUrl ? <a href={resolvedAppStoreUrl} target="_blank" rel="noopener noreferrer" className={badgeClass} aria-label="Download MWFitnessUK from the App Store">{apple}</a> : <div className={badgeClass} aria-label="App Store listing coming soon">{apple}</div>}
     {resolvedGooglePlayUrl ? <a href={resolvedGooglePlayUrl} target="_blank" rel="noopener noreferrer" className={badgeClass} aria-label="Get MWFitnessUK on Google Play">{google}</a> : <div className={badgeClass} aria-label="Google Play listing coming soon">{google}</div>}
   </div>;
