@@ -14,6 +14,12 @@
 }
 
 @layer base {
+  input::placeholder,
+  textarea::placeholder {
+    color: #a1a1aa;
+    opacity: 1;
+  }
+
   body {
     font-family: var(--font-sans);
     background-color: #0b0c0e;
