@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Ticker } from '../Ticker';
 import { APP_FEATURES, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { Smartphone, CheckCircle, ArrowRight, Scale, TrendingUp, Utensils, Dumbbell, Instagram, PhoneCall } from 'lucide-react';
@@ -72,6 +73,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
         </div>
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
+    <Ticker />
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 

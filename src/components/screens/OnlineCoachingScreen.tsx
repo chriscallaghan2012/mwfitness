@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Ticker } from '../Ticker';
 import { ScreenId } from '../../types';
 import { ONLINE_COACHING } from '../../data/mockData';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
@@ -37,6 +38,7 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
       </div></div>
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
+    <Ticker />
     <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="border-b border-[#22252e] pb-4 mb-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT YOU GET ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Coaching built around real life.</h2></div>
@@ -55,21 +57,21 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
         const renderFeature = (plan: PublicPlan, feature: string, comparison = true) => {
           const included = plan.features.includes(feature);
           if (!included && !comparison) return null;
-          return <li key={feature} className="flex min-h-9 items-start gap-2.5 text-sm leading-relaxed">
+          return <li key={feature} className="flex min-h-0 items-start gap-2 text-sm leading-snug">
             {included ? <Check aria-label="Included" className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" /> : <span aria-label="Not included" className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-zinc-500"><span aria-hidden="true" className="text-base leading-none">×</span></span>}
             <span className={included ? 'text-zinc-200' : 'text-zinc-400'}>{feature}</span>
           </li>;
         };
         const renderCard = (plan: PublicPlan, featured = false) => (
-          <article key={plan.id} className={'relative flex h-full flex-col border transition-all duration-300 ' + (featured ? 'p-5 md:p-5 border-[#30313a] bg-[#121419]' : plan.is_popular ? 'p-6 md:p-7 border-[#ff5500] bg-[#151419] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'p-6 md:p-7 border-[#20232b] bg-[#121419]')}>
+          <article key={plan.id} className={'relative flex h-full flex-col border transition-all duration-300 ' + (featured ? 'p-4 md:p-4 border-[#30313a] bg-[#121419]' : plan.is_popular ? 'p-6 md:p-7 border-[#ff5500] bg-[#151419] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'p-6 md:p-7 border-[#20232b] bg-[#121419]')}>
             {(featured || plan.is_popular || plan.badge) && <span className="absolute right-0 top-0 bg-[#ff5500] px-3 py-1.5 font-mono text-[10px] font-bold uppercase text-black">{featured ? 'One-off coaching' : (plan.is_popular ? 'Most popular' : plan.badge)}</span>}
             <div className={'flex flex-col justify-between gap-3 pr-2 ' + (featured ? 'md:flex-row md:items-center' : 'min-h-[6.5rem]')}>
               <div className="min-w-0"><h3 className="flex min-h-[3.25rem] items-center font-display text-xl uppercase leading-tight text-white md:text-xl">{plan.name}</h3><p className="mt-1 min-h-4 text-xs font-mono uppercase tracking-wider text-zinc-500">{plan.tag}</p></div>
               <div className={featured ? 'shrink-0 md:text-right' : 'shrink-0'}><div className="font-display text-3xl text-[#ff5500] md:text-4xl">{formatPrice(plan.price)}</div>{plan.original_price !== null && <div className="text-xs font-mono text-zinc-500 line-through">{formatPrice(plan.original_price)}</div>}</div>
             </div>
-            <p className={'text-sm leading-relaxed text-zinc-400 ' + (featured ? 'mt-2 max-w-4xl' : 'mt-4 min-h-[4.5rem]')}>{plan.description}</p>
-            <ul className={'grid content-start gap-y-2.5 ' + (featured ? 'mt-3 grid-cols-1 sm:grid-cols-2 sm:gap-x-8' : 'mt-5 flex-1 grid-cols-1')}>{(featured ? plan.features : featureList).map((feature) => renderFeature(plan, feature, !featured))}</ul>
-            <button onClick={() => onCheckout(plan)} className="mt-auto flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-3.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
+            <p className={'text-sm leading-relaxed text-zinc-400 ' + (featured ? 'mt-1 max-w-4xl leading-snug' : 'mt-4 min-h-[4.5rem]')}>{plan.description}</p>
+            <ul className={'grid content-start gap-y-2.5 ' + (featured ? 'mt-2 grid-cols-1 gap-y-1 sm:grid-cols-2 sm:gap-x-6' : 'mt-5 flex-1 grid-cols-1')}>{(featured ? plan.features : featureList).map((feature) => renderFeature(plan, feature, !featured))}</ul>
+            <button onClick={() => onCheckout(plan)} className="mt-auto flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-2.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
               Book Now <ArrowRight className="h-4 w-4" />
             </button>
           </article>
