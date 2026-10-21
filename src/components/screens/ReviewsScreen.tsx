@@ -1,4 +1,5 @@
 import React from 'react';
+import { Ticker } from '../Ticker';
 import { ScreenId, Review } from '../../types';
 import { REVIEWS, TESTIMONIALS } from '../../data/mockData';
 import { ArrowRight, Star, Quote } from 'lucide-react';
@@ -21,6 +22,7 @@ export const ReviewsScreen: React.FC<ReviewsScreenProps> = ({ onSelectScreen }) 
       </div>
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
+    <Ticker />
     <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8 md:py-20">
       <div className="mb-10 border-b border-[#22252e] pb-5"><div className="mb-2 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real progress.</h2></div>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
