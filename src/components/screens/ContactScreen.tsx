@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { MapPin, Mail, Instagram, Facebook, PhoneCall, CheckCircle, ArrowRight, Clock } from 'lucide-react';
-import { StoreBadges } from '../StoreBadges';
 
 interface ContactScreenProps {
   onOpenBookCall: () => void;
@@ -69,7 +68,6 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
               Questions, bookings or just want to say hello? Send a message and Mike will get back to you within 24 hours — usually much sooner.
             </p>
-            <div className="mt-6 space-y-3"><p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p><StoreBadges /></div>
           </div>
         </div>
       </section>
