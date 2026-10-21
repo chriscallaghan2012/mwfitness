@@ -4,7 +4,6 @@ import { ONLINE_COACHING } from '../../data/mockData';
 import { createCheckoutSession } from '../../lib/stripe';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { ArrowRight, Check, CreditCard, MessageCircle, Video } from 'lucide-react';
-import { StoreBadges } from '../StoreBadges';
 
 interface OnlineCoachingScreenProps { onSelectScreen: (screen: ScreenId) => void; }
 
@@ -52,10 +51,6 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
         <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">{ONLINE_COACHING.intro}</p>
         <button onClick={() => document.getElementById('online-plans')?.scrollIntoView({ behavior: 'smooth' })} className="cursor-pointer bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2">Explore coaching plans <ArrowRight className="w-4 h-4" /></button>
       </div></div>
-    
-      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
-        <StoreBadges compact />
-      </div>
     </section>
     <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
