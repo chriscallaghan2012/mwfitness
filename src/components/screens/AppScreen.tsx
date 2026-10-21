@@ -74,7 +74,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
     <Ticker />
-    <div aria-hidden="true" className="hero-dashed-divider" />
+    <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
