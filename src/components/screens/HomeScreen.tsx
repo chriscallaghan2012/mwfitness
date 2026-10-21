@@ -150,7 +150,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </div>
 
-      <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
+      <div aria-hidden="true" className="hero-dashed-divider" />
 
       {/* 3. ABOUT MIKE */}
       <section id="about-mike" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -451,16 +451,18 @@ a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):no
 }
 
 
-/* Edge-to-edge separators and ticker bands, even when a screen sits inside a constrained parent. */
+/* Full-viewport separators and tickers on every public screen.
+   Use the same dashed rule above and below the ticker; don't depend on page-layout nesting. */
 .hero-dashed-divider,
-.page-layout > .home-ticker,
-.page-layout > .industrial-stripe--divider {
+.home-ticker,
+.industrial-stripe--divider {
   position: relative;
-  left: 50%;
+  left: auto;
   width: 100vw;
   max-width: none;
-  margin-left: -50vw !important;
+  margin-left: calc(50% - 50vw) !important;
   box-sizing: border-box;
+  display: block;
 }
 
 .hero-dashed-divider {
