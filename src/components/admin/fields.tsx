@@ -47,20 +47,52 @@ export function StatusPill(status: string) {
   );
 }
 
-/** Responsive data table shared by the Staff HQ sections. */
+/** Search text for raw records, including nested profile/plan relationships. */
+function searchableText(value: unknown, depth = 0): string {
+  if (value == null || depth > 4) return '';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) return value.map((item) => searchableText(item, depth + 1)).join(' ');
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    if ('$$typeof' in record) return '';
+    return Object.values(record).map((item) => searchableText(item, depth + 1)).join(' ');
+  }
+  return '';
+}
+
+/** Responsive, searchable and paginated table shared by Staff HQ sections. */
 export function AdminTable({
   cols,
   rows,
   empty,
   onEdit,
   onDelete,
+  sectionTitle,
+  collapsible = false,
+  defaultCollapsed = false,
+  searchPlaceholder = 'Search records…',
 }: {
   cols: { key: string; label: string; render?: (r: Row) => ReactNode }[];
   rows: Row[];
   empty?: string;
   onEdit?: (r: Row) => void;
   onDelete?: (r: Row) => void;
+  sectionTitle?: string;
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
+  searchPlaceholder?: string;
 }) {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const indexedRows = rows.map((row) => ({ row, searchText: searchableText(row).toLocaleLowerCase() }));
+  const query = search.trim().toLocaleLowerCase();
+  const filteredRows = query ? indexedRows.filter((item) => item.searchText.includes(query)).map((item) => item.row) : rows;
+  const pageCount = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const currentPage = Math.min(page, pageCount - 1);
+  const pageRows = filteredRows.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+
   if (!rows || rows.length === 0) {
     return (
       <div className="grid min-h-36 place-items-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.015] px-6 py-10 text-center">
@@ -71,45 +103,89 @@ export function AdminTable({
       </div>
     );
   }
+
+  const tableContent = (
+    <>
+      <div className="flex flex-col gap-3 border-b border-white/[0.06] p-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+        <label className="relative block w-full sm:max-w-sm">
+          <span className="sr-only">{searchPlaceholder}</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => { setSearch(event.target.value); setPage(0); }}
+            placeholder={searchPlaceholder}
+            className="w-full rounded-lg border border-white/[0.1] bg-[#0b0c0e] py-2.5 pl-9 pr-3 text-xs text-white outline-none placeholder:text-zinc-600 focus:border-orange-400/70 focus:ring-2 focus:ring-orange-400/10"
+          />
+          <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">⌕</span>
+        </label>
+        <label className="flex shrink-0 items-center gap-2 text-[11px] text-zinc-500">
+          Rows per page
+          <select aria-label="Rows per page" value={pageSize} onChange={(event) => { setPageSize(Number(event.target.value)); setPage(0); }} className="rounded-lg border border-white/[0.1] bg-[#0b0c0e] px-2.5 py-2 text-xs text-zinc-200 outline-none focus:border-orange-400/70">
+            {[10, 25, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+          </select>
+        </label>
+      </div>
+      {filteredRows.length === 0 ? (
+        <div className="grid min-h-28 place-items-center px-6 py-8 text-center">
+          <div><p className="text-sm font-medium text-zinc-200">No matching records</p><p className="mt-1 text-xs text-zinc-500">Try another search term or clear the search.</p></div>
+        </div>
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead className="border-b border-white/[0.06] bg-white/[0.035]">
+                <tr className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                  {cols.map((column) => <th key={column.key} className="whitespace-nowrap px-4 py-3.5">{column.label}</th>)}
+                  {onEdit || onDelete ? <th className="px-4 py-3.5 text-right">Actions</th> : null}
+                </tr>
+              </thead>
+              <tbody>
+                {pageRows.map((row, index) => (
+                  <tr key={String(row.id ?? String(currentPage) + '-' + String(index))} className="border-t border-white/[0.055] transition-colors hover:bg-orange-500/[0.035]">
+                    {cols.map((column) => (
+                      <td key={column.key} className="max-w-[360px] px-4 py-4 align-middle text-zinc-300">
+                        {column.render ? column.render(row) : String(row[column.key] ?? '—')}
+                      </td>
+                    ))}
+                    {onEdit || onDelete ? (
+                      <td className="whitespace-nowrap px-4 py-3.5">
+                        <div className="flex justify-end gap-2">
+                          {onEdit ? <button type="button" onClick={() => onEdit(row)} className={btnGhost}><Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit</button> : null}
+                          {onDelete ? <button type="button" onClick={() => onDelete(row)} className={btnGhost}><Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Remove</button> : null}
+                        </div>
+                      </td>
+                    ) : null}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-col gap-3 border-t border-white/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-[11px] text-zinc-500">
+              Showing {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, filteredRows.length)} of {filteredRows.length}
+              {query ? ' matching records' : ' records'}
+              {filteredRows.length !== rows.length ? ' · ' + rows.length + ' total' : ''}
+            </span>
+            <div className="flex items-center gap-2">
+              <button type="button" className={btnGhost} disabled={currentPage === 0} onClick={() => setPage((value) => Math.max(0, value - 1))}>Previous</button>
+              <span className="min-w-20 text-center text-[11px] text-zinc-400">Page {currentPage + 1} of {pageCount}</span>
+              <button type="button" className={btnGhost} disabled={currentPage >= pageCount - 1} onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}>Next</button>
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  );
+
   return (
     <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#121418] to-[#0f1013] shadow-lg shadow-black/10">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="border-b border-white/[0.06] bg-white/[0.035]">
-            <tr className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
-              {cols.map((column) => (
-                <th key={column.key} className="whitespace-nowrap px-4 py-3.5">
-                  {column.label}
-                </th>
-              ))}
-              {onEdit || onDelete ? <th className="px-4 py-3.5 text-right">Actions</th> : null}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={String(row.id)} className="border-t border-white/[0.055] transition-colors hover:bg-orange-500/[0.035]">
-                {cols.map((column) => (
-                  <td key={column.key} className="max-w-[360px] px-4 py-4 align-middle text-zinc-300">
-                    {column.render ? column.render(row) : String(row[column.key] ?? '—')}
-                  </td>
-                ))}
-                {onEdit || onDelete ? (
-                  <td className="whitespace-nowrap px-4 py-3.5">
-                    <div className="flex justify-end gap-2">
-                      {onEdit ? <button type="button" onClick={() => onEdit(row)} className={btnGhost}><Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit</button> : null}
-                      {onDelete ? <button type="button" onClick={() => onDelete(row)} className={btnGhost}><Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Remove</button> : null}
-                    </div>
-                  </td>
-                ) : null}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex items-center justify-between border-t border-white/[0.06] px-4 py-3 text-[11px] text-zinc-500">
-        <span>{rows.length} {rows.length === 1 ? 'record' : 'records'}</span>
-        <span>{onEdit || onDelete ? 'Select a row action to manage records' : 'Workspace records'}</span>
-      </div>
+      {collapsible ? (
+        <button type="button" aria-expanded={!collapsed} onClick={() => setCollapsed((value) => !value)} className="flex w-full items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-3.5 text-left hover:bg-white/[0.025]">
+          <span className="text-sm font-semibold text-white">{sectionTitle ?? 'Records'} <span className="ml-2 text-xs font-normal text-zinc-500">{rows.length}</span></span>
+          <span aria-hidden="true" className="text-zinc-400">{collapsed ? '＋' : '−'}</span>
+        </button>
+      ) : null}
+      {(!collapsible || !collapsed) ? tableContent : null}
     </div>
   );
 }
