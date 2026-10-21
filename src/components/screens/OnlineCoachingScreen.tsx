@@ -75,7 +75,7 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
             </div>
             <p className={'mt-4 text-sm leading-relaxed text-zinc-400 ' + (featured ? 'max-w-4xl md:min-h-10' : 'min-h-[4.5rem]')}>{plan.description}</p>
             <ul className={'mt-5 grid flex-1 content-start gap-y-2.5 ' + (featured ? 'grid-cols-1 md:grid-cols-2 md:gap-x-8' : 'grid-cols-1')}>{featureList.map((feature) => renderFeature(plan, feature))}</ul>
-            <button onClick={() => onCheckout(plan)} className="mt-auto flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-3.5 pt-7 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
+            <button onClick={() => onCheckout(plan)} className="mt-auto flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-3.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
               Book Now <ArrowRight className="h-4 w-4" />
             </button>
           </article>
