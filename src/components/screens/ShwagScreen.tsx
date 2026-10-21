@@ -98,7 +98,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
     <Ticker />
-    <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
+    <div aria-hidden="true" className="hero-dashed-divider" />
 
 
       {/* 2. WHAT SHWAG STANDS FOR */}
