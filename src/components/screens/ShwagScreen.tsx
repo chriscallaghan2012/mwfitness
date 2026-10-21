@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SHWAG, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { Shirt, CheckCircle, ArrowRight, Sparkles, ExternalLink, Instagram } from 'lucide-react';
+import { StoreBadges } from '../StoreBadges';
 
 type SwagProduct = { id: string; slug: string; name: string; description: string; category: string; price: number; compare_at_price: number | null; image_url: string; product_url: string; sizes: string[]; stock_status: string };
 const FALLBACK_PRODUCTS: SwagProduct[] = SHWAG.products.map((product, index) => ({
@@ -83,7 +84,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full">
-          <div className="max-w-3xl space-y-6 text-center mx-auto">
+          <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
               <span>[ SHWAG ]</span>
@@ -93,9 +94,10 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               SHWAG.
             </h1>
 
-            <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
               {SHWAG.intro}
             </p>
+            <div className="mt-6 space-y-3"><p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p><StoreBadges /></div>
           </div>
         </div>
       </section>
