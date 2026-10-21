@@ -44,6 +44,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const orderedTestimonials = [...TESTIMONIALS.slice(reviewIndex), ...TESTIMONIALS.slice(0, reviewIndex)];
+
   const renderStars = (count: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star key={i} className={`w-4 h-4 ${i < count ? 'text-[#ff5500] fill-[#ff5500]' : 'text-zinc-600'}`} />
@@ -366,8 +368,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mw-electric-card overflow-hidden border border-[#252a34] bg-[#121419] p-6 sm:p-9" onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
           <div className="mb-6 flex items-center justify-between"><div className="flex gap-1.5">{renderStars(5)}</div><span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Member stories · auto-moving</span></div>
           <div className="overflow-hidden">
-            <div className="flex transition-transform duration-700 ease-in-out motion-reduce:transition-none" style={{ transform: `translateX(-${reviewIndex * (100 / TESTIMONIALS.length)}%)` }}>
-              {TESTIMONIALS.map((t) => <article key={t.id} className="w-full min-w-full shrink-0 px-1 md:w-1/3 md:min-w-[33.333333%] md:px-2">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+              {orderedTestimonials.map((t) => <article key={t.id} className="min-w-0 px-1 transition-all duration-700 ease-in-out md:px-0">
                 <div className="mb-4 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center border border-[#ff5500] bg-[#ff5500]/10 font-display text-sm font-bold text-white">{t.avatarText}</div><div><p className="font-display text-xl uppercase text-white">{t.name}</p><p className="font-mono text-[10px] uppercase tracking-wider text-[#ff5500]">{t.metric}</p></div></div>
                 <p className="max-w-4xl text-lg leading-relaxed text-zinc-200 sm:text-2xl">“{t.quote}”</p><p className="mt-5 font-mono text-[10px] uppercase tracking-widest text-zinc-500">{t.programme}</p>
               </article>)}
