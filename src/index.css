@@ -409,3 +409,9 @@ a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):no
     animation: none !important;
   }
 }
+
+
+/* Keep the homepage app showcase tucked closer to the preceding steps; avoid a dead band above it. */
+.page-layout > .home-app-section {
+  margin-block-start: clamp(1.25rem, 2.5vw, 2rem) !important;
+}

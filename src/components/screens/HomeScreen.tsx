@@ -44,6 +44,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const orderedTestimonials = [...TESTIMONIALS.slice(reviewIndex), ...TESTIMONIALS.slice(0, reviewIndex)];
+
   const renderStars = (count: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star key={i} className={`w-4 h-4 ${i < count ? 'text-[#ff5500] fill-[#ff5500]' : 'text-zinc-600'}`} />
@@ -65,7 +67,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           <div className="absolute inset-0 bg-grid-pattern opacity-40"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 w-full">
           <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
@@ -98,8 +100,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </button>
             </div>
 
-            <div className="pt-2 space-y-2"><p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">MWFitnessUK app — coming soon</p><StoreBadges /></div>
-
             <div className="flex flex-wrap items-center gap-2 pt-6" aria-label="Jump to a section">
               <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mr-1">Jump to:</span>
               <button onClick={() => scrollToId('about-mike')} className="cursor-pointer bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
@@ -125,6 +125,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </span>
             </div>
           </div>
+        </div>
+        <div className="absolute right-6 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-end gap-3 xl:flex 2xl:right-[max(3rem,calc((100vw-80rem)/2))]">
+          <p className="text-right font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
+          <StoreBadges />
+        </div>
+        <div className="absolute bottom-8 left-4 right-4 z-20 flex flex-col items-center gap-2 xl:hidden sm:left-6 sm:right-6">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
+          <StoreBadges />
         </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       </section>
@@ -321,18 +329,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
 
       {/* 6. THE APP */}
-      <section className="relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
+      <section className="home-app-section relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
         <div className="absolute inset-0 bg-grid-pattern opacity-20" />
         <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#ff5500]/10 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-16 sm:px-6 md:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div className="space-y-5">
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+          <div className="space-y-5 pt-2 lg:pt-8">
             <div className="inline-flex items-center gap-2 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Smartphone className="h-4 w-4" /> Your training, in your pocket</div>
             <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-tight text-white sm:text-5xl">The MWFitnessUK<br /><span className="text-[#ff5500]">app is on the way.</span></h2>
             <p className="max-w-xl text-sm leading-relaxed text-zinc-300 sm:text-base">A clearer way to keep your training, nutrition and progress together. The app is being developed to make consistency easier between check-ins — with the important details in one place, wherever you train.</p>
             <ul className="space-y-2.5 text-sm text-zinc-300">
               {['Daily weigh-ins and progress history','Food logging and nutrition habits','Training sessions and lift tracking','Progress photos, measurements and coach check-ins'].map((item) => <li key={item} className="flex items-start gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" />{item}</li>)}
             </ul>
-            <div className="pt-2"><p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-zinc-500">Store listings will be linked once published</p><StoreBadges /></div>
             <button onClick={() => onSelectScreen('app')} className="cursor-pointer inline-flex items-center gap-2 border border-[#ff5500] px-5 py-3 font-mono text-xs font-bold uppercase text-white transition-colors hover:bg-[#ff5500] hover:text-black">Explore the app <ArrowRight className="h-4 w-4" /></button>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -346,6 +353,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>)}
           </div>
         </div>
+        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-2 px-4 pb-8 sm:px-6 lg:absolute lg:right-8 lg:top-8 lg:items-end lg:px-0 lg:pb-0 2xl:right-[max(3rem,calc((100vw-80rem)/2))]">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 lg:text-right">Store listings linked once published</p>
+          <StoreBadges />
+        </div>
       </section>
 
       {/* 7. TESTIMONIALS */}
@@ -357,8 +368,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mw-electric-card overflow-hidden border border-[#252a34] bg-[#121419] p-6 sm:p-9" onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
           <div className="mb-6 flex items-center justify-between"><div className="flex gap-1.5">{renderStars(5)}</div><span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Member stories · auto-moving</span></div>
           <div className="overflow-hidden">
-            <div className="flex transition-transform duration-700 ease-in-out motion-reduce:transition-none" style={{ transform: `translateX(-${reviewIndex * 100}%)` }}>
-              {TESTIMONIALS.map((t) => <article key={t.id} className="w-full min-w-full shrink-0 px-1">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+              {orderedTestimonials.map((t) => <article key={t.id} className="min-w-0 px-1 transition-all duration-700 ease-in-out md:px-0">
                 <div className="mb-4 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center border border-[#ff5500] bg-[#ff5500]/10 font-display text-sm font-bold text-white">{t.avatarText}</div><div><p className="font-display text-xl uppercase text-white">{t.name}</p><p className="font-mono text-[10px] uppercase tracking-wider text-[#ff5500]">{t.metric}</p></div></div>
                 <p className="max-w-4xl text-lg leading-relaxed text-zinc-200 sm:text-2xl">“{t.quote}”</p><p className="mt-5 font-mono text-[10px] uppercase tracking-widest text-zinc-500">{t.programme}</p>
               </article>)}
@@ -372,7 +383,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
 
       {/* 8. CLOSING CTA */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-4 md:pb-24">
         <div className="mw-electric-card relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
 
