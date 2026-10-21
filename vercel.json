@@ -44,6 +44,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/gdpr",
+      "destination": "/index.html"
+    },
+    {
       "source": "/delete-account",
       "destination": "/index.html"
     }

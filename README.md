@@ -67,6 +67,8 @@ PUBLIC_SITE_URL=https://your-domain.example
 
 The online coaching page creates a Stripe Checkout session server-side. Keep `STRIPE_SECRET_KEY` server-only and never expose it through Vite/client environment variables.
 
+> **Known gap:** checkout session creation is the only Stripe step implemented. No webhook provisions a membership, creates a payment record or activates an account, and no Stripe credentials are configured yet — do not promise automatic signup, activation or receipts from checkout.
+
 ## Content & staff controls
 
 - **Plans and pricing** are read from the shared Neon `plans` table and edited in Staff login → Plans; active plans are shown on the public home, packages and online-coaching pages.
@@ -88,6 +90,6 @@ DATABASE_URL=<server-only pooled Neon PostgreSQL connection string>
 
 Only the two `VITE_NEON_*` endpoint URLs are browser-visible. Keep `DATABASE_URL` server-only and never prefix it with `VITE_`.
 
-The shared schema and ordered migration files are maintained in `MW-FITNESS-APP-MOBILE/neon/migrations/`. The production Neon branch currently has migrations 0001–0004 applied. The push endpoint authenticates using the caller's Neon JWT and relies on PostgreSQL row-level security; it does not require a privileged database key.
+The shared schema and ordered migration files are maintained in `MW-FITNESS-APP-MOBILE/neon/migrations/`, with website-owned dated migrations in `db/migrations/` (mobile nutrition live, communications centre, staff admin allowlist, SHWAG products, coaching videos). Migration files in either repository are not proof of deployment: verify the applied migrations, RLS policies and grants on the intended Neon branch before relying on them. The mobile README lists the recommended combined order for a fresh branch. The push endpoint authenticates using the caller's Neon JWT and relies on PostgreSQL row-level security; it does not require a privileged database key.
 
 The first coach/admin must be created in Neon Auth and promoted to `admin` in `public.profiles` by an authorized database administrator. Do not use sample credentials for real accounts.

@@ -15,6 +15,8 @@ import { ShwagScreen } from './components/screens/ShwagScreen';
 import { ContactScreen } from './components/screens/ContactScreen';
 import { PrivacyScreen } from './components/screens/PrivacyScreen';
 import { CookiePolicyScreen } from './components/screens/CookiePolicyScreen';
+import { GdprRightsScreen } from './components/screens/GdprRightsScreen';
+import { CookieConsentBanner } from './components/CookieConsent';
 import { AccountDeletionScreen } from './components/screens/AccountDeletionScreen';
 import { MemberAccountScreen } from './components/screens/MemberAccountScreen';
 import { AdminScreen } from './components/admin/AdminScreen';
@@ -37,6 +39,7 @@ export default function App() {
       '/account': 'account',
       '/privacy': 'privacy',
       '/cookies': 'cookies',
+      '/gdpr': 'gdpr',
       '/delete-account': 'delete-account',
     };
     return path === '/packages' ? 'online-coaching' : (routes[path] || 'home');
@@ -81,6 +84,7 @@ export default function App() {
       account: '/account',
       privacy: '/privacy',
       cookies: '/cookies',
+      gdpr: '/gdpr',
       'delete-account': '/delete-account',
     };
     const nextPath = routes[screen];
@@ -128,6 +132,7 @@ export default function App() {
         {currentScreen === 'account' && <MemberAccountScreen onSelectScreen={handleSelectScreen} />}
         {currentScreen === 'privacy' && <PrivacyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'cookies' && <CookiePolicyScreen onBack={() => { window.location.href = '/'; }} />}
+        {currentScreen === 'gdpr' && <GdprRightsScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'delete-account' && <AccountDeletionScreen onBack={() => { window.location.href = '/'; }} />}
       </main>
 
@@ -152,6 +157,9 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Cookie consent banner (slides up from the bottom on first visit) */}
+      <CookieConsentBanner />
 
       {/* Book a call modal */}
       <ConsultationModal

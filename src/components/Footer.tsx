@@ -60,7 +60,9 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
         <nav aria-label="Legal and privacy" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <a href="/privacy" className="hover:text-[#ff5500] uppercase tracking-wider">Privacy policy</a>
           <a href="/cookies" className="hover:text-[#ff5500] uppercase tracking-wider">Cookie policy</a>
+          <a href="/gdpr" className="hover:text-[#ff5500] uppercase tracking-wider">UK GDPR</a>
           <a href="/delete-account" className="hover:text-[#ff5500] uppercase tracking-wider">Account and data deletion</a>
+          <button type="button" onClick={() => window.dispatchEvent(new Event('mw:open-cookie-settings'))} className="hover:text-[#ff5500] uppercase tracking-wider">Cookie settings</button>
         </nav>
       </div>
     </div>
