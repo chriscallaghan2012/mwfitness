@@ -126,7 +126,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </span>
             </div>
           </div>
-        <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       
       </div>
     </section>
