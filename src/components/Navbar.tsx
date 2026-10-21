@@ -88,15 +88,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-3 text-left group focus:outline-none"
           >
-            <div className="w-10 h-10 bg-[#16181d] border border-[#ff5500] flex items-center justify-center relative overflow-hidden group-hover:border-white transition-colors">
+            <div className="w-10 h-10 bg-transparent border border-[#ff5500] flex items-center justify-center relative overflow-hidden group-hover:border-white transition-colors">
               <span aria-hidden="true" className="font-display text-2xl leading-none tracking-tighter text-[#ff5500]">MW</span>
-              <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#ff5500]/20 pointer-events-none"></div>
             </div>
             <div>
-              <div className="font-display text-2xl tracking-widest text-white font-bold uppercase leading-none">
-                MWFitness<span className="text-[#ff5500]">UK</span>
+              <div className="font-display text-2xl tracking-widest text-white font-bold uppercase leading-none group-hover:text-[#ff5500] transition-colors">
+                MWFitness<span className="text-[#ff5500] group-hover:text-white">UK</span>
               </div>
-              <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+              <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider group-hover:text-[#ff5500] transition-colors">
                 Online coaching • Train anywhere
               </div>
             </div>
@@ -110,8 +109,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handleNavClick(item.id)}
                 className={`px-3.5 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
                   currentScreen === item.id
-                    ? 'bg-[#ff5500] text-black font-bold'
-                    : 'text-zinc-400 hover:text-white hover:bg-[#1a1d24] bg-[#16181d] border border-[#262930]'
+                    ? 'text-[#ff5500] font-bold hover:text-white'
+                    : 'text-white hover:text-[#ff5500]'
                 }`}
               >
                 {item.label}
@@ -147,8 +146,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleNavClick(item.id)}
             className={`px-3 py-1 text-xs font-mono whitespace-nowrap transition-colors ${
               currentScreen === item.id
-                ? 'bg-[#ff5500] text-black font-bold'
-                : 'text-zinc-400 hover:text-white bg-[#1a1d24]'
+                ? 'text-[#ff5500] font-bold hover:text-white'
+                : 'text-white hover:text-[#ff5500]'
             }`}
           >
             {item.label}
@@ -170,10 +169,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center justify-between p-3 text-left font-mono text-sm border transition-all ${
+                  className={`flex items-center justify-between p-3 text-left font-mono text-sm transition-colors ${
                     isActive
-                      ? 'bg-[#181b22] text-white border-[#ff5500]'
-                      : 'bg-[#121419] text-zinc-400 hover:text-white border-[#1c1f26]'
+                      ? 'text-[#ff5500]'
+                      : 'text-white hover:text-[#ff5500]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
