@@ -8,6 +8,14 @@
       "destination": "/index.html"
     },
     {
+      "source": "/nutrition",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/reviews",
+      "destination": "/index.html"
+    },
+    {
       "source": "/app",
       "destination": "/index.html"
     },
