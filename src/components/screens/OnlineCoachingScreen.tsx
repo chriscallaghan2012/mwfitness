@@ -52,6 +52,7 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
         <button onClick={() => document.getElementById('online-plans')?.scrollIntoView({ behavior: 'smooth' })} className="cursor-pointer bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2">Explore coaching plans <ArrowRight className="w-4 h-4" /></button>
       </div></div>
     </section>
+    <div aria-hidden="true" className="hero-dashed-divider" />
     <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="border-b border-[#22252e] pb-4 mb-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT YOU GET ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Coaching built around real life.</h2></div>
@@ -64,7 +65,7 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
     </section>
     <section id="online-plans" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="border-b border-[#22252e] pb-4 mb-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ CHOOSE YOUR PLAN ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Online coaching packages.</h2><p className="text-sm text-zinc-400 mt-3">Compare the currently active plans. Package details and prices are managed by Mike in Staff HQ; secure checkout is available directly from each plan.</p></div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{plans.map((plan) => <div key={plan.id} className={`bg-[#121419] border p-6 md:p-8 flex flex-col relative ${plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'}`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">{plans.map((plan) => <div key={plan.id} className={`bg-[#121419] border p-6 md:p-8 flex flex-col relative ${plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'}`}>
         {plan.badge && <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">{plan.badge}</span>}
         <div className="flex items-baseline justify-between gap-4"><div><h3 className="font-display text-3xl text-white uppercase">{plan.name}</h3><p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">{plan.tag}</p></div><div className="text-right"><div className="font-display text-4xl text-white">{formatPrice(plan.price)}</div>{plan.original_price !== null && <div className="text-xs font-mono text-zinc-500 line-through">{formatPrice(plan.original_price)}</div>}</div></div>
         <p className="text-sm text-zinc-400 leading-relaxed mt-4">{plan.description}</p><ul className="mt-5 space-y-2.5 text-sm text-zinc-300">{plan.features.map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}</ul>
