@@ -124,10 +124,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <span className="w-1.5 h-1.5 bg-emerald-400"></span> {CONTACT.sessions}
               </span>
             </div>
-            <div className="mt-6 space-y-3">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
-              <StoreBadges />
-            </div>
           </div>
         </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
@@ -246,7 +242,30 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </section>
 
-      {/* 4. ONLINE COACHING PACKAGES — keep the homepage aligned with the live coaching catalogue */}
+      {/* HOW IT WORKS */}
+      <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="border-b border-[#22252e] pb-4 mb-10 text-center">
+          <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
+            [ HOW IT WORKS ]
+          </div>
+          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+            THREE SIMPLE STEPS.
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {HOW_IT_WORKS.map((step) => (
+            <div key={step.step} className="mw-electric-card bg-[#121419] border border-[#20232b] p-6 relative group">
+              <div className="text-4xl font-display text-[#ff5500] font-bold mb-3">{step.step}</div>
+              <h3 className="font-display text-2xl text-white uppercase tracking-wider mb-2">{step.title}</h3>
+              <p className="text-sm font-sans text-zinc-400 leading-relaxed">{step.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
+      {/* ONLINE COACHING PACKAGES — live catalogue */}
       <section id="packages-overview" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -282,49 +301,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         {plansLoading && <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p>}
         {!plansLoading && plansError && <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p>}
       </section>
-      {/* 4. ONLINE COACHING SPOTLIGHT */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mw-electric-card relative overflow-hidden border border-[#ff5500]/60 bg-[#171920] p-8 md:p-12">
-          <div className="absolute inset-y-0 right-0 w-1/3 bg-[#ff5500]/10 skew-x-[-18deg] translate-x-1/4 pointer-events-none"></div>
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest">[ TRAIN ANYWHERE ]</div>
-            <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-tight">Online coaching. No meet-ups required.</h2>
-            <p className="text-sm sm:text-base font-sans text-zinc-300 leading-relaxed max-w-2xl">
-              Get a plan built around your life, your equipment and your goals, with weekly check-ins and direct support from Mike.
-            </p>
-            <button onClick={() => onSelectScreen('online-coaching')}
-              className="cursor-pointer bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
-            >
-              Explore online coaching
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. HOW IT WORKS */}
-      <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-[#22252e] pb-4 mb-10 text-center">
-          <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
-            [ HOW IT WORKS ]
-          </div>
-          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            THREE SIMPLE STEPS.
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {HOW_IT_WORKS.map((step) => (
-            <div key={step.step} className="mw-electric-card bg-[#121419] border border-[#20232b] p-6 relative group">
-              <div className="text-4xl font-display text-[#ff5500] font-bold mb-3">{step.step}</div>
-              <h3 className="font-display text-2xl text-white uppercase tracking-wider mb-2">{step.title}</h3>
-              <p className="text-sm font-sans text-zinc-400 leading-relaxed">{step.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 6. THE APP */}
+      {/* THE APP */}
       <section className="home-app-section relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
         <div className="absolute inset-0 bg-grid-pattern opacity-20" />
         <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#ff5500]/10 blur-3xl" />
@@ -337,6 +314,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               {['Daily weigh-ins and progress history','Food logging and nutrition habits','Training sessions and lift tracking','Progress photos, measurements and coach check-ins'].map((item) => <li key={item} className="flex items-start gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" />{item}</li>)}
             </ul>
             <button onClick={() => onSelectScreen('app')} className="cursor-pointer inline-flex items-center gap-2 border border-[#ff5500] px-5 py-3 font-mono text-xs font-bold uppercase text-white transition-colors hover:bg-[#ff5500] hover:text-black">Explore the app <ArrowRight className="h-4 w-4" /></button>
+            <div className="space-y-3 pt-2">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Store listings will link here once published</p>
+              <StoreBadges />
+            </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {[
@@ -349,13 +330,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>)}
           </div>
         </div>
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-2 px-4 pb-8 sm:px-6 lg:absolute lg:right-8 lg:top-8 lg:items-end lg:px-0 lg:pb-0 2xl:right-[max(3rem,calc((100vw-80rem)/2))]">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 lg:text-right">Store listings linked once published</p>
-          <StoreBadges />
-        </div>
       </section>
 
-      {/* 7. TESTIMONIALS */}
+      {/* TESTIMONIALS */}
       <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[#22252e] pb-5 sm:flex-row sm:items-end">
           <div><div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2><p className="mt-3 max-w-xl text-sm text-zinc-400">Stories from people building stronger routines with support that fits around real life.</p></div>
@@ -378,7 +355,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </section>
 
-      {/* 8. CLOSING CTA */}
+      {/* CLOSING CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-4 md:pb-24">
         <div className="mw-electric-card relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
