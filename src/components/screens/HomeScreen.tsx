@@ -68,7 +68,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
 
         <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_500px] lg:px-8">
-          <div className="mx-auto w-full max-w-3xl space-y-6 text-center">
+          <div className="w-full max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
               <span>Welcome to MWFitnessUK</span>
@@ -85,7 +85,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               Online coaching built around your goals and routine. No jargon, no judgement — just clear training and nutrition guidance, real support and progress that lasts.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               <button onClick={() => onOpenBookCall()}
                 className="cursor-pointer bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
               >
@@ -100,7 +100,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-6" aria-label="Jump to a section">
+            <div className="flex flex-wrap items-center gap-2 pt-6" aria-label="Jump to a section">
               <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mr-1">Jump to:</span>
               <button onClick={() => scrollToId('about-mike')} className="cursor-pointer bg-[#16181d] border border-[#262930] text-zinc-300 text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 transition-colors">
                 About Mike
@@ -116,7 +116,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-4 text-xs font-mono text-zinc-400">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-4 text-xs font-mono text-zinc-400">
               <span className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[#ff5500]" /> {CONTACT.location}
               </span>
