@@ -5,11 +5,6 @@ import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, Graduatio
 import { StoreBadges } from '../StoreBadges';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
-// Package grid: three cards across on large screens; when the final row would
-// hold exactly two cards, those two split the row evenly (half and half).
-const planCardSpan = (index: number, total: number): string =>
-  total % 3 === 2 && index >= total - 2 ? 'lg:col-span-3' : 'lg:col-span-2';
-
 interface HomeScreenProps {
   onSelectScreen: (screen: ScreenId) => void;
   onOpenBookCall: (interest?: string) => void;
