@@ -364,7 +364,7 @@ export function AdminScreen() {
                 { label: 'Review check-ins', detail: 'Member feedback and follow-ups', tab: 'checkins' as Tab },
                 { label: 'Review progress', detail: 'Weight and progress logs', tab: 'checkins' as Tab },
                 { label: 'Open website leads', detail: 'New enquiries and contact requests', tab: 'leads' as Tab },
-              ].map((item) => <button key={item.label} type="button" onClick={() => setTab(item.tab)} className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-4 text-left transition hover:border-orange-500/25 hover:bg-orange-500/[0.04]"><span className="block text-sm font-medium text-white">{item.label} <span className="text-orange-300">↗</span></span><span className="mt-1 block text-xs text-zinc-500">{item.detail}</span></button>)}
+              ].map((item) => <button key={item.label} type="button" onClick={() => setTab(item.tab)} className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-4 text-left transition hover:border-black hover:bg-black/40"><span className="block text-sm font-medium text-white">{item.label} <span className="text-zinc-500">↗</span></span><span className="mt-1 block text-xs text-zinc-500">{item.detail}</span></button>)}
             </div>
           </section>
         </div>
