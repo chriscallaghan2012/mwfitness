@@ -451,12 +451,23 @@ a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):no
 }
 
 
-/* Shared full-width dashed separator directly beneath every public-page hero. */
+/* Edge-to-edge separators and ticker bands, even when a screen sits inside a constrained parent. */
+.hero-dashed-divider,
+.page-layout > .home-ticker,
+.page-layout > .industrial-stripe--divider {
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  max-width: none;
+  margin-left: -50vw !important;
+  box-sizing: border-box;
+}
+
 .hero-dashed-divider {
-  width: 100%;
   height: 0;
   border-top: 1px dashed #454954;
-  margin: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   flex: 0 0 auto;
 }
 

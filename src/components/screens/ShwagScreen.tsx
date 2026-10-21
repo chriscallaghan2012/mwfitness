@@ -100,7 +100,6 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
     <Ticker />
     <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
-      <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
       {/* 2. WHAT SHWAG STANDS FOR */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
