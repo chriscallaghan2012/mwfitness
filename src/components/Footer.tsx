@@ -45,6 +45,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
             <div className="flex items-start gap-2"><MapPin className="w-3.5 h-3.5 text-[#ff5500] shrink-0 mt-0.5" /><span>{CONTACT.location}</span></div>
             <div className="flex items-center gap-2"><Mail className="w-3.5 h-3.5 text-[#ff5500] shrink-0" /><a href={`mailto:${CONTACT.email}`} className="hover:text-[#ff5500]">{CONTACT.email}</a></div>
             <div className="flex items-center gap-2"><Instagram className="w-3.5 h-3.5 text-[#ff5500] shrink-0" /><a href={CONTACT.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500]">@{CONTACT.instagramHandle}</a></div>
+            <div className="flex items-center gap-2"><Instagram className="w-3.5 h-3.5 text-[#ff5500] shrink-0" /><a href={CONTACT.shwagInstagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500]">@{CONTACT.shwagInstagramHandle} <span className="text-zinc-600">(SHWAG)</span></a></div>
             <div className="flex items-center gap-2"><Facebook className="w-3.5 h-3.5 text-[#ff5500] shrink-0" /><a href={CONTACT.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500]">{CONTACT.facebookName}</a></div>
           </div>
           <button onClick={onOpenBookCall} className="mt-2 inline-flex items-center gap-2 text-xs font-mono text-zinc-300 hover:text-[#ff5500]"><PhoneCall className="w-3.5 h-3.5" /> Book a free call</button>

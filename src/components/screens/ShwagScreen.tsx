@@ -1,29 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { SHWAG, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
-import { Shirt, CheckCircle, ArrowRight, Sparkles, ExternalLink, Instagram } from 'lucide-react';
+import { Shirt, HardHat, CheckCircle, ArrowRight, Sparkles, ExternalLink, Instagram } from 'lucide-react';
 
 type SwagProduct = { id: string; slug: string; name: string; description: string; category: string; price: number; compare_at_price: number | null; image_url: string; product_url: string; sizes: string[]; stock_status: string };
-const FALLBACK_PRODUCTS: SwagProduct[] = SHWAG.products.map((product, index) => ({
-  id: 'fallback-' + index,
-  slug: product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
-  name: product.name,
-  description: 'Price and availability on request. Send an enquiry to confirm current options and stock.',
-  category: 'apparel',
-  price: 0,
-  compare_at_price: null,
-  image_url: '',
-  product_url: '',
-  sizes: [],
-  stock_status: 'enquiry_only',
-}));
+
+// Display-only placeholders shown until the live swag_products catalogue has
+// real stock. They mirror the real product cards but cannot be clicked or ordered.
+const COMING_SOON = [
+  { id: 'soon-hoodie', name: 'SHWAG Hoodie', tagline: 'Heavyweight hoodie for warm-ups and rest days.', Icon: Shirt },
+  { id: 'soon-tshirt', name: 'SHWAG T-Shirt', tagline: 'Everyday cotton tee with the Solid Hard Work mark.', Icon: Shirt },
+  { id: 'soon-cap', name: 'SHWAG Cap', tagline: 'Six-panel cap. Train harder, dress sharper.', Icon: HardHat },
+] as const;
 
 interface ShwagScreenProps {
   onOpenBookCall: () => void;
 }
 
 export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
-  const [products, setProducts] = useState<SwagProduct[]>(FALLBACK_PRODUCTS);
+  const [products, setProducts] = useState<SwagProduct[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState('');
   useEffect(() => {
@@ -46,7 +41,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
   };
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [item, setItem] = useState('Classic SHWAG T-Shirt');
+  const [item, setItem] = useState('Something else');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
@@ -129,6 +124,44 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
         </div>
       </section>
 
+      {/* 2b. MWFitnessUK x SHWAG-MCR — STRONGER TOGETHER */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="border border-[#20232b] bg-[#121419]">
+          <div className="border-b border-[#20232b] bg-gradient-to-r from-[#21170f] via-[#15171b] to-[#121419] p-8 sm:p-10">
+            <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-2">[ MWFITNESSUK × SHWAG-MCR ]</div>
+            <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-tight leading-[0.95]">Stronger<br />Together.</h2>
+            <p className="mt-4 max-w-2xl text-sm font-sans text-zinc-400 leading-relaxed">Two businesses, one shared vision — promoting positive mental attitudes, encouraging healthy lifestyles, and bringing people together through a common purpose.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-0">
+            <div className="p-8 sm:p-10 space-y-5">
+              <p className="text-sm font-sans text-zinc-300 leading-relaxed">
+                At MWFitnessUK and SHWAG-MCR, we believe that fitness, nutrition and sportswear are about much more than physical appearance — they're about building confidence, developing a positive mindset, and creating a community that inspires people to become the best versions of themselves. Our two businesses work hand in hand with one shared vision: to promote positive mental attitudes, encourage healthy lifestyles, and bring people together through a common purpose.
+              </p>
+              <p className="text-sm font-sans text-zinc-300 leading-relaxed">
+                Through the MWFitnessUK and SHWAG-MCR community, you're never alone on your journey. Whether your goals are to improve your fitness, build healthier habits, develop greater self-belief, overcome personal challenges, or strengthen your mental wellbeing, you'll find encouragement, guidance and support from people who share the same drive to grow.
+              </p>
+              <p className="text-sm font-sans text-zinc-300 leading-relaxed">
+                We're here to remind you that greatness isn't achieved overnight — it's built through the small decisions you make every day, the effort you put in when nobody is watching, and the support you give and receive along the way.
+              </p>
+              <p className="text-base font-sans text-white font-semibold leading-relaxed border-t border-[#20232b] pt-5">
+                Together, we train stronger, think stronger, live stronger, and achieve more. <span className="text-[#ff5500]">Solid Hard Work Achieves Greatness — not just in the gym, but in life.</span>
+              </p>
+            </div>
+
+            <div className="flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-[#20232b] bg-[#0e1013] p-8 sm:p-10">
+              <div className="text-[#ff5500] mb-4"><Sparkles className="w-6 h-6" /></div>
+              <p className="font-display text-3xl sm:text-4xl text-white uppercase leading-tight tracking-wide">Solid Hard Work Achieves Greatness</p>
+              <p className="mt-4 text-sm font-sans text-zinc-400 leading-relaxed">A mindset that goes far beyond the gym — a philosophy for everyday life, reminding us that progress comes through consistency, determination, resilience, and the willingness to keep pushing forward, even when things get tough.</p>
+              <a href={CONTACT.shwagInstagramUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 text-zinc-400 hover:text-[#ff5500] font-mono text-xs uppercase transition-colors">
+                <Instagram className="w-3.5 h-3.5 text-[#ff5500]" />
+                Join the community — @{CONTACT.shwagInstagramHandle}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 3. PRODUCTS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10">
@@ -142,9 +175,9 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
 
         {productsLoading ? <p className="text-sm text-zinc-400">Loading the latest SHWAG range…</p> : null}
         {productsError ? <p role="status" className="mb-4 border border-orange-500/20 bg-orange-500/5 p-3 text-sm text-zinc-300">{productsError} You can still send an order enquiry below.</p> : null}
-        {!productsLoading && products.length === 0 ? <div className="border border-dashed border-[#30333b] bg-[#121419] p-8 text-center"><Shirt className="mx-auto mb-3 h-8 w-8 text-[#ff5500]/60" /><h3 className="font-display text-xl text-white uppercase">New drops coming soon</h3><p className="mt-2 text-sm text-zinc-400">Ask Mike about available sizes, colours and upcoming SHWAG.</p></div> : null}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
+        {!productsLoading && products.length === 0 ? <p className="mb-6 text-sm text-zinc-400">The full webshop is coming. Until the first drop lands, take a look below — and send Mike an enquiry to reserve yours.</p> : null}
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${products.length > 0 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+          {products.length > 0 ? products.map((product) => (
             <article key={product.id} className="bg-[#121419] border border-[#20232b] p-5 flex flex-col hover:border-[#ff5500]/50 transition-all duration-300">
               <div className="aspect-square bg-[#16181d] border border-[#262930] flex items-center justify-center mb-4 overflow-hidden">
                 {product.image_url ? <img src={product.image_url} alt={product.name} loading="lazy" className="h-full w-full object-cover" /> : <Shirt className="w-12 h-12 text-[#ff5500]/40" />}
@@ -156,6 +189,20 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               <p className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-4">{(product.stock_status === 'enquiry_only' ? 'enquiry only' : String(product.stock_status).replace('_', ' '))}</p>
               <div className="mt-auto">
                 {product.product_url && product.stock_status !== 'sold_out' ? <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center gap-2 bg-[#ff5500] px-4 py-3 text-xs font-mono font-bold uppercase text-black">View product <ExternalLink className="h-3.5 w-3.5" /></a> : <button type="button" disabled={product.stock_status === 'sold_out'} onClick={() => chooseProduct(product.name)} className="inline-flex w-full items-center justify-center gap-2 border border-[#ff5500]/60 px-4 py-3 text-xs font-mono font-bold uppercase text-[#ff5500] disabled:opacity-40">{product.stock_status === 'sold_out' ? 'Sold out' : 'Enquire about item'} <ArrowRight className="h-3.5 w-3.5" /></button>}
+              </div>
+            </article>
+          )) : COMING_SOON.map(({ id, name, tagline, Icon }) => (
+            <article key={id} className="bg-[#121419] border border-[#20232b] p-5 flex flex-col">
+              <div className="relative aspect-square bg-[#16181d] border border-[#262930] flex items-center justify-center mb-4 overflow-hidden">
+                <Icon className="w-12 h-12 text-[#ff5500]/40" />
+                <span className="absolute top-2 right-2 border border-[#ff5500]/50 bg-[#16181d]/90 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[#ff5500]">Coming soon</span>
+              </div>
+              <h3 className="font-display text-xl text-white uppercase tracking-wider mb-1">{name}</h3>
+              <p className="text-sm text-zinc-400 leading-relaxed mb-3">{tagline}</p>
+              <p className="font-mono text-lg text-zinc-500 mb-2">Price TBC</p>
+              <p className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-4">Launching with the first SHWAG drop</p>
+              <div className="mt-auto">
+                <button type="button" disabled className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 border border-zinc-700 px-4 py-3 text-xs font-mono font-bold uppercase text-zinc-500 opacity-70">Coming soon</button>
               </div>
             </article>
           ))}
@@ -179,13 +226,13 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               </p>
 
               <a
-                href={CONTACT.instagramUrl}
+                href={CONTACT.shwagInstagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-zinc-400 hover:text-[#ff5500] font-mono text-xs uppercase transition-colors"
               >
                 <Instagram className="w-3.5 h-3.5 text-[#ff5500]" />
-                Follow @{CONTACT.instagramHandle} for SHWAG drops
+                Follow @{CONTACT.shwagInstagramHandle} for SHWAG drops
               </a>
             </div>
           ) : (

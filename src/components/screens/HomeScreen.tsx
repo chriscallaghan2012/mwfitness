@@ -5,12 +5,18 @@ import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, Graduatio
 import { StoreBadges } from '../StoreBadges';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
+// Package grid: three cards across on large screens; when the final row would
+// hold exactly two cards, those two split the row evenly (half and half).
+const planCardSpan = (index: number, total: number): string =>
+  total % 3 === 2 && index >= total - 2 ? 'lg:col-span-3' : 'lg:col-span-2';
+
 interface HomeScreenProps {
   onSelectScreen: (screen: ScreenId) => void;
   onOpenBookCall: (interest?: string) => void;
+  onCheckout: (plan: PublicPlan) => void;
 }
 
-export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBookCall }) => {
+export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBookCall, onCheckout }) => {
   const [plans, setPlans] = useState<PublicPlan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
   const [plansError, setPlansError] = useState<string | null>(null);
@@ -21,7 +27,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
     let active = true;
     void loadPublicPlans('online').then((result) => {
       if (!active) return;
-      setPlans(result.plans.slice(0, 4));
+      setPlans(result.plans);
       setPlansError(result.error);
       setPlansLoading(false);
     }, (cause: unknown) => {
@@ -280,9 +286,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <span>Compare all plan details</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
-          {plans.map((plan) => (
-            <article key={plan.id} className={'mw-electric-card bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]')}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 items-stretch">
+          {plans.map((plan, index) => (
+            <article key={plan.id} className={'mw-electric-card bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + planCardSpan(index, plans.length) + ' ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]')}>
               {plan.badge && <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">{plan.badge}</span>}
               <div className="flex items-start justify-between gap-4">
                 <div><h3 className="font-display text-3xl text-white uppercase">{plan.name}</h3><p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">{plan.tag}</p></div>
@@ -295,7 +301,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               <ul className="mt-5 space-y-2.5 text-sm text-zinc-300">
                 {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}
               </ul>
-              <button onClick={() => onSelectScreen('online-coaching')} className="cursor-pointer mt-7 bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
+              <button onClick={() => onCheckout(plan)} className="cursor-pointer mt-7 bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
                 View plan &amp; checkout <ArrowRight className="w-4 h-4" />
               </button>
             </article>

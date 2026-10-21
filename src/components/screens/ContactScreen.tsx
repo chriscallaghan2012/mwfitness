@@ -103,6 +103,10 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
                   <a href={CONTACT.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500] transition-colors">@{CONTACT.instagramHandle}</a>
                 </div>
                 <div className="flex items-center gap-3">
+                  <Instagram className="w-4 h-4 text-[#ff5500] shrink-0" />
+                  <a href={CONTACT.shwagInstagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500] transition-colors">@{CONTACT.shwagInstagramHandle} <span className="text-zinc-500">(SHWAG)</span></a>
+                </div>
+                <div className="flex items-center gap-3">
                   <Facebook className="w-4 h-4 text-[#ff5500] shrink-0" />
                   <a href={CONTACT.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff5500] transition-colors">{CONTACT.facebookName}</a>
                 </div>

@@ -1,9 +1,9 @@
-export async function createCheckoutSession(planId: string): Promise<{ url?: string; error?: string }> {
+export async function createCheckoutSession(planId: string, customer?: { name?: string; email?: string }): Promise<{ url?: string; error?: string }> {
   try {
     const response = await fetch('/api/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ planId }),
+      body: JSON.stringify({ planId, customerName: customer?.name, customerEmail: customer?.email }),
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data?.url) throw new Error(data?.error || 'Checkout could not be started.');

@@ -49,9 +49,27 @@ SMTP_PASS=YOUR_16_CHAR_APP_PASSWORD
 MAIL_TO=mwfitnessukonline@gmail.com        # where enquiries are delivered
 ```
 
-## Deploy (Vercel)
+## Deploy (self-hosted)
 
-The `dist/` folder is the static site and `api/` is auto-detected as serverless functions.
+The site is designed to run from a single Node process — no Vercel required:
+
+```bash
+npm ci
+npm run build                 # produces dist/
+cp .env.example .env          # add DATABASE_URL, SMTP_*, STRIPE_*, PUBLIC_SITE_URL
+PORT=8787 npm run server      # serves the site + all /api routes on one port
+```
+
+`server.mjs` loads `.env` automatically, serves the built `dist/` folder, exposes every `/api/*` route (contact/leads, plans, checkout, push, communications, unsubscribe, health), and has a catch-all that returns `index.html` for all other paths — so `/privacy`, `/cookies`, `/gdpr` and `/checkout` deep links work out of the box.
+
+Production notes:
+- Put a reverse proxy (Caddy/Nginx) in front for HTTPS and set `PUBLIC_SITE_URL` to the public origin (Stripe return URLs use it).
+- Keep the process supervisor of your choice in charge (systemd unit, pm2, Docker, etc.) and set `PORT` as needed.
+- `DATABASE_URL` stays server-side only. Never expose it to the browser build.
+
+### Deploy (Vercel, alternative)
+
+The `dist/` folder is the static site and `api/` is auto-detected as serverless functions; `vercel.json` provides the SPA rewrites that `server.mjs` handles natively when self-hosting.
 Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables. The website's Neon migration `0005_website_leads.sql` is maintained in the companion mobile repository and applied to the dedicated MW Fitness database.
 
 ### Stripe checkout
@@ -62,6 +80,11 @@ Create two one-time Prices in Stripe for the online coaching offer, then add the
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_PRICE_ONLINE_WEEKLY=price_...
 STRIPE_PRICE_ONLINE_12_WEEK=price_...
+STRIPE_PRICE_ONLINE_4_WEEK_ONCE=price_...
+STRIPE_PRICE_ONLINE_BRONZE_4WEEK=price_...
+STRIPE_PRICE_ONLINE_SILVER_8WEEK=price_...
+STRIPE_PRICE_ONLINE_GOLD_8WEEK=price_...
+STRIPE_PRICE_ONLINE_PLATINUM_8WEEK=price_...
 PUBLIC_SITE_URL=https://your-domain.example
 ```
 

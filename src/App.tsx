@@ -17,6 +17,8 @@ import { PrivacyScreen } from './components/screens/PrivacyScreen';
 import { CookiePolicyScreen } from './components/screens/CookiePolicyScreen';
 import { GdprRightsScreen } from './components/screens/GdprRightsScreen';
 import { CookieConsentBanner } from './components/CookieConsent';
+import { CheckoutScreen } from './components/screens/CheckoutScreen';
+import type { PublicPlan } from './lib/plans';
 import { AccountDeletionScreen } from './components/screens/AccountDeletionScreen';
 import { MemberAccountScreen } from './components/screens/MemberAccountScreen';
 import { AdminScreen } from './components/admin/AdminScreen';
@@ -40,6 +42,7 @@ export default function App() {
       '/privacy': 'privacy',
       '/cookies': 'cookies',
       '/gdpr': 'gdpr',
+      '/checkout': 'checkout',
       '/delete-account': 'delete-account',
     };
     return path === '/packages' ? 'online-coaching' : (routes[path] || 'home');
@@ -49,6 +52,7 @@ export default function App() {
   const [bookCallOpen, setBookCallOpen] = useState(false);
   const [bookCallInterest, setBookCallInterest] = useState('');
   const [showMobileCta, setShowMobileCta] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState<PublicPlan | null>(null);
 
   // Show the sticky mobile "book a call" bar once the visitor scrolls past the hero
   useEffect(() => {
@@ -85,6 +89,7 @@ export default function App() {
       privacy: '/privacy',
       cookies: '/cookies',
       gdpr: '/gdpr',
+      checkout: '/checkout',
       'delete-account': '/delete-account',
     };
     const nextPath = routes[screen];
@@ -100,6 +105,13 @@ export default function App() {
     setBookCallOpen(true);
   };
 
+  const handleGoCheckout = (plan: PublicPlan) => {
+    setCheckoutPlan(plan);
+    if (window.location.pathname !== '/checkout') window.history.pushState({}, '', '/checkout');
+    setCurrentScreen('checkout');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0c0e] text-[#f3f4f6] font-sans selection:bg-[#ff5500] selection:text-black">
       {/* Sticky Navigation */}
@@ -112,10 +124,10 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 w-full">
         {currentScreen === 'home' && (
-          <HomeScreen onSelectScreen={handleSelectScreen} onOpenBookCall={handleOpenBookCall} />
+          <HomeScreen onSelectScreen={handleSelectScreen} onOpenBookCall={handleOpenBookCall} onCheckout={handleGoCheckout} />
         )}
         {currentScreen === 'online-coaching' && (
-          <OnlineCoachingScreen onSelectScreen={handleSelectScreen} />
+          <OnlineCoachingScreen onSelectScreen={handleSelectScreen} onCheckout={handleGoCheckout} />
         )}
         {currentScreen === 'nutrition' && <NutritionScreen onSelectScreen={handleSelectScreen} />}
         {currentScreen === 'reviews' && <ReviewsScreen onSelectScreen={handleSelectScreen} />}
@@ -133,6 +145,7 @@ export default function App() {
         {currentScreen === 'privacy' && <PrivacyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'cookies' && <CookiePolicyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'gdpr' && <GdprRightsScreen onBack={() => { window.location.href = '/'; }} />}
+        {currentScreen === 'checkout' && <CheckoutScreen plan={checkoutPlan} onSelectScreen={handleSelectScreen} />}
         {currentScreen === 'delete-account' && <AccountDeletionScreen onBack={() => { window.location.href = '/'; }} />}
       </main>
 

@@ -1,0 +1,161 @@
+-- Live online-coaching packages for the public website catalogue.
+-- PREPARED ONLY: review, then run against the intended Neon branch with approval
+-- (Neon SQL editor or an authorised migration window). Safe to re-run: rows are
+-- upserted by stable id, so re-applying updates in place instead of duplicating.
+-- The public site reads kind='online', active=true via /api/plans; Staff HQ can
+-- still edit every field afterwards in Staff login → Plans & pricing.
+
+insert into public.plans (id, name, tag, price, original_price, badge, is_popular, description, features, cta_text, kind, active) values
+(
+  'online-4-week-once',
+  '4 Week One-Off Coaching',
+  '4 week one-off',
+  99.99,
+  null,
+  null,
+  false,
+  'One-off 4 week coaching package, delivered in 5–7 days. Less than £4 a day — you would spend that on a Greggs each day 🙂',
+  '[
+    "3, 4 or 5 day workout programme tailor made to your needs and abilities",
+    "BMR calculation",
+    "TDEE calculation",
+    "Macronutrient calculation and verification",
+    "Daily weigh-ins and data point analysis",
+    "Weekly photograph check-ins for transformation comparison",
+    "Weekly check-ins sent via WhatsApp video"
+  ]'::jsonb,
+  'Start coaching',
+  'online',
+  true
+),
+(
+  'online-bronze-4week',
+  'Bronze — 4 Week Plan',
+  '4 week plan',
+  159.99,
+  null,
+  null,
+  false,
+  '4 week plan with a tailor-made nutrition plan. Please allow 5–7 days upon receipt of payment to calculate, create and deliver.',
+  '[
+    "3, 4 or 5 day workout programme tailor made to your needs and abilities",
+    "BMR calculation",
+    "TDEE calculation",
+    "Macronutrient calculation and verification",
+    "Daily weigh-ins and data point analysis",
+    "Weekly photograph check-ins for transformation comparison",
+    "Weekly check-ins sent via WhatsApp video",
+    "Nutrition plan tailor made for specific requirements",
+    "All meals calorie specific with macronutrient breakdowns",
+    "Multiple meal options created so your meals are never monotonous",
+    "Healthy snack options to suit a busy lifestyle",
+    "Meal prep ideas",
+    "Healthy shopping list",
+    "Delivered within 5–7 days of payment"
+  ]'::jsonb,
+  'Start coaching',
+  'online',
+  true
+),
+(
+  'online-silver-8week',
+  'Silver — 8 Week Plan',
+  '8 week plan',
+  299.99,
+  null,
+  null,
+  false,
+  '8 week plan with a tailor-made nutrition plan. Please allow 5–7 days upon receipt of payment to calculate, create and deliver.',
+  '[
+    "3, 4 or 5 day workout programme tailor made to your needs and abilities",
+    "BMR calculation",
+    "TDEE calculation",
+    "Macronutrient calculation and verification",
+    "Daily weigh-ins and data point analysis",
+    "Weekly photograph check-ins for transformation comparison",
+    "Weekly check-ins sent via WhatsApp video",
+    "Nutrition plan tailor made for specific requirements",
+    "All meals calorie specific with macronutrient breakdowns",
+    "Multiple meal options created so your meals are never monotonous",
+    "Healthy snack options to suit a busy lifestyle",
+    "Meal prep ideas",
+    "Healthy shopping list",
+    "Delivered within 5–7 days of payment"
+  ]'::jsonb,
+  'Start coaching',
+  'online',
+  true
+),
+(
+  'online-gold-8week',
+  'Gold — 8 Week Plan',
+  '8 week plan',
+  399.99,
+  null,
+  null,
+  false,
+  '8 week plan with a tailor-made nutrition plan. Please allow 5–7 days upon receipt of payment to calculate, create and deliver.',
+  '[
+    "3, 4 or 5 day workout programme tailor made to your needs and abilities",
+    "BMR calculation",
+    "TDEE calculation",
+    "Macronutrient calculation and verification",
+    "Daily weigh-ins and data point analysis",
+    "Weekly photograph check-ins for transformation comparison",
+    "Weekly check-ins sent via WhatsApp video",
+    "Nutrition plan tailor made for specific requirements",
+    "All meals calorie specific with macronutrient breakdowns",
+    "Multiple meal options created so your meals are never monotonous",
+    "Healthy snack options to suit a busy lifestyle",
+    "Meal prep ideas",
+    "Healthy shopping list",
+    "Delivered within 5–7 days of payment"
+  ]'::jsonb,
+  'Start coaching',
+  'online',
+  true
+),
+(
+  'online-platinum-8week',
+  'Platinum — 8 Week Plan',
+  '8 week plan',
+  449.99,
+  null,
+  'FREE SHWAG KIT',
+  false,
+  '8 week plan with a tailor-made nutrition plan, plus a free SHWAG bundle (hoodie, t-shirt and cap). Please allow 5–7 days upon receipt of payment to calculate, create and deliver.',
+  '[
+    "3, 4 or 5 day workout programme tailor made to your needs and abilities",
+    "BMR calculation",
+    "TDEE calculation",
+    "Macronutrient calculation and verification",
+    "Daily weigh-ins and data point analysis",
+    "Weekly photograph check-ins for transformation comparison",
+    "Weekly check-ins sent via WhatsApp video",
+    "Nutrition plan tailor made for specific requirements",
+    "All meals calorie specific with macronutrient breakdowns",
+    "Multiple meal options created so your meals are never monotonous",
+    "Healthy snack options to suit a busy lifestyle",
+    "Meal prep ideas",
+    "Healthy shopping list",
+    "1 FREE SHWAG hoodie",
+    "1 FREE SHWAG t-shirt",
+    "1 FREE SHWAG baseball cap",
+    "Delivered within 5–7 days of payment"
+  ]'::jsonb,
+  'Start coaching',
+  'online',
+  true
+)
+on conflict (id) do update set
+  name = excluded.name,
+  tag = excluded.tag,
+  price = excluded.price,
+  original_price = excluded.original_price,
+  badge = excluded.badge,
+  is_popular = excluded.is_popular,
+  description = excluded.description,
+  features = excluded.features,
+  cta_text = excluded.cta_text,
+  kind = excluded.kind,
+  active = excluded.active;

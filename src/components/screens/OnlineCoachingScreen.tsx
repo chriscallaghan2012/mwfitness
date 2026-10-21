@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { ScreenId } from '../../types';
 import { ONLINE_COACHING } from '../../data/mockData';
-import { createCheckoutSession } from '../../lib/stripe';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { ArrowRight, Check, CreditCard, MessageCircle, Video } from 'lucide-react';
 
-interface OnlineCoachingScreenProps { onSelectScreen: (screen: ScreenId) => void; }
+// Package grid: three cards across on large screens; when the final row would
+// hold exactly two cards, those two split the row evenly (half and half).
+const planCardSpan = (index: number, total: number): string =>
+  total % 3 === 2 && index >= total - 2 ? 'lg:col-span-3' : 'lg:col-span-2';
 
-export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSelectScreen }) => {
-  const [loadingPlan, setLoadingPlan] = useState('');
-  const [error, setError] = useState('');
+interface OnlineCoachingScreenProps { onSelectScreen: (screen: ScreenId) => void; onCheckout: (plan: PublicPlan) => void; }
+
+export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSelectScreen, onCheckout }) => {
   const [plans, setPlans] = useState<PublicPlan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
   const [plansError, setPlansError] = useState<string | null>(null);
@@ -26,18 +28,6 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
     });
     return () => { active = false; };
   }, []);
-
-  const handleCheckout = async (planId: string) => {
-    setLoadingPlan(planId); setError('');
-    try {
-      const result = await createCheckoutSession(planId);
-      if (result.url) { window.location.assign(result.url); return; }
-      setError(result.error || 'Checkout is unavailable right now. Please contact Mike and he will help you get started.');
-    } catch (cause) {
-      console.error('[MW Fitness] Checkout request failed:', cause);
-      setError('Checkout is unavailable right now. Please contact Mike and he will help you get started.');
-    } finally { setLoadingPlan(''); }
-  };
 
   const formatPrice = (value: number) => `£${value.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const comparisonFeatures = Array.from(new Set(plans.flatMap((plan) => plan.features)));
@@ -65,13 +55,13 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
     </section>
     <section id="online-plans" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="border-b border-[#22252e] pb-4 mb-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ CHOOSE YOUR PLAN ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Online coaching packages.</h2><p className="text-sm text-zinc-400 mt-3">Compare the currently active plans. Package details and prices are managed by Mike in Staff HQ; secure checkout is available directly from each plan.</p></div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">{plans.map((plan) => <div key={plan.id} className={`bg-[#121419] border p-6 md:p-8 flex flex-col relative ${plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'}`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 items-stretch">{plans.map((plan, index) => <div key={plan.id} className={`bg-[#121419] border p-6 md:p-8 flex flex-col relative ${planCardSpan(index, plans.length)} ${plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]'}`}>
         {plan.badge && <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">{plan.badge}</span>}
         <div className="flex items-baseline justify-between gap-4"><div><h3 className="font-display text-3xl text-white uppercase">{plan.name}</h3><p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">{plan.tag}</p></div><div className="text-right"><div className="font-display text-4xl text-white">{formatPrice(plan.price)}</div>{plan.original_price !== null && <div className="text-xs font-mono text-zinc-500 line-through">{formatPrice(plan.original_price)}</div>}</div></div>
         <p className="text-sm text-zinc-400 leading-relaxed mt-4">{plan.description}</p><ul className="mt-5 space-y-2.5 text-sm text-zinc-300">{plan.features.map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}</ul>
-        <button onClick={() => handleCheckout(plan.id)} disabled={loadingPlan !== ''} className="mt-7 bg-[#ff5500] hover:bg-[#ff6a1f] disabled:opacity-60 text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2">{loadingPlan === plan.id ? 'Opening secure checkout…' : (plan.cta_text || 'Buy this plan')}{loadingPlan !== plan.id && <ArrowRight className="w-4 h-4" />}</button>
+        <button onClick={() => onCheckout(plan)} className="mt-7 bg-[#ff5500] hover:bg-[#ff6a1f] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2">{plan.cta_text || 'Buy this plan'}<ArrowRight className="w-4 h-4" /></button>
       </div>)}</div>
-      {plansLoading && <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p>}{!plansLoading && plansError && <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p>}{error && <div role="alert" className="mt-5 border border-red-500/50 bg-[#2a1414] text-red-300 px-4 py-3 text-sm font-mono">{error}</div>}
+      {plansLoading && <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p>}{!plansLoading && plansError && <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p>}
     </section>
     {plans.length > 0 && <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div className="border-b border-[#22252e] pb-4 mb-8"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT'S INCLUDED ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Compare your options.</h2></div><div className="overflow-x-auto border border-[#20232b] bg-[#121419]"><table className="w-full min-w-[560px] text-sm"><thead><tr className="border-b border-[#1b1e26] bg-[#16181d]"><th className="p-4 text-left text-xs font-mono text-zinc-400 uppercase tracking-wider">What's included</th>{plans.map((plan) => <th key={plan.id} className="p-4 text-center"><div className="font-display text-xl text-white uppercase">{plan.name}</div><div className="text-[11px] font-mono text-[#ff5500]">{formatPrice(plan.price)}</div></th>)}</tr></thead><tbody className="divide-y divide-[#1b1e26]">{comparisonFeatures.map((feature) => <tr key={feature}><td className="p-4 font-medium text-white">{feature}</td>{plans.map((plan) => <td key={plan.id} className="p-4 text-center">{plan.features.includes(feature) ? <Check className="inline w-4 h-4 text-emerald-400" /> : <span className="text-zinc-600">—</span>}</td>)}</tr>)}</tbody></table></div></section>}
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8"><div className="mw-electric-card mx-auto flex max-w-4xl flex-col items-center border border-[#2a2f3a] bg-[#121419] p-8 text-center md:p-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-2">[ QUESTIONS ]</div><h2 className="font-display text-3xl text-white uppercase">Need help choosing?</h2><p className="mx-auto max-w-xl text-sm text-zinc-400 mt-2">Contact Mike if you have a question about online coaching before buying.</p><button onClick={() => onSelectScreen('contact')} className="mt-6 inline-flex items-center justify-center gap-2 border border-[#ff5500] px-6 py-3.5 font-mono font-bold text-xs uppercase text-white hover:bg-[#ff5500] hover:text-black">Contact Mike <ArrowRight className="w-4 h-4" /></button></div></section>

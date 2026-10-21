@@ -1,13 +1,14 @@
 /**
- * MWFitnessUK — local email API server.
+ * MWFitnessUK — self-hosted server (Express).
  *
- * Run alongside `npm run dev` (two terminals):
- *   Terminal 1: npm run server   → http://localhost:8787/api/send-mail
- *   Terminal 2: npm run dev      → http://localhost:3000 (proxies /api to :8787)
- *
- * Also serves the built `dist/` on port 8787 for a quick prod check:
+ * Serves the built site + all API routes on one port:
  *   npm run build && PORT=8787 npm run server
+ *
+ * Loads .env automatically (DATABASE_URL, SMTP_*, STRIPE_*, PUBLIC_SITE_URL).
+ * The catch-all route serves dist/index.html for every non-/api path, so all
+ * SPA routes (/privacy, /cookies, /gdpr, /checkout, …) work without Vercel.
  */
+import 'dotenv/config';
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -56,10 +57,15 @@ app.post('/api/send-mail', async (req, res) => {
 app.post('/api/create-checkout', async (req, res) => {
   try {
     const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
-    const result = await createCheckoutSession({ planId: req.body?.planId, origin });
+    const result = await createCheckoutSession({
+      planId: req.body?.planId,
+      origin,
+      customerEmail: typeof req.body?.customerEmail === 'string' ? req.body.customerEmail.trim() : undefined,
+      customerName: typeof req.body?.customerName === 'string' ? req.body.customerName.trim() : undefined,
+    });
     res.json(result);
   } catch (err) {
-    const status = /Invalid|not configured|public site/i.test(err.message || '') ? 400 : 500;
+    const status = /Invalid|not configured|public site|keys are not present|no price ID/i.test(err.message || '') ? 400 : 500;
     res.status(status).json({ ok: false, error: err.message || 'Checkout could not be started.' });
   }
 });

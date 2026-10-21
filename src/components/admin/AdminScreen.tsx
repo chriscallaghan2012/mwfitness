@@ -273,15 +273,16 @@ export function AdminScreen() {
 
   useEffect(() => {
     if (!neon) return;
-    neon.auth
+    const client = neon;
+    client.auth
       .getSession({ query: {} })
       .then(async ({ data }) => {
-        const user = data.user;
+        const user = data?.user ?? null;
         if (!user) return;
-        const { data: profile, error } = await neon.from('profiles').select('role').eq('id', user.id).maybeSingle();
+        const { data: profile, error } = await client.from('profiles').select('role').eq('id', user.id).maybeSingle();
         const emailIsNamedAdmin = isAuthorisedAdminEmail(user.email);
         if (error || (profile?.role !== 'admin' && profile?.role !== 'coach') || (emailIsNamedAdmin && profile?.role !== 'admin')) {
-          await neon.auth.signOut({});
+          await client.auth.signOut({});
           return;
         }
         setEmail(user.email ?? '');

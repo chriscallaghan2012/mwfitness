@@ -1,15 +1,21 @@
 const PLAN_PRICE_ENV = {
   'online-weekly': 'STRIPE_PRICE_ONLINE_WEEKLY',
   'online-12-week': 'STRIPE_PRICE_ONLINE_12_WEEK',
+  'online-4-week-once': 'STRIPE_PRICE_ONLINE_4_WEEK_ONCE',
+  'online-bronze-4week': 'STRIPE_PRICE_ONLINE_BRONZE_4WEEK',
+  'online-silver-8week': 'STRIPE_PRICE_ONLINE_SILVER_8WEEK',
+  'online-gold-8week': 'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
+  'online-platinum-8week': 'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
 };
 
-export async function createCheckoutSession({ planId, origin }) {
+export async function createCheckoutSession({ planId, origin, customerEmail, customerName }) {
   const priceEnv = PLAN_PRICE_ENV[planId];
   if (!priceEnv) throw new Error('Invalid coaching plan.');
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const priceId = process.env[priceEnv];
-  if (!secretKey || !priceId) throw new Error('Stripe checkout is not configured yet.');
+  if (!secretKey) throw new Error('Stripe keys are not present on the server (STRIPE_SECRET_KEY is missing). Payments are not live yet.');
+  if (!priceId) throw new Error(`Stripe keys are present, but no price ID is configured for this plan yet (${priceEnv}).`);
 
   const baseUrl = origin || process.env.PUBLIC_SITE_URL;
   if (!baseUrl) throw new Error('The public site URL is not configured.');
@@ -22,6 +28,8 @@ export async function createCheckoutSession({ planId, origin }) {
     cancel_url: `${baseUrl}/#online-coaching?checkout=cancelled`,
     'metadata[plan_id]': planId,
   });
+  if (customerEmail) params.set('customer_email', customerEmail);
+  if (customerName) params.set('metadata[customer_name]', customerName);
 
   const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
