@@ -70,7 +70,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
   };
 
   const inputClass =
-    'w-full bg-[#16181d] border border-[#262930] text-zinc-200 px-4 py-3 text-sm font-sans focus:outline-none focus:border-[#ff5500] placeholder:text-zinc-600';
+    'w-full bg-[#16181d] border border-[#262930] text-zinc-100 px-4 py-3 text-sm font-sans focus:outline-none focus:border-[#ff5500] placeholder:text-zinc-400 placeholder:opacity-100';
 
   return (
     <div className="page-layout">
@@ -163,7 +163,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
 
       {/* 4. ORDER ENQUIRY */}
       <section id="swag-order-enquiry" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="bg-[#121419] border border-[#242833] p-8 md:p-10">
+        <div className="bg-[#121419] border border-[#242833] p-8 text-center md:p-10">
           {done ? (
             <div className="space-y-5 text-center py-6 animate-in zoom-in-95 duration-200">
               <div className="w-16 h-16 bg-[#181d19] border border-emerald-500 mx-auto flex items-center justify-center text-emerald-400">
@@ -195,11 +195,11 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-2">
                 GET YOUR SHWAG
               </h2>
-              <p className="text-sm font-sans text-zinc-400 leading-relaxed mb-6">
+              <p className="mx-auto max-w-xl text-sm font-sans text-zinc-400 leading-relaxed mb-6">
                 Interested in a piece? Drop your details and which item you're after, and we'll sort the rest.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-4 text-left">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">Your name *</label>
