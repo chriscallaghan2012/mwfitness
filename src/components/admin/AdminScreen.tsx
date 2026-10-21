@@ -587,7 +587,6 @@ export function AdminScreen() {
       {demoMode && tab === 'overview' && (
         <div className="space-y-5">
           <div className="relative overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-br from-[#21170f] via-[#15171b] to-[#111216] p-6 sm:p-8">
-            <div className="pointer-events-none absolute -right-10 -top-20 h-64 w-64 rounded-full bg-orange-500/10 blur-3xl" />
             <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-orange-300">Coach workspace · sandbox</p>

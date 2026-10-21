@@ -371,7 +371,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       {/* CLOSING CTA */}
       <section className="mx-auto w-full max-w-7xl px-4 pb-16 pt-4 sm:px-6 md:pb-20 lg:px-8">
         <div className="mw-electric-card relative mx-auto flex w-full max-w-4xl flex-col items-center overflow-hidden border border-[#2a2f3a] bg-gradient-to-b from-[#171920] to-[#121418] px-5 py-8 text-center sm:px-8 md:py-10">
-          <div className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 rounded-full bg-[#ff5500]/10 blur-3xl"></div>
           <div className="relative w-full max-w-2xl space-y-3">
             <div className="inline-flex items-center justify-center gap-2 text-xs font-mono uppercase tracking-widest text-[#ff5500]">
               <span className="h-2 w-2 bg-[#ff5500]"></span>
