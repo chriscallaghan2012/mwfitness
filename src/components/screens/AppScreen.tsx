@@ -40,9 +40,10 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
       {/* 1. HERO */}
       <section className="page-hero relative min-h-[40vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[#0b0c0e]"></div>
-          <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
-          <div className="absolute -right-20 -top-20 w-96 h-96 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <img src="/images/main-hero.jpg" alt="MWFitnessUK training floor" className="h-full w-full object-cover object-center brightness-60 contrast-125" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e] via-[#0b0c0e]/60 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0b0c0e] via-[#0b0c0e]/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-grid-pattern opacity-40"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full">
@@ -102,7 +103,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
 
       {/* 3. WAITLIST */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="bg-[#121419] border border-[#242833] p-8 md:p-10">
+        <div className="bg-[#121419] border border-[#242833] p-8 md:p-10 text-center">
           {done ? (
             <div className="space-y-5 text-center py-6 animate-in zoom-in-95 duration-200">
               <div className="w-16 h-16 bg-[#181d19] border border-emerald-500 mx-auto flex items-center justify-center text-emerald-400">
@@ -144,11 +145,11 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
               <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-2">
                 BE FIRST IN
               </h2>
-              <p className="text-sm font-sans text-zinc-400 leading-relaxed mb-6">
+              <p className="mx-auto max-w-xl text-sm font-sans text-zinc-400 leading-relaxed mb-6">
                 Leave your details and we'll email you as soon as the app goes live. No spam, just the good stuff.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="mx-auto w-full max-w-xl space-y-4 text-left">
                 <div>
                   <label className="block text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">Your name *</label>
                   <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Alex" required className={inputClass} />

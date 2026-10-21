@@ -77,9 +77,10 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
       {/* 1. HERO */}
       <section className="page-hero relative min-h-[40vh] flex items-center justify-center overflow-hidden border-b border-[#262930]">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[#0b0c0e]"></div>
-          <div className="absolute inset-0 bg-dots-pattern opacity-60"></div>
-          <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <img src="/images/main-hero.jpg" alt="MWFitnessUK training floor" className="h-full w-full object-cover object-center brightness-60 contrast-125" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e] via-[#0b0c0e]/60 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0b0c0e] via-[#0b0c0e]/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-grid-pattern opacity-40"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full">
