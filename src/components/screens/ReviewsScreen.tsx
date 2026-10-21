@@ -11,7 +11,7 @@ export const ReviewsScreen: React.FC<ReviewsScreenProps> = ({ onSelectScreen }) 
   const items: Review[] = REVIEWS;
   return <div className="page-layout">
     <section className="page-hero relative min-h-[40vh] flex items-center overflow-hidden border-b border-[#262930]">
-      <div className="absolute inset-0 bg-grid-pattern opacity-30" /><div className="absolute -right-20 -top-24 h-96 w-96 rounded-full bg-[#ff5500]/10 blur-3xl" />
+      <div className="absolute inset-0 z-0"><img src="/images/main-hero.jpg" alt="MWFitnessUK training floor" className="h-full w-full object-cover object-center brightness-60 contrast-125" /><div className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e] via-[#0b0c0e]/60 to-transparent" /><div className="absolute inset-0 bg-gradient-to-r from-[#0b0c0e] via-[#0b0c0e]/40 to-transparent" /><div className="absolute inset-0 bg-grid-pattern opacity-40" /></div>
       <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[minmax(0,1fr)_500px] lg:px-8"><div className="w-full max-w-3xl space-y-6">
         <div className="mb-5 inline-flex items-center gap-2 border border-[#ff5500]/60 bg-[#16181e]/90 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Star className="h-3.5 w-3.5" /> Member stories</div>
         <h1 className="font-display text-5xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-7xl">Progress looks<br /><span className="text-[#ff5500]">different on everyone.</span></h1>
