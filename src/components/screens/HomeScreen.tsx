@@ -354,9 +354,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               {['Daily weigh-ins and progress history','Food logging and nutrition habits','Training sessions and lift tracking','Progress photos, measurements and coach check-ins'].map((item) => <li key={item} className="flex items-start gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" />{item}</li>)}
             </ul>
             <button onClick={() => onSelectScreen('app')} className="cursor-pointer inline-flex items-center gap-2 border border-[#ff5500] px-5 py-3 font-mono text-xs font-bold uppercase text-white transition-colors hover:bg-[#ff5500] hover:text-black">Explore the app <ArrowRight className="h-4 w-4" /></button>
-            <div className="space-y-3 pt-2">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Store listings will link here once published</p>
-              <StoreBadges />
+            <div className="mx-auto w-full max-w-[360px] space-y-2 pt-1">
+              <p className="text-left font-mono text-[10px] uppercase tracking-widest text-zinc-500">Store listings will link here once published</p>
+              <StoreBadges stacked />
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
