@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { APP_FEATURES, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { Smartphone, CheckCircle, ArrowRight, Scale, TrendingUp, Utensils, Dumbbell, Instagram, PhoneCall } from 'lucide-react';
+import { StoreBadges } from '../StoreBadges';
 
 interface AppScreenProps {
   onOpenBookCall?: () => void;
@@ -46,7 +47,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full">
-          <div className="max-w-3xl space-y-6 text-center mx-auto">
+          <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
               <span>[ COMING SOON ]</span>
@@ -59,13 +60,17 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
               Everything you need to stay on track, in one place. Weigh-ins, progress, food and training — all simple, all in your pocket. It's being built right now.
             </p>
 
             <div className="inline-flex items-center gap-2 bg-[#14161d] border border-emerald-500/40 px-3.5 py-2.5 font-mono text-xs text-emerald-300">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               Currently in development — join the waitlist to be first in
+            </div>
+            <div className="mt-6 space-y-3">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
+              <StoreBadges />
             </div>
           </div>
         </div>
