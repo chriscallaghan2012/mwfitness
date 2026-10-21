@@ -5,11 +5,6 @@ import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, Graduatio
 import { StoreBadges } from '../StoreBadges';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 
-// Package grid: three cards across on large screens; when the final row would
-// hold exactly two cards, those two split the row evenly (half and half).
-const planCardSpan = (index: number, total: number): string =>
-  total % 3 === 2 && index >= total - 2 ? 'lg:col-span-3' : 'lg:col-span-2';
-
 interface HomeScreenProps {
   onSelectScreen: (screen: ScreenId) => void;
   onOpenBookCall: (interest?: string) => void;
@@ -286,29 +281,44 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <span>Compare all plan details</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 items-stretch">
-          {plans.map((plan, index) => (
-            <article key={plan.id} className={'mw-electric-card bg-[#121419] border p-6 md:p-7 flex flex-col relative transition-all duration-300 ' + planCardSpan(index, plans.length) + ' ' + (plan.is_popular ? 'border-[#ff5500] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b]')}>
-              {plan.badge && <span className="absolute top-0 right-0 bg-[#ff5500] text-black font-mono text-[10px] uppercase px-3 py-1.5 font-bold">{plan.badge}</span>}
-              <div className="flex items-start justify-between gap-4">
-                <div><h3 className="font-display text-3xl text-white uppercase">{plan.name}</h3><p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">{plan.tag}</p></div>
-                <div className="text-right shrink-0">
-                  <div className="font-display text-3xl text-white">£{plan.price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+        {(() => {
+          const oneOff = plans.find((plan) => plan.id === 'online-4-week-once');
+          const tiers = plans.filter((plan) => plan.id !== 'online-4-week-once');
+          const featureList = Array.from(new Set(plans.flatMap((plan) => plan.features)));
+          const renderFeature = (plan: PublicPlan, feature: string) => {
+            const included = plan.features.includes(feature);
+            return <li key={feature} className="flex min-h-9 items-start gap-2.5 text-sm leading-relaxed">
+              {included ? <Check aria-label="Included" className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" /> : <span aria-label="Not included" className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-zinc-500"><span aria-hidden="true" className="text-base leading-none">×</span></span>}
+              <span className={included ? 'text-zinc-200' : 'text-zinc-400'}>{feature}</span>
+            </li>;
+          };
+          const renderCard = (plan: PublicPlan, featured = false) => (
+            <article key={plan.id} className={'mw-electric-card relative flex h-full flex-col border p-6 transition-all duration-300 md:p-7 ' + (featured ? 'border-[#ff5500]/70 bg-gradient-to-br from-[#1c1714] via-[#121419] to-[#121419] shadow-[0_0_28px_rgba(255,85,0,0.10)]' : plan.is_popular ? 'border-[#ff5500] bg-[#151419] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'border-[#20232b] bg-[#121419]')}>
+              {(plan.badge || plan.is_popular || featured) && <span className="absolute right-0 top-0 bg-[#ff5500] px-3 py-1.5 font-mono text-[10px] font-bold uppercase text-black">{plan.badge || (featured ? 'One-off coaching' : 'Most popular')}</span>}
+              <div className={'flex min-h-[6.5rem] flex-col justify-between gap-3 pr-2 ' + (featured ? 'md:flex-row md:items-center' : '')}>
+                <div className="min-w-0">
+                  <h3 className="min-h-[2.4rem] font-display text-2xl uppercase leading-tight text-white md:text-3xl">{plan.name}</h3>
+                  <p className="mt-1 min-h-4 text-xs font-mono uppercase tracking-wider text-zinc-500">{plan.tag}</p>
+                </div>
+                <div className={featured ? 'shrink-0 md:text-right' : 'shrink-0'}>
+                  <div className="font-display text-3xl text-white md:text-4xl">£{plan.price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                   {plan.original_price !== null && <div className="text-xs font-mono text-zinc-500 line-through">£{plan.original_price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>}
                 </div>
               </div>
-              <p className="text-sm text-zinc-400 leading-relaxed mt-4">{plan.description}</p>
-              <ul className="mt-5 space-y-2.5 text-sm text-zinc-300">
-                {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#ff5500] shrink-0 mt-0.5" /><span>{feature}</span></li>)}
-              </ul>
-              <button onClick={() => onCheckout(plan)} className="cursor-pointer mt-7 bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 flex items-center justify-center gap-2 transition-all">
-                View plan &amp; checkout <ArrowRight className="w-4 h-4" />
+              <p className={'mt-4 text-sm leading-relaxed text-zinc-400 ' + (featured ? 'max-w-4xl md:min-h-10' : 'min-h-[4.5rem]')}>{plan.description}</p>
+              <ul className={'mt-5 grid flex-1 content-start gap-y-2.5 ' + (featured ? 'grid-cols-1 md:grid-cols-2 md:gap-x-8' : 'grid-cols-1')}>{featureList.map((feature) => renderFeature(plan, feature))}</ul>
+              <button onClick={() => onCheckout(plan)} className="mt-auto flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-3.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
+                Book Now <ArrowRight className="h-4 w-4" />
               </button>
             </article>
-          ))}
-        </div>
-        {plansLoading && <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p>}
-        {!plansLoading && plansError && <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p>}
+          );
+          return <div className="space-y-6">
+            {oneOff && <div className="grid grid-cols-1">{renderCard(oneOff, true)}</div>}
+            <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 xl:grid-cols-4">{tiers.map((plan) => renderCard(plan, false))}</div>
+          </div>;
+        })()}
+        {plansLoading && <p className="mt-4 text-sm text-zinc-400">Loading current online plans…</p>}
+        {!plansLoading && plansError && <p role="status" className="mt-4 text-sm text-zinc-400">{plansError}</p>}
       </section>
       {/* TESTIMONIALS */}
       <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
