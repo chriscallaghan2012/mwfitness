@@ -145,7 +145,8 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
                 We're here to remind you that greatness isn't achieved overnight — it's built through the small decisions you make every day, the effort you put in when nobody is watching, and the support you give and receive along the way.
               </p>
               <p className="text-base font-sans text-white font-semibold leading-relaxed border-t border-[#20232b] pt-5">
-                Together, we train stronger, think stronger, live stronger, and achieve more. <span className="text-[#ff5500]">Solid Hard Work Achieves Greatness — not just in the gym, but in life.</span>
+                Together, we train stronger, think stronger, live stronger, and achieve more.
+                <span className="relative mt-2 block text-[#ff5500]">Solid Hard Work Achieves Greatness — not just in the gym, but in life.</span>
               </p>
             </div>
 
@@ -192,16 +193,16 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               </div>
             </article>
           )) : COMING_SOON.map(({ id, name, tagline, Icon }) => (
-            <article key={id} className="bg-[#121419] border border-[#20232b] p-5 flex flex-col">
-              <div className="relative aspect-square bg-[#16181d] border border-[#262930] flex items-center justify-center mb-4 overflow-hidden">
+            <article key={id} className="bg-[#121419] border border-[#20232b] p-5 flex flex-col items-center text-center">
+              <div className="relative aspect-square w-full bg-[#16181d] border border-[#262930] flex items-center justify-center mb-4 overflow-hidden">
                 <Icon className="w-12 h-12 text-[#ff5500]/40" />
-                <span className="absolute top-2 right-2 border border-[#ff5500]/50 bg-[#16181d]/90 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[#ff5500]">Coming soon</span>
               </div>
               <h3 className="font-display text-xl text-white uppercase tracking-wider mb-1">{name}</h3>
               <p className="text-sm text-zinc-400 leading-relaxed mb-3">{tagline}</p>
-              <p className="font-mono text-lg text-zinc-500 mb-2">Price TBC</p>
+              <span className="mb-3 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-[#ff5500]">Coming soon</span>
+              <p className="font-mono text-lg text-zinc-500 mb-1">Price TBC</p>
               <p className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mb-4">Launching with the first SHWAG drop</p>
-              <div className="mt-auto">
+              <div className="mt-auto w-full">
                 <button type="button" disabled className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 border border-zinc-700 px-4 py-3 text-xs font-mono font-bold uppercase text-zinc-500 opacity-70">Coming soon</button>
               </div>
             </article>
