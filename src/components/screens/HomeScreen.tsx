@@ -67,8 +67,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           <div className="absolute inset-0 bg-grid-pattern opacity-40"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 w-full">
-          <div className="max-w-3xl space-y-6">
+        <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_220px] lg:px-8">
+          <div className="w-full max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
               <span>Welcome to MWFitnessUK</span>
@@ -125,11 +125,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </span>
             </div>
           </div>
-        </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       
-      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
-        <StoreBadges compact />
+      <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-end">
+          <div className="w-full max-w-[220px]"><StoreBadges compact stacked /></div>
+        </div>
       </div>
     </section>
 
@@ -163,6 +163,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
               MEET MIKE. YOUR ONLINE COACH.
             </h2>
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">I’m Mike, and I help busy people build strength, confidence and healthier routines through practical online coaching. Your plan is shaped around your goals, your schedule and real life — with clear training and nutrition guidance, plus support to help you stay consistent.</p>
             <div aria-hidden="true" className="industrial-stripe industrial-stripe--marker" />
           </div>
           <button onClick={() => onOpenBookCall()}
