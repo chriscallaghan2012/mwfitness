@@ -307,23 +307,35 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
       {/* TESTIMONIALS */}
       <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[#22252e] pb-5 sm:flex-row sm:items-end">
-          <div><div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2><p className="mt-3 max-w-xl text-sm text-zinc-400">Stories from people building stronger routines with support that fits around real life.</p></div>
-          <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
-        </div>
-        <div className="mw-electric-card overflow-hidden border border-[#252a34] bg-[#121419] p-6 sm:p-9" onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
-          <div className="mb-6 flex items-center justify-between"><div className="flex gap-1.5">{renderStars(5)}</div><span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Member stories · auto-moving</span></div>
-          <div className="overflow-hidden">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
-              {orderedTestimonials.map((t) => <article key={t.id} className="min-w-0 px-1 transition-all duration-700 ease-in-out md:px-0">
-                <div className="mb-4 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center border border-[#ff5500] bg-[#ff5500]/10 font-display text-sm font-bold text-white">{t.avatarText}</div><div><p className="font-display text-xl uppercase text-white">{t.name}</p><p className="font-mono text-[10px] uppercase tracking-wider text-[#ff5500]">{t.metric}</p></div></div>
-                <p className="max-w-4xl text-lg leading-relaxed text-zinc-200 sm:text-2xl">“{t.quote}”</p><p className="mt-5 font-mono text-[10px] uppercase tracking-widest text-zinc-500">{t.programme}</p>
-              </article>)}
-            </div>
+        <div className="mb-8 border-b border-[#22252e] pb-5">
+          <div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div>
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2>
+            <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
           </div>
-          <div className="mt-8 flex items-center justify-between border-t border-[#252a34] pt-5">
-            <div className="flex items-center gap-2">{TESTIMONIALS.map((t, index) => <button key={t.id} aria-label={`Show review ${index + 1}`} aria-current={reviewIndex === index ? 'true' : undefined} onClick={() => setReviewIndex(index)} className={`h-1.5 cursor-pointer rounded-full transition-all ${reviewIndex === index ? 'w-8 bg-[#ff5500]' : 'w-3 bg-zinc-700 hover:bg-zinc-500'}`} />)}</div>
-            <div className="flex gap-2"><button aria-label="Previous review" onClick={() => setReviewIndex((index) => (index - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronLeft className="h-4 w-4" /></button><button aria-label="Next review" onClick={() => setReviewIndex((index) => (index + 1) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronRight className="h-4 w-4" /></button></div>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Mike believes fitness should fit around real life. His online coaching focuses on practical training, straightforward nutrition and consistent support — helping people build confidence, find a routine that works for them and make progress they can maintain.</p>
+        </div>
+        <div onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+            {orderedTestimonials.slice(0, 3).map((t) => <article key={t.id} className="mw-electric-card min-w-0 border border-[#252a34] bg-[#121419]/70 p-5 sm:p-6">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="flex gap-1">{renderStars(5)}</div>
+                <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">Member review</span>
+              </div>
+              <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">“{t.quote}”</p>
+              <div className="mt-5 flex items-center gap-3 border-t border-[#252a34] pt-4">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-[#ff5500]/70 bg-[#ff5500]/10 font-display text-xs font-bold text-white">{t.avatarText}</div>
+                <div className="min-w-0">
+                  <p className="truncate font-display text-base uppercase text-white">{t.name}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-wider text-[#ff5500]">{t.metric}</p>
+                  <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-zinc-500">{t.programme}</p>
+                </div>
+              </div>
+            </article>)}
+          </div>
+          <div className="mt-5 flex items-center justify-between">
+            <div className="flex items-center gap-2">{TESTIMONIALS.map((t, index) => <button key={t.id} aria-label={`Show review set starting at review ${index + 1}`} aria-current={reviewIndex === index ? 'true' : undefined} onClick={() => setReviewIndex(index)} className={`h-1.5 cursor-pointer rounded-full transition-all ${reviewIndex === index ? 'w-8 bg-[#ff5500]' : 'w-3 bg-zinc-700 hover:bg-zinc-500'}`} />)}</div>
+            <div className="flex gap-2"><button aria-label="Previous reviews" onClick={() => setReviewIndex((index) => (index - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronLeft className="h-4 w-4" /></button><button aria-label="Next reviews" onClick={() => setReviewIndex((index) => (index + 1) % TESTIMONIALS.length)} className="cursor-pointer border border-[#353a45] p-2 text-zinc-300 transition-colors hover:border-[#ff5500] hover:text-white"><ChevronRight className="h-4 w-4" /></button></div>
           </div>
         </div>
       </section>
