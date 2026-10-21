@@ -18,10 +18,11 @@ export const ReviewsScreen: React.FC<ReviewsScreenProps> = ({ onSelectScreen }) 
         <h1 className="font-display text-5xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-7xl">Progress looks<br /><span className="text-[#ff5500]">different on everyone.</span></h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg">Read the stories and feedback shared by people working towards stronger, healthier routines with MWFitnessUK.</p>
         <button onClick={() => onSelectScreen('online-coaching')} className="mt-7 inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-6 py-3.5 font-mono text-xs font-bold uppercase text-black">Find your plan <ArrowRight className="h-4 w-4" /></button>
-      </div></div>
+      </div>
     
       <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-end">
         <div className="w-full max-w-[220px]"><StoreBadges compact stacked /></div>
+      </div>
       </div>
     </section>
     <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8 md:py-20">
