@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SHWAG, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { Shirt, CheckCircle, ArrowRight, Sparkles, ExternalLink, Instagram } from 'lucide-react';
+import { StoreBadges } from '../StoreBadges';
 
 type SwagProduct = { id: string; slug: string; name: string; description: string; category: string; price: number; compare_at_price: number | null; image_url: string; product_url: string; sizes: string[]; stock_status: string };
 const FALLBACK_PRODUCTS: SwagProduct[] = SHWAG.products.map((product, index) => ({
@@ -98,7 +99,11 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
             </p>
           </div>
         </div>
-      </section>
+      
+      <div className="relative z-20 mx-auto mt-2 flex w-full max-w-7xl justify-center px-4 pb-6 sm:px-6 lg:absolute lg:bottom-5 lg:right-8 lg:mx-0 lg:mt-0 lg:w-auto lg:justify-end lg:px-0 lg:pb-0">
+        <StoreBadges compact />
+      </div>
+    </section>
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
