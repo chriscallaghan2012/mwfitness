@@ -20,6 +20,7 @@ import { MemberActivityAdmin } from './MemberActivityAdmin';
 import { CommunicationsAdmin } from './CommunicationsAdmin';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
+import { isAuthorisedAdminEmail } from '../../lib/adminEmails';
 
 type Tab = 'overview' | 'users' | 'client-records' | 'plans' | 'memberships' | 'nutrition' | 'workouts' | 'programmes' | 'videos' | 'checkins' | 'progress' | 'messages' | 'leads' | 'member-activity' | 'communications';
 
@@ -42,9 +43,6 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 type DemoTab = Exclude<Tab, 'overview'>;
-
-const AUTHORISED_ADMIN_EMAILS = new Set(['instantonlinesuccess@gmail.com', 'mwfitnessukonline@gmail.com']);
-const isAuthorisedAdminEmail = (email: string | null | undefined) => AUTHORISED_ADMIN_EMAILS.has(String(email || '').trim().toLowerCase());
 
 const DEMO_TABLES: Record<DemoTab, { columns: { key: string; label: string }[]; rows: Row[] }> = {
   users: {

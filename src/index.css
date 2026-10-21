@@ -11,6 +11,9 @@
   --color-brand-card: #16181d;
   --color-brand-border: #262930;
   --color-brand-muted: #8b929e;
+  /* Lifted zinc-500 (default ≈ #71717b ≈ 3.9:1 on #0b0c0e) for readability —
+     #8f8f9a ≈ 5.7:1 contrast on the dark background while staying muted. */
+  --color-zinc-500: #8f8f9a;
 }
 
 @layer base {
@@ -91,6 +94,24 @@ section[id] {
 button,
 a {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Link hover: TEXT COLOUR ONLY — brand orange links turn white, white/light
+   links turn orange. Background/border effects are reserved for buttons.
+   The :not([class*="hover:"]) guards keep per-element Tailwind hover utilities
+   (which are the intended orange-on-light behaviour) in control. ── */
+a[class*="text-[#ff5500]"]:not([class*="hover:"]):hover,
+a[class*="text-[#ff7547]"]:not([class*="hover:"]):hover,
+a[class*="text-orange-"]:not([class*="hover:"]):hover {
+  color: #ffffff;
+}
+
+a.text-white:not([class*="hover:"]):hover,
+a.text-zinc-300:not([class*="hover:"]):hover,
+a.text-zinc-400:not([class*="hover:"]):hover,
+a.text-zinc-500:not([class*="hover:"]):hover,
+a.text-zinc-600:not([class*="hover:"]):hover {
+  color: #ff5500;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -221,6 +242,7 @@ article::after,
     transparent 330deg,
     transparent 360deg
   );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -334,6 +356,7 @@ a[class*="bg-orange-500"]:hover {
     transparent 330deg,
     transparent 360deg
   );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -408,6 +431,7 @@ a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):no
     transparent 330deg,
     transparent 360deg
   );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
