@@ -124,15 +124,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <span className="w-1.5 h-1.5 bg-emerald-400"></span> {CONTACT.sessions}
               </span>
             </div>
+            <div className="mt-6 space-y-3">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
+              <StoreBadges />
+            </div>
           </div>
-        </div>
-        <div className="absolute right-6 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-end gap-3 xl:flex 2xl:right-[max(3rem,calc((100vw-80rem)/2))]">
-          <p className="text-right font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
-          <StoreBadges />
-        </div>
-        <div className="absolute bottom-8 left-4 right-4 z-20 flex flex-col items-center gap-2 xl:hidden sm:left-6 sm:right-6">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
-          <StoreBadges />
         </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       </section>
