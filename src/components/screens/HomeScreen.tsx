@@ -249,7 +249,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
       {/* HOW IT WORKS */}
       <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-[#22252e] pb-4 mb-10 text-center">
+        <div className="border-b border-[#22252e] pb-4 mb-10">
           <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
             [ HOW IT WORKS ]
           </div>
@@ -345,7 +345,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       {/* THE APP */}
       <section className="home-app-section relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
         <div className="absolute inset-0 bg-grid-pattern opacity-20" />
-        <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#ff5500]/10 blur-3xl" />
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
           <div className="space-y-5 pt-2 lg:pt-8">
             <div className="inline-flex items-center gap-2 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Smartphone className="h-4 w-4" /> Your training, in your pocket</div>
@@ -366,8 +365,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               { icon: TrendingUp, title: 'Progress tracking', text: 'Keep measurements, photos and milestones together.' },
               { icon: Utensils, title: 'Food & nutrition', text: 'Log meals and build awareness of everyday habits.' },
               { icon: Dumbbell, title: 'Training log', text: 'Keep workouts and performance moving forward.' },
-            ].map(({ icon: Icon, title, text }) => <div key={title} className="mw-electric-card border border-[#252a34] bg-[#15171d]/90 p-5">
-              <div className="mb-4 flex h-10 w-10 items-center justify-center border border-[#ff5500]/60 bg-[#ff5500]/10 text-[#ff5500]"><Icon className="h-5 w-5" /></div><h3 className="mb-2 font-display text-xl uppercase text-white">{title}</h3><p className="text-sm leading-relaxed text-zinc-400">{text}</p>
+            ].map(({ icon: Icon, title, text }) => <div key={title} className="mw-electric-card border border-[#252a34] bg-[#15171d]/90 p-5 text-center">
+              <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center border border-[#ff5500]/60 bg-[#ff5500]/10 text-[#ff5500]"><Icon className="h-5 w-5" /></div><h3 className="mb-2 font-display text-xl uppercase text-white">{title}</h3><p className="text-sm leading-relaxed text-zinc-400">{text}</p>
             </div>)}
           </div>
         </div>
