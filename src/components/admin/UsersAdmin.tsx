@@ -1,9 +1,10 @@
 // UsersAdmin — customers and coaches backed by Neon Auth and the shared profiles table.
 import { useEffect, useState } from 'react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
 export function UsersAdmin({ onOpenProfile }: { onOpenProfile: (profileId: string) => void }) {
+  const db = adminDb();
   const [users, setUsers] = useState<Row[] | null>(null);
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
@@ -12,13 +13,13 @@ export function UsersAdmin({ onOpenProfile }: { onOpenProfile: (profileId: strin
   const [addOpen, setAddOpen] = useState(false);
 
   const load = async () => {
-    if (!neon) {
+    if (!db) {
       setMsg('Neon is not configured; user records cannot be loaded.');
       setUsers([]);
       return;
     }
     try {
-      const { data, error } = await neon.from('profiles').select('*').order('created_at');
+      const { data, error } = await db.from('profiles').select('*').order('created_at');
       if (error) {
         setMsg(`Could not load users: ${error.message}`);
         return;
@@ -35,7 +36,7 @@ export function UsersAdmin({ onOpenProfile }: { onOpenProfile: (profileId: strin
 
   const saveEdit = async () => {
     if (!edit) return;
-    if (!neon) {
+    if (!db) {
       setMsg('Neon is not configured; profile changes cannot be saved.');
       return;
     }
@@ -57,7 +58,7 @@ export function UsersAdmin({ onOpenProfile }: { onOpenProfile: (profileId: strin
         return;
       }
       payload.full_name = String(f.full_name).trim();
-      const result = await neon.from('profiles').update(payload).eq('id', edit.id).select('id');
+      const result = await db.from('profiles').update(payload).eq('id', edit.id).select('id');
       if (result.error) {
         setMsg(`Save failed: ${result.error.message}`);
         return;

@@ -1,9 +1,10 @@
 // CheckinsAdmin + ProgressAdmin — coach review of check-ins and weight logs.
 import { useEffect, useRef, useState } from 'react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, ShortDate, StatusPill, btn, btnGhost, inp } from './fields';
 
 export function CheckinsAdmin() {
+  const db = adminDb();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [checkinMsg, setCheckinMsg] = useState('');
   useEffect(() => {
@@ -11,9 +12,9 @@ export function CheckinsAdmin() {
   }, []);
 
   const load = async () => {
-    if (!neon) { setRows([]); setCheckinMsg('Neon is not configured; check-ins cannot be loaded.'); return; }
+    if (!db) { setRows([]); setCheckinMsg('Neon is not configured; check-ins cannot be loaded.'); return; }
     try {
-      const { data, error } = await neon.from('checkins').select('*, profiles(full_name,email)').order('checkin_date', { ascending: false });
+      const { data, error } = await db.from('checkins').select('*, profiles(full_name,email)').order('checkin_date', { ascending: false });
       if (error) setCheckinMsg('Could not load check-ins: ' + error.message);
       else { setRows((data ?? []) as Row[]); setCheckinMsg(''); }
     } catch (error) {
@@ -24,9 +25,9 @@ export function CheckinsAdmin() {
   const review = async (r: Row) => {
     const notes = window.prompt('Coach notes for this check-in', String(r.coach_notes ?? ''));
     if (notes === null) return;
-    if (!neon) { setCheckinMsg('Neon is not configured; check-ins cannot be updated.'); return; }
+    if (!db) { setCheckinMsg('Neon is not configured; check-ins cannot be updated.'); return; }
     try {
-      const result = await neon.from('checkins').update({ status: 'reviewed', coach_notes: notes || null, coach_prescription: notes || null }).eq('id', r.id).select('id');
+      const result = await db.from('checkins').update({ status: 'reviewed', coach_notes: notes || null, coach_prescription: notes || null }).eq('id', r.id).select('id');
       if (result.error) { setCheckinMsg('Could not save review: ' + result.error.message); return; }
       if (!result.data?.length) { setCheckinMsg('The check-in was not updated. It may no longer exist or your staff permissions may not allow this change.'); return; }
       setCheckinMsg('Check-in review saved.');
@@ -37,9 +38,9 @@ export function CheckinsAdmin() {
   };
 
   const remove = async (id: string) => {
-    if (!neon) { setCheckinMsg('Neon is not configured; check-ins cannot be deleted.'); return; }
+    if (!db) { setCheckinMsg('Neon is not configured; check-ins cannot be deleted.'); return; }
     try {
-      const result = await neon.from('checkins').delete().eq('id', id).select('id');
+      const result = await db.from('checkins').delete().eq('id', id).select('id');
       if (result.error) { setCheckinMsg('Could not delete check-in: ' + result.error.message); return; }
       if (!result.data?.length) { setCheckinMsg('The check-in was not deleted. It may already be gone or your staff permissions may not allow this change.'); return; }
       setCheckinMsg('Check-in deleted.');
@@ -89,6 +90,7 @@ export function CheckinsAdmin() {
 }
 
 export function ProgressAdmin() {
+  const db = adminDb();
   const [users, setUsers] = useState<Row[]>([]);
   const [rows, setRows] = useState<Row[] | null>(null);
   const [userId, setUserId] = useState('');
@@ -98,8 +100,8 @@ export function ProgressAdmin() {
   const loadRequest = useRef(0);
 
   useEffect(() => {
-    if (!neon) { setMsg('Neon is not configured; progress records cannot be loaded.'); return; }
-    void neon.from('profiles').select('id,full_name').order('full_name').then(({ data, error }) => {
+    if (!db) { setMsg('Neon is not configured; progress records cannot be loaded.'); return; }
+    void db.from('profiles').select('id,full_name').order('full_name').then(({ data, error }) => {
       if (error) setMsg(`Could not load customers: ${error.message}`);
       else setUsers((data ?? []) as Row[]);
     }, (error) => setMsg(`Could not load customers: ${error instanceof Error ? error.message : 'Unexpected error'}`));
@@ -108,11 +110,11 @@ export function ProgressAdmin() {
   const load = async (profileId = userId) => {
     const requestId = ++loadRequest.current;
     if (!profileId) { setRows(null); return; }
-    if (!neon) { setMsg('Neon is not configured; progress records cannot be loaded.'); setRows([]); return; }
+    if (!db) { setMsg('Neon is not configured; progress records cannot be loaded.'); setRows([]); return; }
     // Never leave the previous customer's weigh-ins visible during a new query.
     setRows([]);
     try {
-      const { data, error } = await neon.from('progress_logs').select('*').eq('profile_id', profileId).order('recorded_on', { ascending: false });
+      const { data, error } = await db.from('progress_logs').select('*').eq('profile_id', profileId).order('recorded_on', { ascending: false });
       if (requestId !== loadRequest.current) return;
       if (error) { setMsg(`Could not load progress: ${error.message}`); setRows([]); }
       else { setRows((data ?? []) as Row[]); setMsg(''); }
@@ -130,9 +132,9 @@ export function ProgressAdmin() {
       setMsg('Enter a valid weight greater than 0 and no more than 999 kg.');
       return;
     }
-    if (!neon) { setMsg('Neon is not configured; progress cannot be saved.'); return; }
+    if (!db) { setMsg('Neon is not configured; progress cannot be saved.'); return; }
     try {
-      const result = await neon.from('progress_logs').insert({
+      const result = await db.from('progress_logs').insert({
         profile_id: userId,
         weight: parsedWeight,
         recorded_on: new Date().toISOString().slice(0, 10),
@@ -150,9 +152,9 @@ export function ProgressAdmin() {
   };
 
   const remove = async (id: string) => {
-    if (!neon) { setMsg('Neon is not configured; progress cannot be deleted.'); return; }
+    if (!db) { setMsg('Neon is not configured; progress cannot be deleted.'); return; }
     try {
-      const result = await neon.from('progress_logs').delete().eq('id', id).select('id');
+      const result = await db.from('progress_logs').delete().eq('id', id).select('id');
       if (result.error) { setMsg(`Could not delete weigh-in: ${result.error.message}`); return; }
       if (!result.data?.length) { setMsg('The weigh-in was not deleted. It may already be gone or your staff permissions may not allow this change.'); return; }
       setMsg('Weigh-in deleted.');

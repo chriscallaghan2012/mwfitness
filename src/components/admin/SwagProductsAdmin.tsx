@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
 const blank = { slug: '', name: '', description: '', category: 'apparel', price: '0', compare_at_price: '', image_url: '', product_url: '', sizes: '', stock_status: 'enquiry_only', active: false, sort_order: '100' };
 
 export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
+  const db = adminDb();
   const [products, setProducts] = useState<Row[]>([]);
   const [draft, setDraft] = useState<Record<string, string | boolean>>(blank);
   const [editing, setEditing] = useState<Row | null>(null);
@@ -15,10 +16,10 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
   const [notice, setNotice] = useState('');
 
   const load = async () => {
-    if (!neon) { setError('Neon is not configured. No product data was loaded.'); setLoading(false); return; }
+    if (!db) { setError('Neon is not configured. No product data was loaded.'); setLoading(false); return; }
     setLoading(true); setError('');
     try {
-      const { data, error: queryError } = await neon.from('swag_products').select('*').order('sort_order').order('name');
+      const { data, error: queryError } = await db.from('swag_products').select('*').order('sort_order').order('name');
       if (queryError) throw queryError;
       setProducts((data || []) as Row[]);
     } catch (e) {
@@ -44,7 +45,7 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
   };
   const set = (key: string, value: string | boolean) => setDraft((old) => ({ ...old, [key]: value }));
   const save = async () => {
-    if (!neon) { setError('Neon is not configured. Nothing was saved.'); return; }
+    if (!db) { setError('Neon is not configured. Nothing was saved.'); return; }
     const slug = String(draft.slug || '').trim().toLowerCase();
     const name = String(draft.name || '').trim();
     const price = Number(draft.price);
@@ -66,8 +67,8 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
     };
     try {
       const result = editing
-        ? await neon.from('swag_products').update(payload).eq('id', editing.id).select('id')
-        : await neon.from('swag_products').insert(payload).select('id');
+        ? await db.from('swag_products').update(payload).eq('id', editing.id).select('id')
+        : await db.from('swag_products').insert(payload).select('id');
       if (result.error) throw result.error;
       if (!result.data?.length) throw new Error('No row was saved. Check staff permissions and the product schema.');
       setNotice('Product saved to Neon. Public visibility is ' + (payload.active ? 'enabled' : 'disabled') + '.');
@@ -78,10 +79,10 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
     } finally { setBusy(false); }
   };
   const toggle = async (row: Row) => {
-    if (!neon) { setError('Neon is not configured.'); return; }
+    if (!db) { setError('Neon is not configured.'); return; }
     setBusy(true); setError(''); setNotice('');
     try {
-      const result = await neon.from('swag_products').update({ active: !row.active, updated_at: new Date().toISOString() }).eq('id', row.id).select('id');
+      const result = await db.from('swag_products').update({ active: !row.active, updated_at: new Date().toISOString() }).eq('id', row.id).select('id');
       if (result.error) throw result.error;
       if (!result.data?.length) throw new Error('Visibility was not changed; check staff permissions.');
       setNotice(String(row.name) + ' is now ' + (!row.active ? 'visible' : 'hidden') + ' on the swag page.');
@@ -90,10 +91,10 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
     finally { setBusy(false); }
   };
   const remove = async (row: Row) => {
-    if (!neon || !window.confirm('Permanently delete ' + String(row.name) + '?')) return;
+    if (!db || !window.confirm('Permanently delete ' + String(row.name) + '?')) return;
     setBusy(true); setError(''); setNotice('');
     try {
-      const result = await neon.from('swag_products').delete().eq('id', row.id).select('id');
+      const result = await db.from('swag_products').delete().eq('id', row.id).select('id');
       if (result.error) throw result.error;
       if (!result.data?.length) throw new Error('Product was not deleted; check staff permissions.');
       setNotice('Product deleted.'); await load();

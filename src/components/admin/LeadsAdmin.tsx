@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, ShortDate, StatusPill, btnGhost, card, inp } from './fields';
 
 const STATUSES = ['new', 'contacted', 'qualified', 'converted', 'closed'];
 
 export function LeadsAdmin() {
+  const db = adminDb();
   const [leads, setLeads] = useState<Row[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -12,14 +13,14 @@ export function LeadsAdmin() {
   const [notice, setNotice] = useState('');
 
   const load = useCallback(async () => {
-    if (!neon) {
+    if (!db) {
       setError('The Neon backend is not configured for this deployment.');
       setLoading(false);
       return;
     }
     setLoading(true);
     try {
-      const query = neon
+      const query = db
         .from('website_leads')
         .select('id,kind,name,email,phone,interest,goal,message,page,status,created_at,times')
         .order('created_at', { ascending: false })
@@ -43,10 +44,10 @@ export function LeadsAdmin() {
   useEffect(() => { void load(); }, [load]);
 
   const updateStatus = async (lead: Row, status: string) => {
-    if (!neon) return;
+    if (!db) return;
     setNotice('');
     try {
-      const { data: updatedRows, error: updateError } = await neon.from('website_leads').update({ status }).eq('id', lead.id).select('id');
+      const { data: updatedRows, error: updateError } = await db.from('website_leads').update({ status }).eq('id', lead.id).select('id');
       if (updateError) {
         setError('Status could not be saved. Check staff permissions and try again.');
         return;

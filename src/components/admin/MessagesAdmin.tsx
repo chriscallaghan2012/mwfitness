@@ -1,6 +1,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCheck, MessageCircle, RefreshCw, Search, Send, UserRound } from 'lucide-react';
 import { neon } from '../../lib/neon';
+import { adminDb, isDemoMode } from '../../lib/admin/adminDb';
 import { Row } from './fields';
 
 const READ_KEY = 'mwfitness-staff-read-messages';
@@ -14,6 +15,7 @@ const timeLabel = (value: string) => {
 const initials = (value: string) => value.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'M';
 
 export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: string }) {
+  const db = adminDb();
   const [athletes, setAthletes] = useState<Row[]>([]);
   const [messages, setMessages] = useState<Row[]>([]);
   const [selectedId, setSelectedId] = useState(initialAthleteId);
@@ -33,14 +35,17 @@ export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: st
   }, [readIds]);
 
   const load = useCallback(async (quiet = false) => {
-    if (!neon) { setError('Messaging is unavailable because the data service is not configured.'); setLoading(false); return; }
+    if (!db) { setError('Messaging is unavailable because the data service is not configured.'); setLoading(false); return; }
     if (!quiet) setLoading(true);
     try {
-      const { data: session, error: sessionError } = await neon.auth.getSession({ query: {} });
-      if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
+      if (!isDemoMode()) {
+        // Demo mode has no staff session; live mode must confirm the staff sign-in first.
+        const sessionResult = await neon?.auth.getSession({ query: {} });
+        if (sessionResult?.error || !sessionResult?.data?.user) throw new Error('Your staff session has expired. Sign in again.');
+      }
       const results = await Promise.all([
-        neon.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name'),
-        neon.from('coach_messages').select('id,athlete_profile_id,sender_profile_id,body,delivery_status,created_at').order('created_at', { ascending: true }).limit(500),
+        db.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name'),
+        db.from('coach_messages').select('id,athlete_profile_id,sender_profile_id,body,delivery_status,created_at').order('created_at', { ascending: true }).limit(500),
       ]);
       if (results[0].error) throw results[0].error;
       if (results[1].error) throw results[1].error;
@@ -83,12 +88,13 @@ export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: st
   const send = async (event: FormEvent) => {
     event.preventDefault();
     const body = draft.trim();
-    if (!neon || !body || !selectedId || busy) return;
+    if (!db || !body || !selectedId || busy) return;
     setBusy(true); setError(''); setNotice('');
     try {
-      const { data: session, error: sessionError } = await neon.auth.getSession({ query: {} });
-      if (sessionError || !session?.user) throw new Error('Your staff session has expired. Sign in again.');
-      const result = await neon.from('coach_messages').insert({ athlete_profile_id: selectedId, sender_profile_id: session.user.id, body });
+      const sessionResult = isDemoMode() ? null : await neon?.auth.getSession({ query: {} });
+      const senderId = isDemoMode() ? 'demo-staff' : String(sessionResult?.data?.user?.id ?? '');
+      if (!senderId) throw new Error('Your staff session has expired. Sign in again.');
+      const result = await db.from('coach_messages').insert({ athlete_profile_id: selectedId, sender_profile_id: senderId, body });
       if (result.error) throw result.error;
       setDraft(''); setNotice('Reply sent'); await load(true);
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Your reply could not be sent.'); }

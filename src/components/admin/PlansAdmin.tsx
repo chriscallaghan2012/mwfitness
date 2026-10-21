@@ -1,12 +1,13 @@
 // PlansAdmin — products (PT blocks + online coaching), same catalogue as the site.
 import { useEffect, useState } from 'react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Fmt, Row, StatusPill, btn, btnGhost, card, inp } from './fields';
 import { SwagProductsAdmin } from './SwagProductsAdmin';
 
 const KINDS = ['pt', 'online'];
 
 export function PlansAdmin() {
+  const db = adminDb();
   const [plans, setPlans] = useState<Row[] | null>(null);
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
@@ -15,9 +16,9 @@ export function PlansAdmin() {
   const [showSwag, setShowSwag] = useState(false);
 
   const load = async () => {
-    if (!neon) { setMsg('Neon is not configured; live pricing cannot be loaded.'); setPlans([]); return; }
+    if (!db) { setMsg('Neon is not configured; live pricing cannot be loaded.'); setPlans([]); return; }
     try {
-      const { data, error } = await neon.from('plans').select('*').order('price');
+      const { data, error } = await db.from('plans').select('*').order('price');
       if (error) { setMsg(`Could not load packages and pricing: ${error.message}`); return; }
       setPlans((data ?? []) as Row[]);
     } catch {
@@ -37,7 +38,7 @@ export function PlansAdmin() {
   };
 
   const save = async () => {
-    if (!neon) { setMsg('Neon is not configured; no changes were saved.'); return; }
+    if (!db) { setMsg('Neon is not configured; no changes were saved.'); return; }
     const price = Number(f.price);
     const originalPrice = f.original_price ? Number(f.original_price) : null;
     if (!f.id?.trim() || !/^[a-z0-9][a-z0-9-]*$/.test(f.id.trim())) { setMsg('Plan ID must use lowercase letters, numbers and hyphens.'); return; }
@@ -64,7 +65,7 @@ export function PlansAdmin() {
       .map((feature) => feature.trim())
       .filter(Boolean);
     try {
-      const result = edit?.id ? await neon.from('plans').update(body).eq('id', edit.id).select('id') : await neon.from('plans').insert(body).select('id');
+      const result = edit?.id ? await db.from('plans').update(body).eq('id', edit.id).select('id') : await db.from('plans').insert(body).select('id');
       if (result.error) {
         setMsg(`Save failed: ${result.error.message}`);
       } else if (!result.data?.length) {
@@ -80,11 +81,11 @@ export function PlansAdmin() {
   };
 
   const remove = async (p: Row) => {
-    if (!neon) { setMsg('Neon is not configured; no changes were made.'); return; }
+    if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete plan “${String(p.name)}”? Plans assigned to memberships may be protected by database constraints; hide the plan instead if it is already in use.`)) return;
     setBusy(true); setMsg('');
     try {
-      const { error } = await neon.from('plans').delete().eq('id', p.id);
+      const { error } = await db.from('plans').delete().eq('id', p.id);
       setMsg(error ? `Delete failed: ${error.message}` : 'Plan deleted.');
       if (!error) await load();
     } catch {
@@ -93,10 +94,10 @@ export function PlansAdmin() {
   };
 
   const toggle = async (p: Row) => {
-    if (!neon) { setMsg('Neon is not configured; no changes were made.'); return; }
+    if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
     setBusy(true); setMsg('');
     try {
-      const result = await neon.from('plans').update({ active: !p.active }).eq('id', p.id).select('id');
+      const result = await db.from('plans').update({ active: !p.active }).eq('id', p.id).select('id');
       if (result.error) { setMsg(`Could not update visibility: ${result.error.message}`); return; }
       if (!result.data?.length) { setMsg('Visibility was not changed. The package may no longer exist or your staff permissions may not allow this change.'); return; }
       setMsg(`${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);

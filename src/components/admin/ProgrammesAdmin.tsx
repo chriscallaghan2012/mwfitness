@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
 const EMPTY = { name: '', description: '', duration_weeks: '12', days_per_week: '4', level: 'All levels', active: 'true' };
 
 export function ProgrammesAdmin() {
+  const db = adminDb();
   const [programmes, setProgrammes] = useState<Row[]>([]);
   const [clients, setClients] = useState<Row[]>([]);
   const [assignments, setAssignments] = useState<Row[]>([]);
@@ -15,16 +16,16 @@ export function ProgrammesAdmin() {
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
   const [dueDate, setDueDate] = useState(() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().slice(0, 10); });
   const [busy, setBusy] = useState(false);
-  const [schemaMissing, setSchemaMissing] = useState(!neon);
+  const [schemaMissing, setSchemaMissing] = useState(!db);
   const [message, setMessage] = useState('');
 
   const load = async () => {
-    if (!neon) { setSchemaMissing(true); setMessage('Neon is not configured for this website environment.'); return; }
+    if (!db) { setSchemaMissing(true); setMessage('Neon is not configured for this website environment.'); return; }
     try {
     const [programResult, clientResult, assignmentResult] = await Promise.all([
-      neon.from('coaching_programmes').select('*').order('created_at', { ascending: false }),
-      neon.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name'),
-      neon.from('coaching_programme_assignments').select('*, profiles(full_name,email), coaching_programmes(name)').order('created_at', { ascending: false }),
+      db.from('coaching_programmes').select('*').order('created_at', { ascending: false }),
+      db.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name'),
+      db.from('coaching_programme_assignments').select('*, profiles(full_name,email), coaching_programmes(name)').order('created_at', { ascending: false }),
     ]);
     const missing = [programResult, assignmentResult].some((r) => r.error && /does not exist|not found|schema cache|could not find/i.test(r.error.message));
     if (missing) {
@@ -63,7 +64,7 @@ export function ProgrammesAdmin() {
   };
 
   const save = async () => {
-    if (!neon) { setMessage('Live database access is not configured; no changes were saved.'); return; }
+    if (!db) { setMessage('Live database access is not configured; no changes were saved.'); return; }
     const weeks = Number(form.duration_weeks);
     const days = Number(form.days_per_week);
     if (!form.name.trim()) { setMessage('Enter a programme name.'); return; }
@@ -73,8 +74,8 @@ export function ProgrammesAdmin() {
     const payload = { name: form.name.trim(), description: form.description.trim() || null, duration_weeks: weeks, days_per_week: days, level: form.level.trim() || 'All levels', active: form.active === 'true' };
     try {
       const result = edit?.id
-        ? await neon.from('coaching_programmes').update(payload).eq('id', edit.id).select('id')
-        : await neon.from('coaching_programmes').insert(payload).select('id');
+        ? await db.from('coaching_programmes').update(payload).eq('id', edit.id).select('id')
+        : await db.from('coaching_programmes').insert(payload).select('id');
       if (result.error) { setMessage('Save failed: ' + result.error.message); return; }
       if (!result.data?.length) { setMessage('Nothing was saved. Check that the programme still exists and staff permissions allow this change.'); return; }
       setEdit(null); setMessage('Programme saved.'); await load();
@@ -84,11 +85,11 @@ export function ProgrammesAdmin() {
   };
 
   const remove = async (row: Row) => {
-    if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
+    if (!db) { setMessage('Live database access is not configured; no changes were made.'); return; }
     if (!window.confirm('Delete programme "' + String(row.name) + '"? Assigned clients may prevent deletion; deactivate it instead if in use.')) return;
     setBusy(true); setMessage('');
     try {
-      const result = await neon.from('coaching_programmes').delete().eq('id', row.id).select('id');
+      const result = await db.from('coaching_programmes').delete().eq('id', row.id).select('id');
       if (result.error) { setMessage('Delete failed: ' + result.error.message); return; }
       if (!result.data?.length) { setMessage('The programme was not deleted. It may already be gone or staff permissions may not allow this change.'); return; }
       setMessage('Programme deleted.'); await load();
@@ -98,13 +99,13 @@ export function ProgrammesAdmin() {
   };
 
   const assign = async () => {
-    if (!neon) { setMessage('Live database access is not configured; no assignment was created.'); return; }
+    if (!db) { setMessage('Live database access is not configured; no assignment was created.'); return; }
     if (!clientId || !programmeId || !startDate) { setMessage('Choose a client, programme and start date.'); return; }
     if (!dueDate) { setMessage('Choose the date this plan must be completed by.'); return; }
     if (dueDate < startDate) { setMessage('The completion date must be on or after the start date.'); return; }
     setBusy(true); setMessage('');
     try {
-      const result = await neon.from('coaching_programme_assignments').insert({ profile_id: clientId, programme_id: programmeId, starts_on: startDate, due_on: dueDate, status: 'active' }).select('id');
+      const result = await db.from('coaching_programme_assignments').insert({ profile_id: clientId, programme_id: programmeId, starts_on: startDate, due_on: dueDate, status: 'active' }).select('id');
       if (result.error) { setMessage('Assignment failed: ' + result.error.message); return; }
       if (!result.data?.length) { setMessage('The assignment was not saved. Check the client, programme and staff permissions.'); return; }
       setMessage('Programme assigned to client.'); await load();
@@ -114,11 +115,11 @@ export function ProgrammesAdmin() {
   };
 
   const finish = async (row: Row) => {
-    if (!neon) { setMessage('Live database access is not configured; no assignment was changed.'); return; }
+    if (!db) { setMessage('Live database access is not configured; no assignment was changed.'); return; }
     const status = row.status === 'completed' ? 'active' : 'completed';
     setBusy(true); setMessage('');
     try {
-      const result = await neon.from('coaching_programme_assignments').update({ status }).eq('id', row.id).select('id');
+      const result = await db.from('coaching_programme_assignments').update({ status }).eq('id', row.id).select('id');
       if (result.error) { setMessage('Could not update assignment: ' + result.error.message); return; }
       if (!result.data?.length) { setMessage('Assignment was not updated. Check staff permissions and refresh the list.'); return; }
       setMessage('Assignment marked ' + status + '.'); await load();
@@ -128,10 +129,10 @@ export function ProgrammesAdmin() {
   };
 
   const toggleVisibility = async (row: Row) => {
-    if (!neon) { setMessage('Live database access is not configured; no changes were made.'); return; }
+    if (!db) { setMessage('Live database access is not configured; no changes were made.'); return; }
     setBusy(true); setMessage('');
     try {
-      const result = await neon.from('coaching_programmes').update({ active: !row.active }).eq('id', row.id).select('id');
+      const result = await db.from('coaching_programmes').update({ active: !row.active }).eq('id', row.id).select('id');
       if (result.error) { setMessage('Visibility update failed: ' + result.error.message); return; }
       if (!result.data?.length) { setMessage('Visibility was not changed. Refresh the list and check staff permissions.'); return; }
       setMessage('Programme visibility updated.'); await load();

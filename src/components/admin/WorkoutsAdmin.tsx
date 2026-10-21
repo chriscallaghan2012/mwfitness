@@ -1,9 +1,10 @@
 // WorkoutsAdmin — template exercises + per-customer session schedule.
 import { useEffect, useRef, useState } from 'react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
 export function WorkoutsAdmin() {
+  const db = adminDb();
   const [templates, setTemplates] = useState<Row[] | null>(null);
   const [users, setUsers] = useState<Row[]>([]);
   const [plans, setPlans] = useState<Row[]>([]);
@@ -15,12 +16,12 @@ export function WorkoutsAdmin() {
   const sessionLoadRequest = useRef(0);
 
   const load = async () => {
-    if (!neon) { setMsg('Neon is not configured; live workouts cannot be loaded.'); setTemplates([]); setSessions([]); return; }
+    if (!db) { setMsg('Neon is not configured; live workouts cannot be loaded.'); setTemplates([]); setSessions([]); return; }
     try {
       const [templateResult, userResult, planResult] = await Promise.all([
-        neon.from('workout_templates').select('*, plans(name)').order('name'),
-        neon.from('profiles').select('id,full_name').order('full_name'),
-        neon.from('plans').select('id,name').order('name'),
+        db.from('workout_templates').select('*, plans(name)').order('name'),
+        db.from('profiles').select('id,full_name').order('full_name'),
+        db.from('plans').select('id,name').order('name'),
       ]);
       if (templateResult.error) setMsg(`Could not load workout templates: ${templateResult.error.message}`);
       else setTemplates((templateResult.data ?? []) as Row[]);
@@ -35,10 +36,10 @@ export function WorkoutsAdmin() {
   const loadSessions = async (profileId = userId) => {
     const requestId = ++sessionLoadRequest.current;
     if (!profileId) { setSessions(null); return; }
-    if (!neon) { setMsg('Neon is not configured; sessions cannot be loaded.'); setSessions([]); return; }
+    if (!db) { setMsg('Neon is not configured; sessions cannot be loaded.'); setSessions([]); return; }
     setSessions([]);
     try {
-      const { data, error } = await neon.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', profileId).order('scheduled_on');
+      const { data, error } = await db.from('workout_sessions').select('*, workout_templates(name)').eq('profile_id', profileId).order('scheduled_on');
       if (requestId !== sessionLoadRequest.current) return;
       if (error) { setMsg(`Could not load sessions: ${error.message}`); setSessions([]); return; }
       setSessions((data ?? []) as Row[]);
@@ -56,9 +57,9 @@ export function WorkoutsAdmin() {
     if (!form.name?.trim()) { setMsg('Enter a workout template name.'); return; }
     const days = Number(form.days_per_week || 0);
     if (days && (!Number.isInteger(days) || days < 1 || days > 7)) { setMsg('Days per week must be between 1 and 7.'); return; }
-    if (!neon) { setMsg('Neon is not configured; workout templates cannot be created.'); return; }
+    if (!db) { setMsg('Neon is not configured; workout templates cannot be created.'); return; }
     try {
-      const result = await neon.from('workout_templates').insert({
+      const result = await db.from('workout_templates').insert({
         name: form.name.trim(),
         description: form.description ?? '',
         days_per_week: days || null,
@@ -75,11 +76,11 @@ export function WorkoutsAdmin() {
   };
 
   const removeTemplate = async (row: Row) => {
-    if (!neon) { setMsg('Neon is not configured; no changes were made.'); return; }
+    if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
     if (!window.confirm(`Delete workout template “${String(row.name)}”? Scheduled sessions may prevent deletion.`)) return;
     setMsg('');
     try {
-      const result = await neon.from('workout_templates').delete().eq('id', row.id).select('id');
+      const result = await db.from('workout_templates').delete().eq('id', row.id).select('id');
       if (result.error) { setMsg(`Delete failed: ${result.error.message}`); return; }
       if (!result.data?.length) { setMsg('The template was not deleted. It may already be gone or your staff permissions may not allow this change.'); return; }
       setMsg('Template deleted.');
@@ -91,9 +92,9 @@ export function WorkoutsAdmin() {
 
   const addSession = async () => {
     if (!userId || !sessForm.template_id) { setMsg('Choose a client and workout template first.'); return; }
-    if (!neon) { setMsg('Neon is not configured; sessions cannot be scheduled.'); return; }
+    if (!db) { setMsg('Neon is not configured; sessions cannot be scheduled.'); return; }
     try {
-      const result = await neon.from('workout_sessions').insert({
+      const result = await db.from('workout_sessions').insert({
         profile_id: userId,
         template_id: sessForm.template_id,
         scheduled_on: sessForm.scheduled_on || null,
@@ -110,10 +111,10 @@ export function WorkoutsAdmin() {
   };
 
   const flipStatus = async (s: Row) => {
-    if (!neon) { setMsg('Neon is not configured; session status cannot be updated.'); return; }
+    if (!db) { setMsg('Neon is not configured; session status cannot be updated.'); return; }
     const status = s.status === 'completed' ? 'planned' : 'completed';
     try {
-      const result = await neon.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id).select('id');
+      const result = await db.from('workout_sessions').update({ status, completed_on: status === 'completed' ? new Date().toISOString() : null }).eq('id', s.id).select('id');
       if (result.error) { setMsg(`Could not update session: ${result.error.message}`); return; }
       if (!result.data?.length) { setMsg('The session was not updated. It may no longer exist or your staff permissions may not allow this change.'); return; }
       setMsg(`Session marked ${status}.`);

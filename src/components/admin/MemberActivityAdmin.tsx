@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 
 type MetricRow = { profile_id: string; metric_date: string; water_litres: number | string; steps: number };
 type CardioRow = { id: string; profile_id: string; completed_at: string; activity: string; duration_minutes: number; average_heart_rate: number | null };
@@ -40,6 +40,7 @@ function RecordTable<T extends object>({
 }
 
 export function MemberActivityAdmin() {
+  const db = adminDb();
   const [metrics, setMetrics] = useState<MetricRow[]>([]);
   const [cardio, setCardio] = useState<CardioRow[]>([]);
   const [supplements, setSupplements] = useState<SupplementRow[]>([]);
@@ -51,7 +52,7 @@ export function MemberActivityAdmin() {
   const [activityWarning, setActivityWarning] = useState('');
 
   const refresh = useCallback(async () => {
-    if (!neon) {
+    if (!db) {
       setError('The shared Neon data connection is not configured.');
       setLoading(false);
       return;
@@ -61,16 +62,16 @@ export function MemberActivityAdmin() {
     setActivityWarning('');
     try {
       const [membersResult, metricsResult, cardioResult, supplementResult, workoutsResult, checkinsResult, progressResult, nutritionResult, photosResult, messagesResult] = await Promise.all([
-        neon.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name').limit(500),
-        neon.from('daily_metrics').select('profile_id,metric_date,water_litres,steps').order('metric_date', { ascending: false }).limit(25),
-        neon.from('cardio_logs').select('id,profile_id,completed_at,activity,duration_minutes,average_heart_rate').order('completed_at', { ascending: false }).limit(25),
-        neon.from('supplement_plans').select('id,profile_id,name,dosage_string,timing,active,created_at').order('created_at', { ascending: false }).limit(25),
-        neon.from('workout_sessions').select('id,profile_id,status,completed_on,created_at,workout_templates(name)').order('created_at', { ascending: false }).limit(40),
-        neon.from('checkins').select('id,profile_id,status,checkin_date,created_at').order('created_at', { ascending: false }).limit(40),
-        neon.from('progress_logs').select('id,profile_id,weight,recorded_on,created_at').order('created_at', { ascending: false }).limit(40),
-        neon.from('nutrition_daily_logs').select('id,profile_id,day_type,completed_day,completed_meal_ids,log_date,updated_at').order('updated_at', { ascending: false }).limit(40),
-        neon.from('progress_photos').select('id,profile_id,caption,recorded_on,created_at').order('created_at', { ascending: false }).limit(40),
-        neon.from('coach_messages').select('id,athlete_profile_id,sender_profile_id,created_at').order('created_at', { ascending: false }).limit(40),
+        db.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name').limit(500),
+        db.from('daily_metrics').select('profile_id,metric_date,water_litres,steps').order('metric_date', { ascending: false }).limit(25),
+        db.from('cardio_logs').select('id,profile_id,completed_at,activity,duration_minutes,average_heart_rate').order('completed_at', { ascending: false }).limit(25),
+        db.from('supplement_plans').select('id,profile_id,name,dosage_string,timing,active,created_at').order('created_at', { ascending: false }).limit(25),
+        db.from('workout_sessions').select('id,profile_id,status,completed_on,created_at,workout_templates(name)').order('created_at', { ascending: false }).limit(40),
+        db.from('checkins').select('id,profile_id,status,checkin_date,created_at').order('created_at', { ascending: false }).limit(40),
+        db.from('progress_logs').select('id,profile_id,weight,recorded_on,created_at').order('created_at', { ascending: false }).limit(40),
+        db.from('nutrition_daily_logs').select('id,profile_id,day_type,completed_day,completed_meal_ids,log_date,updated_at').order('updated_at', { ascending: false }).limit(40),
+        db.from('progress_photos').select('id,profile_id,caption,recorded_on,created_at').order('created_at', { ascending: false }).limit(40),
+        db.from('coach_messages').select('id,athlete_profile_id,sender_profile_id,created_at').order('created_at', { ascending: false }).limit(40),
       ]);
       const profiles = (membersResult.data || []) as MemberRow[];
       setMembers(profiles);

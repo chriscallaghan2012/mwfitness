@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
-import { neon } from '../../lib/neon';
+import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
 const EMPTY: Record<string, string> = { title: '', description: '', category: 'Technique', video_url: '', thumbnail_url: '', duration_seconds: '', level: 'All levels', active: 'true' };
 
 export function VideosAdmin() {
+  const db = adminDb();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [edit, setEdit] = useState<Row | null>(null);
   const [form, setForm] = useState<Record<string, string>>(EMPTY);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
-  const [schemaMissing, setSchemaMissing] = useState(!neon);
+  const [schemaMissing, setSchemaMissing] = useState(!db);
 
   const load = async () => {
-    if (!neon) { setSchemaMissing(true); setRows([]); setMessage('Neon is not configured for this website environment.'); return; }
+    if (!db) { setSchemaMissing(true); setRows([]); setMessage('Neon is not configured for this website environment.'); return; }
     try {
-    const { data, error } = await neon.from('coaching_videos').select('*').order('created_at', { ascending: false });
+    const { data, error } = await db.from('coaching_videos').select('*').order('created_at', { ascending: false });
     if (error) {
       setRows([]);
       setSchemaMissing(/does not exist|not found|schema cache|could not find/i.test(error.message));
@@ -40,7 +41,7 @@ export function VideosAdmin() {
     setForm({ title: String(row.title ?? ''), description: String(row.description ?? ''), category: String(row.category ?? 'Technique'), video_url: String(row.video_url ?? ''), thumbnail_url: String(row.thumbnail_url ?? ''), duration_seconds: String(row.duration_seconds ?? ''), level: String(row.level ?? 'All levels'), active: row.active ? 'true' : 'false' });
   };
   const save = async () => {
-    if (!neon) { setMessage('Live database access is not configured; no changes were saved.'); return; }
+    if (!db) { setMessage('Live database access is not configured; no changes were saved.'); return; }
     if (!form.title.trim() || !form.video_url.trim()) { setMessage('A title and video URL are required.'); return; }
     try { new URL(form.video_url); } catch { setMessage('Enter a valid video URL.'); return; }
     if (form.thumbnail_url.trim()) { try { new URL(form.thumbnail_url); } catch { setMessage('Thumbnail must be a valid URL.'); return; } }
@@ -50,8 +51,8 @@ export function VideosAdmin() {
     const body = { title: form.title.trim(), description: form.description.trim() || null, category: form.category.trim() || 'General', video_url: form.video_url.trim(), thumbnail_url: form.thumbnail_url.trim() || null, duration_seconds: duration, level: form.level.trim() || 'All levels', active: form.active === 'true' };
     try {
       const result = edit?.id
-        ? await neon.from('coaching_videos').update(body).eq('id', edit.id).select('id')
-        : await neon.from('coaching_videos').insert(body).select('id');
+        ? await db.from('coaching_videos').update(body).eq('id', edit.id).select('id')
+        : await db.from('coaching_videos').insert(body).select('id');
       if (result.error) { setMessage(`Save failed: ${result.error.message}`); return; }
       if (!result.data?.length) { setMessage('Nothing was saved. The video may no longer exist or your staff permissions may not allow this change.'); return; }
       setEdit(null); setMessage('Video saved.'); await load();
@@ -62,12 +63,12 @@ export function VideosAdmin() {
     }
   };
   const remove = async (row: Row) => {
-    if (!neon || schemaMissing) { setMessage('Live video storage is not configured; no changes were made.'); return; }
+    if (!db || schemaMissing) { setMessage('Live video storage is not configured; no changes were made.'); return; }
     if (busy) return;
     if (!window.confirm('Delete "' + String(row.title) + '" from the video library?')) return;
     setBusy(true); setMessage('');
     try {
-      const result = await neon.from('coaching_videos').delete().eq('id', row.id).select('id');
+      const result = await db.from('coaching_videos').delete().eq('id', row.id).select('id');
       if (result.error) { setMessage('Delete failed: ' + result.error.message); return; }
       if (!result.data?.length) { setMessage('The video was not deleted. Refresh the list and check staff permissions.'); return; }
       setMessage('Video deleted.'); await load();
@@ -76,11 +77,11 @@ export function VideosAdmin() {
     } finally { setBusy(false); }
   };
   const toggle = async (row: Row) => {
-    if (!neon || schemaMissing) { setMessage('Live video storage is not configured; no changes were made.'); return; }
+    if (!db || schemaMissing) { setMessage('Live video storage is not configured; no changes were made.'); return; }
     if (busy) return;
     setBusy(true); setMessage('');
     try {
-      const result = await neon.from('coaching_videos').update({ active: !row.active }).eq('id', row.id).select('id');
+      const result = await db.from('coaching_videos').update({ active: !row.active }).eq('id', row.id).select('id');
       if (result.error) { setMessage('Visibility update failed: ' + result.error.message); return; }
       if (!result.data?.length) { setMessage('Video visibility was not changed. Refresh the list and check staff permissions.'); return; }
       setMessage('Video visibility updated.'); await load();
