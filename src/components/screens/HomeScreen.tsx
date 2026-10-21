@@ -125,12 +125,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               </span>
             </div>
           </div>
-        </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       
       <div className="relative z-20 flex w-full items-center justify-center lg:justify-self-end">
           <div className="w-full max-w-[220px]"><StoreBadges compact stacked /></div>
         </div>
+      </div>
     </section>
 
       {/* 2. INDUSTRIAL TICKER TAPE BANNER */}
