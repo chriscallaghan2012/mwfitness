@@ -103,6 +103,10 @@ a {
 }
 
 /* The ticker sits directly beneath the home hero; section rhythm is handled by .page-layout. */
+.page-layout > .home-app-section {
+  margin-block-start: 0 !important;
+}
+
 .home-ticker {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
