@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { ChevronDown, RefreshCw } from 'lucide-react';
 import { adminDb } from '../../lib/admin/adminDb';
 
 type MetricRow = { profile_id: string; metric_date: string; water_litres: number | string; steps: number };
@@ -32,11 +32,41 @@ function RecordTable<T extends object>({
   empty: string;
   rowKey: (row: T) => string;
 }) {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const query = search.trim().toLocaleLowerCase();
+  const filteredRows = query ? rows.filter((row) => JSON.stringify(row).toLocaleLowerCase().includes(query)) : rows;
+  const pageCount = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const currentPage = Math.min(page, pageCount - 1);
+  const pageRows = filteredRows.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+
   if (!rows.length) return <Empty>{empty}</Empty>;
-  return <div className="overflow-x-auto"><table className={tableClass}>
-    <thead><tr>{columns.map((column) => <th key={column.label} className={cell + ' font-mono uppercase tracking-wide text-zinc-500'}>{column.label}</th>)}</tr></thead>
-    <tbody>{rows.map((row) => <tr key={rowKey(row)}>{columns.map((column) => <td key={column.label} className={cell + ' text-zinc-300'}>{column.render(row)}</td>)}</tr>)}</tbody>
-  </table></div>;
+  return <div>
+    <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <label className="relative block w-full sm:max-w-sm">
+        <span className="sr-only">Search activity records</span>
+        <input type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(0); }} placeholder="Search these records…" className="w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] py-2.5 pl-3 pr-14 text-xs text-white outline-none placeholder:text-zinc-600 focus:border-orange-400/70" />{search ? <button type="button" onClick={() => { setSearch(""); setPage(0); }} className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-[10px] text-zinc-400 hover:bg-white/10 hover:text-white">Clear</button> : null}
+      </label>
+      <label className="flex shrink-0 items-center gap-2 text-[11px] text-zinc-500">Rows per page
+        <select aria-label="Activity rows per page" value={pageSize} onChange={(event) => { setPageSize(Number(event.target.value)); setPage(0); }} className="rounded-lg border border-zinc-700 bg-[#0b0c0e] px-2.5 py-2 text-xs text-zinc-200">
+          {[10, 25, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+        </select>
+      </label>
+    </div>
+    {filteredRows.length ? <div className="overflow-x-auto"><table className={tableClass}>
+      <thead><tr>{columns.map((column) => <th key={column.label} className={cell + ' font-mono uppercase tracking-wide text-zinc-500'}>{column.label}</th>)}</tr></thead>
+      <tbody>{pageRows.map((row) => <tr key={rowKey(row)}>{columns.map((column) => <td key={column.label} className={cell + ' text-zinc-300'}>{column.render(row)}</td>)}</tr>)}</tbody>
+    </table></div> : <Empty>No matching records. Try a different search.</Empty>}
+    {filteredRows.length > 0 ? <div className="mt-3 flex flex-col gap-3 border-t border-zinc-800 pt-3 sm:flex-row sm:items-center sm:justify-between">
+      <span className="text-[11px] text-zinc-500">Showing {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, filteredRows.length)} of {filteredRows.length} records</span>
+      <div className="flex items-center gap-2">
+        <button type="button" disabled={currentPage === 0} onClick={() => setPage(Math.max(0, currentPage - 1))} className="rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-300 disabled:opacity-40">Previous</button>
+        <span className="min-w-20 text-center text-[11px] text-zinc-400">Page {currentPage + 1} of {pageCount}</span>
+        <button type="button" disabled={currentPage >= pageCount - 1} onClick={() => setPage(Math.min(pageCount - 1, currentPage + 1))} className="rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-300 disabled:opacity-40">Next</button>
+      </div>
+    </div> : null}
+  </div>;
 }
 
 export function MemberActivityAdmin() {
@@ -133,8 +163,8 @@ export function MemberActivityAdmin() {
     <section className={panel}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div><h3 className="font-semibold text-white">Recent member activity</h3><p className="mt-1 text-xs text-zinc-500">Most recent saved records across member app activity</p></div>
-        <label className="text-xs text-zinc-400">Member
-          <select value={memberFilter} onChange={(event) => setMemberFilter(event.target.value)} className="ml-2 rounded border border-zinc-700 bg-[#0b0c0e] px-3 py-2 text-zinc-200">
+        <label className="grid min-w-0 gap-1.5 text-xs text-zinc-400 sm:w-56">Member
+          <select value={memberFilter} onChange={(event) => setMemberFilter(event.target.value)} className="block w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] px-3 py-2.5 text-zinc-200">
             <option value="all">All members</option>
             {members.map((member) => <option key={member.id} value={member.id}>{member.full_name || member.email || `Member ${member.id.slice(0, 8)}`}</option>)}
           </select>
@@ -148,25 +178,25 @@ export function MemberActivityAdmin() {
         </div>)}
       </div> : <Empty>{loading ? 'Loading activity…' : 'No saved activity found for this selection.'}</Empty>}
     </section>
-    <section className={panel}><h3 className="font-semibold text-white">Daily hydration & steps</h3><p className="mt-1 text-xs text-zinc-500">Latest 25 member-day records</p><RecordTable rows={metrics} rowKey={(r) => r.profile_id + r.metric_date} empty={loading ? 'Loading…' : 'No daily metrics have been recorded yet.'} columns={[
+    <details className={panel}><summary className="group flex cursor-pointer list-none items-center justify-between gap-3"><span className="min-w-0"><span className="block font-semibold text-white">Daily hydration &amp; steps</span><span className="mt-1 block text-xs text-zinc-500">Latest 25 member-day records · expand to search</span></span><ChevronDown aria-hidden="true" className="ml-3 h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 group-open:rotate-180" /></summary><div className="mt-3"><RecordTable rows={metrics} rowKey={(r) => r.profile_id + r.metric_date} empty={loading ? 'Loading…' : 'No daily metrics have been recorded yet.'} columns={[
       { label: 'Member ID', render: (r) => r.profile_id.slice(0, 8) + '…' },
       { label: 'Date', render: (r) => r.metric_date },
       { label: 'Water', render: (r) => `${Number(r.water_litres).toFixed(2)} L` },
       { label: 'Steps', render: (r) => Number(r.steps || 0).toLocaleString('en-GB') },
-    ]} /></section>
-    <section className={panel}><h3 className="font-semibold text-white">Cardio sessions</h3><p className="mt-1 text-xs text-zinc-500">Latest 25 completed sessions</p><RecordTable rows={cardio} rowKey={(r) => r.id} empty={loading ? 'Loading…' : 'No cardio sessions have been logged yet.'} columns={[
+    ]} /></div></details>
+    <details className={panel}><summary className="group flex cursor-pointer list-none items-center justify-between gap-3"><span className="min-w-0"><span className="block font-semibold text-white">Cardio sessions</span><span className="mt-1 block text-xs text-zinc-500">Latest 25 completed sessions · expand to search</span></span><ChevronDown aria-hidden="true" className="ml-3 h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 group-open:rotate-180" /></summary><div className="mt-3"><RecordTable rows={cardio} rowKey={(r) => r.id} empty={loading ? 'Loading…' : 'No cardio sessions have been logged yet.'} columns={[
       { label: 'Member ID', render: (r) => r.profile_id.slice(0, 8) + '…' },
       { label: 'Completed', render: (r) => new Date(r.completed_at).toLocaleString('en-GB') },
       { label: 'Activity', render: (r) => r.activity },
       { label: 'Duration', render: (r) => `${r.duration_minutes} min` },
       { label: 'Avg. HR', render: (r) => r.average_heart_rate ? `${r.average_heart_rate} bpm` : '—' },
-    ]} /></section>
-    <section className={panel}><h3 className="font-semibold text-white">Supplement plans</h3><p className="mt-1 text-xs text-zinc-500">Coach-assigned records; use approved instructions only</p><RecordTable rows={supplements} rowKey={(r) => r.id} empty={loading ? 'Loading…' : 'No supplement plans have been assigned yet.'} columns={[
+    ]} /></div></details>
+    <details className={panel}><summary className="group flex cursor-pointer list-none items-center justify-between gap-3"><span className="min-w-0"><span className="block font-semibold text-white">Supplement plans</span><span className="mt-1 block text-xs text-zinc-500">Coach-assigned records · expand to search</span></span><ChevronDown aria-hidden="true" className="ml-3 h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 group-open:rotate-180" /></summary><div className="mt-3"><RecordTable rows={supplements} rowKey={(r) => r.id} empty={loading ? 'Loading…' : 'No supplement plans have been assigned yet.'} columns={[
       { label: 'Member ID', render: (r) => r.profile_id.slice(0, 8) + '…' },
       { label: 'Supplement', render: (r) => r.name },
       { label: 'Instructions', render: (r) => r.dosage_string || 'As directed' },
       { label: 'Timing', render: (r) => r.timing.replaceAll('_', ' ').toLowerCase() },
       { label: 'Status', render: (r) => r.active ? 'Active' : 'Inactive' },
-    ]} /></section>
+    ]} /></div></details>
   </div>;
 }
