@@ -75,6 +75,7 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
     </section>
     <div aria-hidden="true" className="hero-dashed-divider" />
     <Ticker />
+    <div aria-hidden="true" className="hero-dashed-divider" />
 
       <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
 
