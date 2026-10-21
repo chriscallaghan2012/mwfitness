@@ -126,14 +126,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>
           </div>
         </div>
-        <div className="absolute right-6 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-end gap-3 xl:flex 2xl:right-[max(3rem,calc((100vw-80rem)/2))]">
-          <p className="text-right font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
-          <StoreBadges />
-        </div>
-        <div className="absolute bottom-8 left-4 right-4 z-20 flex flex-col items-center gap-2 xl:hidden sm:left-6 sm:right-6">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">MWFitnessUK app · coming soon</p>
-          <StoreBadges />
-        </div>
         <div aria-hidden="true" className="industrial-stripe absolute bottom-0 left-0 z-20" />
       </section>
 
@@ -165,7 +157,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               [ ABOUT MIKE ]
             </div>
             <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-              TRAINING MADE SIMPLE.
+              MEET MIKE. YOUR ONLINE COACH.
             </h2>
             <div aria-hidden="true" className="industrial-stripe industrial-stripe--marker" />
           </div>
@@ -250,7 +242,30 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </section>
 
-      {/* 4. ONLINE COACHING PACKAGES — keep the homepage aligned with the live coaching catalogue */}
+      {/* HOW IT WORKS */}
+      <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="border-b border-[#22252e] pb-4 mb-10 text-center">
+          <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
+            [ HOW IT WORKS ]
+          </div>
+          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+            THREE SIMPLE STEPS.
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {HOW_IT_WORKS.map((step) => (
+            <div key={step.step} className="mw-electric-card bg-[#121419] border border-[#20232b] p-6 relative group">
+              <div className="text-4xl font-display text-[#ff5500] font-bold mb-3">{step.step}</div>
+              <h3 className="font-display text-2xl text-white uppercase tracking-wider mb-2">{step.title}</h3>
+              <p className="text-sm font-sans text-zinc-400 leading-relaxed">{step.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
+      {/* ONLINE COACHING PACKAGES — live catalogue */}
       <section id="packages-overview" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -286,80 +301,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         {plansLoading && <p className="text-sm text-zinc-400 mt-4">Loading current online plans…</p>}
         {!plansLoading && plansError && <p role="status" className="text-sm text-zinc-400 mt-4">{plansError}</p>}
       </section>
-      {/* 4. ONLINE COACHING SPOTLIGHT */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mw-electric-card relative overflow-hidden border border-[#ff5500]/60 bg-[#171920] p-8 md:p-12">
-          <div className="absolute inset-y-0 right-0 w-1/3 bg-[#ff5500]/10 skew-x-[-18deg] translate-x-1/4 pointer-events-none"></div>
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest">[ TRAIN ANYWHERE ]</div>
-            <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-tight">Online coaching. No meet-ups required.</h2>
-            <p className="text-sm sm:text-base font-sans text-zinc-300 leading-relaxed max-w-2xl">
-              Get a plan built around your life, your equipment and your goals, with weekly check-ins and direct support from Mike.
-            </p>
-            <button onClick={() => onSelectScreen('online-coaching')}
-              className="cursor-pointer bg-[#ff5500] text-black font-mono font-bold text-xs uppercase px-6 py-3.5 inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,85,0,0.3)] active:scale-95"
-            >
-              Explore online coaching
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. HOW IT WORKS */}
-      <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-[#22252e] pb-4 mb-10 text-center">
-          <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
-            [ HOW IT WORKS ]
-          </div>
-          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            THREE SIMPLE STEPS.
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {HOW_IT_WORKS.map((step) => (
-            <div key={step.step} className="mw-electric-card bg-[#121419] border border-[#20232b] p-6 relative group">
-              <div className="text-4xl font-display text-[#ff5500] font-bold mb-3">{step.step}</div>
-              <h3 className="font-display text-2xl text-white uppercase tracking-wider mb-2">{step.title}</h3>
-              <p className="text-sm font-sans text-zinc-400 leading-relaxed">{step.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 6. THE APP */}
-      <section className="home-app-section relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
-        <div className="absolute inset-0 bg-grid-pattern opacity-20" />
-        <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#ff5500]/10 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div className="space-y-5 pt-2 lg:pt-8">
-            <div className="inline-flex items-center gap-2 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Smartphone className="h-4 w-4" /> Your training, in your pocket</div>
-            <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-tight text-white sm:text-5xl">The MWFitnessUK<br /><span className="text-[#ff5500]">app is on the way.</span></h2>
-            <p className="max-w-xl text-sm leading-relaxed text-zinc-300 sm:text-base">A clearer way to keep your training, nutrition and progress together. The app is being developed to make consistency easier between check-ins — with the important details in one place, wherever you train.</p>
-            <ul className="space-y-2.5 text-sm text-zinc-300">
-              {['Daily weigh-ins and progress history','Food logging and nutrition habits','Training sessions and lift tracking','Progress photos, measurements and coach check-ins'].map((item) => <li key={item} className="flex items-start gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" />{item}</li>)}
-            </ul>
-            <button onClick={() => onSelectScreen('app')} className="cursor-pointer inline-flex items-center gap-2 border border-[#ff5500] px-5 py-3 font-mono text-xs font-bold uppercase text-white transition-colors hover:bg-[#ff5500] hover:text-black">Explore the app <ArrowRight className="h-4 w-4" /></button>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {[
-              { icon: Scale, title: 'Daily weigh-ins', text: 'Spot trends over time instead of focusing on one number.' },
-              { icon: TrendingUp, title: 'Progress tracking', text: 'Keep measurements, photos and milestones together.' },
-              { icon: Utensils, title: 'Food & nutrition', text: 'Log meals and build awareness of everyday habits.' },
-              { icon: Dumbbell, title: 'Training log', text: 'Keep workouts and performance moving forward.' },
-            ].map(({ icon: Icon, title, text }) => <div key={title} className="mw-electric-card border border-[#252a34] bg-[#15171d]/90 p-5">
-              <div className="mb-4 flex h-10 w-10 items-center justify-center border border-[#ff5500]/60 bg-[#ff5500]/10 text-[#ff5500]"><Icon className="h-5 w-5" /></div><h3 className="mb-2 font-display text-xl uppercase text-white">{title}</h3><p className="text-sm leading-relaxed text-zinc-400">{text}</p>
-            </div>)}
-          </div>
-        </div>
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-2 px-4 pb-8 sm:px-6 lg:absolute lg:right-8 lg:top-8 lg:items-end lg:px-0 lg:pb-0 2xl:right-[max(3rem,calc((100vw-80rem)/2))]">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 lg:text-right">Store listings linked once published</p>
-          <StoreBadges />
-        </div>
-      </section>
-
-      {/* 7. TESTIMONIALS */}
+      {/* TESTIMONIALS */}
       <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col justify-between gap-4 border-b border-[#22252e] pb-5 sm:flex-row sm:items-end">
           <div><div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div><h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2><p className="mt-3 max-w-xl text-sm text-zinc-400">Stories from people building stronger routines with support that fits around real life.</p></div>
@@ -382,7 +324,39 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </section>
 
-      {/* 8. CLOSING CTA */}
+
+      {/* THE APP */}
+      <section className="home-app-section relative overflow-hidden border-y border-[#22252e] bg-[#101115]">
+        <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+        <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-[#ff5500]/10 blur-3xl" />
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+          <div className="space-y-5 pt-2 lg:pt-8">
+            <div className="inline-flex items-center gap-2 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]"><Smartphone className="h-4 w-4" /> Your training, in your pocket</div>
+            <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-tight text-white sm:text-5xl">The MWFitnessUK<br /><span className="text-[#ff5500]">app is on the way.</span></h2>
+            <p className="max-w-xl text-sm leading-relaxed text-zinc-300 sm:text-base">A clearer way to keep your training, nutrition and progress together. The app is being developed to make consistency easier between check-ins — with the important details in one place, wherever you train.</p>
+            <ul className="space-y-2.5 text-sm text-zinc-300">
+              {['Daily weigh-ins and progress history','Food logging and nutrition habits','Training sessions and lift tracking','Progress photos, measurements and coach check-ins'].map((item) => <li key={item} className="flex items-start gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" />{item}</li>)}
+            </ul>
+            <button onClick={() => onSelectScreen('app')} className="cursor-pointer inline-flex items-center gap-2 border border-[#ff5500] px-5 py-3 font-mono text-xs font-bold uppercase text-white transition-colors hover:bg-[#ff5500] hover:text-black">Explore the app <ArrowRight className="h-4 w-4" /></button>
+            <div className="space-y-3 pt-2">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Store listings will link here once published</p>
+              <StoreBadges />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[
+              { icon: Scale, title: 'Daily weigh-ins', text: 'Spot trends over time instead of focusing on one number.' },
+              { icon: TrendingUp, title: 'Progress tracking', text: 'Keep measurements, photos and milestones together.' },
+              { icon: Utensils, title: 'Food & nutrition', text: 'Log meals and build awareness of everyday habits.' },
+              { icon: Dumbbell, title: 'Training log', text: 'Keep workouts and performance moving forward.' },
+            ].map(({ icon: Icon, title, text }) => <div key={title} className="mw-electric-card border border-[#252a34] bg-[#15171d]/90 p-5">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center border border-[#ff5500]/60 bg-[#ff5500]/10 text-[#ff5500]"><Icon className="h-5 w-5" /></div><h3 className="mb-2 font-display text-xl uppercase text-white">{title}</h3><p className="text-sm leading-relaxed text-zinc-400">{text}</p>
+            </div>)}
+          </div>
+        </div>
+      </section>
+
+      {/* CLOSING CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-4 md:pb-24">
         <div className="mw-electric-card relative bg-gradient-to-r from-[#171920] to-[#121418] border border-[#2a2f3a] p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[#ff5500]/10 rounded-full blur-3xl pointer-events-none"></div>

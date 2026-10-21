@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { APP_FEATURES, CONTACT } from '../../data/mockData';
 import { postEnquiry } from '../../lib/mail';
 import { Smartphone, CheckCircle, ArrowRight, Scale, TrendingUp, Utensils, Dumbbell, Instagram, PhoneCall } from 'lucide-react';
+import { StoreBadges } from '../StoreBadges';
 
 interface AppScreenProps {
   onOpenBookCall?: () => void;
@@ -46,7 +47,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full">
-          <div className="max-w-3xl space-y-6 text-center mx-auto">
+          <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#16181e]/90 border border-[#ff5500]/60 text-xs font-mono text-[#ff5500] uppercase tracking-widest backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-[#ff5500] animate-pulse"></span>
               <span>[ COMING SOON ]</span>
@@ -59,7 +60,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
               Everything you need to stay on track, in one place. Weigh-ins, progress, food and training — all simple, all in your pocket. It's being built right now.
             </p>
 
@@ -97,6 +98,10 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
               </div>
             );
           })}
+        </div>
+        <div className="mt-8 flex flex-col items-start gap-3 border-t border-[#22252e] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div><p className="font-mono text-xs uppercase tracking-widest text-zinc-300">App availability</p><p className="mt-1 text-sm text-zinc-500">Official store links will be added when each listing is published.</p></div>
+          <StoreBadges />
         </div>
       </section>
 

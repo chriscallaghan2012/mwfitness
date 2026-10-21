@@ -26,6 +26,7 @@ export const NutritionScreen: React.FC<NutritionScreenProps> = ({ onSelectScreen
             <button onClick={() => onSelectScreen('online-coaching')} className="cursor-pointer border border-zinc-700 bg-[#16181d] px-6 py-3.5 font-mono text-xs font-bold uppercase text-white hover:border-[#ff5500]">Explore coaching</button>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 pt-2 text-xs text-zinc-500"><span className="inline-flex items-center gap-2"><Download className="h-4 w-4 text-[#ff5500]" /> Downloadable formats</span><span className="inline-flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-[#ff5500]" /> Planned secure purchase library</span></div>
+
         </div>
       </div>
     </section>
