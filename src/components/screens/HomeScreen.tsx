@@ -153,7 +153,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       {/* 3. ABOUT MIKE */}
       <section id="about-mike" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
+          <div className="w-full min-w-0">
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
               [ ABOUT MIKE ]
             </div>
@@ -161,7 +161,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               MEET MIKE. YOUR ONLINE COACH.
             </h2>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">I’m Mike, and I help busy people build strength, confidence and healthier routines through practical online coaching. Your plan is shaped around your goals, your schedule and real life — with clear training and nutrition guidance, plus support to help you stay consistent.</p>
-            <div aria-hidden="true" className="industrial-stripe industrial-stripe--marker" />
+            <div aria-hidden="true" className="mt-5 w-full border-b border-dashed border-[#454954]" />
           </div>
           <button onClick={() => onOpenBookCall()}
             className="cursor-pointer text-xs font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 group"
@@ -372,16 +372,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       <section className="mx-auto w-full max-w-7xl px-4 pb-16 pt-4 sm:px-6 md:pb-20 lg:px-8">
         <div className="mw-electric-card relative mx-auto flex w-full max-w-4xl flex-col items-center overflow-hidden border border-[#2a2f3a] bg-gradient-to-b from-[#171920] to-[#121418] px-5 py-8 text-center sm:px-8 md:py-10">
           <div className="relative w-full max-w-2xl space-y-3">
+            <div aria-hidden="true" className="mb-5 w-full border-t border-dashed border-[#454954]" />
             <div className="inline-flex items-center justify-center gap-2 text-xs font-mono uppercase tracking-widest text-[#ff5500]">
               <span className="h-2 w-2 bg-[#ff5500]"></span>
               <span>Ready when you are</span>
             </div>
-            <h2 className="border-b border-dashed border-[#454954] pb-4 font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">
+            <h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">
               LET'S GET STARTED.
             </h2>
             <p className="mx-auto max-w-xl text-sm font-sans leading-relaxed text-zinc-300">
               One quick chat is all it takes. We'll talk about where you are, where you want to be and the simplest way to get there. No commitment, no pressure.
             </p>
+            <div aria-hidden="true" className="pt-1 w-full border-b border-dashed border-[#454954]" />
           </div>
           <div className="relative mt-6 flex w-full max-w-sm flex-col items-center gap-2.5 sm:flex-row sm:justify-center">
             <button onClick={() => onOpenBookCall()}
