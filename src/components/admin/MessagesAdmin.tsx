@@ -66,6 +66,10 @@ export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: st
     return () => window.clearInterval(timer);
   }, [load]);
 
+  useEffect(() => {
+    if (initialAthleteId) setSelectedId(initialAthleteId);
+  }, [initialAthleteId]);
+
   const threads = useMemo(() => athletes.map((athlete) => {
     const id = String(athlete.id);
     const threadMessages = messages.filter((message) => String(message.athlete_profile_id) === id);
