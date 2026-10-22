@@ -125,32 +125,32 @@ export function StaffNotifications({ onNavigate }: {
     setReadIds((current) => current.includes(id) ? current : [...current, id]);
   };
 
-  return <div className="relative">
-    <button type="button" onClick={() => setOpen((value) => !value)} aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : 'Notifications'} aria-expanded={open} className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.025] text-zinc-300 transition hover:border-orange-400/40 hover:bg-white/[0.06] hover:text-white">
+  return <div className="relative z-40">
+    <button type="button" onClick={() => setOpen((value) => !value)} aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : 'Notifications'} aria-expanded={open} className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#2b2d33] bg-[#15171b] text-zinc-400 transition-colors hover:border-[#ff5500]/70 hover:bg-[#ff5500]/10 hover:text-[#ff6a1f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5500]">
       <Bell size={17} />
       {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-black">{unreadCount > 99 ? '99+' : unreadCount}</span>}
     </button>
-    {open && <div className="absolute right-0 top-12 z-50 w-[min(92vw,420px)] overflow-hidden rounded-2xl border border-white/10 bg-[#111316] shadow-2xl shadow-black/50">
-      <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] px-4 py-3">
+    {open && <div className="absolute right-0 top-11 z-50 w-[min(90vw,360px)] overflow-hidden rounded-xl border border-[#2b2d33] bg-[#111316] shadow-xl shadow-black/40">
+      <div className="flex items-center justify-between gap-3 border-b border-[#26282e] px-3.5 py-3">
         <div><h3 className="text-sm font-semibold text-white">Member submissions</h3><p className="mt-0.5 text-[11px] text-zinc-500">Last 7 days · {unreadCount} unread</p></div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={clearAll} disabled={!unreadCount} className="inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-white disabled:opacity-40"><Check size={13} /> Clear all</button>
-          <button type="button" onClick={() => setOpen(false)} aria-label="Close notifications" className="rounded-lg p-1.5 text-zinc-500 hover:bg-white/5 hover:text-white"><X size={15} /></button>
+          <button type="button" onClick={clearAll} disabled={!unreadCount} className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-zinc-400 transition-colors hover:bg-[#ff5500]/10 hover:text-[#ff6a1f] disabled:opacity-40"><Check size={13} /> Clear all</button>
+          <button type="button" onClick={() => setOpen(false)} aria-label="Close notifications" className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-[#22252b] hover:text-[#ff6a1f]"><X size={15} /></button>
         </div>
       </div>
       {error && <p role="status" className="border-b border-amber-500/20 px-4 py-2 text-xs text-amber-200">{error}</p>}
       <div className="max-h-[min(65vh,560px)] overflow-y-auto">
         {loading && visibleItems.length === 0 ? <p className="px-4 py-8 text-center text-xs text-zinc-500">Loading submissions…</p> :
           visibleItems.length === 0 ? <p className="px-4 py-8 text-center text-xs text-zinc-500">{isDemoMode() ? 'No sample submissions in the last 7 days.' : 'No member submissions in the last 7 days.'}</p> :
-          visibleItems.map((item) => <div key={item.id} className={'group flex gap-2 border-b border-white/[0.05] px-3 py-3 ' + (readIds.includes(item.id) ? 'bg-transparent' : 'bg-orange-500/[0.045]')}>
+          visibleItems.map((item) => <div key={item.id} className={'group mx-1 flex gap-2 rounded-lg px-2.5 py-2.5 transition-colors hover:bg-[#202228] ' + (readIds.includes(item.id) ? 'bg-transparent' : 'bg-[#ff5500]/[0.07] hover:bg-[#ff5500]/[0.12]')}>
             <button type="button" onClick={() => openItem(item)} className="min-w-0 flex-1 text-left">
               <span className="flex items-start gap-2"><span className={'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ' + (readIds.includes(item.id) ? 'bg-zinc-700' : 'bg-orange-400')} /><span className="min-w-0"><span className="block text-xs font-semibold text-zinc-100">{item.title}</span><span className="mt-1 block break-words text-[11px] leading-4 text-zinc-400">{item.detail}</span><span className="mt-1.5 block text-[10px] text-zinc-600">{new Date(item.createdAt).toLocaleString('en-GB')}</span></span><ExternalLink size={13} className="mt-1 shrink-0 text-zinc-600" /></span>
             </button>
-            <button type="button" onClick={() => dismiss(item.id)} aria-label={`Dismiss ${item.title}`} title="Dismiss notification" className="h-7 w-7 shrink-0 rounded-lg text-zinc-600 opacity-70 transition hover:bg-white/[0.07] hover:text-white sm:opacity-0 sm:group-hover:opacity-100"><X size={14} /></button>
+            <button type="button" onClick={() => dismiss(item.id)} aria-label={`Dismiss ${item.title}`} title="Dismiss notification" className="h-7 w-7 shrink-0 rounded-md text-zinc-600 opacity-70 transition-colors hover:bg-[#ff5500]/15 hover:text-[#ff6a1f] focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"><X size={14} /></button>
           </div>)
         }
       </div>
-      <div className="flex items-center justify-between border-t border-white/[0.07] px-4 py-2.5"><span className="text-[10px] text-zinc-600">Refreshes every 30 seconds</span><button type="button" onClick={() => void refresh()} disabled={loading} className="text-[11px] text-orange-300 hover:text-orange-200 disabled:opacity-50">{loading ? 'Refreshing…' : 'Refresh'}</button></div>
+      <div className="flex items-center justify-between border-t border-[#26282e] px-3.5 py-2.5"><span className="text-[10px] text-zinc-600">Refreshes every 30 seconds</span><button type="button" onClick={() => void refresh()} disabled={loading} className="rounded-md px-2 py-1 text-[11px] text-[#ff6a1f] transition-colors hover:bg-[#ff5500]/10 hover:text-[#ff8a50] disabled:opacity-50">{loading ? 'Refreshing…' : 'Refresh'}</button></div>
     </div>}
   </div>;
 }
