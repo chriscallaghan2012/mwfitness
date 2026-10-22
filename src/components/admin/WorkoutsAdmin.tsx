@@ -77,7 +77,6 @@ export function WorkoutsAdmin() {
 
   const removeTemplate = async (row: Row) => {
     if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
-    if (!window.confirm(`Delete workout template “${String(row.name)}”? Scheduled sessions may prevent deletion.`)) return;
     setMsg('');
     try {
       const result = await db.from('workout_templates').delete().eq('id', row.id).select('id');
