@@ -133,9 +133,9 @@ export function AdminTable({
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto">
+          <div className="max-h-[65vh] overflow-auto">
             <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="border-b border-white/[0.06] bg-white/[0.035]">
+              <thead className="sticky top-0 z-10 border-b border-white/[0.06] bg-[#17191e]">
                 <tr className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
                   {cols.map((column) => <th key={column.key} className="whitespace-nowrap px-4 py-3.5">{column.label}</th>)}
                   {onEdit || onDelete ? <th className="px-4 py-3.5 text-right">Actions</th> : null}
