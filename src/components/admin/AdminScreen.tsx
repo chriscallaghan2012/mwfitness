@@ -18,6 +18,7 @@ import { PasswordRecovery } from './PasswordRecovery';
 import { MemberActivityAdmin } from './MemberActivityAdmin';
 import { ActivityCalendar } from './ActivityCalendar';
 import { CommunicationsAdmin } from './CommunicationsAdmin';
+import { StaffNotifications } from './StaffNotifications';
 import { Row, btn, btnGhost, card } from './fields';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { adminDb, isDemoMode, setAdminDemoMode } from '../../lib/admin/adminDb';
@@ -263,13 +264,21 @@ export function AdminScreen() {
         ) : (
           <span className="text-xs text-zinc-400">signed in as {email}</span>
         )}
-        <button onClick={demoMode ? exitDemo : signOut} className="text-xs text-zinc-500 underline">
-          {demoMode ? 'Exit demo' : 'Sign out'}
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          <StaffNotifications onNavigate={(nextTab, profileId) => {
+            if (nextTab === 'messages') setSelectedMessageClientId(profileId);
+            if (nextTab === 'members') setSelectedClientId(profileId);
+            else setSelectedClientId('');
+            setTab(nextTab);
+          }} />
+          <button onClick={demoMode ? exitDemo : signOut} className="text-xs text-zinc-500 underline">
+            {demoMode ? 'Exit demo' : 'Sign out'}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[224px_minmax(0,1fr)] xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-6">
-        <aside className="min-w-0 self-start">
+        <aside className="min-w-0 self-start lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:h-full lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-white/[0.08] lg:bg-[#131519] lg:p-3">
         <p className="hidden px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 lg:block">Workspace</p>
         {TABS.map((t) => (
