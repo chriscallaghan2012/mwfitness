@@ -217,7 +217,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
       .filter((event) => event.at)
       .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
       .slice(0, 12);
-  }, [records]);
+  }, [records, progressPhotos]);
 
   // ---- Assignment actions (demo = session memory, live = Neon) ----
   const reload = () => setRefreshTick((value) => value + 1);
