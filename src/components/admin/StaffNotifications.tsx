@@ -130,8 +130,8 @@ export function StaffNotifications({ onNavigate }: {
       <Bell size={17} />
       {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-black">{unreadCount > 99 ? '99+' : unreadCount}</span>}
     </button>
-    {open && <div className="absolute right-0 top-11 z-50 w-[min(90vw,360px)] overflow-hidden rounded-xl border border-[#2b2d33] bg-[#111316] shadow-xl shadow-black/40">
-      <div className="flex items-center justify-between gap-3 border-b border-[#26282e] px-3.5 py-3">
+    {open && <div className="absolute right-0 top-11 z-50 w-[min(88vw,340px)] overflow-hidden rounded-xl border border-[#303239] bg-[#111316] shadow-2xl shadow-black/50">
+      <div className="flex items-center justify-between gap-2 border-b border-[#26282e] px-3 py-2.5">
         <div><h3 className="text-sm font-semibold text-white">Member submissions</h3><p className="mt-0.5 text-[11px] text-zinc-500">Last 7 days · {unreadCount} unread</p></div>
         <div className="flex items-center gap-2">
           <button type="button" onClick={clearAll} disabled={!unreadCount} className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-zinc-400 transition-colors hover:bg-[#ff5500]/10 hover:text-[#ff6a1f] disabled:opacity-40"><Check size={13} /> Clear all</button>
@@ -139,10 +139,10 @@ export function StaffNotifications({ onNavigate }: {
         </div>
       </div>
       {error && <p role="status" className="border-b border-amber-500/20 px-4 py-2 text-xs text-amber-200">{error}</p>}
-      <div className="max-h-[min(65vh,560px)] overflow-y-auto">
+      <div className="max-h-[min(52vh,420px)] overflow-y-auto overscroll-contain">
         {loading && visibleItems.length === 0 ? <p className="px-4 py-8 text-center text-xs text-zinc-500">Loading submissions…</p> :
           visibleItems.length === 0 ? <p className="px-4 py-8 text-center text-xs text-zinc-500">{isDemoMode() ? 'No sample submissions in the last 7 days.' : 'No member submissions in the last 7 days.'}</p> :
-          visibleItems.map((item) => <div key={item.id} className={'group mx-1 flex gap-2 rounded-lg px-2.5 py-2.5 transition-colors hover:bg-[#202228] ' + (readIds.includes(item.id) ? 'bg-transparent' : 'bg-[#ff5500]/[0.07] hover:bg-[#ff5500]/[0.12]')}>
+          visibleItems.map((item) => <div key={item.id} className={'group flex gap-2 border-b border-[#24262c] px-3 py-2 transition-colors hover:bg-[#1b1d22] ' + (readIds.includes(item.id) ? 'bg-transparent' : 'bg-[#ff5500]/[0.035] hover:bg-[#ff5500]/[0.07]')}>
             <button type="button" onClick={() => openItem(item)} className="min-w-0 flex-1 text-left">
               <span className="flex items-start gap-2"><span className={'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ' + (readIds.includes(item.id) ? 'bg-zinc-700' : 'bg-orange-400')} /><span className="min-w-0"><span className="block text-xs font-semibold text-zinc-100">{item.title}</span><span className="mt-1 block break-words text-[11px] leading-4 text-zinc-400">{item.detail}</span><span className="mt-1.5 block text-[10px] text-zinc-600">{new Date(item.createdAt).toLocaleString('en-GB')}</span></span><ExternalLink size={13} className="mt-1 shrink-0 text-zinc-600" /></span>
             </button>
@@ -150,7 +150,7 @@ export function StaffNotifications({ onNavigate }: {
           </div>)
         }
       </div>
-      <div className="flex items-center justify-between border-t border-[#26282e] px-3.5 py-2.5"><span className="text-[10px] text-zinc-600">Refreshes every 30 seconds</span><button type="button" onClick={() => void refresh()} disabled={loading} className="rounded-md px-2 py-1 text-[11px] text-[#ff6a1f] transition-colors hover:bg-[#ff5500]/10 hover:text-[#ff8a50] disabled:opacity-50">{loading ? 'Refreshing…' : 'Refresh'}</button></div>
+      <div className="flex items-center justify-between border-t border-[#26282e] px-3 py-2"><span className="text-[10px] text-zinc-600">Refreshes every 30 seconds</span><button type="button" onClick={() => void refresh()} disabled={loading} className="rounded-md px-2 py-1 text-[11px] text-[#ff6a1f] transition-colors hover:bg-[#ff5500]/10 hover:text-[#ff8a50] disabled:opacity-50">{loading ? 'Refreshing…' : 'Refresh'}</button></div>
     </div>}
   </div>;
 }
