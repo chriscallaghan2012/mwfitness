@@ -91,7 +91,7 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
     finally { setBusy(false); }
   };
   const remove = async (row: Row) => {
-    if (!db || !window.confirm('Permanently delete ' + String(row.name) + '?')) return;
+    if (!db) return;
     setBusy(true); setError(''); setNotice('');
     try {
       const result = await db.from('swag_products').delete().eq('id', row.id).select('id');

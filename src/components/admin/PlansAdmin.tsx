@@ -82,7 +82,6 @@ export function PlansAdmin() {
 
   const remove = async (p: Row) => {
     if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
-    if (!window.confirm(`Delete plan “${String(p.name)}”? Plans assigned to memberships may be protected by database constraints; hide the plan instead if it is already in use.`)) return;
     setBusy(true); setMsg('');
     try {
       const { error } = await db.from('plans').delete().eq('id', p.id);

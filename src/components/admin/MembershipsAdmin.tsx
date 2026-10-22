@@ -1,7 +1,7 @@
 // MembershipsAdmin — which customer owns which plan (Stripe-backed).
 import { useEffect, useState } from 'react';
 import { adminDb } from '../../lib/admin/adminDb';
-import { AdminTable, Row, ShortDate, StatusPill, btn, btnGhost, card, inp } from './fields';
+import { AdminTable, ConfirmDialog, Row, ShortDate, StatusPill, btn, btnGhost, card, inp } from './fields';
 
 const STATUSES = ['active', 'trialing', 'past_due', 'canceled', 'incomplete'];
 
@@ -13,6 +13,7 @@ export function MembershipsAdmin() {
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({});
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const load = async () => {
     if (!db) { setMsg('Neon is not configured; memberships cannot be loaded.'); setRows([]); return; }
@@ -118,7 +119,7 @@ export function MembershipsAdmin() {
             render: (r) => (
               <>
                 {ShortDate(r.current_period_end as string)}
-                <button className={`${btnGhost} ml-2`} onClick={() => void remove(String(r.id))}>
+                <button className={`${btnGhost} ml-2`} onClick={() => setPendingDeleteId(String(r.id))}>
                   Remove
                 </button>
               </>
@@ -126,6 +127,7 @@ export function MembershipsAdmin() {
           },
         ]}
       />
+      {pendingDeleteId && <ConfirmDialog title="Remove membership?" description="This permanently removes the membership assignment. It does not issue a Stripe refund or cancel a Stripe subscription." confirmLabel="Remove membership" onCancel={() => setPendingDeleteId(null)} onConfirm={() => { const id = pendingDeleteId; setPendingDeleteId(null); if (id) void remove(id); }} />}
     </div>
   );
 }

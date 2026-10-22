@@ -139,7 +139,6 @@ export function NutritionAdmin() {
 
   const removeRow = async (row: Row) => {
     if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
-    if (!window.confirm(`Delete “${String(row.name)}”? This cannot be undone.`)) return;
     setBusy(true); setMsg('');
     try {
       const { error } = await db.from(schema()).delete().eq('id', row.id);
