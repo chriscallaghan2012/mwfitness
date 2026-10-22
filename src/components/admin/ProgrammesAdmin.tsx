@@ -86,7 +86,6 @@ export function ProgrammesAdmin() {
 
   const remove = async (row: Row) => {
     if (!db) { setMessage('Live database access is not configured; no changes were made.'); return; }
-    if (!window.confirm('Delete programme "' + String(row.name) + '"? Assigned clients may prevent deletion; deactivate it instead if in use.')) return;
     setBusy(true); setMessage('');
     try {
       const result = await db.from('coaching_programmes').delete().eq('id', row.id).select('id');
