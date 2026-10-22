@@ -2,65 +2,33 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [
+  "headers": [
     {
-      "source": "/online-coaching",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/nutrition",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/reviews",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/app",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/shwag",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/contact",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/account",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/privacy",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/cookies",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/gdpr",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/checkout",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/delete-account",
-      "destination": "/index.html"
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" }
+      ]
     }
   ],
+  "rewrites": [
+    { "source": "/online-coaching", "destination": "/index.html" },
+    { "source": "/nutrition", "destination": "/index.html" },
+    { "source": "/reviews", "destination": "/index.html" },
+    { "source": "/app", "destination": "/index.html" },
+    { "source": "/shwag", "destination": "/index.html" },
+    { "source": "/contact", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/account", "destination": "/index.html" },
+    { "source": "/privacy", "destination": "/index.html" },
+    { "source": "/cookies", "destination": "/index.html" },
+    { "source": "/gdpr", "destination": "/index.html" },
+    { "source": "/checkout", "destination": "/index.html" },
+    { "source": "/delete-account", "destination": "/index.html" }
+  ],
   "redirects": [
-    {
-      "source": "/packages",
-      "destination": "/online-coaching",
-      "permanent": true
-    }
+    { "source": "/packages", "destination": "/online-coaching", "permanent": true }
   ]
 }
