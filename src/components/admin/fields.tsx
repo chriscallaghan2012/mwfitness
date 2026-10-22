@@ -86,6 +86,7 @@ export function AdminTable({
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const [pendingDelete, setPendingDelete] = useState<Row | null>(null);
   const indexedRows = rows.map((row) => ({ row, searchText: searchableText(row).toLocaleLowerCase() }));
   const query = search.trim().toLocaleLowerCase();
   const filteredRows = query ? indexedRows.filter((item) => item.searchText.includes(query)).map((item) => item.row) : rows;
@@ -152,7 +153,7 @@ export function AdminTable({
                       <td className="whitespace-nowrap px-4 py-3.5">
                         <div className="flex justify-end gap-2">
                           {onEdit ? <button type="button" onClick={() => onEdit(row)} className={btnGhost}><Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit</button> : null}
-                          {onDelete ? <button type="button" onClick={() => onDelete(row)} className={btnGhost}><Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Remove</button> : null}
+                          {onDelete ? <button type="button" onClick={() => setPendingDelete(row)} className={btnGhost}><Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Remove</button> : null}
                         </div>
                       </td>
                     ) : null}
@@ -187,6 +188,19 @@ export function AdminTable({
         </button>
       ) : null}
       {(!collapsible || !collapsed) ? tableContent : null}
+      {pendingDelete ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4" role="presentation">
+          <section role="alertdialog" aria-modal="true" aria-labelledby="staff-delete-title" aria-describedby="staff-delete-description" className="w-full max-w-md rounded-2xl border border-white/10 bg-[#17191e] p-5 shadow-2xl shadow-black/60">
+            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-red-500/25 bg-red-500/10 text-red-300"><Trash2 className="h-5 w-5" /></div>
+            <h3 id="staff-delete-title" className="text-base font-semibold text-white">Confirm deletion</h3>
+            <p id="staff-delete-description" className="mt-2 text-sm leading-6 text-zinc-400">Delete <span className="font-medium text-white">{String(pendingDelete.name ?? pendingDelete.title ?? pendingDelete.full_name ?? pendingDelete.email ?? pendingDelete.id ?? 'this record')}</span>? This action may not be reversible.</p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setPendingDelete(null)} className={btnGhost}>Cancel</button>
+              <button type="button" onClick={() => { const row = pendingDelete; setPendingDelete(null); onDelete?.(row); }} className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-red-400"><Trash2 className="h-3.5 w-3.5" /> Delete</button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }
