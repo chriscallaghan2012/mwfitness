@@ -34,17 +34,18 @@ export function ActivityCalendar({ profileId, onOpenClient }: { profileId?: stri
     setLoading(true);
     setError('');
     try {
+      const scoped = (query: any, column = 'profile_id') => profileId ? query.eq(column, profileId) : query;
       const results = await Promise.all([
         db.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name').limit(500),
-        db.from('workout_sessions').select('id,profile_id,status,completed_on,created_at,workout_templates(name)').order('created_at', { ascending: false }).limit(500),
-        db.from('checkins').select('id,profile_id,status,checkin_date,created_at').order('created_at', { ascending: false }).limit(500),
-        db.from('progress_logs').select('id,profile_id,weight,recorded_on,created_at').order('created_at', { ascending: false }).limit(500),
-        db.from('nutrition_logs').select('id,profile_id,calories,protein_grams,logged_on,created_at').order('created_at', { ascending: false }).limit(500),
-        db.from('nutrition_daily_logs').select('id,profile_id,completed_day,completed_meal_ids,log_date,updated_at').order('updated_at', { ascending: false }).limit(500),
-        db.from('progress_photos').select('id,profile_id,caption,recorded_on,created_at').order('created_at', { ascending: false }).limit(500),
-        db.from('daily_metrics').select('profile_id,metric_date,water_litres,steps').order('metric_date', { ascending: false }).limit(500),
-        db.from('cardio_logs').select('id,profile_id,completed_at,activity,duration_minutes').order('completed_at', { ascending: false }).limit(500),
-        db.from('coach_messages').select('id,athlete_profile_id,sender_profile_id,created_at').order('created_at', { ascending: false }).limit(500),
+        scoped(db.from('workout_sessions').select('id,profile_id,status,completed_on,created_at,workout_templates(name)')).order('created_at', { ascending: false }).limit(500),
+        scoped(db.from('checkins').select('id,profile_id,status,checkin_date,created_at')).order('created_at', { ascending: false }).limit(500),
+        scoped(db.from('progress_logs').select('id,profile_id,weight,recorded_on,created_at')).order('created_at', { ascending: false }).limit(500),
+        scoped(db.from('nutrition_logs').select('id,profile_id,calories,protein_grams,logged_on,created_at')).order('created_at', { ascending: false }).limit(500),
+        scoped(db.from('nutrition_daily_logs').select('id,profile_id,completed_day,completed_meal_ids,log_date,updated_at')).order('updated_at', { ascending: false }).limit(500),
+        scoped(db.from('progress_photos').select('id,profile_id,caption,recorded_on,created_at')).order('created_at', { ascending: false }).limit(500),
+        scoped(db.from('daily_metrics').select('profile_id,metric_date,water_litres,steps')).order('metric_date', { ascending: false }).limit(500),
+        scoped(db.from('cardio_logs').select('id,profile_id,completed_at,activity,duration_minutes')).order('completed_at', { ascending: false }).limit(500),
+        scoped(db.from('coach_messages').select('id,athlete_profile_id,sender_profile_id,created_at'), 'athlete_profile_id').order('created_at', { ascending: false }).limit(500),
       ]);
       const [memberRows, workouts, checkins, progress, nutrition, nutritionDaily, photos, metrics, cardio, messages] = results;
       if (memberRows.error) throw new Error('Member list could not be loaded. Check Staff HQ access and the profiles table.');
@@ -132,7 +133,7 @@ export function ActivityCalendar({ profileId, onOpenClient }: { profileId?: stri
     </div>
     {view === 'calendar' ? <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
       <section className={panel}>
-        <div className="mb-4 flex items-center justify-between gap-2"><button type="button" aria-label="Previous month" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} className={button}><ChevronLeft className="h-4 w-4" /></button><h3 className="text-sm font-semibold text-white">{month.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h3><button type="button" aria-label="Next month" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} className={button}><ChevronRight className="h-4 w-4" /></button></div>
+        <div className="mb-4 flex items-center justify-between gap-2"><button type="button" aria-label="Previous month" onClick={() => { const nextMonth = new Date(month.getFullYear(), month.getMonth() - 1, 1); setMonth(nextMonth); setSelectedDay(localKey(nextMonth)); }} className={button}><ChevronLeft className="h-4 w-4" /></button><h3 className="text-sm font-semibold text-white">{month.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h3><button type="button" aria-label="Next month" onClick={() => { const nextMonth = new Date(month.getFullYear(), month.getMonth() + 1, 1); setMonth(nextMonth); setSelectedDay(localKey(nextMonth)); }} className={button}><ChevronRight className="h-4 w-4" /></button></div>
         <div className="grid grid-cols-7 gap-1 text-center">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => <div key={day} className="py-2 text-[10px] font-mono uppercase text-zinc-500">{day}</div>)}
           {gridDays.map((day) => { const key = localKey(day); const count = eventsByDay.get(key)?.length || 0; const inMonth = day.getMonth() === month.getMonth(); return <button key={key} type="button" onClick={() => { setSelectedDay(key); if (!inMonth) setMonth(new Date(day.getFullYear(), day.getMonth(), 1)); }} aria-pressed={selectedDay === key} className={`min-h-[68px] rounded-lg border p-1.5 text-left transition sm:min-h-[82px] ${selectedDay === key ? 'border-orange-400 bg-orange-500/10' : 'border-zinc-800 hover:border-zinc-600'} ${inMonth ? 'text-zinc-200' : 'text-zinc-600'}`}><span className="text-xs">{day.getDate()}</span>{count > 0 && <span className="mt-1 flex items-center gap-1 text-[10px] text-orange-300"><span className="h-1.5 w-1.5 rounded-full bg-orange-400" />{count} {count === 1 ? 'record' : 'records'}</span>}</button>; })}
         </div>
