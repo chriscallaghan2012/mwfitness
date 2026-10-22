@@ -65,7 +65,13 @@ export function AdminScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState(false);
-  const [demoMode, setDemoMode] = useState(false);
+  const [demoMode, setDemoMode] = useState(() => {
+    // Keep demo mode for this browser tab so refreshing Staff HQ doesn't send
+    // a demo user back to the live sign-in screen.
+    const restored = typeof window !== 'undefined' && window.sessionStorage.getItem('mwfitness-staff-demo') === '1';
+    if (restored) setAdminDemoMode(true);
+    return restored;
+  });
   const [tab, setTab] = useState<Tab>('overview');
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedMessageClientId, setSelectedMessageClientId] = useState('');
@@ -76,6 +82,12 @@ export function AdminScreen() {
   const [forgotMode, setForgotMode] = useState(false);
 
   useEffect(() => {
+    if (demoMode) {
+      resetDemoDb();
+      setAdminDemoMode(true);
+      void loadStats();
+      return;
+    }
     if (!neon) return;
     const client = neon;
     client.auth
@@ -94,7 +106,7 @@ export function AdminScreen() {
         void loadStats();
       })
       .catch(() => undefined);
-  }, []);
+  }, [demoMode]);
 
   const loadStats = async () => {
     const db = adminDb();
@@ -185,6 +197,7 @@ export function AdminScreen() {
   };
 
   const signOut = () => {
+    window.sessionStorage.removeItem('mwfitness-staff-demo');
     void neon?.auth.signOut({});
     setSignedIn(false);
     setDemoMode(false);
@@ -198,6 +211,7 @@ export function AdminScreen() {
     // Demo mode swaps the data source only — the staff HQ layout is identical to live.
     resetDemoDb();
     setAdminDemoMode(true);
+    window.sessionStorage.setItem('mwfitness-staff-demo', '1');
     setDemoMode(true);
     setSignedIn(false);
     setSelectedClientId('');
@@ -209,6 +223,7 @@ export function AdminScreen() {
   };
 
   const exitDemo = () => {
+    window.sessionStorage.removeItem('mwfitness-staff-demo');
     setAdminDemoMode(false);
     resetDemoDb();
     setDemoMode(false);
