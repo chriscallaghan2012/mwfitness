@@ -149,7 +149,12 @@ export function MemberActivityAdmin() {
     }
   }, []);
 
-  const visibleActivity = memberFilter === 'all' ? activity : activity.filter((event) => event.profile_id === memberFilter);
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const visibleActivity = activity.filter((event) =>
+    (memberFilter === 'all' || event.profile_id === memberFilter) &&
+    Number.isFinite(new Date(event.occurred_at).getTime()) &&
+    new Date(event.occurred_at).getTime() >= sevenDaysAgo
+  );
 
   useEffect(() => { void refresh(); }, [refresh]);
 
@@ -162,7 +167,7 @@ export function MemberActivityAdmin() {
     {loading && <p role="status" className="text-sm text-zinc-500">Loading live member records…</p>}
     <section className={panel}>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h3 className="font-semibold text-white">Recent member activity</h3><p className="mt-1 text-xs text-zinc-500">Most recent saved records across member app activity</p></div>
+        <div><h3 className="font-semibold text-white">Recent member activity</h3><p className="mt-1 text-xs text-zinc-500">Saved member activity from the last 7 days</p></div>
         <label className="grid min-w-0 gap-1.5 text-xs text-zinc-400 sm:w-56">Member
           <select value={memberFilter} onChange={(event) => setMemberFilter(event.target.value)} className="block w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] px-3 py-2.5 text-zinc-200">
             <option value="all">All members</option>
@@ -171,7 +176,7 @@ export function MemberActivityAdmin() {
         </label>
       </div>
       {activityWarning && <p role="status" className="mt-3 text-xs text-amber-200">{activityWarning}</p>}
-      {visibleActivity.length ? <div className="mt-4 divide-y divide-zinc-800">
+      {visibleActivity.length ? <div className="mt-4 max-h-[360px] overflow-y-auto pr-1 divide-y divide-zinc-800">
         {visibleActivity.slice(0, 50).map((event) => <div key={event.id} className="flex flex-wrap items-start justify-between gap-2 py-3">
           <div className="min-w-0"><p className="text-xs font-semibold uppercase text-orange-300">{event.kind} · {memberName(event.profile_id, members)}</p><p className="mt-1 break-words text-sm text-zinc-200">{event.detail}</p></div>
           <time className="shrink-0 text-xs text-zinc-500">{new Date(event.occurred_at).toLocaleString('en-GB')}</time>
