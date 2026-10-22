@@ -65,7 +65,6 @@ export function VideosAdmin() {
   const remove = async (row: Row) => {
     if (!db || schemaMissing) { setMessage('Live video storage is not configured; no changes were made.'); return; }
     if (busy) return;
-    if (!window.confirm('Delete "' + String(row.title) + '" from the video library?')) return;
     setBusy(true); setMessage('');
     try {
       const result = await db.from('coaching_videos').delete().eq('id', row.id).select('id');
