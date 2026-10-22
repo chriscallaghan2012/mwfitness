@@ -80,6 +80,11 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
   const [assignProgrammeId, setAssignProgrammeId] = useState('');
   const [assignProgrammeStart, setAssignProgrammeStart] = useState(todayStr);
   const [assignProgrammeDue, setAssignProgrammeDue] = useState(() => plusDays(7));
+  const [supplementName, setSupplementName] = useState('');
+  const [supplementDosage, setSupplementDosage] = useState('');
+  const [supplementTiming, setSupplementTiming] = useState('AS_DIRECTED');
+  const [supplementInstructions, setSupplementInstructions] = useState('');
+  const [supplementBusy, setSupplementBusy] = useState(false);
 
   // Client list plus the libraries used by the "Assign to client" panel.
   useEffect(() => {
@@ -239,7 +244,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
     if (!db || !userId) return;
     if (!assignWorkoutTemplate || !assignWorkoutDate) { setAssignNotice('Choose a workout template and a date.'); return; }
     const { error } = await db.from('workout_sessions').insert({
-      profile_id: userId, template_id: assignWorkoutTemplate, scheduled_on: assignWorkoutDate, status: 'scheduled',
+      profile_id: userId, template_id: assignWorkoutTemplate, scheduled_on: assignWorkoutDate, status: 'planned',
     }).select('id');
     setAssignNotice(error ? `Session could not be scheduled: ${error.message}` : `Session scheduled for ${ShortDate(assignWorkoutDate)}.`);
     if (!error) reload();
@@ -258,6 +263,39 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
     }).select('id');
     setAssignNotice(error ? `Programme could not be assigned: ${error.message}` : 'Coaching programme assigned to this member.');
     if (!error) { setAssignProgrammeId(''); reload(); }
+  };
+
+  const assignSupplement = async () => {
+    if (!db || !userId) return;
+    if (!supplementName.trim()) { setAssignNotice('Enter a supplement name.'); return; }
+    setSupplementBusy(true);
+    try {
+      const { data, error } = await db.from('supplement_plans').insert({
+        profile_id: userId,
+        name: supplementName.trim(),
+        dosage_string: supplementDosage.trim(),
+        timing: supplementTiming,
+        instructions: supplementInstructions.trim(),
+        sort_order: records.supplement_plans.length,
+        active: true,
+      }).select('id');
+      if (error) { setAssignNotice(`Supplement plan could not be assigned: ${error.message}`); return; }
+      if (!data?.length) { setAssignNotice('Supplement plan was not saved. Check staff permissions and retry.'); return; }
+      setAssignNotice(`Assigned “${supplementName.trim()}” to this member.`);
+      setSupplementName(''); setSupplementDosage(''); setSupplementTiming('AS_DIRECTED'); setSupplementInstructions('');
+      reload();
+    } catch (error) {
+      setAssignNotice(`Supplement plan could not be assigned: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    } finally { setSupplementBusy(false); }
+  };
+
+  const toggleSupplement = async (row: Row) => {
+    if (!db || !userId) return;
+    const { data, error } = await db.from('supplement_plans').update({ active: !row.active }).eq('id', row.id).eq('profile_id', userId).select('id');
+    if (error) { setAssignNotice(`Supplement status could not be updated: ${error.message}`); return; }
+    if (!data?.length) { setAssignNotice('Supplement status was not updated. Check staff permissions and retry.'); return; }
+    setAssignNotice(`${String(row.name)} ${row.active ? 'paused' : 'activated'}.`);
+    reload();
   };
 
   const cols = (() => {
@@ -295,7 +333,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
       { key: 'activity', label: 'Activity' }, { key: 'duration_minutes', label: 'Minutes' }, { key: 'average_heart_rate', label: 'Avg HR' }, { key: 'notes', label: 'Notes' },
     ];
     if (dataset === 'supplement_plans') return [
-      { key: 'name', label: 'Supplement' }, { key: 'dosage_string', label: 'Dosage' }, { key: 'timing', label: 'Timing' }, { key: 'active', label: 'Active', render: (r: Row) => r.active ? 'Yes' : 'No' },
+      { key: 'name', label: 'Supplement' }, { key: 'dosage_string', label: 'Dosage' }, { key: 'timing', label: 'Timing' }, { key: 'instructions', label: 'Instructions' }, { key: 'active', label: 'Status', render: (r: Row) => <button type="button" className={btnGhost} onClick={() => void toggleSupplement(r)}>{r.active ? 'Active · Pause' : 'Inactive · Activate'}</button> },
     ];
     return [
       { key: 'created_at', label: 'Sent', render: (r: Row) => ShortDate(String(r.created_at ?? '')) },
@@ -440,6 +478,18 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
                   <label className="text-[11px] text-zinc-500">Complete by<input type="date" min={assignProgrammeStart} className={inp} value={assignProgrammeDue} onChange={(event) => setAssignProgrammeDue(event.target.value)} /></label>
                 </div>
                 <button type="button" className={`${btn} mt-3`} onClick={() => void assignProgramme()}>Assign programme</button>
+              </div>
+              <div className="rounded-xl border border-white/[0.07] bg-black/10 p-4">
+                <p className="text-xs font-semibold text-white">Supplement plan</p>
+                <input className={`${inp} mt-2`} value={supplementName} onChange={(event) => setSupplementName(event.target.value)} placeholder="Supplement name" aria-label="Supplement name" />
+                <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <input className={inp} value={supplementDosage} onChange={(event) => setSupplementDosage(event.target.value)} placeholder="Dosage, e.g. 5 g" aria-label="Supplement dosage" />
+                  <select className={inp} value={supplementTiming} onChange={(event) => setSupplementTiming(event.target.value)} aria-label="Supplement timing">
+                    <option value="AM">Morning</option><option value="PM">Evening</option><option value="WITH_MEAL">With a meal</option><option value="AS_DIRECTED">As directed</option>
+                  </select>
+                </div>
+                <input className={`${inp} mt-2`} value={supplementInstructions} onChange={(event) => setSupplementInstructions(event.target.value)} placeholder="Instructions (optional)" aria-label="Supplement instructions" />
+                <button type="button" disabled={supplementBusy} className={`${btn} mt-3`} onClick={() => void assignSupplement()}>{supplementBusy ? 'Saving…' : 'Assign supplement'}</button>
               </div>
             </div>
           </div>
