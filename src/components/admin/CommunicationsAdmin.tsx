@@ -62,7 +62,7 @@ export function CommunicationsAdmin() {
         setTemplates([]);
         setRules([]);
         setEvents([]);
-        setError('Communications tables are not available yet. The communications migration is prepared on the working branch but has not been applied to Neon. No notification has been sent.');
+        setError('Communications tables could not be read. Check the live Neon schema, Data API access and staff permissions. No notification has been sent.');
         return;
       }
       const nextTemplates = (t.data ?? []) as Template[];
