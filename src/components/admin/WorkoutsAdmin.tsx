@@ -159,16 +159,16 @@ export function WorkoutsAdmin() {
       />
       <div className={`${card} mt-4`}>
         <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Schedule sessions for a customer</p>
-        <select className={inp} value={userId} onChange={(e) => { setUserId(e.target.value); void loadSessions(e.target.value); }}>
-          <option value="">Customer…</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.full_name}
-            </option>
-          ))}
-        </select>
-        {userId && (
-          <div className="flex flex-wrap gap-2 mt-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.25fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_auto]">
+          <select className={inp} value={userId} onChange={(e) => { setUserId(e.target.value); void loadSessions(e.target.value); }}>
+            <option value="">Customer…</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.full_name}
+              </option>
+            ))}
+          </select>
+          {userId && <>
             <select className={inp} value={sessForm.template_id ?? ''} onChange={(e) => setSessForm({ ...sessForm, template_id: e.target.value })}>
               <option value="">Template…</option>
               {templates?.map((t) => (
@@ -178,11 +178,11 @@ export function WorkoutsAdmin() {
               ))}
             </select>
             <input className={inp} type="date" value={sessForm.scheduled_on ?? ''} onChange={(e) => setSessForm({ ...sessForm, scheduled_on: e.target.value })} />
-            <button onClick={addSession} className={btn}>
+            <button onClick={addSession} className={`${btn} whitespace-nowrap`}>
               Schedule
             </button>
-          </div>
-        )}
+          </>}
+        </div>
         <AdminTable
           rows={sessions ?? []}
           empty={userId ? 'No sessions for this customer yet.' : 'Pick a customer to see their schedule.'}

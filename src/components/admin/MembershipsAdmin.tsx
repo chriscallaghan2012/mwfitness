@@ -72,6 +72,7 @@ export function MembershipsAdmin() {
     <div>
       <div className={`${card} mb-4`}>
         <p className="font-mono text-[10px] text-zinc-500 uppercase mb-2">Assign plan to customer</p>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.7fr)_auto]">
         <select className={inp} value={form.profile_id ?? ''} onChange={(e) => setForm({ ...form, profile_id: e.target.value })}>
           <option value="">Customer…</option>
           {users.map((u) => (
@@ -80,7 +81,7 @@ export function MembershipsAdmin() {
             </option>
           ))}
         </select>
-        <select className={`${inp} mt-2`} value={form.plan_id ?? ''} onChange={(e) => setForm({ ...form, plan_id: e.target.value })}>
+        <select className={inp} value={form.plan_id ?? ''} onChange={(e) => setForm({ ...form, plan_id: e.target.value })}>
           <option value="">Plan…</option>
           {plans.map((p) => (
             <option key={p.id} value={p.id}>
@@ -88,17 +89,18 @@ export function MembershipsAdmin() {
             </option>
           ))}
         </select>
-        <select className={`${inp} mt-2`} value={form.status ?? 'active'} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+        <select className={inp} value={form.status ?? 'active'} onChange={(e) => setForm({ ...form, status: e.target.value })}>
           {STATUSES.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
           ))}
         </select>
-        <button disabled={busy} onClick={assign} className={`${btn} mt-3`}>
+        <button disabled={busy} onClick={assign} className={`${btn} whitespace-nowrap`}>
           Assign
         </button>
-        {msg && <span className="text-xs text-zinc-400 ml-2">{msg}</span>}
+        </div>
+        {msg && <span className="mt-2 block text-xs text-zinc-400">{msg}</span>}
       </div>
 
       <AdminTable

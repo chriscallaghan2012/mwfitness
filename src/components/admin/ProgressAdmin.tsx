@@ -166,7 +166,7 @@ export function ProgressAdmin() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-end gap-3 mb-4">
+      <div className="mb-4 grid grid-cols-1 items-end gap-2 sm:grid-cols-[minmax(0,1.25fr)_minmax(0,0.7fr)_minmax(0,1.5fr)_auto]">
         <select className={inp} value={userId} onChange={(e) => { const nextUserId = e.target.value; setUserId(nextUserId); void load(nextUserId); }}>
           <option value="">Customer…</option>
           {users.map((u) => (
