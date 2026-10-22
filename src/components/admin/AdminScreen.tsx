@@ -280,12 +280,6 @@ export function AdminScreen() {
           <span className="text-xs text-zinc-400">signed in as {email}</span>
         )}
         <div className="ml-auto flex items-center gap-2">
-          <StaffNotifications onNavigate={(nextTab, profileId) => {
-            if (nextTab === 'messages') setSelectedMessageClientId(profileId);
-            if (nextTab === 'members') setSelectedClientId(profileId);
-            else setSelectedClientId('');
-            setTab(nextTab);
-          }} />
           <button onClick={demoMode ? exitDemo : signOut} className="text-xs text-zinc-500 underline">
             {demoMode ? 'Exit demo' : 'Sign out'}
           </button>
