@@ -85,6 +85,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
   const [supplementTiming, setSupplementTiming] = useState('AS_DIRECTED');
   const [supplementInstructions, setSupplementInstructions] = useState('');
   const [supplementBusy, setSupplementBusy] = useState(false);
+  const [coachPrescription, setCoachPrescription] = useState('');
 
   // Client list plus the libraries used by the "Assign to client" panel.
   useEffect(() => {
@@ -122,7 +123,9 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
     setBusy(true);
     setMessage('');
     setAssignNotice('');
-    setProfile(users.find((user) => user.id === userId) ?? null);
+    const selectedProfile = users.find((user) => user.id === userId) ?? null;
+    setProfile(selectedProfile);
+    setCoachPrescription(String(selectedProfile?.coach_prescription ?? ''));
     const datasetIds: Dataset[] = ['checkins', 'progress_logs', 'nutrition_logs', 'nutrition_daily_logs', 'workout_sessions', 'coach_messages', 'daily_metrics', 'cardio_logs', 'supplement_plans'];
     void Promise.all([
       db.from('checkins').select('*').eq('profile_id', userId).order('checkin_date', { ascending: false }),
@@ -290,6 +293,15 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
     } catch (error) {
       setAssignNotice(`Supplement plan could not be assigned: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     } finally { setSupplementBusy(false); }
+  };
+
+  const saveCardioPrescription = async () => {
+    if (!db || !userId) return;
+    const { data, error } = await db.from('profiles').update({ coach_prescription: coachPrescription.trim() || null }).eq('id', userId).select('id');
+    if (error) { setAssignNotice(`Cardio prescription could not be saved: ${error.message}`); return; }
+    if (!data?.length) { setAssignNotice('Cardio prescription was not saved. Check staff permissions and retry.'); return; }
+    setAssignNotice('Cardio prescription saved for the mobile app.');
+    reload();
   };
 
   const toggleSupplement = async (row: Row) => {
@@ -493,6 +505,12 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
                 </div>
                 <input className={`${inp} mt-2`} value={supplementInstructions} onChange={(event) => setSupplementInstructions(event.target.value)} placeholder="Instructions (optional)" aria-label="Supplement instructions" />
                 <button type="button" disabled={supplementBusy} className={`${btn} mt-3`} onClick={() => void assignSupplement()}>{supplementBusy ? 'Saving…' : 'Assign supplement'}</button>
+              </div>
+              <div className="rounded-xl border border-white/[0.07] bg-black/10 p-4">
+                <p className="text-xs font-semibold text-white">Cardio prescription</p>
+                <p className="mt-1 text-[11px] text-zinc-500">Shown in the member app's cardio guidance.</p>
+                <textarea className={`${inp} mt-2 min-h-24`} rows={3} value={coachPrescription} onChange={(event) => setCoachPrescription(event.target.value)} placeholder="Coach guidance for cardio sessions…" aria-label="Cardio prescription" />
+                <button type="button" className={`${btn} mt-3`} onClick={() => void saveCardioPrescription()}>Save cardio guidance</button>
               </div>
             </div>
           </div>
