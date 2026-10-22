@@ -94,9 +94,41 @@ export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: st
       const sessionResult = isDemoMode() ? null : await neon?.auth.getSession({ query: {} });
       const senderId = isDemoMode() ? 'demo-staff' : String(sessionResult?.data?.user?.id ?? '');
       if (!senderId) throw new Error('Your staff session has expired. Sign in again.');
-      const result = await db.from('coach_messages').insert({ athlete_profile_id: selectedId, sender_profile_id: senderId, body });
+      const result = await db.from('coach_messages')
+        .insert({ athlete_profile_id: selectedId, sender_profile_id: senderId, body })
+        .select('id')
+        .single();
       if (result.error) throw result.error;
-      setDraft(''); setNotice('Reply sent'); await load(true);
+
+      let deliveryNotice = 'Reply sent';
+      if (!isDemoMode() && result.data?.id) {
+        const tokenResult = await neon?.auth.getSession({ query: {} });
+        const accessToken = tokenResult?.data?.session?.access_token;
+        if (accessToken) {
+          try {
+            const response = await fetch('/api/send-push', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ messageIds: [result.data.id] }),
+            });
+            const delivery = await response.json().catch(() => ({}));
+            if (!response.ok) deliveryNotice = 'Reply sent; push delivery could not be confirmed';
+            else if (Number(delivery.accepted) > 0) deliveryNotice = 'Reply sent; push notification accepted by Expo';
+            else if (Number(delivery.noDevice) > 0) deliveryNotice = 'Reply sent; member has no registered device';
+            else deliveryNotice = 'Reply sent; push notification was not accepted';
+          } catch {
+            deliveryNotice = 'Reply sent; push delivery could not be confirmed';
+          }
+        } else {
+          deliveryNotice = 'Reply sent; push delivery could not be confirmed';
+        }
+      }
+      setDraft('');
+      setNotice(deliveryNotice);
+      await load(true);
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Your reply could not be sent.'); }
     finally { setBusy(false); }
   };
