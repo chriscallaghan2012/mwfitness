@@ -102,10 +102,12 @@ export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: st
 
       let deliveryNotice = 'Reply sent';
       if (!isDemoMode() && result.data?.id) {
-        const tokenResult = await neon?.auth.getSession({ query: {} });
-        const accessToken = tokenResult?.data?.session?.access_token;
-        if (accessToken) {
-          try {
+        try {
+          const tokenResult = await neon?.auth.getSession({ query: {} });
+          const accessToken = tokenResult?.data?.session?.access_token;
+          if (!accessToken) {
+            deliveryNotice = 'Reply sent; push delivery could not be confirmed';
+          } else {
             const response = await fetch('/api/send-push', {
               method: 'POST',
               headers: {
@@ -119,10 +121,8 @@ export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: st
             else if (Number(delivery.accepted) > 0) deliveryNotice = 'Reply sent; push notification accepted by Expo';
             else if (Number(delivery.noDevice) > 0) deliveryNotice = 'Reply sent; member has no registered device';
             else deliveryNotice = 'Reply sent; push notification was not accepted';
-          } catch {
-            deliveryNotice = 'Reply sent; push delivery could not be confirmed';
           }
-        } else {
+        } catch {
           deliveryNotice = 'Reply sent; push delivery could not be confirmed';
         }
       }
