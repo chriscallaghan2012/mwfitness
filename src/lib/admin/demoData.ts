@@ -176,8 +176,8 @@ export function createDemoTables(): DemoTables {
       active: member.id !== 'demo-taylor', created_at: isoTime(daysAgo(Math.min(60, member.sinceDays - 1))),
     });
 
-    insert('supplement_plans', { id: uid('supplement_plans'), profile_id: member.id, name: 'Creatine monohydrate', dosage_string: '5 g', timing: 'post_workout', active: true, created_at: isoTime(daysAgo(Math.min(60, member.sinceDays))) });
-    insert('supplement_plans', { id: uid('supplement_plans'), profile_id: member.id, name: 'Vitamin D3', dosage_string: '25 µg daily', timing: 'morning', active: true, created_at: isoTime(daysAgo(Math.min(60, member.sinceDays))) });
+    insert('supplement_plans', { id: uid('supplement_plans'), profile_id: member.id, name: 'Creatine monohydrate', dosage_string: '5 g', timing: 'WITH_MEAL', active: true, created_at: isoTime(daysAgo(Math.min(60, member.sinceDays))) });
+    insert('supplement_plans', { id: uid('supplement_plans'), profile_id: member.id, name: 'Vitamin D3', dosage_string: '25 µg daily', timing: 'AM', active: true, created_at: isoTime(daysAgo(Math.min(60, member.sinceDays))) });
     if (member.tier === 'Gold' || member.tier === 'Elite') {
       insert('supplement_plans', { id: uid('supplement_plans'), profile_id: member.id, name: 'Omega-3', dosage_string: '1 g with food', timing: 'with_meal', active: true, created_at: isoTime(daysAgo(Math.min(45, member.sinceDays))) });
     }
@@ -267,7 +267,7 @@ export function createDemoTables(): DemoTables {
         insert('workout_sessions', {
           id: uid('workout_sessions'), profile_id: member.id,
           template_id: member.tier === 'Starter' ? 'wt-full-body-express' : 'wt-upper-a',
-          scheduled_on: dateStr, status: 'scheduled', completed_on: null, notes: null,
+          scheduled_on: dateStr, status: 'planned', completed_on: null, notes: null,
           created_at: isoTime(daysAgo(1)),
         });
       }
