@@ -1,12 +1,13 @@
 // CheckinsAdmin + ProgressAdmin — coach review of check-ins and weight logs.
 import { useEffect, useRef, useState } from 'react';
 import { adminDb } from '../../lib/admin/adminDb';
-import { AdminTable, Row, ShortDate, StatusPill, btn, btnGhost, inp } from './fields';
+import { AdminTable, ConfirmDialog, Row, ShortDate, StatusPill, btn, btnGhost, inp } from './fields';
 
 export function CheckinsAdmin() {
   const db = adminDb();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [checkinMsg, setCheckinMsg] = useState('');
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   useEffect(() => {
     void load();
   }, []);
@@ -77,7 +78,7 @@ export function CheckinsAdmin() {
               <button onClick={() => void review(r)} className={btnGhost}>
                 Review
               </button>
-              <button className={`${btnGhost} ml-1`} onClick={() => void remove(String(r.id))}>
+              <button className={`${btnGhost} ml-1`} onClick={() => setPendingDeleteId(String(r.id))}>
                 Delete
               </button>
             </>
@@ -97,6 +98,7 @@ export function ProgressAdmin() {
   const [weight, setWeight] = useState('');
   const [note, setNote] = useState('');
   const [msg, setMsg] = useState('');
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const loadRequest = useRef(0);
 
   useEffect(() => {
@@ -191,9 +193,10 @@ export function ProgressAdmin() {
           { key: 'recorded_on', label: 'Date', render: (r) => ShortDate(r.recorded_on as string) },
           { key: 'weight', label: 'Weight', render: (r) => <span className="font-medium text-white">{r.weight} kg</span> },
           { key: 'note', label: 'Note' },
-          { key: 'x', label: '', render: (r) => <button className={btnGhost} onClick={() => void remove(String(r.id))}>Delete</button> },
+          { key: 'x', label: '', render: (r) => <button className={btnGhost} onClick={() => setPendingDeleteId(String(r.id))}>Delete</button> },
         ]}
       />
+      {pendingDeleteId && <ConfirmDialog title="Delete weigh-in?" description="This permanently removes the saved progress entry. This action cannot be undone." onCancel={() => setPendingDeleteId(null)} onConfirm={() => { const id = pendingDeleteId; setPendingDeleteId(null); if (id) void remove(id); }} />}
     </div>
   );
 }
