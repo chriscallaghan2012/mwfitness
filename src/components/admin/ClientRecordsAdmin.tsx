@@ -300,6 +300,10 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
     const { data, error } = await db.from('profiles').update({ coach_prescription: coachPrescription.trim() || null }).eq('id', userId).select('id');
     if (error) { setAssignNotice(`Cardio prescription could not be saved: ${error.message}`); return; }
     if (!data?.length) { setAssignNotice('Cardio prescription was not saved. Check staff permissions and retry.'); return; }
+    const savedPrescription = coachPrescription.trim();
+    setCoachPrescription(savedPrescription);
+    setProfile((current) => current ? { ...current, coach_prescription: savedPrescription || null } : current);
+    setUsers((current) => current.map((user) => user.id === userId ? { ...user, coach_prescription: savedPrescription || null } : user));
     setAssignNotice('Cardio prescription saved for the mobile app.');
     reload();
   };
