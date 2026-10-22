@@ -11,7 +11,7 @@ const button = 'rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-20
 const keyFor = (value: string | Date) => {
   if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10);
+  return Number.isNaN(date.getTime()) ? '' : localKey(date);
 };
 const localKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 const memberLabel = (member: Member | undefined, id: string) => member?.full_name || member?.email || `Member ${id.slice(0, 8)}`;
@@ -26,6 +26,8 @@ export function ActivityCalendar({ profileId, onOpenClient }: { profileId?: stri
   const [memberFilter, setMemberFilter] = useState(profileId || 'all');
   const [kindFilter, setKindFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const pageSize = 25;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -112,6 +114,9 @@ export function ActivityCalendar({ profileId, onOpenClient }: { profileId?: stri
   }, [month]);
 
   const dayEvents = eventsByDay.get(selectedDay) || [];
+  const pageCount = Math.max(1, Math.ceil(visibleEvents.length / pageSize));
+  const currentPage = Math.min(page, pageCount - 1);
+  const pageEvents = visibleEvents.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
   const kinds = Array.from(new Set(events.map((event) => event.kind))).sort();
 
   return <div className="space-y-4">
@@ -127,9 +132,9 @@ export function ActivityCalendar({ profileId, onOpenClient }: { profileId?: stri
     </div>
     {error && <p role="status" className="rounded-lg border border-amber-500/30 bg-amber-950/20 p-3 text-xs text-amber-200">{error}</p>}
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {!profileId && <label className="grid gap-1.5 text-xs text-zinc-400">Client<select value={memberFilter} onChange={(event) => setMemberFilter(event.target.value)} className="w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] px-3 py-2.5 text-zinc-200"><option value="all">All clients</option>{members.map((member) => <option key={member.id} value={member.id}>{memberLabel(member, member.id)}</option>)}</select></label>}
-      <label className="grid gap-1.5 text-xs text-zinc-400">Activity type<select value={kindFilter} onChange={(event) => setKindFilter(event.target.value)} className="w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] px-3 py-2.5 text-zinc-200"><option value="all">All activity types</option>{kinds.map((kind) => <option key={kind} value={kind}>{kind}</option>)}</select></label>
-      <label className="grid gap-1.5 text-xs text-zinc-400">Search<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search clients or activity…" className="w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] px-3 py-2.5 text-zinc-200 placeholder:text-zinc-600" /></label>
+      {!profileId && <label className="grid gap-1.5 text-xs text-zinc-400">Client<select value={memberFilter} onChange={(event) => { setMemberFilter(event.target.value); setPage(0); }} className="w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] px-3 py-2.5 text-zinc-200"><option value="all">All clients</option>{members.map((member) => <option key={member.id} value={member.id}>{memberLabel(member, member.id)}</option>)}</select></label>}
+      <label className="grid gap-1.5 text-xs text-zinc-400">Activity type<select value={kindFilter} onChange={(event) => { setKindFilter(event.target.value); setPage(0); }} className="w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] px-3 py-2.5 text-zinc-200"><option value="all">All activity types</option>{kinds.map((kind) => <option key={kind} value={kind}>{kind}</option>)}</select></label>
+      <label className="grid gap-1.5 text-xs text-zinc-400">Search<input value={search} onChange={(event) => { setSearch(event.target.value); setPage(0); }} placeholder="Search clients or activity…" className="w-full rounded-lg border border-zinc-700 bg-[#0b0c0e] px-3 py-2.5 text-zinc-200 placeholder:text-zinc-600" /></label>
     </div>
     {view === 'calendar' ? <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
       <section className={panel}>
@@ -144,7 +149,8 @@ export function ActivityCalendar({ profileId, onOpenClient }: { profileId?: stri
       </section>
     </div> : <section className={panel}>
       <div className="mb-3 flex items-center justify-between"><h3 className="font-semibold text-white">Activity records</h3><span className="text-xs text-zinc-500">{visibleEvents.length} records</span></div>
-      {visibleEvents.length ? <div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-xs"><thead><tr className="text-[10px] font-mono uppercase tracking-wide text-zinc-500"><th className="border-b border-zinc-800 px-3 py-3">Date</th>{!profileId && <th className="border-b border-zinc-800 px-3 py-3">Client</th>}<th className="border-b border-zinc-800 px-3 py-3">Activity</th><th className="border-b border-zinc-800 px-3 py-3">Details</th>{!profileId && <th className="border-b border-zinc-800 px-3 py-3">Open</th>}</tr></thead><tbody>{visibleEvents.map((event) => <tr key={event.id} className="hover:bg-white/[0.02]"><td className="border-b border-zinc-800 px-3 py-3 text-zinc-400">{new Date(`${keyFor(event.occurred_at)}T12:00:00`).toLocaleDateString('en-GB')}</td>{!profileId && <td className="border-b border-zinc-800 px-3 py-3 text-zinc-200">{memberLabel(members.find((member) => member.id === event.profile_id), event.profile_id)}</td>}<td className="border-b border-zinc-800 px-3 py-3 text-orange-300">{event.kind}</td><td className="border-b border-zinc-800 px-3 py-3 text-zinc-300">{event.detail}</td>{!profileId && <td className="border-b border-zinc-800 px-3 py-3"><button type="button" onClick={() => onOpenClient?.(event.profile_id)} className="text-orange-300 hover:text-orange-200">Open client ↗</button></td>}</tr>)}</tbody></table></div> : <p className="py-5 text-sm text-zinc-500">{loading ? 'Loading activity…' : 'No activity records match these filters.'}</p>}
+      {visibleEvents.length ? <div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-xs"><thead><tr className="text-[10px] font-mono uppercase tracking-wide text-zinc-500"><th className="border-b border-zinc-800 px-3 py-3">Date</th>{!profileId && <th className="border-b border-zinc-800 px-3 py-3">Client</th>}<th className="border-b border-zinc-800 px-3 py-3">Activity</th><th className="border-b border-zinc-800 px-3 py-3">Details</th>{!profileId && <th className="border-b border-zinc-800 px-3 py-3">Open</th>}</tr></thead><tbody>{pageEvents.map((event) => <tr key={event.id} className="hover:bg-white/[0.02]"><td className="border-b border-zinc-800 px-3 py-3 text-zinc-400">{new Date(`${keyFor(event.occurred_at)}T12:00:00`).toLocaleDateString('en-GB')}</td>{!profileId && <td className="border-b border-zinc-800 px-3 py-3 text-zinc-200">{memberLabel(members.find((member) => member.id === event.profile_id), event.profile_id)}</td>}<td className="border-b border-zinc-800 px-3 py-3 text-orange-300">{event.kind}</td><td className="border-b border-zinc-800 px-3 py-3 text-zinc-300">{event.detail}</td>{!profileId && <td className="border-b border-zinc-800 px-3 py-3"><button type="button" onClick={() => onOpenClient?.(event.profile_id)} className="text-orange-300 hover:text-orange-200">Open client ↗</button></td>}</tr>)}</tbody></table></div> : <p className="py-5 text-sm text-zinc-500">{loading ? 'Loading activity…' : 'No activity records match these filters.'}</p>}
+      {visibleEvents.length > 0 && <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-800 pt-3"><span className="text-[11px] text-zinc-500">Showing {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, visibleEvents.length)} of {visibleEvents.length} records</span><div className="flex items-center gap-2"><button type="button" disabled={currentPage === 0} onClick={() => setPage(Math.max(0, currentPage - 1))} className={button}>Previous</button><span className="text-[11px] text-zinc-400">Page {currentPage + 1} of {pageCount}</span><button type="button" disabled={currentPage >= pageCount - 1} onClick={() => setPage(Math.min(pageCount - 1, currentPage + 1))} className={button}>Next</button></div></div>}
     </section>}
   </div>;
 }
