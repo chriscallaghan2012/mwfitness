@@ -18,7 +18,6 @@ import { PasswordRecovery } from './PasswordRecovery';
 import { MemberActivityAdmin } from './MemberActivityAdmin';
 import { ActivityCalendar } from './ActivityCalendar';
 import { CommunicationsAdmin } from './CommunicationsAdmin';
-import { StaffNotifications } from './StaffNotifications';
 import { Row, btn, btnGhost, card } from './fields';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { adminDb, isDemoMode, setAdminDemoMode } from '../../lib/admin/adminDb';
@@ -80,6 +79,20 @@ export function AdminScreen() {
   const [publicCatalogue, setPublicCatalogue] = useState<PublicPlan[] | null>(null);
   const [publicCatalogueError, setPublicCatalogueError] = useState<string | null>(null);
   const [forgotMode, setForgotMode] = useState(false);
+
+  useEffect(() => {
+    const handleNotificationNavigate = (event: Event) => {
+      const detail = (event as CustomEvent<{ tab: Tab; profileId: string }>).detail;
+      if (!detail) return;
+      if (detail.tab === 'messages') setSelectedMessageClientId(detail.profileId);
+      if (detail.tab === 'members') setSelectedClientId(detail.profileId);
+      else setSelectedClientId('');
+      setTab(detail.tab);
+    };
+    window.addEventListener('mwfitness:staff-notification-navigate', handleNotificationNavigate);
+    return () => window.removeEventListener('mwfitness:staff-notification-navigate', handleNotificationNavigate);
+  }, []);
+
 
   useEffect(() => {
     if (demoMode) {
@@ -280,12 +293,6 @@ export function AdminScreen() {
           <span className="text-xs text-zinc-400">signed in as {email}</span>
         )}
         <div className="ml-auto flex items-center gap-2">
-          <StaffNotifications onNavigate={(nextTab, profileId) => {
-            if (nextTab === 'messages') setSelectedMessageClientId(profileId);
-            if (nextTab === 'members') setSelectedClientId(profileId);
-            else setSelectedClientId('');
-            setTab(nextTab);
-          }} />
           <button onClick={demoMode ? exitDemo : signOut} className="text-xs text-zinc-500 underline">
             {demoMode ? 'Exit demo' : 'Sign out'}
           </button>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { StaffNotifications } from './StaffNotifications';
 
 /**
  * Compact dashboard chrome for Staff HQ (/admin). The marketing site's Navbar
@@ -17,8 +18,9 @@ export const AdminTopBar: React.FC = () => (
           MWFitness<span className="text-[#ff5500] transition-colors group-hover:text-white"> HQ</span>
         </span>
       </a>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <span className="hidden font-mono text-[10px] uppercase tracking-wider text-zinc-500 sm:inline">Staff dashboard</span>
+        <StaffNotifications onNavigate={(tab, profileId) => window.dispatchEvent(new CustomEvent('mwfitness:staff-notification-navigate', { detail: { tab, profileId } }))} />
         <a
           href="/"
           className="inline-flex items-center gap-1.5 border border-zinc-700 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-white transition-colors hover:text-[#ff5500]"
