@@ -397,6 +397,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
 
       {userId && (
         <>
+          <ActivityCalendar profileId={userId} />
           <div className={card}>
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div>
