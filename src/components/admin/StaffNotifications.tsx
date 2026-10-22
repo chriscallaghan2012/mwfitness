@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Bell, Check, ExternalLink, X } from 'lucide-react';
 import { adminDb, isDemoMode } from '../../lib/admin/adminDb';
 
@@ -130,7 +131,9 @@ export function StaffNotifications({ onNavigate }: {
       <Bell size={17} />
       {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-black">{unreadCount > 99 ? '99+' : unreadCount}</span>}
     </button>
-    {open && <div className="absolute right-0 top-14 z-50 w-[min(88vw,340px)] overflow-hidden rounded-xl border border-[#303239] bg-[#111316] shadow-2xl shadow-black/50">
+    {open && createPortal(<>
+      <button type="button" aria-label="Close notifications panel" onClick={() => setOpen(false)} className="fixed inset-0 z-[90] cursor-default bg-black/55" />
+      <aside role="dialog" aria-modal="true" aria-label="Member submissions" className="fixed inset-y-0 right-0 z-[100] flex h-[100dvh] w-[min(92vw,420px)] flex-col overflow-hidden border-l border-[#303239] bg-[#111316] shadow-2xl shadow-black/60 animate-in slide-in-from-right duration-200">
       <div className="flex items-center justify-between gap-2 border-b border-[#26282e] px-3 py-2.5">
         <div><h3 className="text-sm font-semibold text-white">Member submissions</h3><p className="mt-0.5 text-[11px] text-zinc-500">Last 7 days · {unreadCount} unread</p></div>
         <div className="flex items-center gap-2">
@@ -139,7 +142,7 @@ export function StaffNotifications({ onNavigate }: {
         </div>
       </div>
       {error && <p role="status" className="border-b border-amber-500/20 px-4 py-2 text-xs text-amber-200">{error}</p>}
-      <div className="max-h-[min(52vh,420px)] overflow-y-auto overscroll-contain">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {loading && visibleItems.length === 0 ? <p className="px-4 py-8 text-center text-xs text-zinc-500">Loading submissions…</p> :
           visibleItems.length === 0 ? <p className="px-4 py-8 text-center text-xs text-zinc-500">{isDemoMode() ? 'No sample submissions in the last 7 days.' : 'No member submissions in the last 7 days.'}</p> :
           visibleItems.map((item) => <div key={item.id} className={'group mx-1 my-1 flex items-stretch gap-2 rounded-lg border px-2.5 py-2 transition-colors ' + (readIds.includes(item.id) ? 'border-[#292b31] bg-transparent hover:border-[#3a3d45] hover:bg-[#191b20]' : 'border-[#3b2a22] bg-[#ff5500]/[0.045] hover:border-[#4a352b] hover:bg-[#1b1d22]')}>
@@ -151,6 +154,7 @@ export function StaffNotifications({ onNavigate }: {
         }
       </div>
       <div className="flex items-center justify-between border-t border-[#26282e] px-3 py-2"><span className="text-[10px] text-zinc-600">Refreshes every 30 seconds</span><button type="button" onClick={() => void refresh()} disabled={loading} className="rounded-md px-2 py-1 text-[11px] text-[#ff6a1f] transition-colors hover:bg-[#ff5500]/10 hover:text-[#ff8a50] disabled:opacity-50">{loading ? 'Refreshing…' : 'Refresh'}</button></div>
-    </div>}
+      </aside>
+    </>, document.body)}
   </div>;
 }
