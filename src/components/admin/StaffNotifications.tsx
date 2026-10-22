@@ -130,7 +130,7 @@ export function StaffNotifications({ onNavigate }: {
       <Bell size={17} />
       {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-black">{unreadCount > 99 ? '99+' : unreadCount}</span>}
     </button>
-    {open && <div className="absolute right-0 top-11 z-50 w-[min(88vw,340px)] overflow-hidden rounded-xl border border-[#303239] bg-[#111316] shadow-2xl shadow-black/50">
+    {open && <div className="absolute right-0 top-14 z-50 w-[min(88vw,340px)] overflow-hidden rounded-xl border border-[#303239] bg-[#111316] shadow-2xl shadow-black/50">
       <div className="flex items-center justify-between gap-2 border-b border-[#26282e] px-3 py-2.5">
         <div><h3 className="text-sm font-semibold text-white">Member submissions</h3><p className="mt-0.5 text-[11px] text-zinc-500">Last 7 days · {unreadCount} unread</p></div>
         <div className="flex items-center gap-2">
