@@ -5,16 +5,24 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const origin = req.headers.origin || process.env.PUBLIC_SITE_URL;
+    // Use the canonical server-configured site URL, never a caller-controlled Origin header.
+    const origin = process.env.PUBLIC_SITE_URL;
+    if (!origin || !/^https:\/\//i.test(origin)) {
+      return res.status(503).json({ ok: false, error: 'Online checkout is temporarily unavailable. Please contact MW Fitness.' });
+    }
     const result = await createCheckoutSession({
       planId: body?.planId,
       origin,
-      customerEmail: typeof body?.customerEmail === 'string' ? body.customerEmail.trim() : undefined,
-      customerName: typeof body?.customerName === 'string' ? body.customerName.trim() : undefined,
+      customerEmail: typeof body?.customerEmail === 'string' ? body.customerEmail.trim().slice(0, 254) : undefined,
+      customerName: typeof body?.customerName === 'string' ? body.customerName.trim().slice(0, 100) : undefined,
     });
     return res.status(200).json(result);
   } catch (error) {
-    const status = /Invalid|not configured|public site|keys are not present|no price ID/i.test(error.message || '') ? 400 : 500;
-    return res.status(status).json({ ok: false, error: error.message || 'Checkout could not be started.' });
+    const message = error instanceof Error ? error.message : '';
+    if (/Invalid coaching plan/i.test(message)) {
+      return res.status(400).json({ ok: false, error: 'Choose a valid coaching plan.' });
+    }
+    console.error('[MW Fitness] Stripe checkout session creation failed:', message || 'Unknown error');
+    return res.status(503).json({ ok: false, error: 'Online checkout is temporarily unavailable. Please contact MW Fitness.' });
   }
 }
