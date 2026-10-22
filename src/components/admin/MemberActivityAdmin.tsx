@@ -54,8 +54,8 @@ function RecordTable<T extends object>({
         </select>
       </label>
     </div>
-    {filteredRows.length ? <div className="overflow-x-auto"><table className={tableClass}>
-      <thead><tr>{columns.map((column) => <th key={column.label} className={cell + ' font-mono uppercase tracking-wide text-zinc-500'}>{column.label}</th>)}</tr></thead>
+    {filteredRows.length ? <div className="max-h-[55vh] overflow-auto"><table className={tableClass}>
+      <thead className="sticky top-0 z-10 bg-[#121315]"><tr>{columns.map((column) => <th key={column.label} className={cell + ' font-mono uppercase tracking-wide text-zinc-500'}>{column.label}</th>)}</tr></thead>
       <tbody>{pageRows.map((row) => <tr key={rowKey(row)}>{columns.map((column) => <td key={column.label} className={cell + ' text-zinc-300'}>{column.render(row)}</td>)}</tr>)}</tbody>
     </table></div> : <Empty>No matching records. Try a different search.</Empty>}
     {filteredRows.length > 0 ? <div className="mt-3 flex flex-col gap-3 border-t border-zinc-800 pt-3 sm:flex-row sm:items-center sm:justify-between">
