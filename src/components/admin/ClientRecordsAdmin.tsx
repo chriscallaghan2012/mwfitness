@@ -217,10 +217,11 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
       ...records.cardio_logs.map((row) => ({ id: `cl-${row.id}`, at: String(row.completed_at ?? ''), kind: 'Cardio', detail: `${String(row.activity ?? '')} · ${row.duration_minutes} min${row.average_heart_rate ? ` · ${row.average_heart_rate} bpm` : ''}` })),
       ...records.coach_messages.map((row) => ({ id: `cm-${row.id}`, at: String(row.created_at ?? ''), kind: 'Message', detail: String(row.body ?? '').slice(0, 90) })),
     ];
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
     return events
-      .filter((event) => event.at)
+      .filter((event) => event.at && Number.isFinite(new Date(event.at).getTime()) && new Date(event.at).getTime() >= cutoff)
       .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
-      .slice(0, 12);
+      .slice(0, 50);
   }, [records, progressPhotos]);
 
   // ---- Assignment actions (demo = session memory, live = Neon) ----
@@ -439,9 +440,9 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
 
           <div className={card}>
             <p className="mb-1 font-mono text-[10px] uppercase tracking-wider text-orange-300">Recent activity</p>
-            <p className="mb-3 text-xs text-zinc-500">Newest records across everything this member has submitted.</p>
+            <p className="mb-3 text-xs text-zinc-500">Submissions and updates from the last 7 days.</p>
             {recentActivity.length ? (
-              <div className="divide-y divide-zinc-800">
+              <div className="max-h-[360px] overflow-y-auto pr-1 divide-y divide-zinc-800">
                 {recentActivity.map((event) => (
                   <div key={event.id} className="flex flex-wrap items-start justify-between gap-2 py-3">
                     <div className="min-w-0">
