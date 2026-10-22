@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
+import { ActivityCalendar } from './ActivityCalendar';
 
 type Dataset = 'checkins' | 'progress_logs' | 'nutrition_logs' | 'nutrition_daily_logs' | 'workout_sessions' | 'coach_messages' | 'daily_metrics' | 'cardio_logs' | 'supplement_plans';
 
