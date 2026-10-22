@@ -16,6 +16,7 @@ import { VideosAdmin } from './VideosAdmin';
 import { ProgrammesAdmin } from './ProgrammesAdmin';
 import { PasswordRecovery } from './PasswordRecovery';
 import { MemberActivityAdmin } from './MemberActivityAdmin';
+import { ActivityCalendar } from './ActivityCalendar';
 import { CommunicationsAdmin } from './CommunicationsAdmin';
 import { Row, btn, btnGhost, card } from './fields';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
@@ -26,11 +27,12 @@ import { isAuthorisedAdminEmail } from '../../lib/adminEmails';
 // Merged sidebar: duplicated tabs are combined so demo and live share one layout.
 // members = user list + per-member app data; plans = catalogue + memberships;
 // training = programmes + workouts; checkins = check-ins + progress logs.
-type Tab = 'overview' | 'members' | 'plans' | 'nutrition' | 'training' | 'videos' | 'checkins' | 'messages' | 'leads' | 'communications';
+type Tab = 'overview' | 'members' | 'activity' | 'plans' | 'nutrition' | 'training' | 'videos' | 'checkins' | 'messages' | 'leads' | 'communications';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'members', label: 'Members' },
+  { id: 'activity', label: 'Activity calendar' },
   { id: 'plans', label: 'Plans & memberships' },
   { id: 'nutrition', label: 'Nutrition' },
   { id: 'training', label: 'Training' },
@@ -273,7 +275,7 @@ export function AdminScreen() {
         {TABS.map((t) => (
           <button
             key={t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => { setTab(t.id); if (t.id !== 'members') setSelectedClientId(''); }}
             aria-pressed={tab === t.id}
             className={
               tab === t.id
@@ -370,6 +372,7 @@ export function AdminScreen() {
         </div>
       )}
       {/* Unified tab rendering — demo and live run the same components; only the data source differs. */}
+      {tab === 'activity' && <ActivityCalendar onOpenClient={(profileId) => { setSelectedClientId(profileId); setTab('members'); }} />}
       {tab === 'members' && !selectedClientId && (
         <div className="space-y-4">
           <UsersAdmin onOpenProfile={(profileId) => setSelectedClientId(profileId)} />
