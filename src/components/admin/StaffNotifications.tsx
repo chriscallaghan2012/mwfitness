@@ -127,7 +127,7 @@ export function StaffNotifications({ onNavigate }: {
   };
 
   return <div className="relative z-40">
-    <button type="button" onClick={() => setOpen((value) => !value)} aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : 'Notifications'} aria-expanded={open} className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#2b2d33] bg-[#15171b] text-zinc-400 transition-colors hover:border-[#ff5500]/70 hover:bg-[#ff5500]/10 hover:text-[#ff6a1f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5500]">
+    <button type="button" onClick={() => setOpen((value) => !value)} aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : 'Notifications'} aria-expanded={open} className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#2b2d33] bg-[#15171b] text-zinc-400 transition-colors hover:border-[#454850] hover:bg-[#22252b] hover:text-zinc-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5500]">
       <Bell size={17} />
       {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-black">{unreadCount > 99 ? '99+' : unreadCount}</span>}
     </button>
