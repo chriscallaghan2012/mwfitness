@@ -59,8 +59,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="text-[#ff5500] hidden sm:inline font-medium">PLANS BUILT AROUND YOUR LIFE</span>
         </div>
         <div className="hidden md:flex items-center gap-4 text-[11px] text-zinc-400">
-          <span className="text-[#ff5500] font-semibold">MWFITNESSUK</span>
-          <span className="text-[#3f434d]">|</span>
           <button
             onClick={() => handleNavClick('account')}
             className="inline-flex items-center gap-1.5 text-zinc-500 hover:text-[#ff5500] transition-colors uppercase tracking-wider"
