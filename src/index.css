@@ -792,7 +792,7 @@ html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
   position: absolute;
   z-index: -1;
   inset: 0 -0.08em;
-  background: #090a0c;
+  background: #ff5500;
   clip-path: polygon(2% 15%, 14% 10%, 28% 13%, 43% 7%, 58% 11%, 72% 6%, 88% 12%, 99% 8%, 96% 28%, 100% 42%, 96% 58%, 99% 78%, 88% 84%, 73% 81%, 58% 90%, 42% 84%, 27% 91%, 13% 84%, 1% 90%, 4% 69%, 0 53%, 4% 35%);
   transform: rotate(-0.7deg);
 }
@@ -806,4 +806,86 @@ html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
 }
 .brush-title--card {
   color: #fff;
+}
+
+
+/* Font picker drawer: opens from the right, starts closed, and keeps its controls usable. */
+.mw-font-preview-panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(410px, calc(100vw - 18px));
+  max-height: 100dvh;
+  height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0;
+  border-width: 0 0 0 1px;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(0);
+  animation: mw-font-drawer-in 260ms ease-out both;
+}
+@keyframes mw-font-drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.mw-font-preview-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  flex: 0 0 auto;
+  padding: 16px;
+  margin: 0;
+  background: #121418;
+  border-bottom: 1px solid #343740;
+}
+.mw-font-preview-panel > :not(.mw-font-preview-header):not(.mw-font-preview-sticky-preview) {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+.mw-font-preview-panel > .mw-font-preview-label:first-of-type { margin-top: 14px; }
+.mw-font-preview-font-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 16px 12px;
+  margin: 0 !important;
+}
+.mw-font-preview-font-row { padding-bottom: 8px; }
+.mw-font-preview-size-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.mw-font-preview-size-row label { color: #a1a1aa; font-size: 11px; }
+.mw-font-preview-size-row input { width: 100%; accent-color: #ff5500; }
+.mw-font-preview-size-value { color: #ff5500; font: 700 11px Arial, sans-serif; }
+.mw-font-preview-sticky-preview {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  flex: 0 0 auto;
+  padding: 12px 16px 16px;
+  background: #0b0c0e;
+  border-top: 1px solid #343740;
+  box-shadow: 0 -12px 28px rgba(0,0,0,.28);
+}
+.mw-font-preview-sticky-preview .mw-font-preview-sample { margin-top: 0; }
+.mw-font-preview-sticky-preview .mw-font-preview-reset { margin-top: 8px; }
+.mw-font-preview-reopen {
+  inset: 50% 0 auto auto;
+  right: 0;
+  bottom: auto;
+  z-index: 101;
+  transform: translateY(-50%);
+  border-radius: 8px 0 0 8px;
+  padding: 12px 10px;
+  writing-mode: vertical-rl;
+  box-shadow: 0 8px 30px rgba(0,0,0,.45);
+}
+.mw-font-preview-reopen svg { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) {
+  .mw-font-preview-panel { animation: none; }
 }
