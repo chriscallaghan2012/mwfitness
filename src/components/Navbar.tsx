@@ -45,9 +45,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#0b0c0e]/95 backdrop-blur-md border-b border-[#262930]">
+    <header className="sticky top-0 z-50 w-full bg-black border-b border-[#262930]">
       {/* Top Status Bar */}
-      <div className="bg-[#121418] border-b border-[#1c1f26] px-4 py-1 text-xs font-mono text-[#8b929e] flex items-center justify-between overflow-x-auto whitespace-nowrap">
+      <div className="bg-black border-b border-[#1c1f26] px-4 py-1 text-xs font-mono text-[#8b929e] flex items-center justify-between overflow-x-auto whitespace-nowrap">
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -79,14 +79,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Main Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center h-20">
+        <div className="relative flex items-center h-24">
           {/* Logo */}
           <button
             id="nav-logo-btn"
             onClick={() => handleNavClick('home')}
             className="relative z-10 flex items-center gap-3 text-left group focus:outline-none"
           >
-            <img src="/logo.jpg" alt="MW Fitness" className="h-14 w-auto max-w-[180px] object-contain" />
+            <img src="/logo.jpg" alt="MW Fitness" className="h-16 sm:h-[4.75rem] w-auto max-w-[200px] object-contain" />
+            <span className="text-white font-black uppercase tracking-[0.12em] text-lg sm:text-xl leading-none">FITNESSUK</span>
           </button>
 
           {/* Desktop Nav (xl) */}
@@ -117,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right-side brand mark */}
           <button type="button" onClick={() => handleNavClick('home')} aria-label="MW Fitness home" className="hidden xl:flex ml-auto items-center focus:outline-none">
-            <img src="/logo.jpg" alt="" aria-hidden="true" className="h-12 w-auto max-w-[120px] object-contain" />
+            <img src="https://raw.githubusercontent.com/chriscallaghan2012/mwfitness/main/websiteimages/logoright.jpg" alt="MW Fitness" className="h-16 w-auto max-w-[180px] object-contain" />
           </button>
 
           {/* Mobile menu toggle */}
@@ -133,7 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Screen Quick Selector Strip (tablet / laptop) */}
-      <div className="hidden lg:flex xl:hidden bg-[#121418] border-t border-[#1e222a] px-6 py-2 overflow-x-auto space-x-2">
+      <div className="hidden lg:flex xl:hidden bg-black border-t border-[#1e222a] px-6 py-2 overflow-x-auto space-x-2">
         {NAV_ITEMS.map((item) => (
           <button
             key={item.id}
@@ -151,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="xl:hidden bg-[#0e1014] border-b border-[#262930] px-4 pt-3 pb-6 space-y-2 animate-in fade-in duration-200">
+        <div className="xl:hidden bg-black border-b border-[#262930] px-4 pt-3 pb-6 space-y-2 animate-in fade-in duration-200">
           <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider px-2 py-1">
             Menu
           </div>
