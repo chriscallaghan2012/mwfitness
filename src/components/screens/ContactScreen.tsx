@@ -176,10 +176,10 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
               </div>
             ) : (
               <>
-                <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
+                <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1 text-center">
                   [ SEND A MESSAGE ]
                 </div>
-                <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-6">
+                <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-6 text-center">
                   <span className="brush-wrap">GET IN</span> <span className="text-[#ff5500]">TOUCH</span>
                 </h2>
 
