@@ -299,7 +299,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           <div className="relative min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] sm:min-h-[420px]">
             <img src={IMAGES.MORE_THAN_WORKOUT} alt="MWFitnessUK coaching approach" loading="lazy" className="absolute inset-0 h-full w-full object-cover" style={{ transform: "scaleX(-1)", objectPosition: "center top" }} />
             <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e]/70 via-transparent to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">MWFitnessUK</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl"><span className="brush-wrap">Your goals.</span> <span className="text-[#ff5500]">Your journey.</span></p></div>
+            <div className="absolute bottom-4 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">MWFitnessUK</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl"><span className="brush-wrap">Your goals.</span> <span className="text-[#ff5500]">Your journey.</span></p></div>
           </div>
         </div>
       </section>
@@ -359,7 +359,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </div>
           <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
             <div className="relative order-2 min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] lg:order-1 sm:min-h-[420px]">
-              <img src={IMAGES.ABOUT} alt="Mike Whitworth and MWFitnessUK" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-[center_25%]" />
+              <img src={IMAGES.ABOUT} alt="Mike Whitworth and MWFitnessUK" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-[center_0%]" />
               <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e]/70 via-transparent to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">Coaching built around you</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl">Real guidance. Real life.</p></div>
             </div>
