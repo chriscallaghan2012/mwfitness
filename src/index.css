@@ -396,6 +396,20 @@ button:hover:not(:disabled),
 a[role="button"]:hover {
   border-color: #ff5500 !important;
 }
+
+/* The brand/logo button is not a CTA: keep its background and wordmark stable on hover. */
+#nav-logo-btn,
+#nav-logo-btn:hover,
+#nav-logo-btn:focus-visible {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+#nav-logo-btn:hover span,
+#nav-logo-btn:focus-visible span {
+  color: #ffffff !important;
+}
 button[class*="bg-[#ff5500]"]:hover,
 a[class*="bg-[#ff5500]"]:hover,
 button[class*="bg-brand-orange"]:hover,
@@ -637,7 +651,7 @@ html[data-mw-font-preview="true"] body * {
 }
 .mw-process-step {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr) minmax(220px, 0.9fr) 24px;
+  grid-template-columns: 76px minmax(0, 1fr) minmax(220px, 0.9fr);
   align-items: center;
   gap: 22px;
   width: 100%;
@@ -669,8 +683,8 @@ html[data-mw-font-preview="true"] body * {
   transition: color 220ms ease;
 }
 .mw-process-description {
-  color: #8a8a8a;
-  font-size: 13px;
+  color: #fff;
+  font-size: 15px;
   line-height: 1.65;
   transition: color 220ms ease;
 }
@@ -692,9 +706,6 @@ html[data-mw-font-preview="true"] body * {
 .mw-process-step:hover .mw-process-title,
 .mw-process-step:focus-visible .mw-process-title,
 .mw-process-step.is-active .mw-process-title,
-.mw-process-step:hover .mw-process-description,
-.mw-process-step:focus-visible .mw-process-description,
-.mw-process-step.is-active .mw-process-description,
 .mw-process-step:hover .mw-process-arrow,
 .mw-process-step:focus-visible .mw-process-arrow,
 .mw-process-step.is-active .mw-process-arrow {
@@ -707,7 +718,7 @@ html[data-mw-font-preview="true"] body * {
 }
 @media (max-width: 700px) {
   .mw-process-step {
-    grid-template-columns: 58px minmax(0, 1fr) 20px;
+    grid-template-columns: 58px minmax(0, 1fr);
     gap: 14px;
     min-height: 0;
     padding: 22px 12px;
@@ -715,9 +726,9 @@ html[data-mw-font-preview="true"] body * {
   .mw-process-number { font-size: 42px; }
   .mw-process-title { font-size: 20px; }
   .mw-process-description {
-    grid-column: 2 / 4;
+    grid-column: 2 / 3;
     grid-row: 2;
-    font-size: 13px;
+    font-size: 15px;
     padding-right: 10px;
   }
 }

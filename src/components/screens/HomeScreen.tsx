@@ -139,8 +139,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
               [ ABOUT MIKE ]
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-              <span className="brush-wrap">MEET MIKE. YOUR ONLINE COACH.</span>
+            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl text-white uppercase leading-[0.95] tracking-tight">
+              <span className="brush-wrap">MEET MIKE.</span> <span className="text-[#ff5500]">YOUR ONLINE COACH.</span>
             </h2>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Practical online coaching for busy people who want to feel stronger, build confidence and make progress they can maintain.</p>
             <div aria-hidden="true" className="mt-5 w-full border-b border-dashed border-[#454954]" />
@@ -229,7 +229,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="mb-8 max-w-4xl sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">How we work</div>
-            <h2 className="font-display text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl md:text-7xl">
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">
               <span className="brush-wrap">OUR 5-STEP</span> <span className="text-[#ff5500]">COACHING PROCESS</span>
             </h2>
             <p className="mt-5 max-w-2xl text-sm leading-relaxed text-[#a1a1aa] sm:text-base">
@@ -256,8 +256,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 >
                   <span className="mw-process-number">{String(index + 1).padStart(2, '0')}</span>
                   <span className="mw-process-title">{step.title}</span>
-                  <span className="mw-process-description">{step.text}</span>
-                  <span className="mw-process-arrow" aria-hidden="true"><ArrowRight className="h-5 w-5" /></span>
+                  <span className="mw-process-description text-base leading-relaxed text-white sm:text-lg">{step.text}</span>
                 </button>
               ))}
             </div>
@@ -376,7 +375,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="mb-8 max-w-5xl sm:mb-10">
           <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ COMMUNITY & MINDSET ]</div>
-          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">FITNESS IS PERSONAL. <span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span> COMMUNITY MAKES US STRONGER.</h2>
+          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">FITNESS IS PERSONAL.<br /><span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span><br /><span className="text-white">COMMUNITY</span> <span className="text-[#ff5500]">MAKES US STRONGER.</span></h2>
         </div>
         <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col justify-center space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
@@ -470,7 +469,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mb-8 border-b border-[#22252e] pb-5">
           <div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div>
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2>
+            <h2 className="font-display text-4xl uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl"><span className="text-white">Real people.</span> <span className="text-[#ff5500]">Real results.</span></h2>
             <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
           </div>
         </div>
