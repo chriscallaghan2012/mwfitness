@@ -142,7 +142,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <h2 className="font-display text-4xl sm:text-5xl md:text-6xl text-white uppercase leading-[0.95] tracking-tight">
               <span className="brush-wrap">MEET MIKE.</span> <span className="text-[#ff5500]">YOUR ONLINE COACH.</span>
             </h2>
-            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Practical online coaching for busy people who want to feel stronger, build confidence and make progress they can maintain.</p>
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">I’m Mike, a qualified personal trainer who helps busy people build strength, confidence and lasting habits. My approach is practical, personal and built around your life — with clear guidance, honest support and no judgement.</p>
             <div aria-hidden="true" className="mt-5 w-full border-b border-dashed border-[#454954]" />
           </div>
           <button onClick={() => onOpenBookCall()}
@@ -161,8 +161,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <UserCheck className="w-5 h-5" />
               </div>
               <div>
-                <div className="font-display text-xl text-white uppercase leading-none">{ABOUT.greeting}</div>
-                <div className="text-[11px] font-mono text-zinc-500">Online Coach • Train anywhere</div>
+                <div className="font-display text-xl text-white uppercase leading-none">A bit about me</div>
+                <div className="text-[11px] font-mono text-zinc-500">Meet Mike • Your coach</div>
               </div>
             </div>
             <ul className="mt-5 space-y-2.5 text-sm font-sans text-zinc-300">
@@ -181,12 +181,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">
                 <Award className="w-5 h-5" />
               </div>
-              <div className="font-display text-xl text-white uppercase">My background</div>
+              <div className="font-display text-xl text-white uppercase">Why I coach</div>
             </div>
             <p className="text-sm font-sans text-zinc-300 leading-relaxed">{ABOUT.background}</p>
 
             <div className="mt-5 pt-4 border-t border-[#1c1f27]">
-              <div className="font-mono text-xs text-zinc-500 uppercase tracking-wider mb-3">Why people train with me</div>
+              <div className="font-mono text-xs text-zinc-500 uppercase tracking-wider mb-3">What you can expect from me</div>
               <ul className="space-y-2 text-sm font-sans text-zinc-300">
                 <li className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-[#ff5500]" /> Plans built around work & family life
@@ -265,7 +265,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#08090b]/95 via-[#08090b]/20 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
                 <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">Your next step starts here</div>
-                <h3 className="max-w-md font-display text-3xl font-black uppercase leading-tight text-white sm:text-4xl">Ready to put your plan into action?</h3>
+                <h3 className="max-w-md font-display text-3xl font-black uppercase leading-tight text-white sm:text-4xl"><span className="brush-wrap">Ready to put your</span> <span className="text-[#ff5500]">plan into action?</span></h3>
                 <p className="mt-3 max-w-md text-sm leading-relaxed text-zinc-300">Tell me what you want to achieve and we'll talk through the right starting point for you. No pressure, just an honest conversation.</p>
                 <div className="mt-5 flex flex-wrap gap-3">
                   <button onClick={() => onOpenBookCall()} className="inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-5 py-3.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-white"><PhoneCall className="h-4 w-4" /> Book a free call</button>
