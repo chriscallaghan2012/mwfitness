@@ -889,3 +889,28 @@ html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
 @media (prefers-reduced-motion: reduce) {
   .mw-font-preview-panel { animation: none; }
 }
+
+
+/* Live per-category font-size preview controls. */
+html[data-mw-font-preview="true"] body { font-size: var(--mw-preview-size-all, 16px); }
+html[data-mw-font-preview="true"] body h1 { font-size: var(--mw-preview-size-h1, 48px) !important; }
+html[data-mw-font-preview="true"] body h2 { font-size: var(--mw-preview-size-h2, 36px) !important; }
+html[data-mw-font-preview="true"] body h3,
+html[data-mw-font-preview="true"] body h4,
+html[data-mw-font-preview="true"] body h5,
+html[data-mw-font-preview="true"] body h6,
+html[data-mw-font-preview="true"] body article h2,
+html[data-mw-font-preview="true"] body article h3,
+html[data-mw-font-preview="true"] body .font-display { font-size: var(--mw-preview-size-headings, 24px) !important; }
+html[data-mw-font-preview="true"] body p,
+html[data-mw-font-preview="true"] body li,
+html[data-mw-font-preview="true"] body blockquote,
+html[data-mw-font-preview="true"] body dd { font-size: var(--mw-preview-size-body, 16px) !important; }
+html[data-mw-font-preview="true"] body button,
+html[data-mw-font-preview="true"] body nav,
+html[data-mw-font-preview="true"] body a,
+html[data-mw-font-preview="true"] body [role="button"] { font-size: var(--mw-preview-size-ui, 14px) !important; }
+html[data-mw-font-preview="true"] body small,
+html[data-mw-font-preview="true"] body label,
+html[data-mw-font-preview="true"] body caption,
+html[data-mw-font-preview="true"] body .font-mono { font-size: var(--mw-preview-size-small, 12px) !important; }
