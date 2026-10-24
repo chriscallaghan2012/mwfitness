@@ -88,17 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleNavClick('home')}
             className="relative z-10 flex items-center gap-3 text-left group focus:outline-none"
           >
-            <div className="w-10 h-10 bg-transparent border border-[#ff5500] flex items-center justify-center relative overflow-hidden group-hover:border-white transition-colors">
-              <span aria-hidden="true" className="font-display text-2xl leading-none tracking-tighter text-[#ff5500]">MW</span>
-            </div>
-            <div>
-              <div className="font-display text-2xl tracking-widest text-white font-bold uppercase leading-none group-hover:text-[#ff5500] transition-colors">
-                MWFitness<span className="text-[#ff5500] group-hover:text-white">UK</span>
-              </div>
-              <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider group-hover:text-[#ff5500] transition-colors">
-                Online coaching • Train anywhere
-              </div>
-            </div>
+            <img src="/logo.jpg" alt="MW Fitness" className="h-14 w-auto max-w-[180px] object-contain" />
           </button>
 
           {/* Desktop Nav (xl) */}
@@ -125,6 +115,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Book a call</span>
             </button>
           </nav>
+
+
+          {/* Right-side brand mark */}
+          <button type="button" onClick={() => handleNavClick('home')} aria-label="MW Fitness home" className="hidden xl:flex ml-auto items-center focus:outline-none">
+            <img src="/logo.jpg" alt="" aria-hidden="true" className="h-12 w-auto max-w-[120px] object-contain" />
+          </button>
 
           {/* Mobile menu toggle */}
           <button
