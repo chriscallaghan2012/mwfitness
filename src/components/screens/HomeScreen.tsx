@@ -57,14 +57,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>
 
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-[0.9] font-black">
-              Fitness that fits
+              BUILD A STRONGER BODY.
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#ff5500] to-white">
-                your life.
+                DEVELOP A STRONGER MIND. BECOME THE BEST VERSION OF YOU.
               </span>
             </h1>
 
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
-              Online coaching built around your goals and routine. No jargon, no judgement — just clear training and nutrition guidance, real support and progress that lasts.
+              Solid Hard Work Achieves Greatness. Welcome to MWFitnessUK — online personal coaching built around you, your goals and your life. Whether your goal is to lose body fat, build muscle, improve your fitness, develop healthier habits or simply feel more confident in yourself, I'm here to help you make it happen.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -238,11 +238,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </div>
           <div className="mw-process-list border-t border-[#222]">
             {[
-              { title: 'Discovery & Goals', text: 'We start by understanding your goals, current routine and what you want to change, so your coaching begins with a plan that fits your life.' },
-              { title: 'Plan & Strategy', text: 'Your training and nutrition guidance is shaped around your experience, preferences, schedule and the support you need.' },
-              { title: 'Train & Build Habits', text: 'Put your plan into practice with clear guidance, manageable steps and a focus on consistency rather than perfection.' },
-              { title: 'Check In & Refine', text: 'Use check-ins and progress updates to see what is working, discuss challenges and adjust your approach when needed.' },
-              { title: 'Progress & Keep Going', text: 'Build on what you learn, celebrate progress and develop routines you can maintain beyond a short burst of motivation.' },
+              { title: 'We start by understanding you.', text: "We'll establish your goals, current circumstances, training experience, lifestyle and any challenges that may affect your progress. This gives us a starting point for building your coaching plan." },
+              { title: 'We build your programme.', text: "Your training and nutrition guidance will be tailored to your objectives and individual requirements. We'll focus on realistic actions that work alongside your everyday commitments." },
+              { title: 'You learn as you progress.', text: "I'll help you develop a better understanding of exercise, nutrition, recovery and the habits that contribute to results. You'll know what you're working towards and why." },
+              { title: 'We track, review and adjust.', text: "Progress isn't always a straight line. We'll use the information available, including relevant weight trends, training performance and feedback, to help assess your progress and make sensible adjustments where needed." },
+              { title: 'We build for the long term.', text: "The ultimate goal is not simply to reach a number on the scales or complete a programme. It's to develop the knowledge, confidence and habits that help you maintain your progress and continue moving forward." },
             ].map((step, index) => (
               <button
                 key={step.title}
@@ -259,6 +259,131 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <span className="mw-process-arrow" aria-hidden="true"><ArrowRight className="h-5 w-5" /></span>
               </button>
             ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* FULL HOMEPAGE COACHING COPY — restored from the supplied brief */}
+      <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
+          <div>
+            <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ THE MWFITNESSUK APPROACH ]</div>
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">MORE THAN A WORKOUT. <span className="text-[#ff5500]">MORE THAN A MEAL PLAN.</span></h2>
+          </div>
+          <div className="space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
+            <p>I believe fitness should be about more than what you see in the mirror. It's about building discipline, developing confidence, improving your physical and mental well-being, and creating habits that make a positive difference to your everyday life.</p>
+            <p>My approach is simple: give you the right guidance, a clear plan, consistent support and the accountability to keep moving forward.</p>
+            <p>You bring the commitment. I'll help you put it to work.</p>
+            <p>At MWFitnessUK, I understand that no two people are the same. We all have different starting points, responsibilities, challenges and ambitions. That's why your coaching should reflect you, rather than expecting you to fit into somebody else's programme.</p>
+            <p>I'm passionate about helping people understand not just what they need to do, but why they're doing it. I want you to develop the knowledge, confidence and independence to make better decisions about your training, nutrition and lifestyle long after you've started your coaching journey.</p>
+            <p>My role isn't simply to tell you what to do. It's to coach you, educate you, encourage you and help you build the tools you need to succeed.</p>
+            <p className="font-mono font-bold uppercase tracking-wide text-white">Your goals. Your journey. Your progress. My support.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full border-y border-[#22252e] bg-[#101115]">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+          <div className="mb-8">
+            <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ HOW I COACH ]</div>
+            <h2 className="font-display text-4xl font-black uppercase tracking-tight text-white sm:text-6xl">COACHING THAT <span className="text-[#ff5500]">WORKS FOR YOU.</span></h2>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {[
+              { title: 'Personalised to you', text: 'Your coaching starts with understanding you. Your goals, current fitness, experience, daily routine, lifestyle and individual challenges all help shape your programme. We establish where you are now, where you want to be and the practical steps needed to get there.' },
+              { title: 'Training with purpose', text: "Your training programme is designed around your objectives, ability and circumstances. Whether you're new to the gym or looking to take your performance to the next level, we'll focus on structured training, sound technique, progressive improvement and consistency. Every session should have a purpose. Every step forward matters." },
+              { title: 'Nutrition without unnecessary complications', text: "Nutrition is a fundamental part of achieving lasting results, but it doesn't need to be confusing, restrictive or impossible to maintain. I'll help you understand how to approach calories, protein, carbohydrates, fats, meal planning and food choices in a way that supports your goals and fits your lifestyle. Where appropriate, your nutrition plan can include practical meal options, portion guidance and clear calorie and macronutrient targets. The aim is to give you structure and flexibility, not make food another source of stress." },
+              { title: 'Accountability that keeps you moving', text: "Motivation comes and goes. Building habits, maintaining focus and taking consistent action are what help create progress. Coaching gives you structure and a clearer sense of direction. We'll use your progress, feedback and performance to help identify what's working, where adjustments may be needed and what your next steps should be. You don't have to get everything perfect. You need a plan you can follow and the willingness to keep improving." },
+            ].map((item, index) => (
+              <article key={item.title} className="mw-electric-card border border-[#252a34] bg-[#121419] p-6 sm:p-8">
+                <div className="mb-4 font-mono text-xs font-bold tracking-[0.18em] text-[#ff5500]">0{index + 1} / HOW I COACH</div>
+                <h3 className="mb-3 font-display text-2xl font-black uppercase leading-tight text-white sm:text-3xl">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">{item.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+        <div className="mb-8 max-w-3xl">
+          <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ YOUR GOALS ]</div>
+          <h2 className="font-display text-4xl font-black uppercase tracking-tight text-white sm:text-6xl">WHAT CAN MWFITNESSUK <span className="text-[#ff5500]">HELP YOU ACHIEVE?</span></h2>
+          <p className="mt-5 text-sm leading-relaxed text-zinc-300 sm:text-base">Whether you have one clear goal or several areas you'd like to improve, your coaching can be built around what matters most to you.</p>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { title: 'Fat loss', text: 'Work towards reducing body fat through a structured approach to nutrition, activity and training.' },
+            { title: 'Muscle growth', text: 'Build strength and muscle with purposeful resistance training, appropriate nutrition and progressive overload.' },
+            { title: 'Body recomposition', text: 'Work towards reducing body fat while building or retaining muscle.' },
+            { title: 'Improved fitness and performance', text: 'Develop strength, work capacity, consistency and confidence in your training.' },
+            { title: 'Better nutritional habits', text: 'Understand your food choices and develop an approach that supports your goals without relying on unnecessary restriction.' },
+            { title: 'Confidence and discipline', text: 'Build routines, recognise your progress and develop the confidence that comes from keeping promises to yourself.' },
+          ].map((item, index) => (
+            <article key={item.title} className="mw-electric-card flex gap-4 border border-[#252a34] bg-[#121419] p-5 sm:p-6">
+              <span className="font-mono text-sm font-bold text-[#ff5500]">0{index + 1}</span>
+              <div><h3 className="mb-2 font-display text-xl font-bold uppercase text-white">{item.title}</h3><p className="text-sm leading-relaxed text-zinc-400">{item.text}</p></div>
+            </article>
+          ))}
+        </div>
+        <p className="mt-6 border-l-2 border-[#ff5500] pl-4 text-sm leading-relaxed text-zinc-300 sm:text-base">Whatever your starting point, your progress should be measured against your own goals, not somebody else's highlight reel.</p>
+      </section>
+
+      <section className="w-full border-y border-[#22252e] bg-[#101115]">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-2 lg:gap-14 lg:px-8">
+          <div>
+            <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ WHY MWFITNESSUK ]</div>
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-6xl">WHY CHOOSE <span className="text-[#ff5500]">MWFITNESSUK?</span></h2>
+          </div>
+          <div className="space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
+            <p>Because I believe good coaching should give you more than instructions.</p>
+            <p>It should give you clarity when you're unsure, structure when you need direction, accountability when motivation dips and education that helps you understand your own progress.</p>
+            <p>I want you to feel that your goals matter, your questions are welcome and your individual circumstances are taken seriously.</p>
+            <p>I also believe in being realistic. Results take time, and no responsible coach can guarantee a particular outcome. What I can offer is a considered approach, practical guidance and a focus on helping you make consistent progress through the actions within your control.</p>
+            <p className="font-mono font-bold uppercase tracking-wide text-white">No magic solutions. No unnecessary complications. Just purposeful coaching, hard work and a commitment to getting better.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
+          <div>
+            <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ COMMUNITY & MINDSET ]</div>
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">FITNESS IS PERSONAL. <span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span> COMMUNITY MAKES US STRONGER.</h2>
+          </div>
+          <div className="space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
+            <p>MWFitnessUK is built on the belief that positive change goes beyond the gym. Training and nutrition can help us improve physically, but the discipline, resilience and self-belief we develop can also influence how we approach work, family life, personal challenges and our ambitions.</p>
+            <p>That's why the values behind MWFitnessUK connect with our sportswear brand, Shwag-MCR. Together, we want to promote a positive mindset, encourage people to take pride in their efforts and create a sense of community where people support one another, celebrate progress and strive to become better versions of themselves.</p>
+            <p>Our motto says it all:</p>
+            <p className="border-l-2 border-[#ff5500] pl-4 font-display text-2xl font-black uppercase text-white sm:text-3xl">SOLID HARD WORK ACHIEVES GREATNESS.</p>
+            <p>That doesn't just apply to lifting weights or following a nutrition plan. It applies to the goals we set, the challenges we face and the choices we make every day.</p>
+            <p>Greatness isn't reserved for a select few. It's built through effort, consistency, determination and the decision to keep going when things get difficult.</p>
+            <p>You don't have to do everything alone, and you don't have to be perfect to belong.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full border-y border-[#22252e] bg-[#101115]">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-2 lg:gap-14 lg:px-8">
+          <div>
+            <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ YOUR JOURNEY STARTS HERE ]</div>
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-6xl">YOUR JOURNEY <span className="text-[#ff5500]">STARTS HERE.</span></h2>
+          </div>
+          <div className="space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
+            <p>You might be starting from scratch, returning to training after time away or looking to break through a plateau. Whatever your situation, the important thing is deciding to take that first step.</p>
+            <p>You don't need to have everything figured out before you begin. That's where coaching can help.</p>
+            <p>We'll establish your starting point, work towards realistic goals and focus on the daily actions that move you closer to the results you want.</p>
+            <p>Your journey will require commitment, but you don't have to figure out every step by yourself.</p>
+            <p>If you're ready to invest in yourself, develop better habits and discover what consistent effort can achieve, I'd love to help you get started.</p>
+            <h3 className="pt-2 font-display text-3xl font-black uppercase text-white">LET'S BUILD SOMETHING <span className="text-[#ff5500]">BETTER.</span></h3>
+            <p className="font-mono font-bold uppercase text-white">MWFitnessUK — Solid Hard Work Achieves Greatness.</p>
+            <p>Take the first step towards a stronger body, a stronger mindset and a healthier future.</p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <button onClick={() => onOpenBookCall()} className="inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-6 py-3.5 font-mono text-xs font-bold uppercase text-black"><PhoneCall className="h-4 w-4" /> Start your coaching journey</button>
+              <button onClick={() => onSelectScreen('contact')} className="inline-flex cursor-pointer items-center gap-2 border border-[#343945] bg-[#17191f] px-6 py-3.5 font-mono text-xs font-bold uppercase text-white">Get in touch <ArrowRight className="h-4 w-4" /></button>
+            </div>
+            <p className="text-sm text-zinc-400">Get in touch to discuss your goals and find out how MWFitnessUK online coaching could work for you.</p>
           </div>
         </div>
       </section>
