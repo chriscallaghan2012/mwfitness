@@ -35,16 +35,13 @@ const DEFAULT_SETTINGS: FontSettings = {
 
 function loadGoogleFont(font: string) {
   if (font === DEFAULT_FONT) return;
-  const id = 'mw-font-preview-google-fonts';
-  let link = document.getElementById(id) as HTMLLinkElement | null;
-  if (!link) {
-    link = document.createElement('link');
-    link.id = id;
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-  }
-  const families = [...new Set([font, ...POPULAR_FONTS.filter((item) => item === font)])];
-  link.href = families.map((family) => `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}:wght@400;500;600;700;800&display=swap`).join('&');
+  const id = `mw-font-preview-${font.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font).replace(/%20/g, '+')}:wght@400;500;600;700;800&display=swap`;
+  document.head.appendChild(link);
 }
 
 function applyFontSettings(settings: FontSettings) {
