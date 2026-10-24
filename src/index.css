@@ -396,6 +396,20 @@ button:hover:not(:disabled),
 a[role="button"]:hover {
   border-color: #ff5500 !important;
 }
+
+/* The brand/logo button is not a CTA: keep its background and wordmark stable on hover. */
+#nav-logo-btn,
+#nav-logo-btn:hover,
+#nav-logo-btn:focus-visible {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+#nav-logo-btn:hover span,
+#nav-logo-btn:focus-visible span {
+  color: #ffffff !important;
+}
 button[class*="bg-[#ff5500]"]:hover,
 a[class*="bg-[#ff5500]"]:hover,
 button[class*="bg-brand-orange"]:hover,
