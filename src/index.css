@@ -799,6 +799,9 @@ html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-size: var(--
 .brush-title {
   position: relative;
   display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+  vertical-align: baseline;
   isolation: isolate;
   z-index: 0;
 }
