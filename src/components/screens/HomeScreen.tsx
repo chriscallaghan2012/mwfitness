@@ -238,11 +238,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           </div>
           <div className="mw-process-list border-t border-[#222]">
             {[
-              { title: 'Discovery & Goals', text: 'We start by understanding your goals, current routine and what you want to change, so your coaching begins with a plan that fits your life.' },
-              { title: 'Plan & Strategy', text: 'Your training and nutrition guidance is shaped around your experience, preferences, schedule and the support you need.' },
-              { title: 'Train & Build Habits', text: 'Put your plan into practice with clear guidance, manageable steps and a focus on consistency rather than perfection.' },
-              { title: 'Check In & Refine', text: 'Use check-ins and progress updates to see what is working, discuss challenges and adjust your approach when needed.' },
-              { title: 'Progress & Keep Going', text: 'Build on what you learn, celebrate progress and develop routines you can maintain beyond a short burst of motivation.' },
+              { title: 'We start by understanding you.', text: "We'll establish your goals, current circumstances, training experience, lifestyle and any challenges that may affect your progress. This gives us a starting point for building your coaching plan." },
+              { title: 'We build your programme.', text: "Your training and nutrition guidance will be tailored to your objectives and individual requirements. We'll focus on realistic actions that work alongside your everyday commitments." },
+              { title: 'You learn as you progress.', text: "I'll help you develop a better understanding of exercise, nutrition, recovery and the habits that contribute to results. You'll know what you're working towards and why." },
+              { title: 'We track, review and adjust.', text: "Progress isn't always a straight line. We'll use the information available, including relevant weight trends, training performance and feedback, to help assess your progress and make sensible adjustments where needed." },
+              { title: 'We build for the long term.', text: "The ultimate goal is not simply to reach a number on the scales or complete a programme. It's to develop the knowledge, confidence and habits that help you maintain your progress and continue moving forward." },
             ].map((step, index) => (
               <button
                 key={step.title}
