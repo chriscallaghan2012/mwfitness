@@ -499,7 +499,7 @@ a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):no
 /* Temporary client font preview: one selection updates all site text, including utility classes. */
 html[data-mw-font-preview="true"] body,
 html[data-mw-font-preview="true"] body * {
-  font-family: var(--mw-preview-font), sans-serif !important;
+  font-family: var(--mw-preview-font-all, inherit) !important;
 }
 
 /* Compact floating Google Fonts picker for the pre-launch design review. */
@@ -719,4 +719,43 @@ html[data-mw-font-preview="true"] body * {
   .mw-process-arrow {
     transition: none;
   }
+}
+
+
+/* Semantic font controls override the all-text preview rule. */
+html[data-mw-font-preview="true"] body h1 {
+  font-family: var(--mw-preview-font-h1, var(--mw-preview-font-all, inherit)) !important;
+}
+html[data-mw-font-preview="true"] body h2 {
+  font-family: var(--mw-preview-font-h2, var(--mw-preview-font-all, inherit)) !important;
+}
+html[data-mw-font-preview="true"] body h3,
+html[data-mw-font-preview="true"] body h4,
+html[data-mw-font-preview="true"] body h5,
+html[data-mw-font-preview="true"] body h6,
+html[data-mw-font-preview="true"] body article h2,
+html[data-mw-font-preview="true"] body article h3,
+html[data-mw-font-preview="true"] body .font-display {
+  font-family: var(--mw-preview-font-headings, var(--mw-preview-font-h2, var(--mw-preview-font-all, inherit))) !important;
+}
+html[data-mw-font-preview="true"] body p,
+html[data-mw-font-preview="true"] body li,
+html[data-mw-font-preview="true"] body blockquote,
+html[data-mw-font-preview="true"] body dd {
+  font-family: var(--mw-preview-font-body, var(--mw-preview-font-all, inherit)) !important;
+}
+html[data-mw-font-preview="true"] body button,
+html[data-mw-font-preview="true"] body nav,
+html[data-mw-font-preview="true"] body a,
+html[data-mw-font-preview="true"] body [role="button"] {
+  font-family: var(--mw-preview-font-ui, var(--mw-preview-font-all, inherit)) !important;
+}
+html[data-mw-font-preview="true"] body small,
+html[data-mw-font-preview="true"] body label,
+html[data-mw-font-preview="true"] body caption,
+html[data-mw-font-preview="true"] body .font-mono,
+html[data-mw-font-preview="true"] body [class*="text-[10px]"],
+html[data-mw-font-preview="true"] body [class*="text-[11px]"],
+html[data-mw-font-preview="true"] body [class*="text-[9px]"] {
+  font-family: var(--mw-preview-font-small, var(--mw-preview-font-all, inherit)) !important;
 }
