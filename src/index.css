@@ -776,8 +776,8 @@ html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
 }
 
 
-/* Brush-stroke title accent inspired by the supplied CC BY-SA example.
-   CSS-only rough brush shape keeps the treatment light and responsive. */
+/* Animated orange brush stroke behind white titles. The title remains visible
+   while the painted stroke sweeps in from the left. */
 .brush-title {
   position: relative;
   isolation: isolate;
@@ -794,7 +794,14 @@ html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
   inset: 0 -0.08em;
   background: #ff5500;
   clip-path: polygon(2% 15%, 14% 10%, 28% 13%, 43% 7%, 58% 11%, 72% 6%, 88% 12%, 99% 8%, 96% 28%, 100% 42%, 96% 58%, 99% 78%, 88% 84%, 73% 81%, 58% 90%, 42% 84%, 27% 91%, 13% 84%, 1% 90%, 4% 69%, 0 53%, 4% 35%);
-  transform: rotate(-0.7deg);
+  transform: rotate(-0.7deg) scaleX(0);
+  transform-origin: left center;
+  animation: mw-brush-stroke-in 760ms cubic-bezier(.2,.75,.25,1) 120ms both;
+}
+@keyframes mw-brush-stroke-in {
+  0% { transform: rotate(-0.7deg) scaleX(0); opacity: .35; }
+  68% { transform: rotate(-0.7deg) scaleX(1.035); opacity: 1; }
+  100% { transform: rotate(-0.7deg) scaleX(1); opacity: 1; }
 }
 .brush-title--card {
   padding-inline: 0.22em;
@@ -802,10 +809,19 @@ html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
 .brush-title--card::before {
   background: #ff5500;
   clip-path: polygon(1% 18%, 18% 10%, 35% 15%, 53% 7%, 69% 12%, 86% 8%, 99% 17%, 96% 39%, 100% 58%, 95% 82%, 78% 88%, 61% 83%, 43% 92%, 25% 85%, 8% 91%, 3% 70%, 0 49%, 4% 32%);
-  transform: rotate(-0.5deg);
+  transform: rotate(-0.5deg) scaleX(0);
+  transform-origin: left center;
+  animation: mw-brush-stroke-in 680ms cubic-bezier(.2,.75,.25,1) 180ms both;
 }
 .brush-title--card {
   color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brush-title::before,
+  .brush-title--card::before {
+    animation: none;
+    transform: rotate(-0.7deg) scaleX(1);
+  }
 }
 
 
