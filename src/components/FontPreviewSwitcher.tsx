@@ -47,7 +47,8 @@ function loadGoogleFont(font: string) {
 }
 
 export function FontPreviewSwitcher() {
-  const [typeFonts, setTypeFonts] = useState<FontSelections>(DEFAULT_SELECTIONS);\n  const [typeSizes, setTypeSizes] = useState<Record<FontType, number>>(DEFAULT_SIZES);
+  const [typeFonts, setTypeFonts] = useState<FontSelections>(DEFAULT_SELECTIONS);
+  const [typeSizes, setTypeSizes] = useState<Record<FontType, number>>(DEFAULT_SIZES);
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
 
@@ -66,7 +67,8 @@ export function FontPreviewSwitcher() {
         }
       }
     } catch {
-      window.localStorage.removeItem(`${STORAGE_KEY}-types`);\n    window.localStorage.removeItem(`${STORAGE_KEY}-sizes`);
+      window.localStorage.removeItem(`${STORAGE_KEY}-types`);
+    window.localStorage.removeItem(`${STORAGE_KEY}-sizes`);
     }
   }, []);
 
@@ -102,7 +104,8 @@ export function FontPreviewSwitcher() {
       Object.entries(typeSizes).some(([key, size]) => size !== DEFAULT_SIZES[key as FontType]);
     if (anyCustom) root.setAttribute('data-mw-font-preview', 'true');
     else root.removeAttribute('data-mw-font-preview');
-    window.localStorage.setItem(`${STORAGE_KEY}-types`, JSON.stringify(typeFonts));\n    window.localStorage.setItem(`${STORAGE_KEY}-sizes`, JSON.stringify(typeSizes));
+    window.localStorage.setItem(`${STORAGE_KEY}-types`, JSON.stringify(typeFonts));
+    window.localStorage.setItem(`${STORAGE_KEY}-sizes`, JSON.stringify(typeSizes));
     if (typeFonts.all !== DEFAULT_FONT) window.localStorage.setItem(STORAGE_KEY, typeFonts.all);
     else window.localStorage.removeItem(STORAGE_KEY);
   }, [typeFonts, typeSizes]);
@@ -121,7 +124,8 @@ export function FontPreviewSwitcher() {
   };
 
   const reset = () => {
-    setTypeFonts(DEFAULT_SELECTIONS);\n    setTypeSizes(DEFAULT_SIZES);
+    setTypeFonts(DEFAULT_SELECTIONS);
+    setTypeSizes(DEFAULT_SIZES);
     setSearch('');
     window.localStorage.removeItem(STORAGE_KEY);
     window.localStorage.removeItem(`${STORAGE_KEY}-types`);
