@@ -139,8 +139,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
               [ ABOUT MIKE ]
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-              <span className="brush-wrap">MEET MIKE. YOUR ONLINE COACH.</span>
+            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl text-white uppercase leading-[0.95] tracking-tight">
+              <span className="brush-wrap">MEET MIKE.</span> <span className="text-[#ff5500]">YOUR ONLINE COACH.</span>
             </h2>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Practical online coaching for busy people who want to feel stronger, build confidence and make progress they can maintain.</p>
             <div aria-hidden="true" className="mt-5 w-full border-b border-dashed border-[#454954]" />
@@ -157,8 +157,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           {/* Intro */}
           <div className="mw-electric-card h-full bg-[#121419] border border-[#20232b] p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">
-                <UserCheck className="w-5 h-5" />
+              <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">                <UserCheck className="w-5 h-5" />
               </div>
               <div>
                 <div className="font-display text-xl text-white uppercase leading-none">{ABOUT.greeting}</div>
@@ -229,7 +228,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="mb-8 max-w-4xl sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">How we work</div>
-            <h2 className="font-display text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl md:text-7xl">
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">
               <span className="brush-wrap">OUR 5-STEP</span> <span className="text-[#ff5500]">COACHING PROCESS</span>
             </h2>
             <p className="mt-5 max-w-2xl text-sm leading-relaxed text-[#a1a1aa] sm:text-base">
@@ -256,8 +255,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 >
                   <span className="mw-process-number">{String(index + 1).padStart(2, '0')}</span>
                   <span className="mw-process-title">{step.title}</span>
-                  <span className="mw-process-description">{step.text}</span>
-                  <span className="mw-process-arrow" aria-hidden="true"><ArrowRight className="h-5 w-5" /></span>
+                  <span className="mw-process-description text-base leading-relaxed text-white sm:text-lg">{step.text}</span>
                 </button>
               ))}
             </div>
@@ -317,8 +315,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               { title: 'Accountability that keeps you moving', text: "Motivation comes and goes. Building habits, maintaining focus and taking consistent action are what help create progress. Coaching gives you structure and a clearer sense of direction. We'll use your progress, feedback and performance to help identify what's working, where adjustments may be needed and what your next steps should be. You don't have to get everything perfect. You need a plan you can follow and the willingness to keep improving." },
             ].map((item, index) => (
               <article key={item.title} className="mw-electric-card border border-[#252a34] bg-[#121419] p-6 sm:p-8">
-                <div className="mb-4 font-mono text-xs font-bold tracking-[0.18em] text-[#ff5500]">0{index + 1} / HOW I COACH</div>
-                <h3 className="mb-3 font-display text-2xl font-black uppercase leading-tight text-white sm:text-3xl">{item.title}</h3>
+                <div className="mb-4 font-mono text-xs font-bold tracking-[0.18em] text-[#ff5500]">0{index + 1} / HOW I COACH</div>                <h3 className="mb-3 font-display text-2xl font-black uppercase leading-tight text-white sm:text-3xl">{item.title}</h3>
                 <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">{item.text}</p>
               </article>
             ))}
@@ -376,7 +373,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="mb-8 max-w-5xl sm:mb-10">
           <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ COMMUNITY & MINDSET ]</div>
-          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">FITNESS IS PERSONAL. <span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span> COMMUNITY MAKES US STRONGER.</h2>
+          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">FITNESS IS PERSONAL.<br /><span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span><br /><span className="text-white">COMMUNITY</span> <span className="text-[#ff5500]">MAKES US STRONGER.</span></h2>
         </div>
         <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col justify-center space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
@@ -470,15 +467,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mb-8 border-b border-[#22252e] pb-5">
           <div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div>
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2>
+            <h2 className="font-display text-4xl uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl"><span className="text-white">Real people.</span> <span className="text-[#ff5500]">Real results.</span></h2>
             <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
           </div>
         </div>
         <div onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
             {orderedTestimonials.slice(0, 3).map((t) => <article key={t.id} className="mw-electric-card min-w-0 border border-[#252a34] bg-[#121419]/70 p-5 sm:p-6">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="flex gap-1">{renderStars(5)}</div>
+              <div className="mb-4 flex items-center justify-between gap-3">                <div className="flex gap-1">{renderStars(5)}</div>
                 <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">Member review</span>
               </div>
               <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">“{t.quote}”</p>
