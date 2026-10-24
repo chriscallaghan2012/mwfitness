@@ -131,7 +131,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
         <div className="border border-[#20232b] bg-[#121419]">
           <div className="border-b border-[#20232b] bg-gradient-to-r from-[#21170f] via-[#15171b] to-[#121419] p-8 sm:p-10">
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-2">[ MWFITNESSUK × SHWAG-MCR ]</div>
-            <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-tight leading-[0.95]"><span className="brush-wrap">Stronger</span><br /><span className="text-[#ff5500]">Together.</span></h2>
+            <h2 className="font-display text-[clamp(1.75rem,6.8vw,3.75rem)] text-white uppercase tracking-tight leading-none whitespace-nowrap"><span className="brush-wrap">Stronger</span> <span className="text-[#ff5500]">Together</span></h2>
             <p className="mt-4 max-w-2xl text-sm font-sans text-zinc-400 leading-relaxed">Two businesses, one shared vision — promoting positive mental attitudes, encouraging healthy lifestyles, and bringing people together through a common purpose.</p>
           </div>
 
