@@ -87,7 +87,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
             </div>
 
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-[0.9] font-black">
-              SHWAG.
+              <span className="brush-wrap">SHWAG.</span>
             </h1>
 
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
@@ -131,7 +131,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
         <div className="border border-[#20232b] bg-[#121419]">
           <div className="border-b border-[#20232b] bg-gradient-to-r from-[#21170f] via-[#15171b] to-[#121419] p-8 sm:p-10">
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-2">[ MWFITNESSUK × SHWAG-MCR ]</div>
-            <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-tight leading-[0.95]">Stronger<br />Together.</h2>
+            <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-tight leading-[0.95]"><span className="brush-wrap">Stronger</span><br /><span className="text-[#ff5500]">Together.</span></h2>
             <p className="mt-4 max-w-2xl text-sm font-sans text-zinc-400 leading-relaxed">Two businesses, one shared vision — promoting positive mental attitudes, encouraging healthy lifestyles, and bringing people together through a common purpose.</p>
           </div>
 
@@ -172,7 +172,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
             [ THE RANGE ]
           </div>
           <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            WEAR THE ATTITUDE.
+            <span className="brush-wrap">WEAR THE</span> <span className="text-[#ff5500]">ATTITUDE.</span>
           </h2>
         </div>
 
@@ -244,7 +244,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
                 [ ORDER ENQUIRY ]
               </div>
               <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-2">
-                GET YOUR SHWAG
+                <span className="brush-wrap">GET YOUR</span> <span className="text-[#ff5500]">SHWAG</span>
               </h2>
               <p className="mx-auto max-w-xl text-sm font-sans text-zinc-400 leading-relaxed mb-6">
                 Interested in a piece? Drop your details and which item you're after, and we'll sort the rest.
