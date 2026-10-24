@@ -57,7 +57,10 @@ export const Footer: React.FC<FooterProps> = ({ onSelectScreen, onOpenBookCall }
         </div>
       </div>
       <div className="border-t border-[#1c1f26] pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px] text-zinc-500">
-        <p>© {new Date().getFullYear()} Michael Whitworth — MWFitnessUK. All rights reserved.</p>
+        <div className="flex flex-col items-center sm:items-start gap-1 text-center sm:text-left">
+          <p>© {new Date().getFullYear()} Michael Whitworth — MWFitnessUK. All rights reserved.</p>
+          <a href="https://christopherjcallaghan.com/" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-colors">Web design &amp; development by Christopher J Callaghan</a>
+        </div>
         <nav aria-label="Legal and privacy" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <a href="/privacy" className="text-white hover:text-[#ff5500] uppercase tracking-wider transition-colors">Privacy policy</a>
           <a href="/cookies" className="text-white hover:text-[#ff5500] uppercase tracking-wider transition-colors">Cookie policy</a>
