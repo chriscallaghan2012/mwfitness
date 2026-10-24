@@ -1,31 +1,36 @@
-const PLAN_PRICE_ENV = {
-  'online-weekly': 'STRIPE_PRICE_ONLINE_WEEKLY',
-  'online-12-week': 'STRIPE_PRICE_ONLINE_12_WEEK',
-  'online-4-week-once': 'STRIPE_PRICE_ONLINE_4_WEEK_ONCE',
-  'online-bronze-4week': 'STRIPE_PRICE_ONLINE_BRONZE_4WEEK',
-  'online-silver-8week': 'STRIPE_PRICE_ONLINE_SILVER_8WEEK',
-  'online-gold-8week': 'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
-  'online-platinum-8week': 'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
-};
+import { neon } from '@neondatabase/serverless';
+
+let database;
+function getDatabase() {
+  if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not configured.');
+  database ||= neon(process.env.DATABASE_URL);
+  return database;
+}
 
 export async function createCheckoutSession({ planId, origin, customerEmail, customerName }) {
-  const priceEnv = PLAN_PRICE_ENV[planId];
-  if (!priceEnv) throw new Error('Invalid coaching plan.');
+  if (typeof planId !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(planId)) {
+    throw new Error('Invalid coaching plan.');
+  }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
-  const priceId = process.env[priceEnv];
-  if (!secretKey) throw new Error('Stripe keys are not present on the server (STRIPE_SECRET_KEY is missing). Payments are not live yet.');
-  if (!priceId) throw new Error(`Stripe keys are present, but no price ID is configured for this plan yet (${priceEnv}).`);
-
   const baseUrl = origin || process.env.PUBLIC_SITE_URL;
-  if (!baseUrl) throw new Error('The public site URL is not configured.');
+  if (!secretKey) throw new Error('Stripe secret key is not configured.');
+  if (!baseUrl || !/^https:\/\//i.test(baseUrl)) throw new Error('The public site URL is not configured.');
+
+  const result = await getDatabase().query(
+    'select id, stripe_price_id from public.plans where id = $1 and kind = $2 and active = true limit 1',
+    [planId, 'online'],
+  );
+  const plan = result.rows?.[0];
+  if (!plan) throw new Error('Invalid coaching plan.');
+  if (!plan.stripe_price_id) throw new Error('This coaching plan is not connected to a live Stripe price yet.');
 
   const params = new URLSearchParams({
     mode: 'payment',
-    'line_items[0][price]': priceId,
+    'line_items[0][price]': String(plan.stripe_price_id),
     'line_items[0][quantity]': '1',
-    success_url: `${baseUrl}/#online-coaching?checkout=success`,
-    cancel_url: `${baseUrl}/#online-coaching?checkout=cancelled`,
+    success_url: `${baseUrl.replace(/\/$/, '')}/#online-coaching?checkout=success`,
+    cancel_url: `${baseUrl.replace(/\/$/, '')}/#online-coaching?checkout=cancelled`,
     'metadata[plan_id]': planId,
   });
   if (customerEmail) params.set('customer_email', customerEmail);
