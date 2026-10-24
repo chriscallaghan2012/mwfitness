@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScreenId } from '../../types';
-import { IMAGES, ABOUT, TESTIMONIALS, HOW_IT_WORKS, CONTACT } from '../../data/mockData';
+import { IMAGES, ABOUT, TESTIMONIALS, CONTACT } from '../../data/mockData';
 import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, GraduationCap, Smartphone, Scale, TrendingUp, Utensils, Dumbbell, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StoreBadges } from '../StoreBadges';
 import { PublicPlan } from '../../lib/plans';
@@ -14,6 +14,7 @@ interface HomeScreenProps {
 export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBookCall, onCheckout }) => {
   const [reviewIndex, setReviewIndex] = useState(0);
   const [reviewsPaused, setReviewsPaused] = useState(false);
+  const [activeProcessStep, setActiveProcessStep] = useState(0);
 
   useEffect(() => {
     if (reviewsPaused || TESTIMONIALS.length < 2) return;
@@ -141,7 +142,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
               MEET MIKE. YOUR ONLINE COACH.
             </h2>
-            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">I’m Mike, and I help busy people build strength, confidence and healthier routines through practical online coaching. Your plan is shaped around your goals, your schedule and real life — with clear training and nutrition guidance, plus support to help you stay consistent.</p>
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Practical online coaching for busy people who want to feel stronger, build confidence and make progress they can maintain.</p>
             <div aria-hidden="true" className="mt-5 w-full border-b border-dashed border-[#454954]" />
           </div>
           <button onClick={() => onOpenBookCall()}
@@ -164,8 +165,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <div className="text-[11px] font-mono text-zinc-500">Online Coach • Train anywhere</div>
               </div>
             </div>
-            <p className="text-sm font-sans text-zinc-300 leading-relaxed">{ABOUT.intro}</p>
-
             <ul className="mt-5 space-y-2.5 text-sm font-sans text-zinc-300">
               {ABOUT.experience.map((item) => (
                 <li key={item} className="flex items-center gap-2.5">
@@ -225,25 +224,42 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-[#22252e] pb-4 mb-10">
-          <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
-            [ HOW IT WORKS ]
+      {/* FIVE-STEP COACHING PROCESS */}
+      <section id="how-it-works" className="mw-process-section w-full bg-black text-white">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="mb-8 max-w-3xl sm:mb-12">
+            <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">How we work</div>
+            <h2 className="font-display text-5xl font-black uppercase leading-[0.88] tracking-tight text-white sm:text-7xl md:text-8xl">
+              OUR 5-STEP<br /> <span className="text-[#ff5500]">COACHING PROCESS</span>
+            </h2>
+            <p className="mt-5 max-w-2xl text-sm leading-relaxed text-[#8a8a8a] sm:text-base">
+              A clear, supportive approach to building habits, making progress and finding a routine that works in real life.
+            </p>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            THREE SIMPLE STEPS.
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {HOW_IT_WORKS.map((step) => (
-            <div key={step.step} className="mw-electric-card bg-[#121419] border border-[#20232b] p-6 relative group">
-              <div className="text-4xl font-display text-[#ff5500] font-bold mb-3">{step.step}</div>
-              <h3 className="font-display text-2xl text-white uppercase tracking-wider mb-2">{step.title}</h3>
-              <p className="text-sm font-sans text-zinc-400 leading-relaxed">{step.text}</p>
-            </div>
-          ))}
+          <div className="mw-process-list border-t border-[#222]">
+            {[
+              { title: 'Discovery & Goals', text: 'We start by understanding your goals, current routine and what you want to change, so your coaching begins with a plan that fits your life.' },
+              { title: 'Plan & Strategy', text: 'Your training and nutrition guidance is shaped around your experience, preferences, schedule and the support you need.' },
+              { title: 'Train & Build Habits', text: 'Put your plan into practice with clear guidance, manageable steps and a focus on consistency rather than perfection.' },
+              { title: 'Check In & Refine', text: 'Use check-ins and progress updates to see what is working, discuss challenges and adjust your approach when needed.' },
+              { title: 'Progress & Keep Going', text: 'Build on what you learn, celebrate progress and develop routines you can maintain beyond a short burst of motivation.' },
+            ].map((step, index) => (
+              <button
+                key={step.title}
+                type="button"
+                className={`mw-process-step ${activeProcessStep === index ? 'is-active' : ''}`}
+                aria-expanded={activeProcessStep === index}
+                onMouseEnter={() => setActiveProcessStep(index)}
+                onFocus={() => setActiveProcessStep(index)}
+                onClick={() => setActiveProcessStep(index)}
+              >
+                <span className="mw-process-number">{String(index + 1).padStart(2, '0')}</span>
+                <span className="mw-process-title">{step.title}</span>
+                <span className="mw-process-description">{step.text}</span>
+                <span className="mw-process-arrow" aria-hidden="true"><ArrowRight className="h-5 w-5" /></span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -293,7 +309,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2>
             <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
           </div>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Mike believes fitness should fit around real life. His online coaching focuses on practical training, straightforward nutrition and consistent support — helping people build confidence, find a routine that works for them and make progress they can maintain.</p>
         </div>
         <div onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
