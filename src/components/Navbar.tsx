@@ -55,7 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-50 w-full bg-black border-b border-[#262930]">
       {/* Top Status Bar */}
-      <div className={`bg-black border-b border-[#1c1f26] px-4 font-mono text-[#8b929e] flex items-center justify-between overflow-x-auto whitespace-nowrap transition-all duration-200 ${isScrolled ? "max-h-0 py-0 opacity-0 border-b-0 overflow-hidden" : "max-h-12 py-1 text-xs"}`}>
+      <div className={`bg-black border-b border-[#1c1f26] px-4 font-mono text-[#8b929e] flex items-center justify-between overflow-x-auto whitespace-nowrap transition-[height,opacity,padding] duration-200 ${isScrolled ? "h-0 py-0 opacity-0 border-b-0 overflow-hidden pointer-events-none" : "h-12 py-1 text-xs"}`}>
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
