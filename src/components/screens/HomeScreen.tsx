@@ -227,6 +227,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       {/* FIVE-STEP COACHING PROCESS */}
       <section id="how-it-works" className="mw-process-section w-full border-y border-[#22252e] bg-[#101115] text-white">
         <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="min-w-0">
           <div className="mb-8 w-full sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">How we work</div>
             <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">
@@ -236,7 +238,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               From your first conversation to long-term progress, every step is designed around you and real life. We start by understanding your goals and circumstances, build a practical training and nutrition plan, and support you as you learn, track progress and make adjustments. The aim is lasting progress that fits your life — not a one-size-fits-all approach.
             </p>
           </div>
-          <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
             <div className="mw-process-list self-stretch border-t border-[#292d36]">
               {[
                 { title: 'We start by understanding you.', text: "We'll establish your goals, current circumstances, training experience, lifestyle and any challenges that may affect your progress. This gives us a starting point for building your coaching plan." },
@@ -263,6 +264,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 </button>
               ))}
             </div>
+            </div>
             <div className="relative min-h-[360px] overflow-hidden border border-[#252a34] bg-[#121419] sm:min-h-[520px]">
               <img src={IMAGES.HERO} alt="Mike at MWFitnessUK" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
               <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#08090b]/90 via-[#08090b]/10 to-transparent" />
@@ -275,8 +277,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                   <button onClick={() => onSelectScreen('contact')} className="inline-flex cursor-pointer items-center gap-2 border border-white/40 bg-black/30 px-5 py-3.5 font-mono text-xs font-bold uppercase text-white transition-colors hover:border-[#ff5500]">Ask a question <ArrowRight className="h-4 w-4" /></button>
                 </div>
               </div>
-            </div>
-          </div>
+            </div>          </div>
         </div>
       </section>
       {/* FULL HOMEPAGE COACHING COPY — restored from the supplied brief */}
