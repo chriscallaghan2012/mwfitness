@@ -94,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleNavClick('home')}
             className="relative z-10 flex items-center gap-4 text-left group focus:outline-none"
           >
-            <img src="https://raw.githubusercontent.com/chriscallaghan2012/mwfitness/main/logo.png" alt="MW Fitness" className={`${isScrolled ? "h-14 sm:h-16" : "h-20 sm:h-24"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
+            <img src="/logo.png" alt="MW Fitness" className={`${isScrolled ? "h-14 sm:h-16" : "h-20 sm:h-24"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
             <span className="text-white font-black uppercase tracking-[0.12em] text-xl sm:text-2xl leading-none">FITNESSUK</span>
           </button>
 
@@ -126,7 +126,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right-side brand mark */}
           <button type="button" onClick={() => handleNavClick('home')} aria-label="MW Fitness home" className="hidden xl:flex ml-auto items-center focus:outline-none">
-            <img src="https://raw.githubusercontent.com/chriscallaghan2012/mwfitness/main/logoright.png" alt="MW Fitness" className={`${isScrolled ? "h-14 2xl:h-16" : "h-20 2xl:h-24"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
+            <img src="/logoright.png" alt="MW Fitness" className={`${isScrolled ? "h-14 2xl:h-16" : "h-20 2xl:h-24"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
           </button>
 
           {/* Mobile menu toggle */}
