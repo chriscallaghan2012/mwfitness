@@ -265,20 +265,25 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
 
 
       {/* FULL HOMEPAGE COACHING COPY — restored from the supplied brief */}
-      <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
-          <div>
-            <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ THE MWFITNESSUK APPROACH ]</div>
-            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">MORE THAN A WORKOUT. <span className="text-[#ff5500]">MORE THAN A MEAL PLAN.</span></h2>
-          </div>
-          <div className="space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
+      <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="mb-8 max-w-4xl sm:mb-10">
+          <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ THE MWFITNESSUK APPROACH ]</div>
+          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">MORE THAN A WORKOUT. <span className="text-[#ff5500]">MORE THAN A MEAL PLAN.</span></h2>
+        </div>
+        <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="flex flex-col justify-center space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
             <p>I believe fitness should be about more than what you see in the mirror. It's about building discipline, developing confidence, improving your physical and mental well-being, and creating habits that make a positive difference to your everyday life.</p>
             <p>My approach is simple: give you the right guidance, a clear plan, consistent support and the accountability to keep moving forward.</p>
             <p>You bring the commitment. I'll help you put it to work.</p>
             <p>At MWFitnessUK, I understand that no two people are the same. We all have different starting points, responsibilities, challenges and ambitions. That's why your coaching should reflect you, rather than expecting you to fit into somebody else's programme.</p>
             <p>I'm passionate about helping people understand not just what they need to do, but why they're doing it. I want you to develop the knowledge, confidence and independence to make better decisions about your training, nutrition and lifestyle long after you've started your coaching journey.</p>
             <p>My role isn't simply to tell you what to do. It's to coach you, educate you, encourage you and help you build the tools you need to succeed.</p>
-            <p className="font-mono font-bold uppercase tracking-wide text-white">Your goals. Your journey. Your progress. My support.</p>
+            <p className="pt-2 font-mono font-bold uppercase tracking-wide text-white">Your goals. Your journey. Your progress. My support.</p>
+          </div>
+          <div className="relative min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] sm:min-h-[420px]">
+            <img src={IMAGES.ABOUT} alt="Training space at MWFitnessUK" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
+            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e]/70 via-transparent to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">MWFitnessUK</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl">Your goals. Your journey.</p></div>
           </div>
         </div>
       </section>
@@ -331,28 +336,35 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
 
       <section className="w-full border-y border-[#22252e] bg-[#101115]">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-2 lg:gap-14 lg:px-8">
-          <div>
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="mb-8 max-w-4xl sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ WHY MWFITNESSUK ]</div>
-            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-6xl">WHY CHOOSE <span className="text-[#ff5500]">MWFITNESSUK?</span></h2>
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">WHY CHOOSE <span className="text-[#ff5500]">MWFITNESSUK?</span></h2>
           </div>
-          <div className="space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
-            <p>Because I believe good coaching should give you more than instructions.</p>
-            <p>It should give you clarity when you're unsure, structure when you need direction, accountability when motivation dips and education that helps you understand your own progress.</p>
-            <p>I want you to feel that your goals matter, your questions are welcome and your individual circumstances are taken seriously.</p>
-            <p>I also believe in being realistic. Results take time, and no responsible coach can guarantee a particular outcome. What I can offer is a considered approach, practical guidance and a focus on helping you make consistent progress through the actions within your control.</p>
-            <p className="font-mono font-bold uppercase tracking-wide text-white">No magic solutions. No unnecessary complications. Just purposeful coaching, hard work and a commitment to getting better.</p>
+          <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="relative order-2 min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] lg:order-1 sm:min-h-[420px]">
+              <img src={IMAGES.CONTACT} alt="Gym training environment" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e]/70 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">Coaching built around you</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl">Real guidance. Real life.</p></div>
+            </div>
+            <div className="order-1 flex flex-col justify-center space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base lg:order-2">
+              <p>Because I believe good coaching should give you more than instructions.</p>
+              <p>It should give you clarity when you're unsure, structure when you need direction, accountability when motivation dips and education that helps you understand your own progress.</p>
+              <p>I want you to feel that your goals matter, your questions are welcome and your individual circumstances are taken seriously.</p>
+              <p>I also believe in being realistic. Results take time, and no responsible coach can guarantee a particular outcome. What I can offer is a considered approach, practical guidance and a focus on helping you make consistent progress through the actions within your control.</p>
+              <p className="pt-2 font-mono font-bold uppercase tracking-wide text-white">No magic solutions. No unnecessary complications. Just purposeful coaching, hard work and a commitment to getting better.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
-          <div>
-            <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ COMMUNITY & MINDSET ]</div>
-            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">FITNESS IS PERSONAL. <span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span> COMMUNITY MAKES US STRONGER.</h2>
-          </div>
-          <div className="space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
+      <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="mb-8 max-w-5xl sm:mb-10">
+          <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ COMMUNITY & MINDSET ]</div>
+          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">FITNESS IS PERSONAL. <span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span> COMMUNITY MAKES US STRONGER.</h2>
+        </div>
+        <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="flex flex-col justify-center space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
             <p>MWFitnessUK is built on the belief that positive change goes beyond the gym. Training and nutrition can help us improve physically, but the discipline, resilience and self-belief we develop can also influence how we approach work, family life, personal challenges and our ambitions.</p>
             <p>That's why the values behind MWFitnessUK connect with our sportswear brand, Shwag-MCR. Together, we want to promote a positive mindset, encourage people to take pride in their efforts and create a sense of community where people support one another, celebrate progress and strive to become better versions of themselves.</p>
             <p>Our motto says it all:</p>
@@ -361,29 +373,41 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <p>Greatness isn't reserved for a select few. It's built through effort, consistency, determination and the decision to keep going when things get difficult.</p>
             <p>You don't have to do everything alone, and you don't have to be perfect to belong.</p>
           </div>
+          <div className="relative min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] sm:min-h-[420px]">
+            <img src={IMAGES.HERO} alt="MWFitnessUK training and fitness mindset" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
+            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e]/70 via-transparent to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">Solid hard work</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl">Achieves greatness.</p></div>
+          </div>
         </div>
       </section>
 
       <section className="w-full border-y border-[#22252e] bg-[#101115]">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-2 lg:gap-14 lg:px-8">
-          <div>
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="mb-8 max-w-4xl sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ YOUR JOURNEY STARTS HERE ]</div>
-            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-6xl">YOUR JOURNEY <span className="text-[#ff5500]">STARTS HERE.</span></h2>
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">YOUR JOURNEY <span className="text-[#ff5500]">STARTS HERE.</span></h2>
           </div>
-          <div className="space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
-            <p>You might be starting from scratch, returning to training after time away or looking to break through a plateau. Whatever your situation, the important thing is deciding to take that first step.</p>
-            <p>You don't need to have everything figured out before you begin. That's where coaching can help.</p>
-            <p>We'll establish your starting point, work towards realistic goals and focus on the daily actions that move you closer to the results you want.</p>
-            <p>Your journey will require commitment, but you don't have to figure out every step by yourself.</p>
-            <p>If you're ready to invest in yourself, develop better habits and discover what consistent effort can achieve, I'd love to help you get started.</p>
-            <h3 className="pt-2 font-display text-3xl font-black uppercase text-white">LET'S BUILD SOMETHING <span className="text-[#ff5500]">BETTER.</span></h3>
-            <p className="font-mono font-bold uppercase text-white">MWFitnessUK — Solid Hard Work Achieves Greatness.</p>
-            <p>Take the first step towards a stronger body, a stronger mindset and a healthier future.</p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <button onClick={() => onOpenBookCall()} className="inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-6 py-3.5 font-mono text-xs font-bold uppercase text-black"><PhoneCall className="h-4 w-4" /> Start your coaching journey</button>
-              <button onClick={() => onSelectScreen('contact')} className="inline-flex cursor-pointer items-center gap-2 border border-[#343945] bg-[#17191f] px-6 py-3.5 font-mono text-xs font-bold uppercase text-white">Get in touch <ArrowRight className="h-4 w-4" /></button>
+          <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="relative order-2 min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] lg:order-1 sm:min-h-[420px]">
+              <img src={IMAGES.ABOUT} alt="A place to begin your fitness journey" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e]/70 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">Take the first step</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl">Let's build something better.</p></div>
             </div>
-            <p className="text-sm text-zinc-400">Get in touch to discuss your goals and find out how MWFitnessUK online coaching could work for you.</p>
+            <div className="order-1 flex flex-col justify-center space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base lg:order-2">
+              <p>You might be starting from scratch, returning to training after time away or looking to break through a plateau. Whatever your situation, the important thing is deciding to take that first step.</p>
+              <p>You don't need to have everything figured out before you begin. That's where coaching can help.</p>
+              <p>We'll establish your starting point, work towards realistic goals and focus on the daily actions that move you closer to the results you want.</p>
+              <p>Your journey will require commitment, but you don't have to figure out every step by yourself.</p>
+              <p>If you're ready to invest in yourself, develop better habits and discover what consistent effort can achieve, I'd love to help you get started.</p>
+              <h3 className="pt-2 font-display text-3xl font-black uppercase text-white">LET'S BUILD SOMETHING <span className="text-[#ff5500]">BETTER.</span></h3>
+              <p className="font-mono font-bold uppercase text-white">MWFitnessUK — Solid Hard Work Achieves Greatness.</p>
+              <p>Take the first step towards a stronger body, a stronger mindset and a healthier future.</p>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <button onClick={() => onOpenBookCall()} className="inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-6 py-3.5 font-mono text-xs font-bold uppercase text-black"><PhoneCall className="h-4 w-4" /> Start your coaching journey</button>
+                <button onClick={() => onSelectScreen('contact')} className="inline-flex cursor-pointer items-center gap-2 border border-[#343945] bg-[#17191f] px-6 py-3.5 font-mono text-xs font-bold uppercase text-white">Get in touch <ArrowRight className="h-4 w-4" /></button>
+              </div>
+              <p className="text-sm text-zinc-400">Get in touch to discuss your goals and find out how MWFitnessUK online coaching could work for you.</p>
+            </div>
           </div>
         </div>
       </section>
