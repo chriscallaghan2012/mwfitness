@@ -81,12 +81,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Main Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="relative flex items-center h-20">
           {/* Logo */}
           <button
             id="nav-logo-btn"
             onClick={() => handleNavClick('home')}
-            className="flex items-center gap-3 text-left group focus:outline-none"
+            className="relative z-10 flex items-center gap-3 text-left group focus:outline-none"
           >
             <div className="w-10 h-10 bg-transparent border border-[#ff5500] flex items-center justify-center relative overflow-hidden group-hover:border-white transition-colors">
               <span aria-hidden="true" className="font-display text-2xl leading-none tracking-tighter text-[#ff5500]">MW</span>
@@ -102,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Desktop Nav (xl) */}
-          <nav className="hidden xl:flex items-center gap-1.5">
+          <nav className="hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-1.5 whitespace-nowrap">
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
@@ -130,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="mobile-menu-toggle-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="xl:hidden p-2.5 text-zinc-400 hover:text-white bg-[#16181d] border border-[#262930] hover:border-zinc-500 focus:outline-none"
+            className="xl:hidden ml-auto p-2.5 text-zinc-400 hover:text-white bg-[#16181d] border border-[#262930] hover:border-zinc-500 focus:outline-none"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
