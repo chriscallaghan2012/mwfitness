@@ -69,8 +69,8 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
               <div className="min-w-0"><h3 className="flex min-h-[3.25rem] items-center font-display text-xl uppercase leading-tight text-white md:text-xl">{plan.name}</h3><p className="mt-1 min-h-4 text-xs font-mono uppercase tracking-wider text-zinc-500">{plan.tag}</p></div>
               <div className={featured ? 'shrink-0 md:text-right' : 'shrink-0'}><div className="font-display text-3xl text-[#ff5500] md:text-4xl">{formatPrice(plan.price)}</div>{plan.original_price !== null && <div className="text-xs font-mono text-zinc-500 line-through">{formatPrice(plan.original_price)}</div>}</div>
             </div>
-            <p className={'text-sm leading-relaxed text-zinc-400 ' + (featured ? 'mt-1 max-w-4xl leading-snug' : 'mt-4 min-h-[4.5rem]')}>{plan.description}</p>
-            <ul className={'grid content-start gap-y-2.5 ' + (featured ? 'mt-2 grid-cols-1 gap-y-1 sm:grid-cols-2 sm:gap-x-6' : 'mt-5 flex-1 grid-cols-1')}>{(featured ? plan.features : featureList).map((feature) => renderFeature(plan, feature, !featured))}</ul>
+            <p className={'text-sm leading-relaxed text-zinc-400 ' + (featured ? 'mt-1 mb-3 max-w-4xl leading-snug' : 'mt-4 min-h-[4.5rem]')}>{plan.description}</p>
+            <ul className={'grid content-start gap-y-2.5 mb-4 ' + (featured ? 'mt-2 grid-cols-1 gap-y-1 sm:grid-cols-2 sm:gap-x-6' : 'mt-5 flex-1 grid-cols-1')}>{(featured ? plan.features : featureList).map((feature) => renderFeature(plan, feature, !featured))}</ul>
             <button onClick={() => onCheckout(plan)} className="mt-auto flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-2.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
               Book Now <ArrowRight className="h-4 w-4" />
             </button>
