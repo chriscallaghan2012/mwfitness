@@ -142,7 +142,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
               MEET MIKE. YOUR ONLINE COACH.
             </h2>
-            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">I’m Mike, and I help busy people build strength, confidence and healthier routines through practical online coaching. Your plan is shaped around your goals, your schedule and real life — with clear training and nutrition guidance, plus support to help you stay consistent.</p>
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Practical online coaching for busy people who want to feel stronger, build confidence and make progress they can maintain.</p>
             <div aria-hidden="true" className="mt-5 w-full border-b border-dashed border-[#454954]" />
           </div>
           <button onClick={() => onOpenBookCall()}
@@ -165,8 +165,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                 <div className="text-[11px] font-mono text-zinc-500">Online Coach • Train anywhere</div>
               </div>
             </div>
-            <p className="text-sm font-sans text-zinc-300 leading-relaxed">{ABOUT.intro}</p>
-
             <ul className="mt-5 space-y-2.5 text-sm font-sans text-zinc-300">
               {ABOUT.experience.map((item) => (
                 <li key={item} className="flex items-center gap-2.5">
@@ -311,7 +309,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">Real people. Real results.</h2>
             <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
           </div>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Mike believes fitness should fit around real life. His online coaching focuses on practical training, straightforward nutrition and consistent support — helping people build confidence, find a routine that works for them and make progress they can maintain.</p>
         </div>
         <div onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
