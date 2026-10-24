@@ -732,98 +732,74 @@ html[data-mw-font-preview="true"] body * {
 }
 
 
-/* Semantic font controls override the all-text preview rule. */
-html[data-mw-font-preview="true"] body h1 {
-  font-family: var(--mw-preview-font-h1, var(--mw-preview-font-all, inherit)) !important;
+/* Typography preview: semantic selectors stay separate so categories don't override each other. */
+html[data-mw-font-preview="true"] body,
+html[data-mw-font-preview="true"] body * {
+  font-family: var(--mw-preview-font-all, inherit) !important;
 }
-html[data-mw-font-preview="true"] body h2 {
-  font-family: var(--mw-preview-font-h2, var(--mw-preview-font-all, inherit)) !important;
-}
+html[data-mw-font-preview="true"] body h1 { font-family: var(--mw-preview-font-h1, var(--mw-preview-font-all, inherit)) !important; }
+html[data-mw-font-preview="true"] body h2 { font-family: var(--mw-preview-font-h2, var(--mw-preview-font-all, inherit)) !important; }
 html[data-mw-font-preview="true"] body h3,
 html[data-mw-font-preview="true"] body h4,
 html[data-mw-font-preview="true"] body h5,
-html[data-mw-font-preview="true"] body h6,
-html[data-mw-font-preview="true"] body article h2,
-html[data-mw-font-preview="true"] body article h3,
-html[data-mw-font-preview="true"] body .font-display {
-  font-family: var(--mw-preview-font-headings, var(--mw-preview-font-h2, var(--mw-preview-font-all, inherit))) !important;
-}
+html[data-mw-font-preview="true"] body h6 { font-family: var(--mw-preview-font-headings, var(--mw-preview-font-all, inherit)) !important; }
 html[data-mw-font-preview="true"] body p,
 html[data-mw-font-preview="true"] body li,
 html[data-mw-font-preview="true"] body blockquote,
-html[data-mw-font-preview="true"] body dd {
-  font-family: var(--mw-preview-font-body, var(--mw-preview-font-all, inherit)) !important;
-}
+html[data-mw-font-preview="true"] body dd { font-family: var(--mw-preview-font-body, var(--mw-preview-font-all, inherit)) !important; }
 html[data-mw-font-preview="true"] body button,
 html[data-mw-font-preview="true"] body nav,
 html[data-mw-font-preview="true"] body a,
-html[data-mw-font-preview="true"] body [role="button"] {
-  font-family: var(--mw-preview-font-ui, var(--mw-preview-font-all, inherit)) !important;
-}
+html[data-mw-font-preview="true"] body [role="button"] { font-family: var(--mw-preview-font-ui, var(--mw-preview-font-all, inherit)) !important; }
 html[data-mw-font-preview="true"] body small,
 html[data-mw-font-preview="true"] body label,
 html[data-mw-font-preview="true"] body caption,
-html[data-mw-font-preview="true"] body .font-mono,
 html[data-mw-font-preview="true"] body [class*="text-[10px]"],
 html[data-mw-font-preview="true"] body [class*="text-[11px]"],
-html[data-mw-font-preview="true"] body [class*="text-[9px]"] {
-  font-family: var(--mw-preview-font-small, var(--mw-preview-font-all, inherit)) !important;
-}
-
+html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-family: var(--mw-preview-font-small, var(--mw-preview-font-all, inherit)) !important; }
 html[data-mw-font-preview="true"] body .mw-font-preview-sample,
-html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
-  font-family: var(--mw-font-preview-sample, inherit) !important;
-}
+html[data-mw-font-preview="true"] body .mw-font-preview-sample * { font-family: var(--mw-font-preview-sample, inherit) !important; }
 
+/* Per-category sizes: don't include .font-display, which used to override h1/h2. */
+html[data-mw-font-preview="true"] body { font-size: var(--mw-preview-size-all, 16px); }
+html[data-mw-font-preview="true"] body h1 { font-size: var(--mw-preview-size-h1, 48px) !important; }
+html[data-mw-font-preview="true"] body h2 { font-size: var(--mw-preview-size-h2, 36px) !important; }
+html[data-mw-font-preview="true"] body h3,
+html[data-mw-font-preview="true"] body h4,
+html[data-mw-font-preview="true"] body h5,
+html[data-mw-font-preview="true"] body h6 { font-size: var(--mw-preview-size-headings, 24px) !important; }
+html[data-mw-font-preview="true"] body p,
+html[data-mw-font-preview="true"] body li,
+html[data-mw-font-preview="true"] body blockquote,
+html[data-mw-font-preview="true"] body dd { font-size: var(--mw-preview-size-body, 16px) !important; }
+html[data-mw-font-preview="true"] body button,
+html[data-mw-font-preview="true"] body nav,
+html[data-mw-font-preview="true"] body a,
+html[data-mw-font-preview="true"] body [role="button"] { font-size: var(--mw-preview-size-ui, 14px) !important; }
+html[data-mw-font-preview="true"] body small,
+html[data-mw-font-preview="true"] body label,
+html[data-mw-font-preview="true"] body caption,
+html[data-mw-font-preview="true"] body [class*="text-[10px]"],
+html[data-mw-font-preview="true"] body [class*="text-[11px]"],
+html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-size: var(--mw-preview-size-small, 12px) !important; }
 
-/* Animated orange brush stroke behind white titles. The title remains visible
-   while the painted stroke sweeps in from the left. */
-.brush-title {
+/* Supplied brush-wrap/clipPath technique: only the wrapped white title text gets paint. */
+.brush-wrap {
   position: relative;
+  display: inline-block;
   isolation: isolate;
-  display: table;
-  max-width: 100%;
-  padding: 0.08em 0.28em 0.12em;
-  color: #fff;
   z-index: 0;
 }
-.brush-title::before {
+.brush-wrap::before {
   content: "";
   position: absolute;
+  inset: -0.06em -0.12em -0.02em;
   z-index: -1;
-  inset: 0 -0.08em;
   background: #ff5500;
-  clip-path: polygon(2% 15%, 14% 10%, 28% 13%, 43% 7%, 58% 11%, 72% 6%, 88% 12%, 99% 8%, 96% 28%, 100% 42%, 96% 58%, 99% 78%, 88% 84%, 73% 81%, 58% 90%, 42% 84%, 27% 91%, 13% 84%, 1% 90%, 4% 69%, 0 53%, 4% 35%);
-  transform: rotate(-0.7deg) scaleX(0);
-  transform-origin: left center;
-  animation: mw-brush-stroke-in 760ms cubic-bezier(.2,.75,.25,1) 120ms both;
+  clip-path: url(#mw-brush-clip);
+  pointer-events: none;
 }
-@keyframes mw-brush-stroke-in {
-  0% { transform: rotate(-0.7deg) scaleX(0); opacity: .35; }
-  68% { transform: rotate(-0.7deg) scaleX(1.035); opacity: 1; }
-  100% { transform: rotate(-0.7deg) scaleX(1); opacity: 1; }
-}
-.brush-title--card {
-  padding-inline: 0.22em;
-}
-.brush-title--card::before {
-  background: #ff5500;
-  clip-path: polygon(1% 18%, 18% 10%, 35% 15%, 53% 7%, 69% 12%, 86% 8%, 99% 17%, 96% 39%, 100% 58%, 95% 82%, 78% 88%, 61% 83%, 43% 92%, 25% 85%, 8% 91%, 3% 70%, 0 49%, 4% 32%);
-  transform: rotate(-0.5deg) scaleX(0);
-  transform-origin: left center;
-  animation: mw-brush-stroke-in 680ms cubic-bezier(.2,.75,.25,1) 180ms both;
-}
-.brush-title--card {
-  color: #fff;
-}
-@media (prefers-reduced-motion: reduce) {
-  .brush-title::before,
-  .brush-title--card::before {
-    animation: none;
-    transform: rotate(-0.7deg) scaleX(1);
-  }
-}
-
+.brush-wrap.brush-wrap--indefinite::before { clip-path: url(#mw-brush-clip-indefinite); }
 
 /* Font picker drawer: opens from the right, starts closed, and keeps its controls usable. */
 .mw-font-preview-panel {
@@ -907,26 +883,3 @@ html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
 }
 
 
-/* Live per-category font-size preview controls. */
-html[data-mw-font-preview="true"] body { font-size: var(--mw-preview-size-all, 16px); }
-html[data-mw-font-preview="true"] body h1 { font-size: var(--mw-preview-size-h1, 48px) !important; }
-html[data-mw-font-preview="true"] body h2 { font-size: var(--mw-preview-size-h2, 36px) !important; }
-html[data-mw-font-preview="true"] body h3,
-html[data-mw-font-preview="true"] body h4,
-html[data-mw-font-preview="true"] body h5,
-html[data-mw-font-preview="true"] body h6,
-html[data-mw-font-preview="true"] body article h2,
-html[data-mw-font-preview="true"] body article h3,
-html[data-mw-font-preview="true"] body .font-display { font-size: var(--mw-preview-size-headings, 24px) !important; }
-html[data-mw-font-preview="true"] body p,
-html[data-mw-font-preview="true"] body li,
-html[data-mw-font-preview="true"] body blockquote,
-html[data-mw-font-preview="true"] body dd { font-size: var(--mw-preview-size-body, 16px) !important; }
-html[data-mw-font-preview="true"] body button,
-html[data-mw-font-preview="true"] body nav,
-html[data-mw-font-preview="true"] body a,
-html[data-mw-font-preview="true"] body [role="button"] { font-size: var(--mw-preview-size-ui, 14px) !important; }
-html[data-mw-font-preview="true"] body small,
-html[data-mw-font-preview="true"] body label,
-html[data-mw-font-preview="true"] body caption,
-html[data-mw-font-preview="true"] body .font-mono { font-size: var(--mw-preview-size-small, 12px) !important; }

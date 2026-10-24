@@ -183,6 +183,16 @@ export default function App() {
         </div>
       )}
 
+      {/* Shared SVG brush texture and wipe animation used by the title wrappers. */}
+      <svg aria-hidden="true" width="0" height="0" xmlns="http://www.w3.org/2000/svg" style={{ position: 'absolute', overflow: 'hidden' }}>
+        <defs>
+          <clipPath id="mw-brush-reveal"><rect x="0" y="0" width="0" height="1"><animate attributeName="width" dur="1s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.5,0,0.5,1" values="0;1" /></rect></clipPath>
+          <clipPath id="mw-brush-reveal-loop"><rect x="0" y="0" width="0" height="1"><animate id="mw-brush-reveal-loop-animation" attributeName="width" dur="1s" calcMode="spline" keyTimes="0;1" keySplines="0.5,0,0.5,1" values="0;1" begin="0s;mw-brush-reveal-loop-animation.end+1s" /></rect></clipPath>
+          <clipPath id="mw-brush-clip" clipPathUnits="objectBoundingBox"><use href="#mw-brush-shape" clipPath="url(#mw-brush-reveal)" /></clipPath>
+          <clipPath id="mw-brush-clip-indefinite" clipPathUnits="objectBoundingBox"><use href="#mw-brush-shape" clipPath="url(#mw-brush-reveal-loop)" /></clipPath>
+          <path id="mw-brush-shape" d="M.01 .66 C.04 .61 .02 .56 .06 .53 C.09 .49 .08 .46 .11 .43 C.15 .39 .13 .35 .17 .32 C.22 .27 .23 .20 .29 .17 C.35 .13 .38 .08 .45 .09 C.52 .10 .55 .04 .63 .07 C.71 .09 .75 .12 .82 .13 C.89 .14 .93 .18 .99 .22 L.98 .30 C.96 .34 1 .39 .98 .44 C.96 .49 .99 .54 .97 .60 C.96 .66 .99 .72 .95 .77 C.92 .81 .88 .80 .84 .84 C.79 .88 .74 .85 .70 .89 C.64 .94 .60 .88 .55 .91 C.49 .94 .44 .89 .39 .92 C.33 .95 .28 .91 .23 .94 C.18 .96 .12 .91 .08 .89 C.04 .87 .02 .82 .01 .78 Z" />
+        </defs>
+      </svg>
       {/* Temporary live typography preview for client review */}
       <FontPreviewSwitcher />
 

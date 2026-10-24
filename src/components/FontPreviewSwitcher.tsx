@@ -13,6 +13,7 @@ const POPULAR_FONTS = [
 
 const DEFAULT_FONT = 'Hanken Grotesk';
 const STORAGE_KEY = 'mwfitness-font-preview';
+const STORAGE_VERSION_KEY = 'mwfitness-font-preview-version';
 const TEXT_TYPES = [
   { key: 'all', label: 'All text' },
   { key: 'h1', label: 'H1 — Main title' },
@@ -59,9 +60,18 @@ export function FontPreviewSwitcher() {
   const [typeSizes, setTypeSizes] = useState<Record<FontType, number>>(DEFAULT_SIZES);
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
+      if (window.localStorage.getItem(STORAGE_VERSION_KEY) !== '2') {
+        window.localStorage.removeItem(STORAGE_KEY);
+        window.localStorage.removeItem(`${STORAGE_KEY}-types`);
+        window.localStorage.removeItem(`${STORAGE_KEY}-sizes`);
+        window.localStorage.setItem(STORAGE_VERSION_KEY, '2');
+        setHydrated(true);
+        return;
+      }
       const savedTypes = window.localStorage.getItem(`${STORAGE_KEY}-types`);
       const savedSizes = window.localStorage.getItem(`${STORAGE_KEY}-sizes`);
       if (savedSizes) setTypeSizes((current) => ({ ...current, ...(JSON.parse(savedSizes) as Partial<Record<FontType, number>>) }));
@@ -77,10 +87,13 @@ export function FontPreviewSwitcher() {
     } catch {
       window.localStorage.removeItem(`${STORAGE_KEY}-types`);
       window.localStorage.removeItem(`${STORAGE_KEY}-sizes`);
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     const root = document.documentElement;
     const keys: Record<FontType, string> = {
       all: '--mw-preview-font-all',
@@ -113,7 +126,7 @@ export function FontPreviewSwitcher() {
     window.localStorage.setItem(`${STORAGE_KEY}-sizes`, JSON.stringify(typeSizes));
     if (typeFonts.all !== DEFAULT_FONT) window.localStorage.setItem(STORAGE_KEY, typeFonts.all);
     else window.localStorage.removeItem(STORAGE_KEY);
-  }, [typeFonts, typeSizes]);
+  }, [typeFonts, typeSizes, hydrated]);
 
   const filteredFonts = useMemo(() => {
     const query = search.trim().toLowerCase();

@@ -354,7 +354,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="mb-8 max-w-4xl sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ WHY MWFITNESSUK ]</div>
-            <h2 className="brush-title font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">WHY CHOOSE <span className="text-[#ff5500]">MWFITNESSUK?</span></h2>
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl"><span className="brush-wrap">WHY CHOOSE</span> <span className="text-[#ff5500]">MWFITNESSUK?</span></h2>
           </div>
           <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
             <div className="relative order-2 min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] lg:order-1 sm:min-h-[420px]">
