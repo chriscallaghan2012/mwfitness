@@ -814,15 +814,19 @@ html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-size: var(--
   transform: scaleX(0);
   transform-origin: left center;
 }
+main .brush-scroll-target:not(.brush-title):not(:has(.brush-wrap)) {
+  width: fit-content;
+  max-width: 100%;
+}
 main .brush-scroll-target:not(.brush-title):not(:has(.brush-wrap))::before {
   content: "";
   position: absolute;
   z-index: -1;
   pointer-events: none;
   left: -0.08em;
-  top: 0.18em;
-  width: min(58%, 7.5em);
-  height: 0.72em;
+  top: 0.12em;
+  width: calc(100% + 0.16em);
+  height: 0.82em;
   background: #ff5500;
   clip-path: url(#clip-static);
   transform: scaleX(0);
