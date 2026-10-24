@@ -795,7 +795,7 @@ html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-size: var(--
 .brush-title::before {
   content: "";
   position: absolute;
-  inset: -0.06em -0.12em -0.02em;
+  inset: -0.05em -0.12em -0.03em;
   z-index: -1;
   background: #ff5500;
   clip-path: url(#clip);
@@ -886,3 +886,17 @@ html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-size: var(--
 }
 
 
+
+/* Hero title gets the same exact irregular SVG brush silhouette, with compact padding. */
+.brush-wrap--hero {
+  padding: 0.02em 0.12em 0.04em;
+  margin-left: -0.12em;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+.brush-wrap--hero::before {
+  inset: -0.04em 0 -0.02em;
+}
+@media (max-width: 640px) {
+  .brush-wrap--hero { white-space: normal; }
+}

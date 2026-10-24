@@ -57,7 +57,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             </div>
 
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-[0.9] font-black">
-              BUILD A STRONGER BODY.
+              <span className="brush-wrap brush-wrap--hero">BUILD A STRONGER BODY.</span>
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#ff5500] to-white">
                 DEVELOP A STRONGER MIND. BECOME THE BEST VERSION OF YOU.
               </span>

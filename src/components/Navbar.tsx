@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScreenId } from '../types';
 import {
   Menu,
@@ -37,6 +37,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenBookCall,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handleNavClick = (id: ScreenId) => {
     onSelectScreen(id);
@@ -47,7 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-50 w-full bg-black border-b border-[#262930]">
       {/* Top Status Bar */}
-      <div className="bg-black border-b border-[#1c1f26] px-4 py-1 text-xs font-mono text-[#8b929e] flex items-center justify-between overflow-x-auto whitespace-nowrap">
+      <div className={`bg-black border-b border-[#1c1f26] px-4 font-mono text-[#8b929e] flex items-center justify-between overflow-x-auto whitespace-nowrap transition-all duration-200 ${isScrolled ? "max-h-0 py-0 opacity-0 border-b-0 overflow-hidden" : "max-h-12 py-1 text-xs"}`}>
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -79,14 +87,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Main Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center min-h-28 py-3">
+        <div className={`relative flex items-center transition-all duration-200 ${isScrolled ? "min-h-16 py-1" : "min-h-28 py-3"}`}>
           {/* Logo */}
           <button
             id="nav-logo-btn"
             onClick={() => handleNavClick('home')}
             className="relative z-10 flex items-center gap-4 text-left group focus:outline-none"
           >
-            <img src="/logo.jpg" alt="MW Fitness" className="h-20 sm:h-24 w-auto max-w-[240px] object-contain" />
+            <img src="/logo.png" alt="MW Fitness" className={`${isScrolled ? "h-14 sm:h-16" : "h-20 sm:h-24"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
             <span className="text-white font-black uppercase tracking-[0.12em] text-xl sm:text-2xl leading-none">FITNESSUK</span>
           </button>
 
@@ -118,7 +126,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right-side brand mark */}
           <button type="button" onClick={() => handleNavClick('home')} aria-label="MW Fitness home" className="hidden xl:flex ml-auto items-center focus:outline-none">
-            <img src="https://raw.githubusercontent.com/chriscallaghan2012/mwfitness/main/websiteimages/logoright.jpg" alt="MW Fitness" className="h-20 2xl:h-24 w-auto max-w-[240px] object-contain" />
+            <img src="/logoright.png" alt="MW Fitness" className={`${isScrolled ? "h-14 2xl:h-16" : "h-20 2xl:h-24"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
           </button>
 
           {/* Mobile menu toggle */}
