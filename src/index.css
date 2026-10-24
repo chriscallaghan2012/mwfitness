@@ -645,25 +645,29 @@ html[data-mw-font-preview="true"] body * {
 }
 
 
-/* Interactive five-step coaching process */
+/* Interactive five-step coaching process: full-width rows with clear hierarchy. */
 .mw-process-section {
   color: #fff;
 }
+.mw-process-list {
+  display: flex;
+  flex-direction: column;
+}
 .mw-process-step {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr) minmax(220px, 0.9fr);
+  grid-template-columns: 76px minmax(0, 1fr) 24px;
   align-items: center;
   gap: 22px;
   width: 100%;
-  min-height: 132px;
+  min-height: 116px;
   padding: 24px 22px;
   border: 0;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #292d36;
   background: #000;
   color: #fff;
   text-align: left;
   cursor: pointer;
-  transition: background-color 220ms ease, color 220ms ease;
+  transition: background-color 220ms ease, color 220ms ease, padding 220ms ease;
 }
 .mw-process-number {
   color: #ff5500;
@@ -673,24 +677,32 @@ html[data-mw-font-preview="true"] body * {
   line-height: .9;
   transition: color 220ms ease;
 }
+.mw-process-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+}
 .mw-process-title {
   color: #fff;
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(19px, 2vw, 26px);
+  font-size: clamp(20px, 2vw, 28px);
   font-weight: 700;
   line-height: 1.05;
   text-transform: uppercase;
   transition: color 220ms ease;
 }
 .mw-process-description {
-  color: #fff;
-  font-size: 15px;
+  display: block;
+  width: 100%;
+  max-width: none;
+  color: #a1a1aa;
+  font-size: 14px;
   line-height: 1.65;
   transition: color 220ms ease;
 }
-.mw-process-arrow {
-  display: flex;
-  justify-content: flex-end;
+.mw-process-row-arrow {
   color: #ff5500;
   transition: color 220ms ease, transform 220ms ease;
 }
@@ -706,38 +718,41 @@ html[data-mw-font-preview="true"] body * {
 .mw-process-step:hover .mw-process-title,
 .mw-process-step:focus-visible .mw-process-title,
 .mw-process-step.is-active .mw-process-title,
-.mw-process-step:hover .mw-process-arrow,
-.mw-process-step:focus-visible .mw-process-arrow,
-.mw-process-step.is-active .mw-process-arrow {
+.mw-process-step:hover .mw-process-description,
+.mw-process-step:focus-visible .mw-process-description,
+.mw-process-step.is-active .mw-process-description,
+.mw-process-step:hover .mw-process-row-arrow,
+.mw-process-step:focus-visible .mw-process-row-arrow,
+.mw-process-step.is-active .mw-process-row-arrow {
   color: #000;
 }
-.mw-process-step:hover .mw-process-arrow,
-.mw-process-step:focus-visible .mw-process-arrow,
-.mw-process-step.is-active .mw-process-arrow {
+.mw-process-step:hover .mw-process-row-arrow,
+.mw-process-step:focus-visible .mw-process-row-arrow,
+.mw-process-step.is-active .mw-process-row-arrow {
   transform: translateX(4px);
 }
 @media (max-width: 700px) {
   .mw-process-step {
-    grid-template-columns: 58px minmax(0, 1fr);
-    gap: 14px;
+    grid-template-columns: 52px minmax(0, 1fr) 18px;
+    gap: 12px;
     min-height: 0;
-    padding: 22px 12px;
+    padding: 22px 8px;
   }
-  .mw-process-number { font-size: 42px; }
+  .mw-process-number { font-size: 38px; }
   .mw-process-title { font-size: 20px; }
+  .mw-process-copy { gap: 8px; }
   .mw-process-description {
-    grid-column: 2 / 3;
-    grid-row: 2;
-    font-size: 15px;
-    padding-right: 10px;
+    font-size: 13px;
+    line-height: 1.6;
   }
+  .mw-process-row-arrow { width: 18px; height: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .mw-process-step,
   .mw-process-number,
   .mw-process-title,
   .mw-process-description,
-  .mw-process-arrow {
+  .mw-process-row-arrow {
     transition: none;
   }
 }
