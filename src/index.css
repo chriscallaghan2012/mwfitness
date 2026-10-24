@@ -645,51 +645,50 @@ html[data-mw-font-preview="true"] body * {
 }
 
 
-/* Interactive five-step coaching process: full-width rows with clear hierarchy. */
-.mw-process-section {
-  color: #fff;
-}
-.mw-process-list {
-  display: flex;
-  flex-direction: column;
-}
+/* Interactive five-step coaching process: split layout, readable copy under each title. */
+.mw-process-section { color: #fff; }
+.mw-process-list { display: flex; flex-direction: column; }
 .mw-process-step {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr) 24px;
-  align-items: center;
-  gap: 22px;
+  grid-template-columns: 52px minmax(0, 1fr) 20px;
+  align-items: start;
+  gap: 14px;
   width: 100%;
-  min-height: 116px;
-  padding: 24px 22px;
+  min-height: 0;
+  padding: 22px 12px;
   border: 0;
   border-bottom: 1px solid #292d36;
   background: #000;
   color: #fff;
   text-align: left;
   cursor: pointer;
-  transition: background-color 220ms ease, color 220ms ease, padding 220ms ease;
+  transition: background-color 220ms ease, color 220ms ease;
 }
 .mw-process-number {
+  padding-top: 2px;
   color: #ff5500;
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(42px, 5vw, 60px);
+  font-size: clamp(34px, 3.5vw, 46px);
   font-weight: 900;
   line-height: .9;
   transition: color 220ms ease;
 }
 .mw-process-copy {
   display: flex;
+  width: 100%;
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 9px;
+  gap: 8px;
 }
 .mw-process-title {
+  display: block;
+  width: 100%;
   color: #fff;
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(20px, 2vw, 28px);
+  font-size: clamp(18px, 1.6vw, 23px);
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1.1;
   text-transform: uppercase;
   transition: color 220ms ease;
 }
@@ -698,20 +697,19 @@ html[data-mw-font-preview="true"] body * {
   width: 100%;
   max-width: none;
   color: #a1a1aa;
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: normal;
   transition: color 220ms ease;
 }
 .mw-process-row-arrow {
+  margin-top: 3px;
   color: #ff5500;
   transition: color 220ms ease, transform 220ms ease;
 }
 .mw-process-step:hover,
 .mw-process-step:focus-visible,
-.mw-process-step.is-active {
-  background: #ff5500;
-  outline: none;
-}
+.mw-process-step.is-active { background: #ff5500; outline: none; }
 .mw-process-step:hover .mw-process-number,
 .mw-process-step:focus-visible .mw-process-number,
 .mw-process-step.is-active .mw-process-number,
@@ -723,38 +721,24 @@ html[data-mw-font-preview="true"] body * {
 .mw-process-step.is-active .mw-process-description,
 .mw-process-step:hover .mw-process-row-arrow,
 .mw-process-step:focus-visible .mw-process-row-arrow,
-.mw-process-step.is-active .mw-process-row-arrow {
-  color: #000;
-}
+.mw-process-step.is-active .mw-process-row-arrow { color: #000; }
 .mw-process-step:hover .mw-process-row-arrow,
 .mw-process-step:focus-visible .mw-process-row-arrow,
-.mw-process-step.is-active .mw-process-row-arrow {
-  transform: translateX(4px);
+.mw-process-step.is-active .mw-process-row-arrow { transform: translateX(4px); }
+@media (max-width: 1023px) {
+  .mw-process-step { grid-template-columns: 52px minmax(0, 1fr) 20px; }
+  .mw-process-title { font-size: 21px; }
+  .mw-process-description { font-size: 14px; }
 }
-@media (max-width: 700px) {
-  .mw-process-step {
-    grid-template-columns: 52px minmax(0, 1fr) 18px;
-    gap: 12px;
-    min-height: 0;
-    padding: 22px 8px;
-  }
-  .mw-process-number { font-size: 38px; }
-  .mw-process-title { font-size: 20px; }
-  .mw-process-copy { gap: 8px; }
-  .mw-process-description {
-    font-size: 13px;
-    line-height: 1.6;
-  }
+@media (max-width: 640px) {
+  .mw-process-step { grid-template-columns: 42px minmax(0, 1fr) 18px; gap: 10px; padding: 18px 4px; }
+  .mw-process-number { font-size: 34px; }
+  .mw-process-title { font-size: 18px; }
+  .mw-process-description { font-size: 13px; line-height: 1.55; }
   .mw-process-row-arrow { width: 18px; height: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .mw-process-step,
-  .mw-process-number,
-  .mw-process-title,
-  .mw-process-description,
-  .mw-process-row-arrow {
-    transition: none;
-  }
+  .mw-process-step, .mw-process-number, .mw-process-title, .mw-process-description, .mw-process-row-arrow { transition: none; }
 }
 
 
