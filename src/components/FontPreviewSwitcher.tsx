@@ -25,6 +25,10 @@ const TEXT_TYPES = [
 type FontType = typeof TEXT_TYPES[number]['key'];
 type FontSelections = Record<FontType, string>;
 
+const DEFAULT_SIZES: Record<FontType, number> = {
+  all: 16, h1: 48, h2: 36, subheadings: 24, body: 16, ui: 14, small: 12,
+};
+
 const DEFAULT_SELECTIONS: FontSelections = {
   all: DEFAULT_FONT, h1: DEFAULT_FONT, h2: DEFAULT_FONT,
   subheadings: DEFAULT_FONT, body: DEFAULT_FONT, ui: DEFAULT_FONT, small: DEFAULT_FONT,
@@ -43,13 +47,15 @@ function loadGoogleFont(font: string) {
 }
 
 export function FontPreviewSwitcher() {
-  const [typeFonts, setTypeFonts] = useState<FontSelections>(DEFAULT_SELECTIONS);
+  const [typeFonts, setTypeFonts] = useState<FontSelections>(DEFAULT_SELECTIONS);\n  const [typeSizes, setTypeSizes] = useState<Record<FontType, number>>(DEFAULT_SIZES);
   const [search, setSearch] = useState('');
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     try {
       const savedTypes = window.localStorage.getItem(`${STORAGE_KEY}-types`);
+      const savedSizes = window.localStorage.getItem(`${STORAGE_KEY}-sizes`);
+      if (savedSizes) setTypeSizes((current) => ({ ...current, ...(JSON.parse(savedSizes) as Partial<Record<FontType, number>>) }));
       if (savedTypes) {
         const parsed = JSON.parse(savedTypes) as Partial<FontSelections>;
         setTypeFonts((current) => ({ ...current, ...parsed }));
@@ -60,7 +66,7 @@ export function FontPreviewSwitcher() {
         }
       }
     } catch {
-      window.localStorage.removeItem(`${STORAGE_KEY}-types`);
+      window.localStorage.removeItem(`${STORAGE_KEY}-types`);\n    window.localStorage.removeItem(`${STORAGE_KEY}-sizes`);
     }
   }, []);
 
@@ -84,13 +90,22 @@ export function FontPreviewSwitcher() {
         root.style.removeProperty(variable);
       }
     });
-    const anyCustom = Object.values(typeFonts).some((selected) => selected !== DEFAULT_FONT);
+    const sizeVariables: Record<FontType, string> = {
+      all: '--mw-preview-size-all', h1: '--mw-preview-size-h1', h2: '--mw-preview-size-h2',
+      subheadings: '--mw-preview-size-headings', body: '--mw-preview-size-body',
+      ui: '--mw-preview-size-ui', small: '--mw-preview-size-small',
+    };
+    Object.entries(sizeVariables).forEach(([key, variable]) => {
+      root.style.setProperty(variable, `${typeSizes[key as FontType]}px`);
+    });
+    const anyCustom = Object.values(typeFonts).some((selected) => selected !== DEFAULT_FONT) ||
+      Object.entries(typeSizes).some(([key, size]) => size !== DEFAULT_SIZES[key as FontType]);
     if (anyCustom) root.setAttribute('data-mw-font-preview', 'true');
     else root.removeAttribute('data-mw-font-preview');
-    window.localStorage.setItem(`${STORAGE_KEY}-types`, JSON.stringify(typeFonts));
+    window.localStorage.setItem(`${STORAGE_KEY}-types`, JSON.stringify(typeFonts));\n    window.localStorage.setItem(`${STORAGE_KEY}-sizes`, JSON.stringify(typeSizes));
     if (typeFonts.all !== DEFAULT_FONT) window.localStorage.setItem(STORAGE_KEY, typeFonts.all);
     else window.localStorage.removeItem(STORAGE_KEY);
-  }, [typeFonts]);
+  }, [typeFonts, typeSizes]);
 
   const filteredFonts = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -106,7 +121,7 @@ export function FontPreviewSwitcher() {
   };
 
   const reset = () => {
-    setTypeFonts(DEFAULT_SELECTIONS);
+    setTypeFonts(DEFAULT_SELECTIONS);\n    setTypeSizes(DEFAULT_SIZES);
     setSearch('');
     window.localStorage.removeItem(STORAGE_KEY);
     window.localStorage.removeItem(`${STORAGE_KEY}-types`);
@@ -139,18 +154,38 @@ export function FontPreviewSwitcher() {
                 <option value={DEFAULT_FONT}>Original — {DEFAULT_FONT}</option>
                 {filteredFonts.filter((item) => item !== DEFAULT_FONT).map((item) => <option value={item} key={item}>{item}</option>)}
               </select>
+              <div className="mw-font-preview-size-row">
+                <label htmlFor={`mw-font-size-${key}`}>Font size</label>
+                <span className="mw-font-preview-size-value">{typeSizes[key]}px</span>
+                <input
+                  id={`mw-font-size-${key}`}
+                  type="range"
+                  min={key === 'h1' ? 24 : 10}
+                  max={key === 'h1' ? 88 : key === 'h2' ? 64 : key === 'subheadings' ? 48 : 32}
+                  step="1"
+                  value={typeSizes[key]}
+                  aria-label={`${label} font size`}
+                  onChange={(event) => {
+                    const size = Number(event.target.value);
+                    if (key === 'all') setTypeSizes(Object.fromEntries(TEXT_TYPES.map(({ key: typeKey }) => [typeKey, size])) as Record<FontType, number>);
+                    else setTypeSizes((current) => ({ ...current, [key]: size }));
+                  }}
+                  style={{ gridColumn: '1 / -1' }}
+                />
+              </div>
             </div>
           );
         })}
       </div>
-      <div className="mw-font-preview-sample" style={{ "--mw-font-preview-sample": `"${typeFonts.h1}"` } as CSSProperties}>
-        <strong>MW FITNESS — Aa Bb 123</strong>
-        <span>Train smarter. Build habits that last.</span>
-        <small>PERSONAL COACHING · REAL-LIFE PROGRESS</small>
+      <div className="mw-font-preview-sticky-preview">
+        <div className="mw-font-preview-sample" style={{ "--mw-font-preview-sample": `"${typeFonts.h1}"`, fontSize: `${typeSizes.h1}px` } as CSSProperties}>
+          <strong style={{ fontSize: `${typeSizes.h1}px` }}>MW FITNESS — Aa Bb 123</strong>
+          <span style={{ fontSize: `${typeSizes.body}px` }}>Train smarter. Build habits that last.</span>
+          <small style={{ fontSize: `${typeSizes.small}px` }}>PERSONAL COACHING · REAL-LIFE PROGRESS</small>
+        </div>
+        <button type="button" className="mw-font-preview-reset" onClick={reset}><RotateCcw size={14} />Reset original fonts</button>
+        <p className="mw-font-preview-note">Preview only · Changes stay in this browser</p>
       </div>
-      <p className="mw-font-preview-type-note">Every text type has its own selector. Choose <strong>All text</strong> to apply one font site-wide, or customise each category independently.</p>
-      <button type="button" className="mw-font-preview-reset" onClick={reset}><RotateCcw size={14} />Reset original fonts</button>
-      <p className="mw-font-preview-note">Preview only · Changes stay in this browser</p>
     </aside>
   );
 }
