@@ -125,7 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right-side brand mark */}
           <button type="button" onClick={() => handleNavClick('home')} aria-label="MW Fitness home" className="hidden xl:flex ml-auto items-center focus:outline-none">
-            <img src="/logoright.png" alt="MW Fitness" className={`${isScrolled ? "h-14 2xl:h-16" : "h-20 2xl:h-24"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
+            <img src="/logoright.png" alt="MW Fitness" className={`${isScrolled ? "h-14 2xl:h-16" : "h-[93px]"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
           </button>
 
           {/* Mobile menu toggle */}
