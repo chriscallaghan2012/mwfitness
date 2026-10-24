@@ -3,7 +3,7 @@ import { ScreenId } from '../../types';
 import { IMAGES, ABOUT, TESTIMONIALS, HOW_IT_WORKS, CONTACT } from '../../data/mockData';
 import { ArrowRight, PhoneCall, Check, Star, MapPin, Award, UserCheck, GraduationCap, Smartphone, Scale, TrendingUp, Utensils, Dumbbell, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StoreBadges } from '../StoreBadges';
-import { loadPublicPlans, PublicPlan } from '../../lib/plans';
+import { PublicPlan } from '../../lib/plans';
 
 interface HomeScreenProps {
   onSelectScreen: (screen: ScreenId) => void;
@@ -12,28 +12,8 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBookCall, onCheckout }) => {
-  const [plans, setPlans] = useState<PublicPlan[]>([]);
-  const [plansLoading, setPlansLoading] = useState(true);
-  const [plansError, setPlansError] = useState<string | null>(null);
   const [reviewIndex, setReviewIndex] = useState(0);
   const [reviewsPaused, setReviewsPaused] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    void loadPublicPlans('online').then((result) => {
-      if (!active) return;
-      setPlans(result.plans);
-      setPlansError(result.error);
-      setPlansLoading(false);
-    }, (cause: unknown) => {
-      if (!active) return;
-      console.error('[MW Fitness] Home pricing request failed:', cause);
-      setPlans([]);
-      setPlansError('Pricing is temporarily unavailable. Please contact Mike for current options.');
-      setPlansLoading(false);
-    });
-    return () => { active = false; };
-  }, []);
 
   useEffect(() => {
     if (reviewsPaused || TESTIMONIALS.length < 2) return;
@@ -268,58 +248,43 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       </section>
 
 
-      {/* ONLINE COACHING PACKAGES — live catalogue */}
-      <section id="packages-overview" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-[#22252e] pb-4 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ CHOOSE YOUR PLAN ]</div>
-            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">PACKAGES THAT FIT YOUR WEEK.</h2>
-            <p className="text-sm text-zinc-400 mt-3 max-w-2xl">The same online coaching packages, live prices and key benefits you'll find on our Online Coaching page.</p>
-          </div>
-          <button onClick={() => onSelectScreen('online-coaching')} className="cursor-pointer text-xs font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 group shrink-0">
-            <span>Compare all plan details</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-        {(() => {
-          const oneOff = plans.find((plan) => plan.id === 'online-4-week-once');
-          const tiers = plans.filter((plan) => plan.id !== 'online-4-week-once');
-          const featureList = Array.from(new Set(plans.flatMap((plan) => plan.features)));
-          const renderFeature = (plan: PublicPlan, feature: string, comparison = true) => {
-            const included = plan.features.includes(feature);
-            if (!included && !comparison) return null;
-            return <li key={feature} className="flex min-h-9 items-start gap-2.5 text-sm leading-relaxed">
-              {included ? <Check aria-label="Included" className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5500]" /> : <span aria-label="Not included" className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-zinc-500"><span aria-hidden="true" className="text-base leading-none">×</span></span>}
-              <span className={included ? 'text-zinc-200' : 'text-zinc-400'}>{feature}</span>
-            </li>;
-          };
-          const renderCard = (plan: PublicPlan, featured = false) => (
-            <article key={plan.id} className={'mw-electric-card relative flex h-full flex-col border transition-all duration-300 ' + (featured ? 'p-5 md:p-5 border-[#30313a] bg-[#121419]' : plan.is_popular ? 'p-6 md:p-7 border-[#ff5500] bg-[#151419] shadow-[0_0_24px_rgba(255,85,0,0.15)]' : 'p-6 md:p-7 border-[#20232b] bg-[#121419]')}>
-              {(featured || plan.is_popular || plan.badge) && <span className="absolute right-0 top-0 bg-[#ff5500] px-3 py-1.5 font-mono text-[10px] font-bold uppercase text-black">{featured ? 'One-off coaching' : (plan.is_popular ? 'Most popular' : plan.badge)}</span>}
-              <div className={'flex flex-col justify-between gap-3 pr-2 ' + (featured ? 'md:flex-row md:items-center' : 'min-h-[6.5rem]')}>
-                <div className="min-w-0">
-                  <h3 className="flex min-h-[3.25rem] items-center font-display text-xl uppercase leading-tight text-white md:text-xl">{plan.name}</h3>
-                  <p className="mt-1 min-h-4 text-xs font-mono uppercase tracking-wider text-zinc-500">{plan.tag}</p>
+      {/* PREMIUM ONLINE COACHING — CTA to the full packages page */}
+      <section id="packages-overview" className="relative overflow-hidden border-y border-[#252a34] bg-[#101115]">
+        <div aria-hidden="true" className="absolute inset-0 bg-grid-pattern opacity-25" />
+        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+          <div className="mw-electric-card relative mx-auto max-w-5xl overflow-hidden border border-[#30313a] bg-gradient-to-br from-[#191b22] via-[#121419] to-[#0d0e11] p-6 sm:p-10 md:p-14">
+            <div aria-hidden="true" className="absolute right-0 top-0 h-1.5 w-36 bg-[#ff5500]" />
+            <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
+              <div className="max-w-3xl">
+                <div className="mb-4 inline-flex items-center gap-2 border border-[#ff5500]/50 bg-[#ff5500]/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#ff5500]">
+                  <span aria-hidden="true" className="h-1.5 w-1.5 bg-[#ff5500]" />
+                  Personal coaching. Real-life results.
                 </div>
-                <div className={featured ? 'shrink-0 md:text-right' : 'shrink-0'}>
-                  <div className="font-display text-3xl text-[#ff5500] md:text-4xl">£{plan.price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                  {plan.original_price !== null && <div className="text-xs font-mono text-zinc-500 line-through">£{plan.original_price.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>}
+                <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">
+                  Premium online <span className="text-[#ff5500]">coaching.</span>
+                </h2>
+                <p className="mt-5 max-w-2xl text-sm leading-relaxed text-zinc-300 sm:text-base">
+                  Training and nutrition support shaped around your goals, your schedule and real life. Explore the coaching options, compare what’s included and choose the level of support that works for you.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-xs font-mono uppercase tracking-wider text-zinc-300">
+                  <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[#ff5500]" /> A plan built around you</span>
+                  <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[#ff5500]" /> Training & nutrition guidance</span>
+                  <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[#ff5500]" /> Support to stay consistent</span>
                 </div>
               </div>
-              <p className={'text-sm leading-relaxed text-zinc-400 ' + (featured ? 'mt-2 max-w-4xl' : 'mt-4 min-h-[4.5rem]')}>{plan.description}</p>
-              <ul className={'grid content-start gap-y-2.5 ' + (featured ? 'mt-3 grid-cols-1 sm:grid-cols-2 sm:gap-x-8' : 'mt-5 flex-1 grid-cols-1')}>{(featured ? plan.features : featureList).map((feature) => renderFeature(plan, feature, !featured))}</ul>
-              <button onClick={() => onCheckout(plan)} className="mt-auto flex w-full items-center justify-center gap-2 border border-[#ff5500] bg-[#ff5500] px-5 py-3.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-[#ff6a1f]">
-                Book Now <ArrowRight className="h-4 w-4" />
-              </button>
-            </article>
-          );
-          return <div className="space-y-6">
-            {oneOff && <div className="grid grid-cols-1">{renderCard(oneOff, true)}</div>}
-            <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 xl:grid-cols-4">{tiers.map((plan) => renderCard(plan, false))}</div>
-          </div>;
-        })()}
-        {plansLoading && <p className="mt-4 text-sm text-zinc-400">Loading current online plans…</p>}
-        {!plansLoading && plansError && <p role="status" className="mt-4 text-sm text-zinc-400">{plansError}</p>}
+              <div className="flex flex-col gap-3 md:min-w-[220px]">
+                <button onClick={() => onSelectScreen('online-coaching')} className="inline-flex w-full cursor-pointer items-center justify-center gap-2 bg-[#ff5500] px-6 py-4 font-mono text-xs font-bold uppercase tracking-wider text-black transition-colors hover:bg-[#ff6a1f]">
+                  View coaching packages <ArrowRight className="h-4 w-4" />
+                </button>
+                <button onClick={() => onOpenBookCall()} className="inline-flex w-full cursor-pointer items-center justify-center gap-2 border border-[#343945] bg-[#17191f] px-6 py-4 font-mono text-xs font-bold uppercase tracking-wider text-white transition-colors hover:border-[#ff5500] hover:text-[#ff5500]">
+                  <PhoneCall className="h-4 w-4" /> Book a free call
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
+
       {/* TESTIMONIALS */}
       <section id="testimonials" className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 border-b border-[#22252e] pb-5">
