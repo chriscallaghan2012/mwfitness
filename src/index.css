@@ -759,3 +759,8 @@ html[data-mw-font-preview="true"] body [class*="text-[11px]"],
 html[data-mw-font-preview="true"] body [class*="text-[9px]"] {
   font-family: var(--mw-preview-font-small, var(--mw-preview-font-all, inherit)) !important;
 }
+
+html[data-mw-font-preview="true"] body .mw-font-preview-sample,
+html[data-mw-font-preview="true"] body .mw-font-preview-sample * {
+  font-family: var(--mw-font-preview-sample, inherit) !important;
+}

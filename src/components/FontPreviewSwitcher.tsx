@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { RotateCcw, Type, X } from 'lucide-react';
 
 const POPULAR_FONTS = [
@@ -139,7 +139,7 @@ export function FontPreviewSwitcher() {
         <option value={DEFAULT_FONT}>Original — {DEFAULT_FONT}</option>
         {filteredFonts.filter((item) => item !== DEFAULT_FONT).map((item) => <option value={item} key={item}>{item}</option>)}
       </select>
-      <div className="mw-font-preview-sample" style={{ fontFamily: `"${activeFonts}", sans-serif` }}>
+      <div className="mw-font-preview-sample" style={{ "--mw-font-preview-sample": `"${activeFonts}"` } as CSSProperties}>
         <strong>MW FITNESS — Aa Bb 123</strong>
         <span>Train smarter. Build habits that last.</span>
         <small>PERSONAL COACHING · REAL-LIFE PROGRESS</small>
