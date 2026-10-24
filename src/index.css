@@ -784,22 +784,25 @@ html[data-mw-font-preview="true"] body [class*="text-[11px]"],
 html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-size: var(--mw-preview-size-small, 12px) !important; }
 
 /* Supplied brush-wrap/clipPath technique: only the wrapped white title text gets paint. */
-.brush-wrap {
+.brush-wrap,
+.brush-title {
   position: relative;
   display: inline-block;
   isolation: isolate;
   z-index: 0;
 }
-.brush-wrap::before {
+.brush-wrap::before,
+.brush-title::before {
   content: "";
   position: absolute;
   inset: -0.06em -0.12em -0.02em;
   z-index: -1;
   background: #ff5500;
-  clip-path: url(#mw-brush-clip);
+  clip-path: url(#clip);
   pointer-events: none;
 }
-.brush-wrap.brush-wrap--indefinite::before { clip-path: url(#mw-brush-clip-indefinite); }
+.brush-wrap.brush-wrap--indefinite::before,
+.brush-title.brush-title--indefinite::before { clip-path: url(#clip-indefinite); }
 
 /* Font picker drawer: opens from the right, starts closed, and keeps its controls usable. */
 .mw-font-preview-panel {

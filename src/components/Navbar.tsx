@@ -79,15 +79,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Main Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center h-24">
+        <div className="relative flex items-center min-h-28 py-3">
           {/* Logo */}
           <button
             id="nav-logo-btn"
             onClick={() => handleNavClick('home')}
-            className="relative z-10 flex items-center gap-3 text-left group focus:outline-none"
+            className="relative z-10 flex items-center gap-4 text-left group focus:outline-none"
           >
-            <img src="/logo.jpg" alt="MW Fitness" className="h-16 sm:h-[4.75rem] w-auto max-w-[200px] object-contain" />
-            <span className="text-white font-black uppercase tracking-[0.12em] text-lg sm:text-xl leading-none">FITNESSUK</span>
+            <img src="/logo.jpg" alt="MW Fitness" className="h-20 sm:h-24 w-auto max-w-[240px] object-contain" />
+            <span className="text-white font-black uppercase tracking-[0.12em] text-xl sm:text-2xl leading-none">FITNESSUK</span>
           </button>
 
           {/* Desktop Nav (xl) */}
@@ -118,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right-side brand mark */}
           <button type="button" onClick={() => handleNavClick('home')} aria-label="MW Fitness home" className="hidden xl:flex ml-auto items-center focus:outline-none">
-            <img src="https://raw.githubusercontent.com/chriscallaghan2012/mwfitness/main/websiteimages/logoright.jpg" alt="MW Fitness" className="h-16 w-auto max-w-[180px] object-contain" />
+            <img src="https://raw.githubusercontent.com/chriscallaghan2012/mwfitness/main/websiteimages/logoright.jpg" alt="MW Fitness" className="h-20 2xl:h-24 w-auto max-w-[240px] object-contain" />
           </button>
 
           {/* Mobile menu toggle */}
