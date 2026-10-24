@@ -157,7 +157,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           {/* Intro */}
           <div className="mw-electric-card h-full bg-[#121419] border border-[#20232b] p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">                <UserCheck className="w-5 h-5" />
+              <div className="w-10 h-10 bg-[#ff5500]/15 border border-[#ff5500] flex items-center justify-center text-[#ff5500]">
+                <UserCheck className="w-5 h-5" />
               </div>
               <div>
                 <div className="font-display text-xl text-white uppercase leading-none">{ABOUT.greeting}</div>
@@ -315,7 +316,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               { title: 'Accountability that keeps you moving', text: "Motivation comes and goes. Building habits, maintaining focus and taking consistent action are what help create progress. Coaching gives you structure and a clearer sense of direction. We'll use your progress, feedback and performance to help identify what's working, where adjustments may be needed and what your next steps should be. You don't have to get everything perfect. You need a plan you can follow and the willingness to keep improving." },
             ].map((item, index) => (
               <article key={item.title} className="mw-electric-card border border-[#252a34] bg-[#121419] p-6 sm:p-8">
-                <div className="mb-4 font-mono text-xs font-bold tracking-[0.18em] text-[#ff5500]">0{index + 1} / HOW I COACH</div>                <h3 className="mb-3 font-display text-2xl font-black uppercase leading-tight text-white sm:text-3xl">{item.title}</h3>
+                <div className="mb-4 font-mono text-xs font-bold tracking-[0.18em] text-[#ff5500]">0{index + 1} / HOW I COACH</div>
+                <h3 className="mb-3 font-display text-2xl font-black uppercase leading-tight text-white sm:text-3xl">{item.title}</h3>
                 <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">{item.text}</p>
               </article>
             ))}
@@ -474,7 +476,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div onMouseEnter={() => setReviewsPaused(true)} onMouseLeave={() => setReviewsPaused(false)} onFocus={() => setReviewsPaused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setReviewsPaused(false); }}>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
             {orderedTestimonials.slice(0, 3).map((t) => <article key={t.id} className="mw-electric-card min-w-0 border border-[#252a34] bg-[#121419]/70 p-5 sm:p-6">
-              <div className="mb-4 flex items-center justify-between gap-3">                <div className="flex gap-1">{renderStars(5)}</div>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="flex gap-1">{renderStars(5)}</div>
                 <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">Member review</span>
               </div>
               <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">“{t.quote}”</p>
