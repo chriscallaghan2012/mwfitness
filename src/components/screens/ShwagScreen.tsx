@@ -243,7 +243,7 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
               <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
                 [ ORDER ENQUIRY ]
               </div>
-              <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-2">
+              <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-2 text-center">
                 <span className="brush-wrap">GET YOUR</span> <span className="text-[#ff5500]">SHWAG</span>
               </h2>
               <p className="mx-auto max-w-xl text-sm font-sans text-zinc-400 leading-relaxed mb-6">
