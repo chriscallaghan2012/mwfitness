@@ -250,10 +250,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                   key={step.title}
                   type="button"
                   className={`mw-process-step ${activeProcessStep === index ? 'is-active' : ''}`}
-                  aria-expanded={activeProcessStep === index}
+                  aria-label={`View online coaching packages — ${step.title}`}
                   onMouseEnter={() => setActiveProcessStep(index)}
                   onFocus={() => setActiveProcessStep(index)}
-                  onClick={() => setActiveProcessStep(index)}
+                  onClick={() => onSelectScreen('online-coaching')}
                 >
                   <span className="mw-process-number">{String(index + 1).padStart(2, '0')}</span>
                   <span className="mw-process-copy">
@@ -297,7 +297,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <p className="pt-2 font-mono font-bold uppercase tracking-wide text-white">Your goals. Your journey. Your progress. My support.</p>
           </div>
           <div className="relative min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] sm:min-h-[420px]">
-            <img src={IMAGES.MORE_THAN_WORKOUT} alt="MWFitnessUK coaching approach" loading="lazy" className="absolute inset-0 h-full w-full object-cover" style={{ transform: "scaleX(-1)", objectPosition: "center 25%" }} />
+            <img src={IMAGES.MORE_THAN_WORKOUT} alt="MWFitnessUK coaching approach" loading="lazy" className="absolute inset-0 h-full w-full object-cover" style={{ transform: "translateY(10px) scaleX(-1)", objectPosition: "center 25%" }} />
             <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e]/70 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">MWFitnessUK</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl"><span className="brush-wrap">Your goals.</span> <span className="text-[#ff5500]">Your journey.</span></p></div>
           </div>
