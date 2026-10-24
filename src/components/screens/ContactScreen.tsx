@@ -65,7 +65,7 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
               <span>[ GET IN TOUCH ]</span>
             </div>
             <h1 className="font-display text-5xl sm:text-7xl tracking-tight text-white uppercase leading-[0.9] font-black">
-              Let's talk.
+              <span className="brush-wrap">Let's</span> <span className="text-[#ff5500]">talk.</span>
             </h1>
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
               Questions, bookings or just want to say hello? Send a message and Mike will get back to you within 24 hours — usually much sooner.
@@ -180,7 +180,7 @@ export const ContactScreen: React.FC<ContactScreenProps> = ({ onOpenBookCall }) 
                   [ SEND A MESSAGE ]
                 </div>
                 <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-6">
-                  GET IN TOUCH
+                  <span className="brush-wrap">GET IN</span> <span className="text-[#ff5500]">TOUCH</span>
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
