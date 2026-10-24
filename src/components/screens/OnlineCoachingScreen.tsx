@@ -41,12 +41,12 @@ export const OnlineCoachingScreen: React.FC<OnlineCoachingScreenProps> = ({ onSe
     <Ticker />
     <div aria-hidden="true" className="industrial-stripe industrial-stripe--divider" />
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="border-b border-[#22252e] pb-4 mb-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT YOU GET ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Coaching built around real life.</h2></div>
+      <div className="border-b border-[#22252e] pb-4 mb-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ WHAT YOU GET ]</div><h2 className="brush-title font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Coaching built around real life.</h2></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{[
         { icon: CreditCard, title: 'A plan made for you', text: 'Choose the active online plan that fits your goals, routine and level of support.' },
         { icon: Video, title: 'Regular check-ins', text: 'Review progress and keep your plan moving in the right direction.' },
         { icon: MessageCircle, title: 'Direct support', text: 'Get help with questions, updates and staying accountable.' },
-      ].map(({ icon: Icon, title, text }) => <div key={title} className="bg-[#121419] border border-[#20232b] p-6"><Icon className="w-7 h-7 text-[#ff5500] mb-5" /><h3 className="font-display text-2xl text-white uppercase mb-2">{title}</h3><p className="text-sm text-zinc-400 leading-relaxed">{text}</p></div>)}</div>
+      ].map(({ icon: Icon, title, text }) => <div key={title} className="bg-[#121419] border border-[#20232b] p-6"><Icon className="w-7 h-7 text-[#ff5500] mb-5" /><h3 className="brush-title brush-title--card font-display text-2xl text-white uppercase mb-2">{title}</h3><p className="text-sm text-zinc-400 leading-relaxed">{text}</p></div>)}</div>
     </section>
     <section id="online-plans" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="border-b border-[#22252e] pb-4 mb-10"><div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">[ CHOOSE YOUR PLAN ]</div><h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">Online coaching packages.</h2><p className="text-sm text-zinc-400 mt-3">Compare the currently active plans. Package details and prices are managed by Mike in Staff HQ; secure checkout is available directly from each plan.</p></div>
