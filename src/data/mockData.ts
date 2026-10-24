@@ -6,10 +6,14 @@ export const SITE = {
   town: 'Online coaching • Train anywhere',
 };
 
+const WEBSITE_IMAGES = 'https://raw.githubusercontent.com/chriscallaghan2012/mwfitness/main/websiteimages';
+
 export const IMAGES = {
-  HERO: '/images/main-hero.jpg',
-  ABOUT: '/images/main-hero.jpg',
-  CONTACT: '/images/facility-gym.jpg',
+  HERO: `${WEBSITE_IMAGES}/mike1.jpg`,
+  ABOUT: `${WEBSITE_IMAGES}/mik3.jpg`,
+  CONTACT: `${WEBSITE_IMAGES}/logoright.jpg`,
+  BEFORE_AFTER: `${WEBSITE_IMAGES}/beforeandafter.jpg`,
+  MIKE_PORTRAIT: `${WEBSITE_IMAGES}/mike2.png`,
 };
 
 export const CONTACT = {
