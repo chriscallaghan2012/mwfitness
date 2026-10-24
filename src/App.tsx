@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ConsultationModal } from './components/ConsultationModal';
 import { PhoneCall } from 'lucide-react';
+import { FontPreviewSwitcher } from './components/FontPreviewSwitcher';
 
 // Screens
 import { HomeScreen } from './components/screens/HomeScreen';
@@ -181,6 +182,9 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Temporary live typography preview for client review */}
+      <FontPreviewSwitcher />
 
       {/* Cookie consent banner (slides up from the bottom on first visit) */}
       <CookieConsentBanner />
