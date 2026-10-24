@@ -619,3 +619,104 @@ html[data-mw-font-preview="true"] body * {
   .mw-font-preview-panel { right: 8px; bottom: 8px; }
   .mw-font-preview-reopen { right: 8px; bottom: 8px; }
 }
+
+
+/* Interactive five-step coaching process */
+.mw-process-section {
+  color: #fff;
+}
+.mw-process-step {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) minmax(220px, 0.9fr) 24px;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  min-height: 132px;
+  padding: 24px 22px;
+  border: 0;
+  border-bottom: 1px solid #222;
+  background: #000;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 220ms ease, color 220ms ease;
+}
+.mw-process-number {
+  color: #ff5500;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(42px, 5vw, 60px);
+  font-weight: 900;
+  line-height: .9;
+  transition: color 220ms ease;
+}
+.mw-process-title {
+  color: #fff;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(19px, 2vw, 26px);
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase;
+  transition: color 220ms ease;
+}
+.mw-process-description {
+  color: #8a8a8a;
+  font-size: 13px;
+  line-height: 1.65;
+  transition: color 220ms ease;
+}
+.mw-process-arrow {
+  display: flex;
+  justify-content: flex-end;
+  color: #ff5500;
+  transition: color 220ms ease, transform 220ms ease;
+}
+.mw-process-step:hover,
+.mw-process-step:focus-visible,
+.mw-process-step.is-active {
+  background: #ff5500;
+  outline: none;
+}
+.mw-process-step:hover .mw-process-number,
+.mw-process-step:focus-visible .mw-process-number,
+.mw-process-step.is-active .mw-process-number,
+.mw-process-step:hover .mw-process-title,
+.mw-process-step:focus-visible .mw-process-title,
+.mw-process-step.is-active .mw-process-title,
+.mw-process-step:hover .mw-process-description,
+.mw-process-step:focus-visible .mw-process-description,
+.mw-process-step.is-active .mw-process-description,
+.mw-process-step:hover .mw-process-arrow,
+.mw-process-step:focus-visible .mw-process-arrow,
+.mw-process-step.is-active .mw-process-arrow {
+  color: #000;
+}
+.mw-process-step:hover .mw-process-arrow,
+.mw-process-step:focus-visible .mw-process-arrow,
+.mw-process-step.is-active .mw-process-arrow {
+  transform: translateX(4px);
+}
+@media (max-width: 700px) {
+  .mw-process-step {
+    grid-template-columns: 58px minmax(0, 1fr) 20px;
+    gap: 14px;
+    min-height: 0;
+    padding: 22px 12px;
+  }
+  .mw-process-number { font-size: 42px; }
+  .mw-process-title { font-size: 20px; }
+  .mw-process-description {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    font-size: 13px;
+    padding-right: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mw-process-step,
+  .mw-process-number,
+  .mw-process-title,
+  .mw-process-description,
+  .mw-process-arrow {
+    transition: none;
+  }
+}
