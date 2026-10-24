@@ -66,6 +66,34 @@ export default function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Animate brush accents on white headings whenever they enter or leave the viewport.
+  useEffect(() => {
+    const headings = Array.from(document.querySelectorAll<HTMLElement>('main h1, main h2, main h3, main h4, main h5, main h6'))
+      .filter((heading) => {
+        const color = window.getComputedStyle(heading).color;
+        const isWhite = color === 'rgb(255, 255, 255)' || color === 'rgb(243, 244, 246)' || heading.classList.contains('text-white');
+        return isWhite && !heading.closest('.mw-font-preview-panel');
+      });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const heading = entry.target as HTMLElement;
+        if (entry.isIntersecting) {
+          heading.classList.add('brush-scroll-in-view');
+        } else {
+          heading.classList.remove('brush-scroll-in-view');
+        }
+      });
+    }, { threshold: 0.35 });
+    headings.forEach((heading) => {
+      heading.classList.add('brush-scroll-target');
+      observer.observe(heading);
+    });
+    return () => {
+      observer.disconnect();
+      headings.forEach((heading) => heading.classList.remove('brush-scroll-target', 'brush-scroll-in-view'));
+    };
+  }, [currentScreen]);
+
   // Keep real page URLs in sync with client-side navigation and browser back/forward.
   useEffect(() => {
     if (window.location.pathname.replace(/\/$/, '') === '/packages') window.history.replaceState({}, '', '/online-coaching');
@@ -195,6 +223,9 @@ export default function App() {
             <rect id="brush-rect-loop" x="0" y="0" width="0" height="1">
               <animate id="anim-indefinite" attributeName="width" dur="1s" calcMode="spline" keyTimes="0;1" keySplines="0.5,0,0.5,1" values="0;1" begin="0s;anim-indefinite.end+1s" />
             </rect>
+          </clipPath>
+          <clipPath id="clip-static" clipPathUnits="objectBoundingBox">
+            <use href="#brush-shape" />
           </clipPath>
           <clipPath id="clip" clipPathUnits="objectBoundingBox">
             <use href="#brush-shape" clipPath="url(#rect-cp)" />
