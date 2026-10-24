@@ -139,8 +139,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <div className="text-xs font-mono text-[#ff5500] uppercase tracking-widest mb-1">
               [ ABOUT MIKE ]
             </div>
-            <h2 className="brush-title font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-              MEET MIKE. YOUR ONLINE COACH.
+            <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+              <span className="brush-wrap">MEET MIKE. YOUR ONLINE COACH.</span>
             </h2>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:text-base">Practical online coaching for busy people who want to feel stronger, build confidence and make progress they can maintain.</p>
             <div aria-hidden="true" className="mt-5 w-full border-b border-dashed border-[#454954]" />
@@ -230,7 +230,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
           <div className="mb-8 max-w-4xl sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">How we work</div>
             <h2 className="font-display text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl md:text-7xl">
-              OUR 5-STEP <span className="text-[#ff5500]">COACHING PROCESS</span>
+              <span className="brush-wrap">OUR 5-STEP</span> <span className="text-[#ff5500]">COACHING PROCESS</span>
             </h2>
             <p className="mt-5 max-w-2xl text-sm leading-relaxed text-[#a1a1aa] sm:text-base">
               From your first conversation to long-term progress, every step is designed around you and real life.
