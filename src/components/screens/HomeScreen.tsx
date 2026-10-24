@@ -227,6 +227,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       {/* FIVE-STEP COACHING PROCESS */}
       <section id="how-it-works" className="mw-process-section w-full border-y border-[#22252e] bg-[#101115] text-white">
         <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="min-w-0">
           <div className="mb-8 w-full sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">How we work</div>
             <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">
@@ -236,43 +238,46 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               From your first conversation to long-term progress, every step is designed around you and real life. We start by understanding your goals and circumstances, build a practical training and nutrition plan, and support you as you learn, track progress and make adjustments. The aim is lasting progress that fits your life — not a one-size-fits-all approach.
             </p>
           </div>
-          <div className="mw-process-list w-full border-t border-[#292d36]">
-            {[
-              { title: 'We start by understanding you.', text: "We'll establish your goals, current circumstances, training experience, lifestyle and any challenges that may affect your progress. This gives us a starting point for building your coaching plan." },
-              { title: 'We build your programme.', text: "Your training and nutrition guidance will be tailored to your objectives and individual requirements. We'll focus on realistic actions that work alongside your everyday commitments." },
-              { title: 'You learn as you progress.', text: "I'll help you develop a better understanding of exercise, nutrition, recovery and the habits that contribute to results. You'll know what you're working towards and why." },
-              { title: 'We track, review and adjust.', text: "Progress isn't always a straight line. We'll use the information available, including relevant weight trends, training performance and feedback, to help assess your progress and make sensible adjustments where needed." },
-              { title: 'We build for the long term.', text: "The ultimate goal is not simply to reach a number on the scales or complete a programme. It's to develop the knowledge, confidence and habits that help you maintain your progress and continue moving forward." },
-            ].map((step, index) => (
-              <button
-                key={step.title}
-                type="button"
-                className={`mw-process-step ${activeProcessStep === index ? 'is-active' : ''}`}
-                aria-expanded={activeProcessStep === index}
-                onMouseEnter={() => setActiveProcessStep(index)}
-                onFocus={() => setActiveProcessStep(index)}
-                onClick={() => setActiveProcessStep(index)}
-              >
-                <span className="mw-process-number">{String(index + 1).padStart(2, '0')}</span>
-                <span className="mw-process-copy">
-                  <span className="mw-process-title">{step.title}</span>
-                  <span className="mw-process-description">{step.text}</span>
-                </span>
-                <ArrowRight className="mw-process-row-arrow h-5 w-5" aria-hidden="true" />
-              </button>
-            ))}
-          </div>
-          <div className="mt-8 flex flex-col items-start justify-between gap-5 border-t border-[#292d36] pt-6 sm:flex-row sm:items-center">
-            <div>
-              <div className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">Your next step starts here</div>
-              <h3 className="font-display text-2xl font-black uppercase leading-tight text-white sm:text-3xl">Ready to put your <span className="text-[#ff5500]">plan into action?</span></h3>
-              <p className="mt-2 max-w-none text-sm leading-relaxed text-zinc-300">Tell me what you want to achieve and we'll talk through the right starting point for you. No pressure, just an honest conversation.</p>
+            <div className="mw-process-list self-stretch border-t border-[#292d36]">
+              {[
+                { title: 'We start by understanding you.', text: "We'll establish your goals, current circumstances, training experience, lifestyle and any challenges that may affect your progress. This gives us a starting point for building your coaching plan." },
+                { title: 'We build your programme.', text: "Your training and nutrition guidance will be tailored to your objectives and individual requirements. We'll focus on realistic actions that work alongside your everyday commitments." },
+                { title: 'You learn as you progress.', text: "I'll help you develop a better understanding of exercise, nutrition, recovery and the habits that contribute to results. You'll know what you're working towards and why." },
+                { title: 'We track, review and adjust.', text: "Progress isn't always a straight line. We'll use the information available, including relevant weight trends, training performance and feedback, to help assess your progress and make sensible adjustments where needed." },
+                { title: 'We build for the long term.', text: "The ultimate goal is not simply to reach a number on the scales or complete a programme. It's to develop the knowledge, confidence and habits that help you maintain your progress and continue moving forward." },
+              ].map((step, index) => (
+                <button
+                  key={step.title}
+                  type="button"
+                  className={`mw-process-step ${activeProcessStep === index ? 'is-active' : ''}`}
+                  aria-expanded={activeProcessStep === index}
+                  onMouseEnter={() => setActiveProcessStep(index)}
+                  onFocus={() => setActiveProcessStep(index)}
+                  onClick={() => setActiveProcessStep(index)}
+                >
+                  <span className="mw-process-number">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="mw-process-copy">
+                    <span className="mw-process-title">{step.title}</span>
+                    <span className="mw-process-description">{step.text}</span>
+                  </span>
+                  <ArrowRight className="mw-process-row-arrow h-5 w-5" aria-hidden="true" />
+                </button>
+              ))}
             </div>
-            <div className="flex shrink-0 flex-wrap gap-3">
-              <button onClick={() => onOpenBookCall()} className="inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-5 py-3.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-white"><PhoneCall className="h-4 w-4" /> Book a free call</button>
-              <button onClick={() => onSelectScreen('contact')} className="inline-flex cursor-pointer items-center gap-2 border border-white/40 bg-black/30 px-5 py-3.5 font-mono text-xs font-bold uppercase text-white transition-colors hover:border-[#ff5500]">Ask a question <ArrowRight className="h-4 w-4" /></button>
             </div>
-          </div>
+            <div className="relative min-h-[360px] overflow-hidden border border-[#252a34] bg-[#121419] sm:min-h-[520px]">
+              <img src={IMAGES.HERO} alt="Mike at MWFitnessUK" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#08090b]/90 via-[#08090b]/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">Your next step starts here</div>
+                <h3 className="max-w-md font-display text-3xl font-black uppercase leading-tight text-white sm:text-4xl"><span className="brush-wrap">Ready to put your</span> <span className="text-[#ff5500]">plan into action?</span></h3>
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-zinc-300">Tell me what you want to achieve and we'll talk through the right starting point for you. No pressure, just an honest conversation.</p>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button onClick={() => onOpenBookCall()} className="inline-flex cursor-pointer items-center gap-2 bg-[#ff5500] px-5 py-3.5 font-mono text-xs font-bold uppercase text-black transition-colors hover:bg-white"><PhoneCall className="h-4 w-4" /> Book a free call</button>
+                  <button onClick={() => onSelectScreen('contact')} className="inline-flex cursor-pointer items-center gap-2 border border-white/40 bg-black/30 px-5 py-3.5 font-mono text-xs font-bold uppercase text-white transition-colors hover:border-[#ff5500]">Ask a question <ArrowRight className="h-4 w-4" /></button>
+                </div>
+              </div>
+            </div>          </div>
         </div>
       </section>
       {/* FULL HOMEPAGE COACHING COPY — restored from the supplied brief */}
@@ -292,7 +297,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
             <p className="pt-2 font-mono font-bold uppercase tracking-wide text-white">Your goals. Your journey. Your progress. My support.</p>
           </div>
           <div className="relative min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] sm:min-h-[420px]">
-            <img src={IMAGES.BEFORE_AFTER} alt="MWFitnessUK client progress transformation" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
+            <img src={IMAGES.MORE_THAN_WORKOUT} alt="MWFitnessUK coaching approach" loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" style={{ transform: "scaleX(-1)" }} />
             <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0c0e]/70 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7"><span className="font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">MWFitnessUK</span><p className="mt-2 font-display text-2xl font-black uppercase text-white sm:text-3xl">Your goals. Your journey.</p></div>
           </div>
