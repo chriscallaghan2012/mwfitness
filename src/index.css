@@ -952,3 +952,10 @@ main .brush-scroll-target.brush-scroll-in-view .brush-wrap::before {
 @media (max-width: 640px) {
   .brush-wrap--hero { white-space: normal; }
 }
+
+
+/* Let the five-step programme introduction use the full content width. */
+.mw-process-section > div > div:first-child > p {
+  width: 100%;
+  max-width: none;
+}
