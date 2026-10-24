@@ -55,10 +55,8 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
             </div>
 
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-[0.9] font-black">
-              The MWFitnessUK
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#ff5500] to-white">
-                app.
-              </span>
+              <span className="brush-wrap">The MWFitnessUK</span>
+              <span className="block text-[#ff5500]">app.</span>
             </h1>
 
             <p className="text-base sm:text-lg font-sans text-zinc-300 leading-relaxed max-w-2xl">
@@ -84,7 +82,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
             [ WHAT'S INSIDE ]
           </div>
           <h2 className="font-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-            EVERYTHING IN ONE PLACE.
+            <span className="brush-wrap">EVERYTHING</span> <span className="text-[#ff5500]">IN ONE PLACE.</span>
           </h2>
         </div>
 
@@ -146,7 +144,7 @@ export const AppScreen: React.FC<AppScreenProps> = ({ onOpenBookCall }) => {
                 [ JOIN THE WAITLIST ]
               </div>
               <h2 className="font-display text-3xl text-white uppercase tracking-wide mb-2">
-                BE FIRST IN
+                <span className="brush-wrap">BE FIRST</span> <span className="text-[#ff5500]">IN</span>
               </h2>
               <p className="mx-auto max-w-xl text-sm font-sans text-zinc-400 leading-relaxed mb-6">
                 Leave your details and we'll email you as soon as the app goes live. No spam, just the good stuff.

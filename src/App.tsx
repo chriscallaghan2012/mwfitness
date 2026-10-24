@@ -66,13 +66,12 @@ export default function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Animate brush accents on white headings whenever they enter or leave the viewport.
+  // Animate only intentional brush accents; ordinary card and form headings stay clean.
   useEffect(() => {
     const headings = Array.from(document.querySelectorAll<HTMLElement>('main h1, main h2, main h3, main h4, main h5, main h6'))
       .filter((heading) => {
-        const color = window.getComputedStyle(heading).color;
-        const isWhite = color === 'rgb(255, 255, 255)' || color === 'rgb(243, 244, 246)' || heading.classList.contains('text-white');
-        return isWhite && !heading.closest('.mw-font-preview-panel');
+        const hasBrush = heading.classList.contains('brush-title') || !!heading.querySelector('.brush-wrap');
+        return hasBrush && !heading.closest('.mw-font-preview-panel');
       });
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
