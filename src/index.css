@@ -783,7 +783,7 @@ html[data-mw-font-preview="true"] body [class*="text-[10px]"],
 html[data-mw-font-preview="true"] body [class*="text-[11px]"],
 html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-size: var(--mw-preview-size-small, 12px) !important; }
 
-/* Supplied brush-wrap/clipPath technique: only the wrapped white title text gets paint. */
+/* Exact SVG brush silhouette, revealed only while its title is in view. */
 .brush-wrap,
 .brush-title {
   position: relative;
@@ -798,12 +798,46 @@ html[data-mw-font-preview="true"] body [class*="text-[9px]"] { font-size: var(--
   inset: -0.05em -0.12em -0.03em;
   z-index: -1;
   background: #ff5500;
-  clip-path: url(#clip);
+  clip-path: url(#clip-static);
   pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left center;
 }
-.brush-wrap.brush-wrap--indefinite::before,
-.brush-title.brush-title--indefinite::before { clip-path: url(#clip-indefinite); }
-
+main .brush-scroll-target:not(.brush-title):not(:has(.brush-wrap))::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  left: -0.08em;
+  top: 0.18em;
+  width: min(58%, 7.5em);
+  height: 0.72em;
+  background: #ff5500;
+  clip-path: url(#clip-static);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+main .brush-scroll-target {
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+}
+main .brush-scroll-target.brush-scroll-in-view::before,
+main .brush-scroll-target.brush-title.brush-scroll-in-view::before,
+main .brush-scroll-target.brush-scroll-in-view .brush-wrap::before {
+  animation: mw-brush-reveal 720ms cubic-bezier(.5, 0, .5, 1) both;
+}
+@keyframes mw-brush-reveal {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  main .brush-scroll-target.brush-scroll-in-view::before,
+  main .brush-scroll-target.brush-scroll-in-view .brush-wrap::before {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
 /* Font picker drawer: opens from the right, starts closed, and keeps its controls usable. */
 .mw-font-preview-panel {
   position: fixed;
