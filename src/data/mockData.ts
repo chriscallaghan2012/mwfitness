@@ -13,6 +13,7 @@ export const IMAGES = {
   ABOUT: `${WEBSITE_IMAGES}/mik3.jpg`,
   CONTACT: `${WEBSITE_IMAGES}/logoright.jpg`,
   BEFORE_AFTER: `${WEBSITE_IMAGES}/beforeandafter.jpg`,
+  MORE_THAN_WORKOUT: `${WEBSITE_IMAGES}/addthisone.jpg`,
   MIKE_PORTRAIT: `${WEBSITE_IMAGES}/mike2.png`,
 };
 
