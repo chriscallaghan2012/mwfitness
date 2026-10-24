@@ -49,7 +49,7 @@ function loadGoogleFonts(fonts: string[]) {
     return;
   }
   const familyParams = families
-    .map((font) => `family=${encodeURIComponent(font).replace(/%20/g, '+')}:wght@400;500;600;700;800;900`)
+    .map((font) => `family=${encodeURIComponent(font).replace(/%20/g, '+')}`)
     .join('&');
   link.href = `https://fonts.googleapis.com/css2?${familyParams}&display=swap`;
 }
@@ -76,7 +76,7 @@ export function FontPreviewSwitcher() {
       }
     } catch {
       window.localStorage.removeItem(`${STORAGE_KEY}-types`);
-    window.localStorage.removeItem(`${STORAGE_KEY}-sizes`);
+      window.localStorage.removeItem(`${STORAGE_KEY}-sizes`);
     }
   }, []);
 
