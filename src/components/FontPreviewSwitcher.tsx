@@ -13,9 +13,29 @@ const POPULAR_FONTS = [
 
 const DEFAULT_FONT = 'Hanken Grotesk';
 const STORAGE_KEY = 'mwfitness-font-preview';
+const TYPES = [
+  { key: 'all', label: 'All text', description: 'Every text style' },
+  { key: 'headings', label: 'Main headings', description: 'H1 and H2' },
+  { key: 'subheadings', label: 'Secondary headings', description: 'H3–H6 and card titles' },
+  { key: 'body', label: 'Paragraphs & body', description: 'Paragraphs and long-form copy' },
+  { key: 'ui', label: 'Buttons & navigation', description: 'Buttons, links and menus' },
+  { key: 'small', label: 'Labels & small text', description: 'Captions, tags and metadata' },
+] as const;
+type FontType = typeof TYPES[number]['key'];
+type FontSettings = Record<FontType, string>;
+
+const DEFAULT_SETTINGS: FontSettings = {
+  all: DEFAULT_FONT,
+  headings: DEFAULT_FONT,
+  subheadings: DEFAULT_FONT,
+  body: DEFAULT_FONT,
+  ui: DEFAULT_FONT,
+  small: DEFAULT_FONT,
+};
 
 function loadGoogleFont(font: string) {
-  const id = 'mw-font-preview-google-font';
+  if (font === DEFAULT_FONT) return;
+  const id = 'mw-font-preview-google-fonts';
   let link = document.getElementById(id) as HTMLLinkElement | null;
   if (!link) {
     link = document.createElement('link');
@@ -23,70 +43,108 @@ function loadGoogleFont(font: string) {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
   }
-  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font).replace(/%20/g, '+')}:wght@400;500;600;700;800&display=swap`;
+  const families = [...new Set([font, ...POPULAR_FONTS.filter((item) => item === font)])];
+  link.href = families.map((family) => `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}:wght@400;500;600;700;800&display=swap`).join('&');
+}
+
+function applyFontSettings(settings: FontSettings) {
+  const root = document.documentElement;
+  const allFont = settings.all !== DEFAULT_FONT ? settings.all : '';
+  const vars: Record<string, string> = {
+    '--mw-preview-font-all': allFont,
+    '--mw-preview-font-headings': settings.headings !== DEFAULT_FONT ? settings.headings : '',
+    '--mw-preview-font-subheadings': settings.subheadings !== DEFAULT_FONT ? settings.subheadings : '',
+    '--mw-preview-font-body': settings.body !== DEFAULT_FONT ? settings.body : '',
+    '--mw-preview-font-ui': settings.ui !== DEFAULT_FONT ? settings.ui : '',
+    '--mw-preview-font-small': settings.small !== DEFAULT_FONT ? settings.small : '',
+  };
+  Object.values(settings).filter((font) => font !== DEFAULT_FONT).forEach(loadGoogleFont);
+  Object.entries(vars).forEach(([name, value]) => {
+    if (value) root.style.setProperty(name, `"${value}"`);
+    else root.style.removeProperty(name);
+  });
+  if (Object.values(settings).some((font) => font !== DEFAULT_FONT)) {
+    root.setAttribute('data-mw-font-preview', 'true');
+  } else {
+    root.removeAttribute('data-mw-font-preview');
+  }
 }
 
 export function FontPreviewSwitcher() {
-  const [font, setFont] = useState(DEFAULT_FONT);
+  const [settings, setSettings] = useState<FontSettings>(DEFAULT_SETTINGS);
+  const [activeType, setActiveType] = useState<FontType>('all');
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved && POPULAR_FONTS.includes(saved)) setFont(saved);
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<FontSettings>;
+        setSettings({ ...DEFAULT_SETTINGS, ...parsed });
+      }
+    } catch {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
   }, []);
 
   useEffect(() => {
-    if (font === DEFAULT_FONT) {
-      document.documentElement.removeAttribute('data-mw-font-preview');
-      document.documentElement.style.removeProperty('--mw-preview-font');
-      window.localStorage.removeItem(STORAGE_KEY);
-      return;
-    }
-    loadGoogleFont(font);
-    document.documentElement.style.setProperty('--mw-preview-font', `"${font}"`);
-    document.documentElement.setAttribute('data-mw-font-preview', 'true');
-    window.localStorage.setItem(STORAGE_KEY, font);
-  }, [font]);
+    applyFontSettings(settings);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  }, [settings]);
 
   const filteredFonts = useMemo(() => {
     const query = search.trim().toLowerCase();
     return POPULAR_FONTS.filter((item) => item.toLowerCase().includes(query));
   }, [search]);
 
+  const setActiveFont = (font: string) => {
+    setSettings((current) => {
+      if (activeType === 'all') {
+        return { all: font, headings: font, subheadings: font, body: font, ui: font, small: font };
+      }
+      return { ...current, [activeType]: font, all: DEFAULT_FONT };
+    });
+  };
+
   const reset = () => {
-    setFont(DEFAULT_FONT);
+    setSettings(DEFAULT_SETTINGS);
     setSearch('');
     window.localStorage.removeItem(STORAGE_KEY);
   };
 
   if (!open) {
     return (
-      <button type="button" className="mw-font-preview-reopen" onClick={() => setOpen(true)} aria-label="Open font preview" title="Try website fonts">
-        <Type size={17} />
-        <span>Try fonts</span>
+      <button type="button" className="mw-font-preview-reopen" onClick={() => setOpen(true)} aria-label="Open font preview" title="Try fonts">
+        <Type size={17} /><span>Try fonts</span>
       </button>
     );
   }
 
   return (
-    <aside className="mw-font-preview-panel" aria-label="Website font preview controls">
+    <aside className="mw-font-preview-panel" aria-label="Website typography preview controls">
       <div className="mw-font-preview-header">
         <div className="mw-font-preview-heading"><Type size={17} /><span>Try website fonts</span></div>
         <button type="button" className="mw-font-preview-icon-button" onClick={() => setOpen(false)} aria-label="Minimise font preview"><X size={16} /></button>
       </div>
+      <label className="mw-font-preview-label" htmlFor="mw-font-type">Text type</label>
+      <select id="mw-font-type" className="mw-font-preview-select" value={activeType} onChange={(event) => setActiveType(event.target.value as FontType)}>
+        {TYPES.map((type) => <option value={type.key} key={type.key}>{type.label}</option>)}
+      </select>
+      <p className="mw-font-preview-type-note">{TYPES.find((type) => type.key === activeType)?.description}</p>
       <label className="mw-font-preview-label" htmlFor="mw-font-search">Search popular Google Fonts</label>
       <input id="mw-font-search" className="mw-font-preview-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search fonts…" />
-      <label className="mw-font-preview-label" htmlFor="mw-font-select">Font family</label>
-      <select id="mw-font-select" className="mw-font-preview-select" value={font} onChange={(event) => setFont(event.target.value)}>
+      <label className="mw-font-preview-label" htmlFor="mw-font-select">Font for {TYPES.find((type) => type.key === activeType)?.label.toLowerCase()}</label>
+      <select id="mw-font-select" className="mw-font-preview-select" value={settings[activeType]} onChange={(event) => setActiveFont(event.target.value)}>
         <option value={DEFAULT_FONT}>Original — {DEFAULT_FONT}</option>
         {filteredFonts.filter((item) => item !== DEFAULT_FONT).map((item) => <option value={item} key={item}>{item}</option>)}
       </select>
-      <div className="mw-font-preview-sample" style={{ fontFamily: `"${font}", sans-serif` }}>
+      <div className="mw-font-preview-sample" style={{ fontFamily: `"${settings[activeType]}", sans-serif` }}>
         <strong>Train smarter.</strong>
         <span>Find the font that fits MW Fitness.</span>
+        <small>Personal coaching. Real-life progress.</small>
       </div>
-      <button type="button" className="mw-font-preview-reset" onClick={reset}><RotateCcw size={14} />Reset original font</button>
+      <button type="button" className="mw-font-preview-reset" onClick={reset}><RotateCcw size={14} />Reset all typography</button>
       <p className="mw-font-preview-note">Preview only · Changes stay in this browser</p>
     </aside>
   );
