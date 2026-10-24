@@ -75,6 +75,8 @@ export function FontPreviewSwitcher() {
     if (anyCustom) root.setAttribute('data-mw-font-preview', 'true');
     else root.removeAttribute('data-mw-font-preview');
     window.localStorage.setItem(`${STORAGE_KEY}-types`, JSON.stringify(typeFonts));
+    if (typeFonts.all !== DEFAULT_FONT) window.localStorage.setItem(STORAGE_KEY, typeFonts.all);
+    else window.localStorage.removeItem(STORAGE_KEY);
   }, [typeFonts]);
 
   const filteredFonts = useMemo(() => {
