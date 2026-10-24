@@ -34,8 +34,9 @@ const DEFAULT_SELECTIONS: FontSelections = {
   subheadings: DEFAULT_FONT, body: DEFAULT_FONT, ui: DEFAULT_FONT, small: DEFAULT_FONT,
 };
 
-function loadGoogleFont(font: string) {
-  const id = 'mw-font-preview-google-font';
+function loadGoogleFonts(fonts: string[]) {
+  const families = [...new Set(fonts)].filter((font) => font !== DEFAULT_FONT);
+  const id = 'mw-font-preview-google-fonts';
   let link = document.getElementById(id) as HTMLLinkElement | null;
   if (!link) {
     link = document.createElement('link');
@@ -43,7 +44,14 @@ function loadGoogleFont(font: string) {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
   }
-  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font).replace(/%20/g, '+')}&display=swap`;
+  if (families.length === 0) {
+    link.removeAttribute('href');
+    return;
+  }
+  const familyParams = families
+    .map((font) => `family=${encodeURIComponent(font).replace(/%20/g, '+')}:wght@400;500;600;700;800;900`)
+    .join('&');
+  link.href = `https://fonts.googleapis.com/css2?${familyParams}&display=swap`;
 }
 
 export function FontPreviewSwitcher() {
@@ -83,14 +91,11 @@ export function FontPreviewSwitcher() {
       ui: '--mw-preview-font-ui',
       small: '--mw-preview-font-small',
     };
+    loadGoogleFonts(Object.values(typeFonts));
     Object.entries(keys).forEach(([key, variable]) => {
       const selected = typeFonts[key as FontType] || DEFAULT_FONT;
-      if (selected !== DEFAULT_FONT) {
-        loadGoogleFont(selected);
-        root.style.setProperty(variable, `"${selected}"`);
-      } else {
-        root.style.removeProperty(variable);
-      }
+      if (selected !== DEFAULT_FONT) root.style.setProperty(variable, `"${selected}"`);
+      else root.style.removeProperty(variable);
     });
     const sizeVariables: Record<FontType, string> = {
       all: '--mw-preview-size-all', h1: '--mw-preview-size-h1', h2: '--mw-preview-size-h2',
@@ -129,6 +134,7 @@ export function FontPreviewSwitcher() {
     setSearch('');
     window.localStorage.removeItem(STORAGE_KEY);
     window.localStorage.removeItem(`${STORAGE_KEY}-types`);
+    window.localStorage.removeItem(`${STORAGE_KEY}-sizes`);
   };
 
   if (!open) {
@@ -144,7 +150,7 @@ export function FontPreviewSwitcher() {
     <aside className="mw-font-preview-panel" aria-label="Website font preview controls">
       <div className="mw-font-preview-header">
         <div className="mw-font-preview-heading"><Type size={17} /><span>Try website fonts</span></div>
-        <button type="button" className="mw-font-preview-icon-button" onClick={() => setOpen(false)} aria-label="Minimise font preview"><X size={16} /></button>
+        <button type="button" className="mw-font-preview-icon-button" onClick={() => setOpen(false)} aria-label="Close font preview" title="Close font preview"><X size={18} /></button>
       </div>
       <label className="mw-font-preview-label" htmlFor="mw-font-search">Search popular Google Fonts</label>
       <input id="mw-font-search" className="mw-font-preview-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search fonts…" />
