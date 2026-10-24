@@ -92,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-logo-btn"
             onClick={() => handleNavClick('home')}
-            className="relative z-10 flex items-center gap-4 text-left group focus:outline-none"
+            className="relative z-10 flex items-center gap-4 text-left group bg-transparent hover:bg-transparent focus:outline-none"
           >
             <img src="/logo.png" alt="MW Fitness" className={`${isScrolled ? "h-14 sm:h-16" : "h-20 sm:h-24"} w-auto max-w-[240px] object-contain transition-all duration-200`} />
             <span className="text-white font-black uppercase tracking-[0.12em] text-xl sm:text-2xl leading-none">FITNESSUK</span>
