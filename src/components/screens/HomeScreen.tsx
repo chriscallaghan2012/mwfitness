@@ -282,7 +282,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="mb-8 max-w-4xl sm:mb-10">
           <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ THE MWFITNESSUK APPROACH ]</div>
-          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">MORE THAN A WORKOUT. <span className="text-[#ff5500]">MORE THAN A MEAL PLAN.</span></h2>
+          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl"><span className="brush-wrap">MORE THAN A WORKOUT.</span> <span className="text-[#ff5500]">MORE THAN A MEAL PLAN.</span></h2>
         </div>
         <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col justify-center space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
@@ -306,7 +306,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
           <div className="mb-8">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ HOW I COACH ]</div>
-            <h2 className="font-display text-4xl font-black uppercase tracking-tight text-white sm:text-6xl">COACHING THAT <span className="text-[#ff5500]">WORKS FOR YOU.</span></h2>
+            <h2 className="font-display text-4xl font-black uppercase tracking-tight text-white sm:text-6xl"><span className="brush-wrap">COACHING THAT</span> <span className="text-[#ff5500]">WORKS FOR YOU.</span></h2>
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {[
@@ -328,7 +328,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="mb-8 max-w-3xl">
           <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ YOUR GOALS ]</div>
-          <h2 className="font-display text-4xl font-black uppercase tracking-tight text-white sm:text-6xl">WHAT CAN MWFITNESSUK <span className="text-[#ff5500]">HELP YOU ACHIEVE?</span></h2>
+          <h2 className="font-display text-4xl font-black uppercase tracking-tight text-white sm:text-6xl"><span className="brush-wrap">WHAT CAN MWFITNESSUK</span> <span className="text-[#ff5500]">HELP YOU ACHIEVE?</span></h2>
           <p className="mt-5 text-sm leading-relaxed text-zinc-300 sm:text-base">Whether you have one clear goal or several areas you'd like to improve, your coaching can be built around what matters most to you.</p>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -375,7 +375,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="mb-8 max-w-5xl sm:mb-10">
           <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ COMMUNITY & MINDSET ]</div>
-          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">FITNESS IS PERSONAL.<br /><span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span><br /><span className="text-white">COMMUNITY</span> <span className="text-[#ff5500]">MAKES US STRONGER.</span></h2>
+          <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl"><span className="brush-wrap">FITNESS IS PERSONAL.</span><br /><span className="text-[#ff5500]">PROGRESS IS POWERFUL.</span><br /><span className="brush-wrap text-white">COMMUNITY</span> <span className="text-[#ff5500]">MAKES US STRONGER.</span></h2>
         </div>
         <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col justify-center space-y-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
@@ -399,7 +399,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="mb-8 max-w-4xl sm:mb-10">
             <div className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-[#ff5500]">[ YOUR JOURNEY STARTS HERE ]</div>
-            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">YOUR JOURNEY <span className="text-[#ff5500]">STARTS HERE.</span></h2>
+            <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl"><span className="brush-wrap">YOUR JOURNEY</span> <span className="text-[#ff5500]">STARTS HERE.</span></h2>
           </div>
           <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
             <div className="relative order-2 min-h-[320px] overflow-hidden border border-[#252a34] bg-[#121419] lg:order-1 sm:min-h-[420px]">
@@ -413,7 +413,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               <p>We'll establish your starting point, work towards realistic goals and focus on the daily actions that move you closer to the results you want.</p>
               <p>Your journey will require commitment, but you don't have to figure out every step by yourself.</p>
               <p>If you're ready to invest in yourself, develop better habits and discover what consistent effort can achieve, I'd love to help you get started.</p>
-              <h3 className="pt-2 font-display text-3xl font-black uppercase text-white">LET'S BUILD SOMETHING <span className="text-[#ff5500]">BETTER.</span></h3>
+              <h3 className="pt-2 font-display text-3xl font-black uppercase text-white"><span className="brush-wrap">LET'S BUILD SOMETHING</span> <span className="text-[#ff5500]">BETTER.</span></h3>
               <p className="font-mono font-bold uppercase text-white">MWFitnessUK — Solid Hard Work Achieves Greatness.</p>
               <p>Take the first step towards a stronger body, a stronger mindset and a healthier future.</p>
               <div className="flex flex-wrap gap-3 pt-2">
@@ -440,7 +440,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
                   Personal coaching. Real-life results.
                 </div>
                 <h2 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl">
-                  Premium online <span className="text-[#ff5500]">coaching.</span>
+                  <span className="brush-wrap">Premium online</span> <span className="text-[#ff5500]">coaching.</span>
                 </h2>
                 <p className="mt-5 max-w-2xl text-sm leading-relaxed text-zinc-300 sm:text-base">
                   Training and nutrition support shaped around your goals, your schedule and real life. Explore the coaching options, compare what’s included and choose the level of support that works for you.
@@ -469,7 +469,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
         <div className="mb-8 border-b border-[#22252e] pb-5">
           <div className="mb-1 font-mono text-xs uppercase tracking-widest text-[#ff5500]">[ WHAT PEOPLE SAY ]</div>
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <h2 className="font-display text-4xl uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl"><span className="text-white">Real people.</span> <span className="text-[#ff5500]">Real results.</span></h2>
+            <h2 className="font-display text-4xl uppercase leading-[0.95] tracking-tight text-white sm:text-5xl md:text-6xl"><span className="brush-wrap text-white">Real people.</span> <span className="text-[#ff5500]">Real results.</span></h2>
             <button onClick={() => onSelectScreen('reviews')} className="cursor-pointer inline-flex items-center gap-2 self-start font-mono text-xs uppercase tracking-wider text-zinc-300 transition-colors hover:text-[#ff5500] sm:self-auto">All reviews <ArrowRight className="h-4 w-4" /></button>
           </div>
         </div>
@@ -537,8 +537,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectScreen, onOpenBo
               <span className="h-2 w-2 bg-[#ff5500]"></span>
               <span>Ready when you are</span>
             </div>
-            <h2 className="font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">
-              LET'S GET STARTED.
+            <h2 className="mx-auto w-full text-center font-display text-4xl uppercase tracking-tight text-white sm:text-5xl">
+              <span className="brush-wrap">LET'S GET STARTED.</span>
             </h2>
             <p className="mx-auto max-w-xl text-sm font-sans leading-relaxed text-zinc-300">
               One quick chat is all it takes. We'll talk about where you are, where you want to be and the simplest way to get there. No commitment, no pressure.
