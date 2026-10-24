@@ -619,3 +619,50 @@ html[data-mw-font-preview="true"] body * {
   .mw-font-preview-panel { right: 8px; bottom: 8px; }
   .mw-font-preview-reopen { right: 8px; bottom: 8px; }
 }
+
+/* Per-text-type live typography preview controls. */
+html[data-mw-font-preview="true"] body,
+html[data-mw-font-preview="true"] body * {
+  font-family: var(--mw-preview-font-all, inherit), sans-serif;
+}
+html[data-mw-font-preview="true"] h1,
+html[data-mw-font-preview="true"] h2,
+html[data-mw-font-preview="true"] .font-display {
+  font-family: var(--mw-preview-font-headings, var(--mw-preview-font-all, inherit)), sans-serif !important;
+}
+html[data-mw-font-preview="true"] h3,
+html[data-mw-font-preview="true"] h4,
+html[data-mw-font-preview="true"] h5,
+html[data-mw-font-preview="true"] h6,
+html[data-mw-font-preview="true"] article h2,
+html[data-mw-font-preview="true"] article h3,
+html[data-mw-font-preview="true"] [class*="font-display"] {
+  font-family: var(--mw-preview-font-subheadings, var(--mw-preview-font-headings, var(--mw-preview-font-all, inherit))), sans-serif !important;
+}
+html[data-mw-font-preview="true"] p,
+html[data-mw-font-preview="true"] li,
+html[data-mw-font-preview="true"] blockquote,
+html[data-mw-font-preview="true"] dd {
+  font-family: var(--mw-preview-font-body, var(--mw-preview-font-all, inherit)), sans-serif !important;
+}
+html[data-mw-font-preview="true"] button,
+html[data-mw-font-preview="true"] nav,
+html[data-mw-font-preview="true"] a,
+html[data-mw-font-preview="true"] [role="button"] {
+  font-family: var(--mw-preview-font-ui, var(--mw-preview-font-all, inherit)), sans-serif !important;
+}
+html[data-mw-font-preview="true"] small,
+html[data-mw-font-preview="true"] label,
+html[data-mw-font-preview="true"] caption,
+html[data-mw-font-preview="true"] .font-mono,
+html[data-mw-font-preview="true"] [class*="text-[10px]"],
+html[data-mw-font-preview="true"] [class*="text-[11px]"],
+html[data-mw-font-preview="true"] [class*="text-[9px]"] {
+  font-family: var(--mw-preview-font-small, var(--mw-preview-font-all, inherit)), sans-serif !important;
+}
+.mw-font-preview-type-note {
+  margin: 4px 0 8px;
+  color: #8f929a;
+  font-size: 10px;
+  line-height: 1.35;
+}
