@@ -440,3 +440,7 @@ References:
 Start with the test foundation, Staff HQ CRUD/security verification and mobile-to-Neon round trips. Then update branding, verify the fresh Android build, complete the release-candidate checks and release the website and app in controlled steps. Treat live payments as a separate gate unless their full webhook-to-membership lifecycle has passed.
 
 **No release is approved by this document alone.**
+
+## Manual end-to-end checklist
+
+The current manual test pass is tracked in [`docs/END_TO_END_RELEASE_CHECKLIST.md`](END_TO_END_RELEASE_CHECKLIST.md). Use that checklist for the real website, Staff HQ/live Neon, authentication and isolation, checkout safety, communications, mobile persistence, production smoke tests and sign-off. Tick items only when tested with evidence; mock tests and a Vercel READY build do not count as live end-to-end proof. Mobile icon/splash assets are intentionally deferred by the owner.
