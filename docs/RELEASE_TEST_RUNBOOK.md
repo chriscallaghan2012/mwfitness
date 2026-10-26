@@ -14,7 +14,7 @@ npm run build
 ```
 
 Expected:
-- `npm test` runs the Staff HQ demo data-layer tests using Node's test runner through the existing `tsx` dependency.
+- `npm test` runs the Staff HQ demo data-layer tests, public API guard/mount tests and PWA configuration checks using Node's test runner through the existing `tsx` dependency.
 - `npm run lint` runs the TypeScript check.
 - `npm run build` creates the Vite production build.
 
