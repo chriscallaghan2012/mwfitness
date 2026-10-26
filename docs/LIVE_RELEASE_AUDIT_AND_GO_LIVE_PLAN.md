@@ -8,7 +8,7 @@
 
 **Do not sign off the complete system for production use yet.** The website has a Vercel deployment marked READY, and the production Neon schema contains many expected tables. That does not prove that every route, Staff HQ mutation, role boundary, mobile save, native build or payment flow works end to end.
 
-The audit found no automated test script in either repository's package scripts. Staff HQ CRUD, authorization, mobile-to-Neon round trips, and fresh Android build/device verification need explicit evidence before release approval.
+The initial audit found no automated test scripts. Review branches now add starter website/demo and mobile schema-contract suites, but those suites have not yet been run. Staff HQ live CRUD, authorization, mobile-to-Neon round trips, and fresh Android build/device verification still need explicit evidence before release approval.
 
 ### Current status snapshot
 
@@ -22,7 +22,7 @@ The audit found no automated test script in either repository's package scripts.
 | Demo mode | Source implementation exists | Prove demo mutations never write to Neon and live mode never silently falls back to mock data. |
 | Mobile persistence | Data-access code exists; round-trip not signed off | Prove mobile → Neon → Staff HQ → mobile reload for critical member data. |
 | Android build / startup | Fresh build and device retest needed | Resolve any lockfile/build issues and test a newly installed build on a physical device. |
-| Branding | Assets/config exist; coordinated update required | Update and verify website favicon, mobile icon, adaptive icons and splash screen together. |
+| Branding | Website PWA/favicon groundwork prepared on review branch; mobile icon/splash deferred | Verify website installability/offline behavior in a browser. Update native app icons and splash separately before store release. |
 | Payments | Not ready for automatic paid membership activation until verified webhook lifecycle is complete | Test Stripe events, idempotency, membership provisioning, failures and refunds. |
 | Release approval | Not ready to sign off | Complete all applicable P0 gates and record an explicit go/no-go decision. |
 
