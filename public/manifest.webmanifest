@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "MWFitnessUK — Online Coaching",
+  "short_name": "MW Fitness",
+  "description": "MWFitnessUK online coaching, training plans, nutrition and member support.",
+  "lang": "en-GB",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B0C0E",
+  "theme_color": "#0B0C0E",
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
