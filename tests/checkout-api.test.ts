@@ -1,11 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import checkoutHandler from '../api/create-checkout.mjs';
+import healthHandler from '../api/health.mjs';
 
 function responseDouble() {
   return {
     statusCode: 200,
     body: undefined as unknown,
+    headers: {} as Record<string, string>,
+    setHeader(name: string, value: string) { this.headers[name] = value; return this; },
     status(code: number) { this.statusCode = code; return this; },
     json(body: unknown) { this.body = body; return this; },
   };
@@ -18,6 +21,7 @@ const envKeys = [
   'VITE_STRIPE_PUBLISHABLE_KEY',
   'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
   'PUBLIC_SITE_URL',
+  'DATABASE_URL',
 ] as const;
 
 async function withCleanEnv(run: () => Promise<void>) {
@@ -65,5 +69,17 @@ test('Preview checkout API rejects live credentials rather than falling back to 
     await checkoutHandler({ method: 'POST', body: { planId: 'online-gold-8week' } } as never, response as never);
     assert.equal(response.statusCode, 503);
     assert.doesNotMatch(JSON.stringify(response.body), /mock/i);
+  });
+});
+
+test('Preview health endpoint reports mock checkout without exposing configuration', async () => {
+  await withCleanEnv(async () => {
+    const response = responseDouble();
+    await healthHandler({ method: 'GET' } as never, response as never);
+    assert.equal(response.statusCode, 503, 'database health can be unavailable independently of checkout mode');
+    const payload = response.body as { checks?: Record<string, string> };
+    assert.equal(payload.checks?.checkout, 'mock');
+    assert.equal(JSON.stringify(payload).includes('STRIPE_SECRET_KEY'), false);
+    assert.equal(JSON.stringify(payload).includes('pk_test_'), false);
   });
 });
