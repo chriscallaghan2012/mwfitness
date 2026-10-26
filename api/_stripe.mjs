@@ -15,8 +15,8 @@ function isProductionEnvironment() {
 
 /**
  * Production must be explicitly configured for live payments. Non-production
- * environments may use an explicit mock only when no Stripe variables at all
- * have been configured. Partial or wrong-mode configuration always fails closed.
+ * environments may use an explicit mock when neither Stripe key is configured.
+ * Partial key pairs and wrong-mode keys always fail closed.
  */
 export function resolveCheckoutMode() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
