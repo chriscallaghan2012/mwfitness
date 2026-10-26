@@ -35,7 +35,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
   const [stripePublishableKey, setStripePublishableKey] = useState('');
   const [mockCheckout, setMockCheckout] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
-  const [returnStatus, setReturnStatus] = useState<'checking' | 'paid' | 'pending' | 'error' | null>(null);
+  const [returnStatus, setReturnStatus] = useState<'checking' | 'paid' | 'pending' | 'review' | 'error' | null>(null);
   const checkoutMountRef = useRef<HTMLDivElement>(null);
 
   const submit = async () => {
@@ -81,7 +81,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
       const data = await response.json();
       if (!response.ok || !data?.ok) throw new Error('Payment status could not be verified.');
       if (checkoutReturn.planId && data.planId !== checkoutReturn.planId) throw new Error('Payment details do not match the selected package.');
-      if (!cancelled) setReturnStatus(data.status === 'paid' ? 'paid' : 'pending');
+      if (!cancelled) setReturnStatus(data.status === 'paid' ? 'paid' : data.status === 'review' ? 'review' : 'pending');
     }).catch(() => {
       if (!cancelled) setReturnStatus('error');
     });
@@ -155,6 +155,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
                 <p className="mt-2 text-sm leading-relaxed text-zinc-200">Do not pay again. Your coaching access is not activated automatically yet because your customer account still needs to be securely linked to this purchase. Mike will need to confirm your account before access is granted.</p>
                 <p className="mt-3 text-xs text-zinc-400">Reference: {checkoutReturn.sessionId.slice(-12)}</p>
               </>}
+              {returnStatus === 'review' && <p className="mt-3 text-sm leading-relaxed text-amber-200">Stripe reports a payment, but the amount or currency needs manual verification. Do not pay again. Contact Mike so the payment can be checked before any access is granted.</p>}
               {returnStatus === 'pending' && <p className="mt-3 text-sm leading-relaxed text-amber-200">Stripe has not confirmed this payment yet. Do not start another payment. Refresh this page shortly or contact Mike if the status does not change.</p>}
               {returnStatus === 'error' && <p className="mt-3 text-sm leading-relaxed text-amber-200">We could not verify this payment automatically. Do not pay again. Contact Mike and provide reference {checkoutReturn.sessionId.slice(-12)} so the payment can be checked.</p>}
               <button type="button" onClick={() => onSelectScreen('contact')} className="mt-4 border border-[#454a55] px-4 py-2 font-mono text-xs font-bold uppercase text-white hover:border-[#ff5500]">Contact Mike</button>
