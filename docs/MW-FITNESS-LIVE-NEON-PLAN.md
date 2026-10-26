@@ -1,6 +1,6 @@
 # Implementation Plan: Live Neon Backend, Staff HQ, and Mobile App Synchronization
 
-> **Historical implementation plan — reviewed 2026-10-26.** The issue list and proposed changes below are not a reliable statement of current outstanding work. In the current mobile `src/lib/remote.ts`, the calendar, progress-photo, weigh-in and cardio fields appear aligned with the checked-in migrations, and cardio calories are stored in notes rather than a non-existent column. Re-verify against the current source and run `npm test` in the mobile repository before reopening those older items. Live Neon persistence and RLS still require dedicated end-to-end tests.
+> **Historical implementation plan — reviewed 2026-10-26.** The issue list and proposed changes below are not a reliable statement of current outstanding work. In the current mobile `src/lib/remote.ts`, the calendar, progress-photo, weigh-in and cardio fields appear aligned with the checked-in migrations, and cardio calories are stored in notes rather than a non-existent column. The current website `server.mjs` also imports and mounts `GET /api/plans` and `GET /api/products`, contrary to the older bullet below. Re-verify against current source and run the new test suites before reopening those older items. Live Neon persistence and RLS still require dedicated end-to-end tests.
 
 This plan audits, aligns, and connects both repositories:
 1. **Website & Staff HQ (`mike`)** — Live production management centre, real database interactions with Neon, public form lead capture, and local API server mounts.
