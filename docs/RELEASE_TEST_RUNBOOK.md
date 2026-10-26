@@ -121,7 +121,7 @@ Create a separate Neon branch for release testing and set `RELEASE_TEST_DATABASE
 RELEASE_TEST_DATABASE_URL='postgresql://...disposable-branch...' npm test
 ```
 
-This verifies a real Neon connection and database CRUD, but it does **not** by itself verify Staff HQ's Neon Data API, user authentication, role permissions or RLS. Those require signed-in test accounts and live UI/API tests against disposable records.
+This verifies a real Neon connection and database CRUD, and reads public pricing/product endpoints against the disposable branch. It does **not** by itself verify Staff HQ's Neon Data API, user authentication, role permissions or RLS. Those require signed-in test accounts and live UI/API tests against disposable records.
 
 ## Stripe Checkout tests and configuration
 
