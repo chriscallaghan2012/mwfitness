@@ -8,7 +8,7 @@
 
 **Do not sign off the complete system for production use yet.** The website has a Vercel deployment marked READY, and the production Neon schema contains many expected tables. That does not prove that every route, Staff HQ mutation, role boundary, mobile save, native build or payment flow works end to end.
 
-The audit found no automated test script in either repository's package scripts. Staff HQ CRUD, authorization, mobile-to-Neon round trips, and fresh Android build/device verification need explicit evidence before release approval.
+The initial audit found no automated test scripts. Review branches now add website demo-data regression tests, a real Neon CRUD integration test gated by RELEASE_TEST_DATABASE_URL, mocked Stripe session tests and mobile schema-contract tests. None have been run in this environment. Staff HQ live CRUD/RLS, mobile-to-Neon round trips and fresh Android build/device verification still need explicit evidence before release approval.
 
 ### Current status snapshot
 
@@ -22,9 +22,42 @@ The audit found no automated test script in either repository's package scripts.
 | Demo mode | Source implementation exists | Prove demo mutations never write to Neon and live mode never silently falls back to mock data. |
 | Mobile persistence | Data-access code exists; round-trip not signed off | Prove mobile → Neon → Staff HQ → mobile reload for critical member data. |
 | Android build / startup | Fresh build and device retest needed | Resolve any lockfile/build issues and test a newly installed build on a physical device. |
-| Branding | Assets/config exist; coordinated update required | Update and verify website favicon, mobile icon, adaptive icons and splash screen together. |
+| Branding | Website PWA/favicon groundwork prepared on review branch; mobile icon/splash deferred | Verify website installability/offline behavior in a browser. Update native app icons and splash separately before store release. |
 | Payments | Not ready for automatic paid membership activation until verified webhook lifecycle is complete | Test Stripe events, idempotency, membership provisioning, failures and refunds. |
 | Release approval | Not ready to sign off | Complete all applicable P0 gates and record an explicit go/no-go decision. |
+
+## Progress while working through this checklist (2026-10-26)
+
+Latest checkout work:
+- Replaced the fake disabled card-number/expiry/CVC inputs and misleading 'switch payments on' copy with an embedded Stripe Checkout mount. Stripe.js supplies the payment fields inside the website; the site never handles card numbers or CVCs.
+- Added environment-based checkout modes: Production requires live keys and fails closed when missing; Preview/Development use test keys when configured and fall back to a clearly labelled mock only when both Stripe keys are absent. Partial key pairs and wrong-mode keys fail closed. For real Stripe sessions, the API verifies the plan is active/online in Neon and checks the selected Stripe Price object's `livemode`, GBP currency and amount against the active database plan before creating a session.
+- Improved checkout input and placeholder contrast.
+- Added a VITE_STRIPE_PUBLISHABLE_KEY placeholder plus server-side secret/Price ID placeholders to .env.example; expanded the health check so checkout is not marked configured until the publishable key, secret and all five active plan Price IDs are present.
+- Added mocked Stripe-session tests, checkout UI regression tests and an optional real Neon CRUD round-trip test that only runs against RELEASE_TEST_DATABASE_URL, never DATABASE_URL.
+- Read-only Vercel environment listing found PUBLIC_SITE_URL and DATABASE_URL, but no Stripe key or Price ID variables. Preview can use mock checkout until test credentials exist; Production remains unavailable until the owner adds real live keys and live Price IDs in Production. Do not create dummy Stripe environment values.
+- Embedded checkout and the environment-safe mock fallback are prepared on this review branch but have not been run or deployed. A signed Stripe webhook and idempotent payment-to-membership provisioning remain a separate go-live blocker.
+
+
+Work prepared on the review branch `release/staff-hq-tests-and-fixes` (not merged or deployed):
+- Added `npm test` and a Node/tsx test suite for Staff HQ demo data operations: seed/read, create-update-delete, embedded relations, demo reset isolation and unknown-table errors.
+- Fixed plan and nutrition-item deletion feedback so Staff HQ checks the returned deleted row instead of reporting success merely because the request had no API error. This matters when Neon RLS blocks a delete and returns zero affected rows.
+- Fixed member-record assignment feedback so memberships, nutrition plans, workout sessions and programme assignments require a returned inserted row before reporting success.
+- A fresh read-only query against the live `mwfitness` Neon branch confirms the enabled `profiles_guard_privileged_changes` and `workout_sessions_guard_member_completion` triggers exist, and the own-profile update policy checks that a user's role remains unchanged. This is schema evidence, not a substitute for runtime role/RLS tests.
+- A read-only live-schema column check confirmed the current mobile helpers' key tables/columns exist for check-ins, progress photos, weigh-ins, cardio, daily metrics, nutrition logs, workouts, memberships, profiles and push tokens. This verifies schema presence only; it does not prove writes succeed under the real signed-in role or that data reloads end to end.
+- Added [the repeatable release test runbook](./RELEASE_TEST_RUNBOOK.md), including safe demo testing, disposable Neon-branch integration tests, device checks and release gates.
+- Added website PWA groundwork on this branch: a standalone manifest, square SVG icon, production-only service-worker registration and a worker that does not cache API/cross-origin responses. Browser installability/offline behavior remains unverified.
+
+Work prepared on the mobile review branch `release/neon-schema-contract-tests` (not merged or released):
+- Added a no-new-dependency `npm test` command and schema-contract tests that compare mobile read/write fields with the SQL migrations.
+- The current `src/lib/remote.ts` already uses the migration-aligned calendar, progress-photo, weigh-in and cardio fields described in the older `MW-FITNESS-LIVE-NEON-PLAN.md`. Treat that older document's mismatch bullets as historical until the new tests and live round-trip tests are run; do not assume those issues remain present in current source.
+
+**Execution status:** I could not run `npm ci`, tests, TypeScript or production builds from this environment because repository cloning/network resolution is unavailable here. The new tests are authored but are **not yet reported as passing**. Run the commands in the runbook on your machine and capture their output against these exact branches before merging.
+
+**Still outstanding in this scope:**
+- Website PWA verification: manifest, icon and service-worker registration are now prepared on the review branch; installability, offline fallback, cache refresh and real-browser behavior still need testing.
+- Live Staff HQ UI CRUD, Neon RLS, and mobile-to-Staff-HQ persistence round trips using dedicated test accounts and a disposable Neon branch.
+- Fresh Android native build and physical-device verification. Mobile branding assets are intentionally deferred at the user's request.
+- Stripe webhook/idempotency and paid membership provisioning, email delivery, production browser/HTTP smoke tests, rollback and explicit go/no-go.
 
 ## 1. Scope and release principles
 
@@ -230,9 +263,10 @@ Changing a PNG in source does not update an already installed app. A fresh nativ
 
 ## 8. Payments and membership activation (separate gate)
 
-The audit's existing documentation indicates Stripe checkout-session creation exists, but verified webhook processing and automatic membership activation are not complete. Do not enable the complete paid-member lifecycle until this gate passes.
+The website now prepares an embedded Stripe Checkout Session, but no Stripe credentials or Price IDs are configured in Vercel, and verified webhook processing/automatic membership activation are not complete. The UI/session code is not proof of live payments. Do not take real payments until the correct live environment values are configured, the test-mode flow passes, and the signed webhook plus idempotent payment-to-membership lifecycle is implemented and verified.
 
-- [ ] Test checkout in Stripe test mode.
+- [ ] Add Stripe test-mode publishable/secret keys and matching test Price IDs to Preview/Development only.
+- [ ] Test embedded checkout in Stripe test mode.
 - [ ] Test success, cancellation and payment failure.
 - [ ] Verify signed webhook events.
 - [ ] Make event processing idempotent.
@@ -241,6 +275,7 @@ The audit's existing documentation indicates Stripe checkout-session creation ex
 - [ ] Test account setup and access to purchased coaching.
 - [ ] Test refunds and relevant failure cases.
 - [ ] Prove browser redirects alone cannot grant paid access.
+- [ ] Add live publishable/secret keys and matching live Price IDs to Vercel Production only.
 - [ ] Confirm live Stripe configuration and operational ownership before enabling live payments.
 
 ## 9. Phased go-live checklist

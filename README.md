@@ -72,25 +72,36 @@ Production notes:
 The `dist/` folder is the static site and `api/` is auto-detected as serverless functions; `vercel.json` provides the SPA rewrites that `server.mjs` handles natively when self-hosting.
 Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables. The website's Neon migration `0005_website_leads.sql` is maintained in the companion mobile repository and applied to the dedicated MW Fitness database.
 
-### Stripe checkout
+### Embedded Stripe Checkout
 
-Create two one-time Prices in Stripe for the online coaching offer, then add these environment variables locally and in Vercel:
+The website creates an **embedded Stripe Checkout Session server-side**. Stripe's secure payment form appears inside the website, while Stripe itself collects card and billing details; the website never receives or stores card numbers or CVCs.
 
+Add these environment variables locally and in Vercel:
+
+```dotenv
+VITE_STRIPE_PUBLISHABLE_KEY=REPLACE_WITH_STRIPE_PUBLISHABLE_KEY
+STRIPE_SECRET_KEY=REPLACE_WITH_STRIPE_SECRET_KEY
+STRIPE_PRICE_ONLINE_WEEKLY=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_12_WEEK=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_4_WEEK_ONCE=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_BRONZE_4WEEK=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_SILVER_8WEEK=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_GOLD_8WEEK=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_PLATINUM_8WEEK=price_REPLACE_WITH_PRICE_ID
+PUBLIC_SITE_URL=https://mwfitnessuk.com
 ```
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PRICE_ONLINE_WEEKLY=price_...
-STRIPE_PRICE_ONLINE_12_WEEK=price_...
-STRIPE_PRICE_ONLINE_4_WEEK_ONCE=price_...
-STRIPE_PRICE_ONLINE_BRONZE_4WEEK=price_...
-STRIPE_PRICE_ONLINE_SILVER_8WEEK=price_...
-STRIPE_PRICE_ONLINE_GOLD_8WEEK=price_...
-STRIPE_PRICE_ONLINE_PLATINUM_8WEEK=price_...
-PUBLIC_SITE_URL=https://your-domain.example
-```
 
-The online coaching page creates a Stripe Checkout session server-side. Keep `STRIPE_SECRET_KEY` server-only and never expose it through Vite/client environment variables.
+**Vercel environment setup**
+- **Production:** set `VITE_STRIPE_PUBLISHABLE_KEY` to the Stripe live publishable key (`pk_live_…`), `STRIPE_SECRET_KEY` to the live secret key (`sk_live_…`), and every active `STRIPE_PRICE_…` value to the corresponding live-mode Price ID from the same Stripe account. Missing keys fail closed; production never falls back to mock checkout.
+- **Preview and Development:** when Stripe is configured, use matching test-mode publishable keys (`pk_test_…`), secret keys (`sk_test_…`) and test-mode Price IDs. Live keys are rejected outside Production.
+- **Preview/Development without keys:** if both Stripe keys are absent, checkout presents an explicitly labelled mock simulation—even if Price IDs were added. It creates no Stripe session, takes no payment and activates no membership. If only one key is set or keys use the wrong mode, checkout fails closed instead of silently mocking.
+- Before real checkout, the API verifies the selected plan is still active and is an online coaching plan in Neon. It retrieves the selected Stripe Price, checks its `livemode` flag against the environment's key mode, and checks that the Stripe amount/currency match the active plan price before creating a Checkout Session.
+- The publishable key is allowed in browser code; keep the secret key server-side only. Never use a `VITE_` prefix for the secret key or commit real credentials.
+- Stripe keys and Price IDs must come from Stripe's dashboard. Placeholder values do not activate payments.
 
-> **Known gap:** checkout session creation is the only Stripe step implemented. No webhook provisions a membership, creates a payment record or activates an account, and no Stripe credentials are configured yet — do not promise automatic signup, activation or receipts from checkout.
+**Current audited Vercel state:** `PUBLIC_SITE_URL` is configured, but no Stripe key or Price ID variables were present in the environment-variable listing. Preview can use mock checkout until test credentials exist; Production checkout remains unavailable until live credentials and Price IDs are configured. No fake credentials were created.
+
+**Important payment lifecycle gap:** the embedded checkout session is prepared, but no verified webhook currently records a payment and provisions/activates the purchased membership. Do not claim automatic paid access, membership activation or receipts until the signed webhook and idempotent membership lifecycle is implemented and tested.
 
 ## Content & staff controls
 

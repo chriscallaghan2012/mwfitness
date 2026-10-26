@@ -1,5 +1,9 @@
 # Implementation Plan: Live Neon Backend, Staff HQ, and Mobile App Synchronization
 
+> **Historical implementation plan — reviewed 2026-10-26.** The issue list and proposed changes below are not a reliable statement of current outstanding work. In the current mobile `src/lib/remote.ts`, the calendar, progress-photo, weigh-in and cardio fields appear aligned with the checked-in migrations, and cardio calories are stored in notes rather than a non-existent column. The current website `server.mjs` also imports and mounts `GET /api/plans` and `GET /api/products`, contrary to the older bullet below. Re-verify against current source and run the new test suites before reopening those older items. Live Neon persistence and RLS still require dedicated end-to-end tests.
+>
+> **Additional update (2026-10-26):** checkout uses embedded Stripe Checkout on the website review branch. Production requires live keys and live Price IDs and fails closed if keys are missing; Preview/Development use test keys when configured, or an explicitly labelled mock simulation when both keys are absent. Partial/wrong-mode keys fail closed and the API checks each selected Price's `livemode`. The current Vercel listing had no Stripe keys or Price IDs, so Production checkout is not live. A signed webhook, payment idempotency and verified membership provisioning remain outstanding. See `docs/LIVE_RELEASE_AUDIT_AND_GO_LIVE_PLAN.md` and `docs/RELEASE_TEST_RUNBOOK.md` for the current release gates.
+
 This plan audits, aligns, and connects both repositories:
 1. **Website & Staff HQ (`mike`)** — Live production management centre, real database interactions with Neon, public form lead capture, and local API server mounts.
 2. **Mobile App (`MW-FITNESS-APP-MOBILE`)** — Member data synchronization with Neon (check-ins, workouts, nutrition, cardio, water/steps, progress photos, messages), calendar queries, and UI/UX state handling.

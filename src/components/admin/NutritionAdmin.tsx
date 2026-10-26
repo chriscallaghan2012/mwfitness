@@ -141,9 +141,17 @@ export function NutritionAdmin() {
     if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
     setBusy(true); setMsg('');
     try {
-      const { error } = await db.from(schema()).delete().eq('id', row.id);
-      setMsg(error ? `Delete failed: ${error.message}` : 'Deleted.');
-      if (!error) { if (mode === 'templates') await loadTemplates(); else await loadPlans(); }
+      const result = await db.from(schema()).delete().eq('id', row.id).select('id');
+      if (result.error) {
+        setMsg(`Delete failed: ${result.error.message}`);
+        return;
+      }
+      if (!result.data?.length) {
+        setMsg('The nutrition item was not deleted. It may already be gone or your staff permissions may not allow this change.');
+        return;
+      }
+      setMsg('Deleted.');
+      if (mode === 'templates') await loadTemplates(); else await loadPlans();
     } catch { setMsg('Could not delete this nutrition item. Check the connection and try again.'); }
     finally { setBusy(false); }
   };
@@ -158,16 +166,18 @@ export function NutritionAdmin() {
       setMsg(tErr ? `Could not load meal template: ${tErr.message}` : 'Template not found.');
       return;
     }
-    const { error } = await db.from('nutrition_plans').insert({
+    const { data: assignedRows, error } = await db.from('nutrition_plans').insert({
       profile_id: userId,
       name: String(t.name),
       targets: t.targets,
       sections: t.sections,
       day_type: t.day_type ?? 'training',
       active: true,
-    });
-    setMsg(error ? `Failed: ${error.message}` : `Assigned “${t.name}” ✓`);
-    if (!error) await loadPlans();
+    }).select('id');
+    if (error) { setMsg(`Failed: ${error.message}`); return; }
+    if (!assignedRows?.length) { setMsg('The nutrition template was not assigned. Check staff permissions and retry.'); return; }
+    setMsg(`Assigned “${t.name}” ✓`);
+    await loadPlans();
     } catch { setMsg('Could not assign this template. Check the connection and try again.'); }
     finally { setBusy(false); }
   };

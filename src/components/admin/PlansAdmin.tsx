@@ -84,9 +84,17 @@ export function PlansAdmin() {
     if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
     setBusy(true); setMsg('');
     try {
-      const { error } = await db.from('plans').delete().eq('id', p.id);
-      setMsg(error ? `Delete failed: ${error.message}` : 'Plan deleted.');
-      if (!error) await load();
+      const result = await db.from('plans').delete().eq('id', p.id).select('id');
+      if (result.error) {
+        setMsg(`Delete failed: ${result.error.message}`);
+        return;
+      }
+      if (!result.data?.length) {
+        setMsg('The plan was not deleted. It may already be gone or your staff permissions may not allow this change.');
+        return;
+      }
+      setMsg('Plan deleted.');
+      await load();
     } catch {
       setMsg('Could not delete this plan. Check the connection and retry.');
     } finally { setBusy(false); }
