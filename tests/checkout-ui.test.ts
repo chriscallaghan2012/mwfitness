@@ -13,6 +13,7 @@ test('checkout mounts Stripe payment fields instead of fake disabled card inputs
   assert.match(screen, /No payment has been taken/);
   assert.match(screen, /no paid membership or account access has been activated/);
   assert.match(screen, /placeholder:text-zinc-400/);
+  assert.match(screen, /\^\[\^\\s@\]\+@\[\^\\s@\]\+\\\\\./);
   assert.doesNotMatch(screen, /placeholder="Card number"/);
   assert.doesNotMatch(screen, /placeholder="MM \/ YY"/);
   assert.doesNotMatch(screen, /placeholder="CVC"/);
@@ -31,7 +32,7 @@ test('checkout API distinguishes mock preview mode from real Stripe mode', () =>
   const client = readFileSync(join(root, 'src', 'lib', 'stripe.ts'), 'utf8');
   const server = readFileSync(join(root, 'api', '_stripe.mjs'), 'utf8');
   assert.match(client, /data\?\.mode === 'mock'/);
-  assert.match(server, /if \(!hasAnyStripeConfiguration\)/);
+  assert.match(server, /if \(!secretKey && !publishableKey && !production\)/);
   assert.match(server, /if \(production\)/);
   assert.match(server, /Preview and development require matching Stripe test keys/);
   assert.match(server, /price\.livemode !== livemode/);
