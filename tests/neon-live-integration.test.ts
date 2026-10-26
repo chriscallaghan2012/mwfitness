@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { neon } from '@neondatabase/serverless';
 import { test } from 'node:test';
+import plansHandler from '../api/plans.mjs';
+import productsHandler from '../api/products.mjs';
 
 // This suite deliberately requires a separate Neon test branch URL.
 // It never falls back to DATABASE_URL, which may point at production.
@@ -52,5 +54,51 @@ test('disposable Neon branch supports real insert/read/update/delete round-trip'
     assert.equal(afterDelete.length, 0);
   } finally {
     await sql`DELETE FROM mwfitness_release_test_records WHERE id = ${id}`;
+  }
+});
+
+
+function responseDouble() {
+  return {
+    statusCode: 200,
+    headers: {} as Record<string, string>,
+    body: undefined as unknown,
+    setHeader(name: string, value: string) { this.headers[name] = value; return this; },
+    status(code: number) { this.statusCode = code; return this; },
+    json(body: unknown) { this.body = body; return this; },
+  };
+}
+
+test('public pricing and product APIs read real rows from the disposable Neon branch', { skip: skipReason }, async () => {
+  const previousDatabaseUrl = process.env.DATABASE_URL;
+  process.env.DATABASE_URL = testDatabaseUrl!;
+  try {
+    const pricingResponse = responseDouble();
+    await plansHandler({ method: 'GET', query: { kind: 'online' }, url: '/api/plans?kind=online' } as never, pricingResponse as never);
+    assert.equal(pricingResponse.statusCode, 200);
+    const pricing = pricingResponse.body as { plans?: Array<Record<string, unknown>> };
+    assert.ok(Array.isArray(pricing.plans) && pricing.plans.length > 0, 'test branch should have active online coaching plans');
+    for (const plan of pricing.plans ?? []) {
+      assert.equal(plan.kind, 'online');
+      assert.equal(typeof plan.id, 'string');
+      assert.equal(typeof plan.name, 'string');
+      assert.equal(typeof plan.price, 'number');
+      assert.ok(!('stripe_price_id' in plan), 'public pricing must not expose Stripe Price IDs');
+    }
+
+    const productsResponse = responseDouble();
+    await productsHandler({ method: 'GET', query: {}, url: '/api/products' } as never, productsResponse as never);
+    assert.equal(productsResponse.statusCode, 200);
+    const products = productsResponse.body as { products?: Array<Record<string, unknown>> };
+    assert.ok(Array.isArray(products.products), 'product endpoint should return a products array');
+    for (const product of products.products ?? []) {
+      assert.equal(typeof product.id, 'string');
+      assert.equal(typeof product.name, 'string');
+      assert.equal(typeof product.price, 'number');
+      assert.ok(!('stripe_price_id' in product), 'public products must not expose payment identifiers');
+    }
+  } finally {
+    if (previousDatabaseUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = previousDatabaseUrl;
   }
 });
