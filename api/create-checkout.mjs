@@ -12,6 +12,11 @@ export default async function handler(req, res) {
     const checkoutMode = resolveCheckoutMode();
     let expectedAmount;
     if (checkoutMode.mode === 'stripe') {
+      // Real payments stay disabled until the payment ledger migration is applied
+      // and the signed webhook is configured and tested in this environment.
+      if (process.env.STRIPE_PAYMENT_LEDGER_ENABLED !== 'true' || !process.env.STRIPE_WEBHOOK_SECRET) {
+        return res.status(503).json({ ok: false, error: 'Online checkout is temporarily unavailable. Please contact MW Fitness.' });
+      }
       if (!process.env.DATABASE_URL) {
         return res.status(503).json({ ok: false, error: 'Online checkout is temporarily unavailable. Please contact MW Fitness.' });
       }
