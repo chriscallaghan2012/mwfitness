@@ -41,7 +41,7 @@ export const GdprRightsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
           <li><span className="text-white">Vercel</span> — website hosting and the contact-form API.</li>
           <li><span className="text-white">Google</span> — the site loads fonts from Google Fonts (fonts.googleapis.com / fonts.gstatic.com, Google Ireland Limited). These requests can process IP addresses. If analytics or advertising (such as Google Analytics or Google Ads) is ever enabled, it will only run after you consent via the cookie banner, and this page and the cookie policy will be updated to name it.</li>
           <li><span className="text-white">Google Play / Apple</span> — distribution of the MW Fitness app; store links on this site open Google or Apple services under their own policies.</li>
-          <li><span className="text-white">Stripe</span> — payment checkout, when enabled. Card details are entered on Stripe-hosted checkout and never reach our servers. Checkout is not currently active on this site.</li>
+          <li><span className="text-white">Stripe</span> — embedded payment checkout, when enabled. Card and security-code details are collected by Stripe inside its secure payment form and are not received or stored by MW Fitness. Checkout is not currently active until Stripe configuration and payment lifecycle checks pass.</li>
           <li><span className="text-white">Email provider</span> — enquiry notifications are delivered by email (for example Gmail/Google Workspace when configured); message content may be processed by that provider.</li>
           <li><span className="text-white">Expo / EAS</span> — build and distribution tooling for the mobile app, including push notification delivery when enabled.</li>
         </ul>
