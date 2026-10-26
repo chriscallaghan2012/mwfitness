@@ -44,7 +44,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
     setClientSecret('');
     setStripePublishableKey('');
     if (!name.trim()) { setFormError('Enter your full name.'); return; }
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())) { setFormError('Enter a valid email address.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setFormError('Enter a valid email address.'); return; }
     if (!plan) return;
     setSubmitting(true);
     try {
@@ -119,7 +119,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
       <div className="mb-8">
         <p className="font-mono text-xs uppercase tracking-widest text-[#ff5500]">Secure checkout</p>
         <h1 className="mt-2 font-display text-4xl text-white uppercase tracking-tight sm:text-5xl">Checkout</h1>
-        <p className="mt-2 text-sm text-zinc-300">Enter your details, then pay securely without leaving this page.</p>
+        <p className="mt-2 text-sm text-zinc-300">{mockCheckout ? 'This Preview is using a simulation; no payment will be taken.' : 'Enter your details, then pay securely without leaving this page.'}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
@@ -136,8 +136,8 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
 
           <h2 className="mt-8 font-display text-2xl text-white uppercase">Payment</h2>
           <div className="mt-4 border border-[#343943] bg-[#191c22] p-4">
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-200"><Lock className="h-3.5 w-3.5 text-[#ff5500]" /> Secure embedded Stripe payment</div>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-300">Your card and billing details are collected securely by Stripe inside this checkout. The website does not receive or store your card number or security code.</p>
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-200"><Lock className="h-3.5 w-3.5 text-[#ff5500]" /> {mockCheckout ? 'Preview mock checkout simulation' : 'Secure embedded Stripe payment'}</div>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-300">{mockCheckout ? 'Mock mode does not load card fields, contact Stripe, or take payment.' : 'Your card and billing details are collected securely by Stripe inside this checkout. The website does not receive or store your card number or security code.'}</p>
             {!clientSecret && !mockCheckout && <p className="mt-2 text-xs leading-relaxed text-zinc-400">Stripe will load here after you continue. If this Preview has no Stripe test keys configured, a clearly labelled mock checkout is shown instead. Your total is shown in the order summary.</p>}
           </div>
 
@@ -167,7 +167,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
               <div ref={checkoutMountRef} aria-label="Stripe secure payment form" />
             </div>
           )}
-          <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-300"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Card details are handled securely by Stripe</p>
+          {!mockCheckout ? <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-300"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Card details are handled securely by Stripe</p> : <p className="mt-3 text-center text-[11px] text-amber-200">No card details collected in mock mode</p>}
         </div>
 
         <aside className="border border-[#20232b] bg-[#121419] p-6 sm:p-8 lg:sticky lg:top-36">
