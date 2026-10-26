@@ -11,9 +11,8 @@ const skipReason = testDatabaseUrl
   : 'Set RELEASE_TEST_DATABASE_URL to a disposable Neon test branch; production DATABASE_URL is never used.';
 
 test('disposable Neon branch supports real insert/read/update/delete round-trip', { skip: skipReason }, async () => {
+  assert.notEqual(testDatabaseUrl, process.env.DATABASE_URL, 'release integration tests must not use the production DATABASE_URL');
   const sql = neon(testDatabaseUrl!);
-  const tableName = 'mwfitness_release_test_records';
-
   await sql`CREATE TABLE IF NOT EXISTS mwfitness_release_test_records (
     id text PRIMARY KEY,
     label text NOT NULL,
