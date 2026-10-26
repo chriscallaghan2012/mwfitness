@@ -23,15 +23,13 @@ function isProductionEnvironment() {
 export function resolveCheckoutMode() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const publishableKey = process.env.VITE_STRIPE_PUBLISHABLE_KEY;
-  const hasAnyPrice = STRIPE_PRICE_ENV_KEYS.some((key) => Boolean(process.env[key]));
-  const hasAnyStripeConfiguration = Boolean(secretKey || publishableKey || hasAnyPrice);
   const production = isProductionEnvironment();
 
-  if (!hasAnyStripeConfiguration) {
-    if (production) {
-      throw new Error('Live Stripe is not configured for production.');
-    }
-    return { mode: 'mock' };
+  // Without either key, Preview/Development stay usable as a labelled mock,
+  // even if someone has added Price IDs but has not obtained test credentials.
+  if (!secretKey && !publishableKey && !production) return { mode: 'mock' };
+  if (!secretKey && !publishableKey && production) {
+    throw new Error('Live Stripe is not configured for production.');
   }
 
   if (!secretKey || !publishableKey) {
