@@ -1,20 +1,27 @@
 import { neon } from '@neondatabase/serverless';
+import { resolveCheckoutMode } from './_stripe.mjs';
 
 function emailConfigured() {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
 
-function checkoutConfigured() {
-  return Boolean(
-    process.env.VITE_STRIPE_PUBLISHABLE_KEY &&
-    process.env.STRIPE_SECRET_KEY &&
-    process.env.STRIPE_PRICE_ONLINE_4_WEEK_ONCE &&
-    process.env.STRIPE_PRICE_ONLINE_BRONZE_4WEEK &&
-    process.env.STRIPE_PRICE_ONLINE_SILVER_8WEEK &&
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK &&
-    process.env.STRIPE_PRICE_ONLINE_PLATINUM_8WEEK &&
-    (process.env.PUBLIC_SITE_URL || process.env.VERCEL_URL)
-  );
+function checkoutStatus() {
+  try {
+    const configuration = resolveCheckoutMode();
+    if (configuration.mode === 'mock') return 'mock';
+    const requiredActivePrices = [
+      'STRIPE_PRICE_ONLINE_4_WEEK_ONCE',
+      'STRIPE_PRICE_ONLINE_BRONZE_4WEEK',
+      'STRIPE_PRICE_ONLINE_SILVER_8WEEK',
+      'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
+      'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
+    ];
+    const hasPrices = requiredActivePrices.every((key) => Boolean(process.env[key]));
+    const hasSiteUrl = Boolean(process.env.PUBLIC_SITE_URL || process.env.VERCEL_URL);
+    return hasPrices && hasSiteUrl ? 'configured' : 'misconfigured';
+  } catch {
+    return 'misconfigured';
+  }
 }
 
 /**
@@ -37,7 +44,7 @@ export default async function health(_req, res) {
   const checks = {
     database,
     email: emailConfigured() ? 'configured' : 'not_configured',
-    checkout: checkoutConfigured() ? 'configured' : 'not_configured',
+    checkout: checkoutStatus(),
   };
   const ok = database === 'connected';
   res.status(ok ? 200 : 503).json({
