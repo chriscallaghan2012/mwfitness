@@ -106,7 +106,7 @@ A successful JavaScript export does not prove the native Android app starts corr
 - Stripe signed webhook, idempotency, refund and membership-provisioning tests before paid membership activation is enabled.
 - Email delivery and failure/retry behavior.
 - Physical-device Android startup and upgrade tests.
-- Website PWA installability, offline fallback and service-worker update behavior (the current source audit did not find a web manifest or service-worker registration).
+- Website PWA installability, offline fallback and service-worker update behavior. PWA manifest, icon, service worker and production-only registration have been added on the review branch; verify them in a real browser before calling this gate passed.
 - Production HTTP/browser smoke tests against the exact deployed commit.
 - Backup/restore and a named rollback owner.
 - Explicit go/no-go approval.
