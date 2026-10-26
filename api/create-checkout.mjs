@@ -6,6 +6,9 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const planId = typeof body?.planId === 'string' ? body.planId.trim() : '';
+    if (!planId) return res.status(400).json({ ok: false, error: 'Choose a valid coaching plan.' });
+
     const checkoutMode = resolveCheckoutMode();
     let expectedAmount;
     if (checkoutMode.mode === 'stripe') {
@@ -14,7 +17,7 @@ export default async function handler(req, res) {
       }
       // Never trust a client-provided amount or allow checkout for hidden/inactive plans.
       const sql = neon(process.env.DATABASE_URL);
-      const plans = await sql`SELECT id, price, kind, active FROM public.plans WHERE id = ${body?.planId} LIMIT 1`;
+      const plans = await sql`SELECT id, price, kind, active FROM public.plans WHERE id = ${planId} LIMIT 1`;
       const plan = plans[0];
       if (!plan || plan.kind !== 'online' || plan.active !== true) {
         return res.status(400).json({ ok: false, error: 'Choose an available online coaching package.' });
@@ -29,7 +32,7 @@ export default async function handler(req, res) {
     // Mock checkout does not need a site URL; Stripe mode validates it server-side.
     const origin = process.env.PUBLIC_SITE_URL;
     const result = await createCheckoutSession({
-      planId: body?.planId,
+      planId,
       origin,
       expectedAmount,
       customerEmail: typeof body?.customerEmail === 'string' ? body.customerEmail.trim().slice(0, 254) : undefined,
