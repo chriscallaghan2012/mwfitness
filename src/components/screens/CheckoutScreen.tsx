@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Lock, ShieldCheck, TriangleAlert } from '
 import { PublicPlan } from '../../lib/plans';
 import { createCheckoutSession } from '../../lib/stripe';
 
-const inputClass = 'w-full border border-[#242833] bg-[#0e1013] px-3.5 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-[#ff5500] focus:outline-none';
+const inputClass = 'w-full border border-[#454a55] bg-[#191c22] px-3.5 py-3 text-sm text-white placeholder:text-zinc-400 focus:border-[#ff5500] focus:outline-none';
 
 const formatPrice = (value: number) => `£${value.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -55,7 +55,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
       <div className="mb-8">
         <p className="font-mono text-xs uppercase tracking-widest text-[#ff5500]">Secure checkout</p>
         <h1 className="mt-2 font-display text-4xl text-white uppercase tracking-tight sm:text-5xl">Checkout</h1>
-        <p className="mt-2 text-sm text-zinc-500">Enter your details below to start your coaching plan.</p>
+        <p className="mt-2 text-sm text-zinc-300">Enter your details below to start your coaching plan.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
@@ -63,32 +63,28 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
         <div className="border border-[#20232b] bg-[#121419] p-6 sm:p-8">
           <h2 className="font-display text-2xl text-white uppercase">Your details</h2>
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 sm:col-span-2">Full name *
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-300 sm:col-span-2">Full name *
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Alex Morgan" className={`${inputClass} mt-1.5`} autoComplete="name" />
             </label>
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 sm:col-span-2">Email *
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-300 sm:col-span-2">Email *
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" className={`${inputClass} mt-1.5`} autoComplete="email" />
             </label>
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400">Phone (optional)
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-300">Phone (optional)
               <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07…" className={`${inputClass} mt-1.5`} autoComplete="tel" />
             </label>
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400">Postcode (optional)
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-300">Postcode (optional)
               <input value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder="e.g. M1 1AA" className={`${inputClass} mt-1.5`} autoComplete="postal-code" />
             </label>
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 sm:col-span-2">Anything Mike should know? (optional)
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-300 sm:col-span-2">Anything Mike should know? (optional)
               <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Goals, injuries, timeline…" className={`${inputClass} mt-1.5 resize-y`} />
             </label>
           </div>
 
           <h2 className="mt-8 font-display text-2xl text-white uppercase">Payment</h2>
-          <div className="mt-4 border border-[#242833] bg-[#0e1013] p-4">
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-400"><Lock className="w-3.5 h-3.5 text-[#ff5500]" /> Secure card payment — Stripe</div>
-            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[2fr_1fr_1fr]">
-              <input disabled placeholder="Card number" className={`${inputClass} cursor-not-allowed opacity-50`} />
-              <input disabled placeholder="MM / YY" className={`${inputClass} cursor-not-allowed opacity-50`} />
-              <input disabled placeholder="CVC" className={`${inputClass} cursor-not-allowed opacity-50`} />
-            </div>
-            <p className="mt-3 text-xs leading-relaxed text-zinc-500">Card details are entered on Stripe's hosted payment page — they are never typed into or stored by this site. The button below hands you over to Stripe once payments are switched on.</p>
+          <div className="mt-4 border border-[#343943] bg-[#191c22] p-4">
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-200"><Lock className="w-3.5 h-3.5 text-[#ff5500]" /> Secure payment with Stripe</div>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-300">Continue to Stripe Checkout to enter your card details securely. Your card number and security code are entered on Stripe, not on this website.</p>
+            <p className="mt-2 text-xs leading-relaxed text-zinc-400">You can review the total and payment details on Stripe before confirming your payment.</p>
           </div>
 
           {formError && <p role="alert" className="mt-4 border border-red-500/40 bg-[#2a1414] px-4 py-3 text-sm text-red-300">{formError}</p>}
@@ -103,7 +99,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
           <button type="button" onClick={() => void submit()} disabled={submitting} className="mt-6 w-full bg-[#ff5500] px-6 py-4 font-mono font-bold text-xs uppercase text-black transition hover:bg-[#ff6a1f] disabled:opacity-60">
             {submitting ? 'Checking payment service…' : `Continue to secure payment — ${formatPrice(plan.price)}`}
           </button>
-          <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-500"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> You will confirm everything on Stripe's secure page</p>
+          <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-300"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> You will confirm everything on Stripe's secure page</p>
         </div>
 
         {/* ORDER SUMMARY */}
