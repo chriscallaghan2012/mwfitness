@@ -5,6 +5,7 @@ import { createCheckoutSession, resolveCheckoutMode } from '../api/_stripe.mjs';
 const envKeys = [
   'VERCEL_ENV',
   'NODE_ENV',
+  'PUBLIC_SITE_URL',
   'STRIPE_SECRET_KEY',
   'VITE_STRIPE_PUBLISHABLE_KEY',
   'STRIPE_PRICE_ONLINE_WEEKLY',
@@ -32,6 +33,7 @@ async function withCleanStripeEnv(run: () => Promise<void>) {
 
 test('Preview falls back to an explicit mock only when no Stripe configuration exists', async () => {
   await withCleanStripeEnv(async () => {
+    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_configured_without_keys';
     assert.deepEqual(resolveCheckoutMode(), { mode: 'mock' });
     const result = await createCheckoutSession({ planId: 'online-gold-8week' });
     assert.deepEqual(result, { mode: 'mock' });
