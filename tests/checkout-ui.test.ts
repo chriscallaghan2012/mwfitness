@@ -33,7 +33,7 @@ test('checkout API distinguishes mock preview mode from real Stripe mode', () =>
   const server = readFileSync(join(root, 'api', '_stripe.mjs'), 'utf8');
   assert.match(client, /data\?\.mode === 'mock'/);
   assert.match(server, /if \(!secretKey && !publishableKey && !production\)/);
-  assert.match(server, /if \(production\)/);
+  assert.match(server, /if \(!secretKey && !publishableKey && production\)/);
   assert.match(server, /Preview and development require matching Stripe test keys/);
   assert.match(server, /price\.livemode !== livemode/);
 });
