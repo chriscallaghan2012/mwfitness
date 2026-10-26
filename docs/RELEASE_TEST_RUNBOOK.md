@@ -14,7 +14,7 @@ npm run build
 ```
 
 Expected:
-- `npm test` runs Staff HQ demo-data regression tests, public API guard/mount tests, PWA configuration checks, mocked Stripe session tests, and the Neon integration test when `RELEASE_TEST_DATABASE_URL` is provided.
+- `npm test` runs Staff HQ demo-data regression tests, public API guard/mount tests, PWA configuration checks, mocked Stripe session tests, checkout UI regression tests, and the Neon integration test when `RELEASE_TEST_DATABASE_URL` is provided.
 - `npm run lint` runs the TypeScript check.
 - `npm run build` creates the Vite production build.
 
