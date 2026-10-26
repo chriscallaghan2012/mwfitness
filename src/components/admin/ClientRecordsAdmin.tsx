@@ -230,9 +230,12 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
   const assignMembership = async () => {
     if (!db || !userId) return;
     if (!assignPlanId) { setAssignNotice('Choose a package to assign.'); return; }
-    const { error } = await db.from('memberships').insert({ profile_id: userId, plan_id: assignPlanId, status: assignMembershipStatus }).select('id');
-    setAssignNotice(error ? `Membership could not be assigned: ${error.message}` : 'Package assigned to this member.');
-    if (!error) { setAssignPlanId(''); reload(); }
+    const { data, error } = await db.from('memberships').insert({ profile_id: userId, plan_id: assignPlanId, status: assignMembershipStatus }).select('id');
+    if (error) { setAssignNotice(`Membership could not be assigned: ${error.message}`); return; }
+    if (!data?.length) { setAssignNotice('Membership was not assigned. Check staff permissions and retry.'); return; }
+    setAssignNotice('Package assigned to this member.');
+    setAssignPlanId('');
+    reload();
   };
 
   const assignNutrition = async () => {
@@ -240,22 +243,27 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
     if (!assignNutritionTemplate) { setAssignNotice('Choose a nutrition template to assign.'); return; }
     const { data: template, error: templateError } = await db.from('nutrition_templates').select('*').eq('id', assignNutritionTemplate).maybeSingle();
     if (templateError || !template) { setAssignNotice('That nutrition template could not be loaded.'); return; }
-    const { error } = await db.from('nutrition_plans').insert({
+    const { data, error } = await db.from('nutrition_plans').insert({
       profile_id: userId, name: template.name, description: template.description ?? '',
       day_type: template.day_type ?? 'training', targets: template.targets ?? {}, sections: template.sections ?? [], active: true,
     }).select('id');
-    setAssignNotice(error ? `Nutrition plan could not be assigned: ${error.message}` : `Assigned “${String(template.name)}” to this member.`);
-    if (!error) { setAssignNutritionTemplate(''); reload(); }
+    if (error) { setAssignNotice(`Nutrition plan could not be assigned: ${error.message}`); return; }
+    if (!data?.length) { setAssignNotice('Nutrition plan was not assigned. Check staff permissions and retry.'); return; }
+    setAssignNotice(`Assigned “${String(template.name)}” to this member.`);
+    setAssignNutritionTemplate('');
+    reload();
   };
 
   const assignWorkout = async () => {
     if (!db || !userId) return;
     if (!assignWorkoutTemplate || !assignWorkoutDate) { setAssignNotice('Choose a workout template and a date.'); return; }
-    const { error } = await db.from('workout_sessions').insert({
+    const { data, error } = await db.from('workout_sessions').insert({
       profile_id: userId, template_id: assignWorkoutTemplate, scheduled_on: assignWorkoutDate, status: 'planned',
     }).select('id');
-    setAssignNotice(error ? `Session could not be scheduled: ${error.message}` : `Session scheduled for ${ShortDate(assignWorkoutDate)}.`);
-    if (!error) reload();
+    if (error) { setAssignNotice(`Session could not be scheduled: ${error.message}`); return; }
+    if (!data?.length) { setAssignNotice('The session was not scheduled. Check staff permissions and retry.'); return; }
+    setAssignNotice(`Session scheduled for ${ShortDate(assignWorkoutDate)}.`);
+    reload();
   };
 
   const assignProgramme = async () => {
@@ -265,12 +273,15 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
       setAssignNotice('The completion date must be on or after the start date.');
       return;
     }
-    const { error } = await db.from('coaching_programme_assignments').insert({
+    const { data, error } = await db.from('coaching_programme_assignments').insert({
       profile_id: userId, programme_id: assignProgrammeId, starts_on: assignProgrammeStart,
       due_on: assignProgrammeDue || null, status: 'active',
     }).select('id');
-    setAssignNotice(error ? `Programme could not be assigned: ${error.message}` : 'Coaching programme assigned to this member.');
-    if (!error) { setAssignProgrammeId(''); reload(); }
+    if (error) { setAssignNotice(`Programme could not be assigned: ${error.message}`); return; }
+    if (!data?.length) { setAssignNotice('The programme was not assigned. Check staff permissions and retry.'); return; }
+    setAssignNotice('Coaching programme assigned to this member.');
+    setAssignProgrammeId('');
+    reload();
   };
 
   const assignSupplement = async () => {
