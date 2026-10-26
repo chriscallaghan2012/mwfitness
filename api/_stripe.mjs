@@ -8,17 +8,76 @@ const PLAN_PRICE_ENV = {
   'online-platinum-8week': 'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
 };
 
+const STRIPE_PRICE_ENV_KEYS = Object.values(PLAN_PRICE_ENV);
+
+function isProductionEnvironment() {
+  if (process.env.VERCEL_ENV) return process.env.VERCEL_ENV === 'production';
+  return process.env.NODE_ENV === 'production';
+}
+
+/**
+ * Production must be explicitly configured for live payments. Non-production
+ * environments may use an explicit mock only when no Stripe variables at all
+ * have been configured. Partial or wrong-mode configuration always fails closed.
+ */
+export function resolveCheckoutMode() {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const publishableKey = process.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  const hasAnyPrice = STRIPE_PRICE_ENV_KEYS.some((key) => Boolean(process.env[key]));
+  const hasAnyStripeConfiguration = Boolean(secretKey || publishableKey || hasAnyPrice);
+  const production = isProductionEnvironment();
+
+  if (!hasAnyStripeConfiguration) {
+    if (production) {
+      throw new Error('Live Stripe is not configured for production.');
+    }
+    return { mode: 'mock' };
+  }
+
+  if (!secretKey || !publishableKey) {
+    throw new Error('Stripe configuration is incomplete: both the secret and publishable keys are required.');
+  }
+
+  const expectedSecretPrefix = production ? 'sk_live_' : 'sk_test_';
+  const expectedPublishablePrefix = production ? 'pk_live_' : 'pk_test_';
+  if (!secretKey.startsWith(expectedSecretPrefix) || !publishableKey.startsWith(expectedPublishablePrefix)) {
+    throw new Error(production
+      ? 'Production requires matching live Stripe keys.'
+      : 'Preview and development require matching Stripe test keys. Live keys are not allowed here.');
+  }
+
+  return { mode: 'stripe', publishableKey, secretKey, livemode: production };
+}
+
 export async function createCheckoutSession({ planId, origin, customerEmail, customerName }) {
   const priceEnv = PLAN_PRICE_ENV[planId];
   if (!priceEnv) throw new Error('Invalid coaching plan.');
 
-  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const configuration = resolveCheckoutMode();
+  if (configuration.mode === 'mock') return { mode: 'mock' };
+
+  const { secretKey, publishableKey, livemode } = configuration;
   const priceId = process.env[priceEnv];
-  if (!secretKey) throw new Error('Stripe keys are not present on the server (STRIPE_SECRET_KEY is missing). Payments are not live yet.');
-  if (!priceId) throw new Error(`Stripe keys are present, but no price ID is configured for this plan yet (${priceEnv}).`);
+  if (!priceId) throw new Error(`Stripe is configured, but no Price ID is set for this plan (${priceEnv}).`);
+
+  if (!/^price_[A-Za-z0-9]+$/.test(priceId)) {
+    throw new Error(`The configured Price ID for this plan (${priceEnv}) is invalid.`);
+  }
 
   const baseUrl = origin || process.env.PUBLIC_SITE_URL;
-  if (!baseUrl) throw new Error('The public site URL is not configured.');
+  if (!baseUrl || !/^https:\/\//i.test(baseUrl)) throw new Error('The public site URL is not configured.');
+
+  // Retrieve the price first so a test key can never be paired with a live
+  // Price ID (or vice versa). Stripe's Price object explicitly reports livemode.
+  const priceResponse = await fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(priceId)}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${secretKey}` },
+  });
+  const price = await priceResponse.json();
+  if (!priceResponse.ok) throw new Error(price?.error?.message || 'Stripe could not verify the configured Price ID.');
+  if (price.livemode !== livemode) {
+    throw new Error('The configured Stripe Price ID does not match this environment’s key mode.');
+  }
 
   const params = new URLSearchParams({
     mode: 'payment',
@@ -45,5 +104,5 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
   const data = await response.json();
   if (!response.ok) throw new Error(data?.error?.message || 'Stripe could not create checkout.');
   if (!data.client_secret) throw new Error('Stripe did not return an embedded checkout client secret.');
-  return { clientSecret: data.client_secret };
+  return { mode: 'stripe', clientSecret: data.client_secret, publishableKey };
 }
