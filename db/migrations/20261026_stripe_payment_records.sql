@@ -1,7 +1,8 @@
 -- Stripe payment receipt ledger for the embedded Checkout webhook.
 -- PREPARED ONLY: review and apply to the intended Neon branch with explicit approval.
--- This records verified paid Checkout Sessions for reconciliation. It deliberately
--- does not grant membership access: customer account linking must be verified first.
+-- This records verified paid Checkout Sessions for reconciliation. Only platform admins
+-- may read it through Staff HQ; browser clients cannot insert/update/delete rows.
+-- It deliberately does not grant membership access: account linking must be verified first.
 
 CREATE TABLE IF NOT EXISTS public.stripe_payment_records (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -44,4 +45,4 @@ CREATE POLICY stripe_payment_records_admin_select
   USING (public.is_platform_admin());
 
 COMMENT ON TABLE public.stripe_payment_records IS
-  'Server-only ledger of Stripe-paid checkout sessions; does not itself grant coaching membership access.';
+  'Verified Stripe-paid checkout ledger. SELECT is limited to platform admins; writes are server-only. Does not itself grant coaching membership access.';
