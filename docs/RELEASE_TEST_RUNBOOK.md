@@ -14,7 +14,7 @@ npm run build
 ```
 
 Expected:
-- `npm test` runs Staff HQ demo-data regression tests, public API guard/mount tests, PWA configuration checks, mocked Stripe session and checkout API mode tests, checkout UI regression tests, and the Neon integration test when `RELEASE_TEST_DATABASE_URL` is provided.
+- `npm test` runs Staff HQ demo-data regression tests, public API guard/mount tests, PWA configuration checks, mocked Stripe session tests, checkout API mode tests, checkout return-status tests, webhook signature tests, checkout UI regression tests, and the Neon integration test when `RELEASE_TEST_DATABASE_URL` is provided.
 - `npm run lint` runs the TypeScript check.
 - `npm run build` creates the Vite production build.
 
@@ -125,11 +125,15 @@ This verifies a real Neon connection and database CRUD, and reads public pricing
 
 ## Stripe Checkout tests and configuration
 
-The Stripe unit tests mock Stripe's API; they must not charge a card. Preview/Development without either Stripe key must use the clearly labelled mock simulation; it must never create a Stripe session, claim a payment succeeded, or activate a membership. When configured, Preview/Development must use matching test publishable/secret keys and test Price IDs. Production must use matching live keys and live Price IDs and must fail closed when keys are missing. Live keys are rejected outside Production. The API verifies the plan is active and `kind=online` in Neon, then retrieves the selected Stripe Price and checks both its `livemode` and GBP amount against the database plan price before creating a session. The current Vercel audit found no Stripe variables, so Production checkout is not yet configured.
+The Stripe unit tests mock Stripe's API; they must not charge a card. Preview/Development without either Stripe key must use the clearly labelled mock simulation; it must never create a Stripe session, claim a payment succeeded, or activate a membership. When configured, Preview/Development must use matching test publishable/secret keys and test Price IDs. Production must use matching live keys and live Price IDs and must fail closed when keys are missing. Live keys are rejected outside Production. The API verifies the plan is active and `kind=online` in Neon, then retrieves the selected Stripe Price and checks both its `livemode` and GBP amount against the database plan price before creating a session. The current Vercel audit found no Stripe variables, so Production checkout is not yet configured. Real checkout also fails closed unless `STRIPE_WEBHOOK_SECRET` is present and `STRIPE_PAYMENT_LEDGER_ENABLED=true`.
 
 Embedded Checkout uses Stripe's payment form inside the website; the browser loads Stripe.js directly from `js.stripe.com`. Card data must never be posted to MW Fitness endpoints or logged by the site.
 
 Manual embedded checkout acceptance checklist:
+- [ ] Confirm `/api/checkout-status` only returns paid/pending status and the plan ID; it never returns customer email, Stripe secret keys or client secrets.
+- [ ] Confirm a Stripe return with `checkout=complete` verifies the session with Stripe and does not show the pay button again.
+- [ ] Confirm a paid return explicitly says membership/account linking is still pending and tells the customer not to pay again.
+- [ ] Confirm real checkout is blocked unless the signed webhook secret is configured and the payment-ledger gate is enabled.
 - [ ] On a Preview deployment with both Stripe keys absent, continue checkout and verify the explicit “Preview mock checkout” panel appears.
 - [ ] Verify mock checkout says no payment was taken and no membership/access was activated; verify no Stripe session is created.
 - [ ] Verify Production with missing Stripe keys reports checkout unavailable and never shows mock checkout.
@@ -143,4 +147,9 @@ Manual embedded checkout acceptance checklist:
 - [ ] Exercise a declined test card and a redirect/3DS flow; verify clear recovery and that the selected package is restored after returning.
 - [ ] Confirm a failed checkout never reports payment success or activates a membership.
 - [ ] Verify no card details, Stripe client secret or secret API key are written to app logs or MW Fitness API requests.
-- [ ] Do not test live charges until the webhook, idempotent payment record and membership activation flow are complete and explicitly approved.
+- [ ] Apply `db/migrations/20261026_stripe_payment_records.sql` only to the approved environment, then configure `/api/stripe-webhook` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `charge.refunded` with the matching signing secret.
+- [ ] Replay the same paid Checkout Session event twice and verify the unique session row is updated, not duplicated.
+- [ ] Verify a paid event with a mismatched plan/amount/currency or wrong live/test mode is flagged for manual review and never activates membership.
+- [ ] Verify full refunds mark the record for refund reconciliation; partial refunds are flagged for manual review.
+- [ ] Keep `STRIPE_PAYMENT_LEDGER_ENABLED=false` until the migration and webhook are proven in that environment.
+- [ ] Do not test live charges until the account-linking, idempotent membership activation, refund/access-revocation flow is complete and explicitly approved.
