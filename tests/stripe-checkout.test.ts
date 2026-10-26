@@ -69,7 +69,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
         body: new URLSearchParams(String(init?.body ?? '')),
       });
       if (method === 'GET') {
-        return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false }), {
+        return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false, currency: 'gbp', unit_amount: 9999 }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
         });
@@ -86,6 +86,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
         origin: 'https://preview.example.test',
         customerEmail: 'release-test@example.com',
         customerName: 'Release Test',
+        expectedAmount: 99.99,
       });
       assert.deepEqual(result, {
         mode: 'stripe',
@@ -139,4 +140,30 @@ test('Stripe Checkout rejects an unknown coaching plan before calling Stripe', a
     () => createCheckoutSession({ planId: 'not-a-real-plan', origin: 'https://mwfitnessuk.com' }),
     /Invalid coaching plan/,
   );
+});
+
+test('Stripe rejects a Price amount that differs from the active website plan', async () => {
+  await withCleanStripeEnv(async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
+    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_test_release_placeholder';
+    const originalFetch = globalThis.fetch;
+    let sessionCreated = false;
+    globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
+      if ((init?.method ?? 'GET') === 'POST') sessionCreated = true;
+      return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false, currency: 'gbp', unit_amount: 10000 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }) as typeof fetch;
+    try {
+      await assert.rejects(
+        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', expectedAmount: 99.99 }),
+        /does not match the active website plan price/i,
+      );
+      assert.equal(sessionCreated, false);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
 });
