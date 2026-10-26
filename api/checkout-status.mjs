@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     if (!response.ok) {
       return res.status(response.status === 404 ? 404 : 503).json({ ok: false, error: 'Payment status could not be verified.' });
     }
-    if (session.mode !== 'payment' || session.livemode !== configuration.livemode) {
+    if (session.id !== sessionId || session.mode !== 'payment' || session.livemode !== configuration.livemode) {
       return res.status(404).json({ ok: false, error: 'Payment status could not be verified.' });
     }
     const planId = typeof session.metadata?.plan_id === 'string' ? session.metadata.plan_id : '';
@@ -47,9 +47,12 @@ export default async function handler(req, res) {
     }
 
     const paid = session.payment_status === 'paid';
+    const expectedAmount = Number(session.metadata?.expected_amount_pence);
+    const amountMatches = Number.isInteger(expectedAmount) && session.amount_total === expectedAmount && session.currency === 'gbp';
+    const status = !paid ? 'pending' : amountMatches ? 'paid' : 'review';
     return res.status(200).json({
       ok: true,
-      status: paid ? 'paid' : 'pending',
+      status,
       planId,
       membership: 'pending_account_link',
     });
