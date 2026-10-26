@@ -150,6 +150,7 @@ Manual embedded checkout acceptance checklist:
 - [ ] Apply `db/migrations/20261026_stripe_payment_records.sql` only to the approved environment, then configure `/api/stripe-webhook` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `charge.refunded` with the matching signing secret.
 - [ ] Replay the same paid Checkout Session event twice and verify the unique session row is updated, not duplicated.
 - [ ] Verify a paid event with a mismatched plan/amount/currency or wrong live/test mode is flagged for manual review and never activates membership.
+- [ ] Verify the payment ledger is visible to platform admins in Staff HQ but not to coaches, members, anonymous users or demo mode.
 - [ ] Verify full refunds mark the record for refund reconciliation; partial refunds are flagged for manual review. The ledger does not automatically revoke an existing membership.
-- [ ] Keep `STRIPE_PAYMENT_LEDGER_ENABLED=false` until the migration and webhook are proven in that environment. The ledger is server-only; no Staff HQ payment-review UI or automatic account-linking flow is implemented yet.
+- [ ] Keep `STRIPE_PAYMENT_LEDGER_ENABLED=false` until the migration and webhook are proven in that environment. The ledger is server-write-only and readable only by platform admins in Staff HQ under Plans & memberships. Verify a coach/member cannot read payment records; the automatic account-linking flow is still not implemented.
 - [ ] Do not test live charges until the account-linking, idempotent membership activation, refund/access-revocation flow is complete and explicitly approved.
