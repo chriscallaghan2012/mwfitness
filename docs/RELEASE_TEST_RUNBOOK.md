@@ -125,7 +125,7 @@ This verifies a real Neon connection and database CRUD, and reads public pricing
 
 ## Stripe Checkout tests and configuration
 
-The Stripe unit tests mock Stripe's API; they must not charge a card. Preview/Development without either Stripe key must use the clearly labelled mock simulation; it must never create a Stripe session, claim a payment succeeded, or activate a membership. When configured, Preview/Development must use matching test publishable/secret keys and test Price IDs. Production must use matching live keys and live Price IDs and must fail closed when keys are missing. Live keys are rejected outside Production. The API retrieves each selected Price and checks its `livemode` flag before creating a session. The current Vercel audit found no Stripe variables, so Production checkout is not yet configured.
+The Stripe unit tests mock Stripe's API; they must not charge a card. Preview/Development without either Stripe key must use the clearly labelled mock simulation; it must never create a Stripe session, claim a payment succeeded, or activate a membership. When configured, Preview/Development must use matching test publishable/secret keys and test Price IDs. Production must use matching live keys and live Price IDs and must fail closed when keys are missing. Live keys are rejected outside Production. The API verifies the plan is active and `kind=online` in Neon, then retrieves the selected Stripe Price and checks both its `livemode` and GBP amount against the database plan price before creating a session. The current Vercel audit found no Stripe variables, so Production checkout is not yet configured.
 
 Embedded Checkout uses Stripe's payment form inside the website; the browser loads Stripe.js directly from `js.stripe.com`. Card data must never be posted to MW Fitness endpoints or logged by the site.
 
@@ -138,7 +138,7 @@ Manual embedded checkout acceptance checklist:
 - [ ] Confirm the form renders inside `/checkout` and does not redirect to a separate Stripe-hosted page for the standard card flow.
 - [ ] Confirm card number, expiry, CVC and billing fields are rendered by Stripe, not ordinary MW Fitness `<input>` elements.
 - [ ] Confirm the name/email placeholders are readable and form borders/focus states have sufficient contrast.
-- [ ] Confirm the amount and selected package match the matching Stripe Price in the current environment.
+- [ ] Confirm the amount and selected package match both the active Neon plan and the matching Stripe Price in the current environment.
 - [ ] Complete a Stripe test-mode payment with a Stripe test card; never use real card details in test mode.
 - [ ] Exercise a declined test card and a redirect/3DS flow; verify clear recovery and that the selected package is restored after returning.
 - [ ] Confirm a failed checkout never reports payment success or activates a membership.
