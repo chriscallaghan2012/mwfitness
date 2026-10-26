@@ -13,7 +13,7 @@ test('checkout mounts Stripe payment fields instead of fake disabled card inputs
   assert.match(screen, /No payment has been taken/);
   assert.match(screen, /no paid membership or account access has been activated/);
   assert.match(screen, /placeholder:text-zinc-400/);
-  assert.match(screen, /\^\[\^\\s@\]\+@\[\^\\s@\]\+\\\\\./);
+  assert.ok(screen.includes(String.raw`if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))`));
   assert.doesNotMatch(screen, /placeholder="Card number"/);
   assert.doesNotMatch(screen, /placeholder="MM \/ YY"/);
   assert.doesNotMatch(screen, /placeholder="CVC"/);
