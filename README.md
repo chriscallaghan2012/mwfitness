@@ -106,7 +106,7 @@ PUBLIC_SITE_URL=https://mwfitnessuk.com
 
 **Current audited Vercel state:** `PUBLIC_SITE_URL` is configured, but no Stripe key or Price ID variables were present in the environment-variable listing. Preview can use mock checkout until test credentials exist; Production checkout remains unavailable until live credentials and Price IDs are configured. No fake credentials were created.
 
-**Important payment lifecycle gap:** a signed webhook and payment ledger are being prepared on a follow-up branch, but its migration is not applied and the endpoint is not deployed/configured. Even after ledger verification, the webhook records a paid purchase as pending account linking/manual review; it does not grant membership access automatically. Do not enable real checkout until the ledger migration, webhook and idempotent account-linking/provisioning flow have been reviewed and verified.
+**Important payment lifecycle gap:** a signed webhook and payment ledger are being prepared on `release/post-merge-audit-and-payment-lifecycle`; this follow-up is not merged/deployed and its migration is not applied. The payment ledger is server-only, with no Staff HQ payment-review screen yet. The webhook records paid purchases as pending account linking/manual review; it does not grant membership access automatically or revoke access after refunds. Do not set `STRIPE_PAYMENT_LEDGER_ENABLED=true` or accept real payments until the migration, webhook, account-linking/provisioning and refund/access-revocation flow have been reviewed and verified.
 
 ## Content & staff controls
 
