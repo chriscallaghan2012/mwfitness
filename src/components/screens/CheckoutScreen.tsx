@@ -32,23 +32,33 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
   const [paymentWarning, setPaymentWarning] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [clientSecret, setClientSecret] = useState('');
+  const [stripePublishableKey, setStripePublishableKey] = useState('');
+  const [mockCheckout, setMockCheckout] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
   const checkoutMountRef = useRef<HTMLDivElement>(null);
 
   const submit = async () => {
     setFormError('');
     setPaymentWarning('');
+    setMockCheckout(false);
+    setClientSecret('');
+    setStripePublishableKey('');
     if (!name.trim()) { setFormError('Enter your full name.'); return; }
     if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())) { setFormError('Enter a valid email address.'); return; }
     if (!plan) return;
     setSubmitting(true);
     try {
       const result = await createCheckoutSession(plan.id, { name: name.trim(), email: email.trim() });
-      if (result.clientSecret) {
+      if ('mode' in result && result.mode === 'mock') {
+        setMockCheckout(true);
+        return;
+      }
+      if ('mode' in result && result.mode === 'stripe') {
+        setStripePublishableKey(result.publishableKey);
         setClientSecret(result.clientSecret);
         return;
       }
-      setPaymentWarning(result.error || 'Online payment is not configured yet. Please contact Mike.');
+      setPaymentWarning('error' in result ? result.error : 'Online payment could not be started. Please contact Mike.');
     } catch {
       setPaymentWarning('We could not start secure payment. Please try again or contact Mike.');
     } finally {
@@ -65,10 +75,9 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
       setStripeLoading(true);
       try {
         await loadStripeJs();
-        const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-        if (!publishableKey) throw new Error('Stripe is not configured for this website yet. Please contact Mike.');
+        if (!stripePublishableKey) throw new Error('Stripe is not configured for this website yet. Please contact Mike.');
         if (!window.Stripe) throw new Error('Stripe could not be initialised. Please refresh and try again.');
-        const stripe = window.Stripe(publishableKey);
+        const stripe = window.Stripe(stripePublishableKey);
         embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret });
         if (cancelled || !checkoutMountRef.current) {
           embeddedCheckout.unmount();
@@ -90,7 +99,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
       cancelled = true;
       embeddedCheckout?.unmount();
     };
-  }, [clientSecret]);
+  }, [clientSecret, stripePublishableKey]);
 
   if (!plan) {
     return (
@@ -129,7 +138,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
           <div className="mt-4 border border-[#343943] bg-[#191c22] p-4">
             <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-200"><Lock className="h-3.5 w-3.5 text-[#ff5500]" /> Secure embedded Stripe payment</div>
             <p className="mt-2 text-sm leading-relaxed text-zinc-300">Your card and billing details are collected securely by Stripe inside this checkout. The website does not receive or store your card number or security code.</p>
-            {!clientSecret && <p className="mt-2 text-xs leading-relaxed text-zinc-400">Stripe will load here after you continue. Your total is shown in the order summary.</p>}
+            {!clientSecret && !mockCheckout && <p className="mt-2 text-xs leading-relaxed text-zinc-400">Stripe will load here after you continue. If this Preview has no Stripe test keys configured, a clearly labelled mock checkout is shown instead. Your total is shown in the order summary.</p>}
           </div>
 
           {formError && <p role="alert" className="mt-4 border border-red-500/40 bg-[#2a1414] px-4 py-3 text-sm text-red-300">{formError}</p>}
@@ -141,9 +150,17 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
             </div>
           )}
 
-          {!clientSecret && <button type="button" onClick={() => void submit()} disabled={submitting} className="mt-6 w-full bg-[#ff5500] px-6 py-4 font-mono font-bold text-xs uppercase text-black transition hover:bg-[#ff6a1f] disabled:opacity-60">
-            {submitting ? 'Preparing secure payment…' : `Continue to payment — ${formatPrice(plan.price)}`}
+          {!clientSecret && !mockCheckout && <button type="button" onClick={() => void submit()} disabled={submitting} className="mt-6 w-full bg-[#ff5500] px-6 py-4 font-mono font-bold text-xs uppercase text-black transition hover:bg-[#ff6a1f] disabled:opacity-60">
+            {submitting ? 'Preparing checkout…' : `Continue to payment — ${formatPrice(plan.price)}`}
           </button>}
+          {mockCheckout && (
+            <div role="status" className="mt-6 border border-amber-500/50 bg-amber-500/10 p-5">
+              <p className="font-mono text-xs font-bold uppercase tracking-wider text-amber-300">Preview mock checkout</p>
+              <h3 className="mt-2 font-display text-xl uppercase text-white">No payment has been taken</h3>
+              <p className="mt-2 text-sm leading-relaxed text-amber-100/90">Stripe test keys are not configured in this non-production environment, so this is a checkout simulation only. No Stripe transaction was created and no paid membership or account access has been activated.</p>
+              <button type="button" onClick={() => setMockCheckout(false)} className="mt-4 border border-amber-300/50 px-4 py-2 font-mono text-xs font-bold uppercase text-amber-200 hover:bg-amber-300/10">Return to checkout</button>
+            </div>
+          )}
           {clientSecret && (
             <div className="mt-5 border border-[#343943] bg-[#191c22] p-4">
               {stripeLoading && <p className="mb-3 text-sm text-zinc-300">Loading secure payment fields…</p>}
