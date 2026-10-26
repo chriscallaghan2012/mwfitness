@@ -1,6 +1,6 @@
 # MW FITNESS — Live Release Audit & Go-Live Plan
 
-**Status:** Planning / release not yet approved  
+**Status:** Planning / release not yet approved (updated 2026-10-26 after PR #138 merge)  
 **Scope:** Website, Staff HQ, Neon, Expo mobile app, branding, payments and production operations  
 **Rule:** This document is a release plan, not evidence that tests have passed. Do not mark a gate complete without recorded evidence for the exact commit/build/environment tested.
 
@@ -35,10 +35,10 @@ Latest checkout work:
 - Added a VITE_STRIPE_PUBLISHABLE_KEY placeholder plus server-side secret/Price ID placeholders to .env.example; expanded the health check so checkout is not marked configured until the publishable key, secret and all five active plan Price IDs are present.
 - Added mocked Stripe-session tests, checkout UI regression tests and an optional real Neon CRUD round-trip test that only runs against RELEASE_TEST_DATABASE_URL, never DATABASE_URL.
 - Read-only Vercel environment listing found PUBLIC_SITE_URL and DATABASE_URL, but no Stripe key or Price ID variables. Preview can use mock checkout until test credentials exist; Production remains unavailable until the owner adds real live keys and live Price IDs in Production. Do not create dummy Stripe environment values.
-- Embedded checkout and the environment-safe mock fallback are prepared on this review branch but have not been run or deployed. A signed Stripe webhook and idempotent payment-to-membership provisioning remain a separate go-live blocker.
+- Embedded checkout and the environment-safe mock fallback are now in `main` but have not been run or deployed against a verified candidate build. A signed Stripe webhook and idempotent payment-to-membership provisioning remain a separate go-live blocker.
 
 
-Work prepared on the review branch `release/staff-hq-tests-and-fixes` (not merged or deployed):
+The work from `release/staff-hq-tests-and-fixes` was squash-merged into `main` on 2026-10-26 as `1dbb45c7eb600f9a5c585a03c7212a86b5de39a8`. Vercel reported a pending status for that commit at the time of the follow-up audit; automated tests/build have not been run or verified. Further review work is being prepared separately on `release/post-merge-audit-and-payment-lifecycle` (not merged or deployed):
 - Added `npm test` and a Node/tsx test suite for Staff HQ demo data operations: seed/read, create-update-delete, embedded relations, demo reset isolation and unknown-table errors.
 - Fixed plan and nutrition-item deletion feedback so Staff HQ checks the returned deleted row instead of reporting success merely because the request had no API error. This matters when Neon RLS blocks a delete and returns zero affected rows.
 - Fixed member-record assignment feedback so memberships, nutrition plans, workout sessions and programme assignments require a returned inserted row before reporting success.
