@@ -8,8 +8,6 @@ function checkoutConfigured() {
   return Boolean(
     process.env.VITE_STRIPE_PUBLISHABLE_KEY &&
     process.env.STRIPE_SECRET_KEY &&
-    process.env.STRIPE_PRICE_ONLINE_WEEKLY &&
-    process.env.STRIPE_PRICE_ONLINE_12_WEEK &&
     process.env.STRIPE_PRICE_ONLINE_4_WEEK_ONCE &&
     process.env.STRIPE_PRICE_ONLINE_BRONZE_4WEEK &&
     process.env.STRIPE_PRICE_ONLINE_SILVER_8WEEK &&
