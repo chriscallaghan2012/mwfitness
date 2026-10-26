@@ -32,7 +32,7 @@ Latest checkout work:
 - Replaced the fake disabled card-number/expiry/CVC inputs and misleading 'switch payments on' copy with an embedded Stripe Checkout mount. Stripe.js supplies the payment fields inside the website; the site never handles card numbers or CVCs.
 - Improved checkout input and placeholder contrast.
 - Added a VITE_STRIPE_PUBLISHABLE_KEY placeholder plus server-side secret/Price ID placeholders to .env.example; expanded the health check so checkout is not marked configured until the publishable key, secret and all seven current plan Price IDs are present.
-- Added mocked Stripe-session tests and an optional real Neon CRUD round-trip test that only runs against RELEASE_TEST_DATABASE_URL, never DATABASE_URL.
+- Added mocked Stripe-session tests, checkout UI regression tests and an optional real Neon CRUD round-trip test that only runs against RELEASE_TEST_DATABASE_URL, never DATABASE_URL.
 - Read-only Vercel environment listing found PUBLIC_SITE_URL and DATABASE_URL, but no Stripe key or Price ID variables. Do not create dummy Stripe environment values: real test/live values must be added by the owner in the correct Vercel environment.
 - Embedded checkout code is prepared but has not been run or deployed. A signed Stripe webhook and idempotent payment-to-membership provisioning remain a separate go-live blocker.
 
