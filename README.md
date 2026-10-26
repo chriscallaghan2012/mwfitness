@@ -95,7 +95,7 @@ PUBLIC_SITE_URL=https://mwfitnessuk.com
 - **Production:** set `VITE_STRIPE_PUBLISHABLE_KEY` to the Stripe live publishable key (`pk_live_…`), `STRIPE_SECRET_KEY` to the live secret key (`sk_live_…`), and every active `STRIPE_PRICE_…` value to the corresponding live-mode Price ID from the same Stripe account. Missing keys fail closed; production never falls back to mock checkout.
 - **Preview and Development:** when Stripe is configured, use matching test-mode publishable keys (`pk_test_…`), secret keys (`sk_test_…`) and test-mode Price IDs. Live keys are rejected outside Production.
 - **Preview/Development without keys:** if both Stripe keys are absent, checkout presents an explicitly labelled mock simulation—even if Price IDs were added. It creates no Stripe session, takes no payment and activates no membership. If only one key is set or keys use the wrong mode, checkout fails closed instead of silently mocking.
-- The API retrieves the selected Stripe Price and checks its `livemode` flag against the environment's key mode before creating a Checkout Session.
+- Before real checkout, the API verifies the selected plan is still active and is an online coaching plan in Neon. It retrieves the selected Stripe Price, checks its `livemode` flag against the environment's key mode, and checks that the Stripe amount/currency match the active plan price before creating a Checkout Session.
 - The publishable key is allowed in browser code; keep the secret key server-side only. Never use a `VITE_` prefix for the secret key or commit real credentials.
 - Stripe keys and Price IDs must come from Stripe's dashboard. Placeholder values do not activate payments.
 
