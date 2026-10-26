@@ -19,7 +19,7 @@ import { CookiePolicyScreen } from './components/screens/CookiePolicyScreen';
 import { GdprRightsScreen } from './components/screens/GdprRightsScreen';
 import { CookieConsentBanner } from './components/CookieConsent';
 import { CheckoutScreen } from './components/screens/CheckoutScreen';
-import type { PublicPlan } from './lib/plans';
+import { loadPublicPlans, type PublicPlan } from './lib/plans';
 import { AccountDeletionScreen } from './components/screens/AccountDeletionScreen';
 import { MemberAccountScreen } from './components/screens/MemberAccountScreen';
 import { AdminScreen } from './components/admin/AdminScreen';
@@ -55,6 +55,19 @@ export default function App() {
   const [bookCallInterest, setBookCallInterest] = useState('');
   const [showMobileCta, setShowMobileCta] = useState(false);
   const [checkoutPlan, setCheckoutPlan] = useState<PublicPlan | null>(null);
+
+  // Stripe can return the customer to /checkout after a redirect-based payment method.
+  // Restore the selected package from the URL rather than showing an empty checkout.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const planId = params.get('plan');
+    if (currentScreen !== 'checkout' || !planId || checkoutPlan?.id === planId) return;
+    let active = true;
+    void loadPublicPlans('online').then(({ plans }) => {
+      if (active) setCheckoutPlan(plans.find((plan) => plan.id === planId) ?? null);
+    });
+    return () => { active = false; };
+  }, [currentScreen, checkoutPlan?.id]);
 
   // Show the sticky mobile "book a call" bar once the visitor scrolls past the hero
   useEffect(() => {
