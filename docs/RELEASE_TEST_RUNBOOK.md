@@ -106,7 +106,7 @@ A successful JavaScript export does not prove the native Android app starts corr
 - Stripe signed webhook, idempotency, refund and membership-provisioning tests before paid membership activation is enabled.
 - Email delivery and failure/retry behavior.
 - Physical-device Android startup and upgrade tests.
-- Website PWA installability, offline fallback and service-worker update behavior. PWA manifest, icon, service worker and production-only registration have been added on the review branch; verify them in a real browser before calling this gate passed.
+- Website PWA installability, offline fallback and service-worker update behavior. PWA manifest, icon, service worker and production-only registration are merged into `main`; verify them in a real browser before calling this gate passed.
 - Production HTTP/browser smoke tests against the exact deployed commit.
 - Backup/restore and a named rollback owner.
 - Explicit go/no-go approval.
@@ -150,6 +150,6 @@ Manual embedded checkout acceptance checklist:
 - [ ] Apply `db/migrations/20261026_stripe_payment_records.sql` only to the approved environment, then configure `/api/stripe-webhook` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `charge.refunded` with the matching signing secret.
 - [ ] Replay the same paid Checkout Session event twice and verify the unique session row is updated, not duplicated.
 - [ ] Verify a paid event with a mismatched plan/amount/currency or wrong live/test mode is flagged for manual review and never activates membership.
-- [ ] Verify full refunds mark the record for refund reconciliation; partial refunds are flagged for manual review.
-- [ ] Keep `STRIPE_PAYMENT_LEDGER_ENABLED=false` until the migration and webhook are proven in that environment.
+- [ ] Verify full refunds mark the record for refund reconciliation; partial refunds are flagged for manual review. The ledger does not automatically revoke an existing membership.
+- [ ] Keep `STRIPE_PAYMENT_LEDGER_ENABLED=false` until the migration and webhook are proven in that environment. The ledger is server-only; no Staff HQ payment-review UI or automatic account-linking flow is implemented yet.
 - [ ] Do not test live charges until the account-linking, idempotent membership activation, refund/access-revocation flow is complete and explicitly approved.
