@@ -72,13 +72,14 @@ Production notes:
 The `dist/` folder is the static site and `api/` is auto-detected as serverless functions; `vercel.json` provides the SPA rewrites that `server.mjs` handles natively when self-hosting.
 Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables. The website's Neon migration `0005_website_leads.sql` is maintained in the companion mobile repository and applied to the dedicated MW Fitness database.
 
-### Stripe Checkout
+### Embedded Stripe Checkout
 
-The website creates a **Stripe-hosted Checkout Session server-side**. The website never collects or stores card numbers or CVCs. The checkout button sends the customer to Stripe's secure payment page.
+The website creates an **embedded Stripe Checkout Session server-side**. Stripe's secure payment form appears inside the website, while Stripe itself collects card and billing details; the website never receives or stores card numbers or CVCs.
 
-Add these server-side environment variables locally and in Vercel:
+Add these environment variables locally and in Vercel:
 
 ```dotenv
+VITE_STRIPE_PUBLISHABLE_KEY=REPLACE_WITH_STRIPE_PUBLISHABLE_KEY
 STRIPE_SECRET_KEY=REPLACE_WITH_STRIPE_SECRET_KEY
 STRIPE_PRICE_ONLINE_WEEKLY=price_REPLACE_WITH_PRICE_ID
 STRIPE_PRICE_ONLINE_12_WEEK=price_REPLACE_WITH_PRICE_ID
@@ -91,15 +92,14 @@ PUBLIC_SITE_URL=https://mwfitnessuk.com
 ```
 
 **Vercel environment setup**
-- **Production:** set `STRIPE_SECRET_KEY` to the Stripe **live secret key** (`sk_live_…`) and set every `STRIPE_PRICE_…` value to the corresponding **live-mode** Price ID from the same Stripe account.
-- **Preview and Development:** use Stripe **test-mode** secret keys (`sk_test_…`) and test-mode Price IDs. Do not use live credentials on preview deployments.
-- Keep the secret key server-side only. Never name it `VITE_STRIPE_SECRET_KEY`, place it in client code, or commit a real key.
+- **Production:** set `VITE_STRIPE_PUBLISHABLE_KEY` to the Stripe live publishable key (`pk_live_…`), `STRIPE_SECRET_KEY` to the live secret key (`sk_live_…`), and every `STRIPE_PRICE_…` value to the corresponding live-mode Price ID from the same Stripe account.
+- **Preview and Development:** use Stripe test-mode publishable keys (`pk_test_…`), secret keys (`sk_test_…`) and test-mode Price IDs. Do not use live credentials on preview deployments.
+- The publishable key is allowed in browser code; keep the secret key server-side only. Never use a `VITE_` prefix for the secret key or commit real credentials.
 - Stripe keys and Price IDs must come from Stripe's dashboard. Placeholder values do not activate payments.
 
-**Current audited Vercel state:** `PUBLIC_SITE_URL` is configured, but no `STRIPE_*` variables were present in the environment-variable listing. Checkout is therefore **not live yet**. Add the real values in Vercel and redeploy the website before testing payment. I have not created fake credentials or changed Vercel environment variables.
+**Current audited Vercel state:** `PUBLIC_SITE_URL` is configured, but no Stripe key or Price ID variables were present in the environment-variable listing. Checkout is therefore **not live yet**. Add the real values in Vercel and redeploy before testing payment. No fake credentials were created.
 
-**Important payment lifecycle gap:** the code creates a Checkout Session, but no verified Stripe webhook currently records a payment and provisions/activates the purchased membership. Checkout can take a customer to Stripe once configured, but do not claim automated paid access, membership activation or receipts until the signed webhook and idempotent membership lifecycle is implemented and tested.
-
+**Important payment lifecycle gap:** the embedded checkout session is prepared, but no verified webhook currently records a payment and provisions/activates the purchased membership. Do not claim automatic paid access, membership activation or receipts until the signed webhook and idempotent membership lifecycle is implemented and tested.
 
 ## Content & staff controls
 
