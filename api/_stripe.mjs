@@ -45,7 +45,7 @@ export function resolveCheckoutMode() {
   return { mode: 'stripe', publishableKey, secretKey, livemode: production };
 }
 
-export async function createCheckoutSession({ planId, origin, customerEmail, customerName }) {
+export async function createCheckoutSession({ planId, origin, customerEmail, customerName, expectedAmount }) {
   const priceEnv = PLAN_PRICE_ENV[planId];
   if (!priceEnv) throw new Error('Invalid coaching plan.');
 
@@ -73,6 +73,12 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
   if (!priceResponse.ok) throw new Error(price?.error?.message || 'Stripe could not verify the configured Price ID.');
   if (price.livemode !== livemode) {
     throw new Error('The configured Stripe Price ID does not match this environment’s key mode.');
+  }
+  if (!Number.isFinite(expectedAmount) || expectedAmount < 0) {
+    throw new Error('The active website plan price could not be verified.');
+  }
+  if (price.currency !== 'gbp' || price.unit_amount !== Math.round(expectedAmount * 100)) {
+    throw new Error('The configured Stripe Price amount does not match the active website plan price.');
   }
 
   const params = new URLSearchParams({
