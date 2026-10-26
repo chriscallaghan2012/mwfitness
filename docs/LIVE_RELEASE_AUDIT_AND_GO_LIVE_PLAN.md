@@ -26,6 +26,25 @@ The audit found no automated test script in either repository's package scripts.
 | Payments | Not ready for automatic paid membership activation until verified webhook lifecycle is complete | Test Stripe events, idempotency, membership provisioning, failures and refunds. |
 | Release approval | Not ready to sign off | Complete all applicable P0 gates and record an explicit go/no-go decision. |
 
+## Progress while working through this checklist (2026-10-26)
+
+Work prepared on the review branch `release/staff-hq-tests-and-fixes` (not merged or deployed):
+- Added `npm test` and a Node/tsx test suite for Staff HQ demo data operations: seed/read, create-update-delete, embedded relations, demo reset isolation and unknown-table errors.
+- Fixed plan deletion feedback so Staff HQ checks the returned deleted row instead of reporting success merely because the request had no API error. This matters when Neon RLS blocks a delete and returns zero affected rows.
+- Added [the repeatable release test runbook](./RELEASE_TEST_RUNBOOK.md), including safe demo testing, disposable Neon-branch integration tests, device checks and release gates.
+
+Work prepared on the mobile review branch `release/neon-schema-contract-tests` (not merged or released):
+- Added a no-new-dependency `npm test` command and schema-contract tests that compare mobile read/write fields with the SQL migrations.
+- The current `src/lib/remote.ts` already uses the migration-aligned calendar, progress-photo, weigh-in and cardio fields described in the older `MW-FITNESS-LIVE-NEON-PLAN.md`. Treat that older document's mismatch bullets as historical until the new tests and live round-trip tests are run; do not assume those issues remain present in current source.
+
+**Execution status:** I could not run `npm ci`, tests, TypeScript or production builds from this environment because repository cloning/network resolution is unavailable here. The new tests are authored but are **not yet reported as passing**. Run the commands in the runbook on your machine and capture their output against these exact branches before merging.
+
+**Still outstanding in this scope:**
+- Website PWA support: current source audit did not find a web manifest or service-worker registration; installability/offline behavior is not verified.
+- Live Staff HQ UI CRUD, Neon RLS, and mobile-to-Staff-HQ persistence round trips using dedicated test accounts and a disposable Neon branch.
+- Fresh Android native build and physical-device verification. Mobile branding assets are intentionally deferred at the user's request.
+- Stripe webhook/idempotency and paid membership provisioning, email delivery, production browser/HTTP smoke tests, rollback and explicit go/no-go.
+
 ## 1. Scope and release principles
 
 This plan covers:
