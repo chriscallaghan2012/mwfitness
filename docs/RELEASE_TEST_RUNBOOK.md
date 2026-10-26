@@ -14,7 +14,7 @@ npm run build
 ```
 
 Expected:
-- `npm test` runs the Staff HQ demo data-layer tests, public API guard/mount tests and PWA configuration checks using Node's test runner through the existing `tsx` dependency.
+- `npm test` runs Staff HQ demo-data regression tests, public API guard/mount tests, PWA configuration checks, mocked Stripe session tests, and the Neon integration test when `RELEASE_TEST_DATABASE_URL` is provided.
 - `npm run lint` runs the TypeScript check.
 - `npm run build` creates the Vite production build.
 
@@ -29,7 +29,7 @@ Record the branch and commit SHA, Node/npm versions, each command's exit code, a
 - demo reset discarding session changes;
 - explicit error for an unknown table.
 
-These tests exercise the in-memory Staff HQ data client, not the live Neon API, React click flows, RLS, or authentication. They are a foundation, not a replacement for live integration tests.
+These tests exercise the in-memory Staff HQ data client, not live Staff HQ UI flows, RLS or authentication. They are only one layer of coverage.
 
 ## 3. Staff HQ UI test — demo mode
 
@@ -112,3 +112,19 @@ A successful JavaScript export does not prove the native Android app starts corr
 - Explicit go/no-go approval.
 
 Do not apply migrations, write production test records, run deployments or publish a mobile release as part of this runbook.
+
+## Real Neon CRUD integration test (disposable branch only)
+
+Create a separate Neon branch for release testing and set `RELEASE_TEST_DATABASE_URL` to that branch's connection string. Do not point this variable at the production branch. The test creates one dedicated test table on that disposable branch, inserts/reads/updates/deletes a unique fixture, and cleans up its row. It never falls back to `DATABASE_URL`.
+
+```bash
+RELEASE_TEST_DATABASE_URL='postgresql://...disposable-branch...' npm test
+```
+
+This verifies a real Neon connection and database CRUD, but it does **not** by itself verify Staff HQ's Neon Data API, user authentication, role permissions or RLS. Those require signed-in test accounts and live UI/API tests against disposable records.
+
+## Stripe Checkout tests and configuration
+
+The Stripe unit tests mock Stripe's API; they must not charge a card. For manual payment acceptance, use Stripe test-mode keys and test Price IDs on Preview/Development first. Production must use the matching live publishable key, secret key and Price IDs. The current Vercel audit found no Stripe variables, so live checkout is not yet configured.
+
+Embedded Checkout uses Stripe's payment form inside the website; the browser loads Stripe.js directly from `js.stripe.com`. Card data must never be posted to MW Fitness endpoints or logged by the site.
