@@ -30,6 +30,7 @@ export default async function handler(req, res) {
     let rawBody;
     if (Buffer.isBuffer(req.body)) rawBody = req.body;
     else if (typeof req.body === 'string') rawBody = Buffer.from(req.body);
+    else if (req.body !== undefined && req.body !== null) throw new Error('Raw request body is unavailable.');
     else {
       const chunks = [];
       for await (const chunk of req) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
@@ -40,19 +41,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ ok: false, error: 'Invalid Stripe webhook signature.' });
     }
     const event = JSON.parse(rawBody.toString('utf8'));
-    return await recordStripeEvent(event, res);
+    return await recordStripeEvent(event, res, configuration.livemode);
   } catch (error) {
     console.error('[MW Fitness] Stripe webhook processing failed:', error instanceof Error ? error.message : 'Unknown error');
     return res.status(500).json({ ok: false, error: 'Stripe event could not be recorded. Stripe will retry.' });
   }
 }
 
-async function recordStripeEvent(event, res) {
+async function recordStripeEvent(event, res, expectedLivemode) {
   if (!event || typeof event.id !== 'string' || typeof event.type !== 'string' || !event.data?.object) {
     return res.status(400).json({ ok: false, error: 'Invalid Stripe webhook event.' });
   }
   const sql = neon(process.env.DATABASE_URL);
   if (event.type === 'charge.refunded') {
+    if (event.livemode !== expectedLivemode) return res.status(400).json({ ok: false, error: 'Stripe event mode does not match this environment.' });
     const charge = event.data.object;
     const paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id;
     if (!paymentIntentId) return res.status(200).json({ received: true, ignored: true });
@@ -87,7 +89,7 @@ async function recordStripeEvent(event, res) {
   if (!email) reasons.push('No customer email was returned by Stripe.');
   if (amountTotal === null || !Number.isInteger(expectedAmount) || amountTotal !== expectedAmount) reasons.push('Paid amount does not match checkout metadata.');
   if (currency !== 'gbp') reasons.push('Payment currency is not GBP.');
-  if (session.livemode !== live) reasons.push('Stripe event live/test mode does not match the deployed environment.');
+  if (session.livemode !== live || event.livemode !== live || expectedLivemode !== live) reasons.push('Stripe event live/test mode does not match the deployed environment.');
   const reviewReason = reasons.length ? reasons.join(' ') : null;
   const status = reviewReason ? 'manual_review' : 'pending_account_link';
   const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id || null;
