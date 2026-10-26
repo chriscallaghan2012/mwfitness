@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MW Fitness">
+  <rect width="512" height="512" rx="72" fill="#0B0C0E"/>
+  <rect x="24" y="24" width="464" height="464" rx="56" fill="#121418" stroke="#FF5500" stroke-width="12"/>
+  <path d="M76 344V166h54l58 88 58-88h54v178h-52V249l-41 62h-37l-42-62v95z" fill="#FF5500"/>
+  <path d="M310 344V166h56l44 67 44-67h2v178h-52V249l-15 22h-38l-15-22v95z" fill="#F3F4F6"/>
+  <path d="M90 394H422" stroke="#FF5500" stroke-width="8" stroke-linecap="square"/>
+  <text x="256" y="445" text-anchor="middle" fill="#F3F4F6" font-family="Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="5">FITNESS</text>
+</svg>
