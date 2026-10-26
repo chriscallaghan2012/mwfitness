@@ -83,3 +83,23 @@ test('Preview health endpoint reports mock checkout without exposing configurati
     assert.equal(JSON.stringify(payload).includes('pk_test_'), false);
   });
 });
+
+test('Configured Stripe checkout fails closed without the database used to verify the active plan', async () => {
+  await withCleanEnv(async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
+    const response = responseDouble();
+    await checkoutHandler({ method: 'POST', body: { planId: 'online-gold-8week' } } as never, response as never);
+    assert.equal(response.statusCode, 503);
+    assert.doesNotMatch(JSON.stringify(response.body), /mock/i);
+  });
+});
+
+test('Checkout API rejects a missing plan ID before attempting any checkout', async () => {
+  await withCleanEnv(async () => {
+    const response = responseDouble();
+    await checkoutHandler({ method: 'POST', body: { customerEmail: 'test@example.com' } } as never, response as never);
+    assert.equal(response.statusCode, 400);
+    assert.match(JSON.stringify(response.body), /valid coaching plan/i);
+  });
+});
