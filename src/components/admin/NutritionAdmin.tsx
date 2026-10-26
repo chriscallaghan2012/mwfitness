@@ -166,16 +166,18 @@ export function NutritionAdmin() {
       setMsg(tErr ? `Could not load meal template: ${tErr.message}` : 'Template not found.');
       return;
     }
-    const { error } = await db.from('nutrition_plans').insert({
+    const { data: assignedRows, error } = await db.from('nutrition_plans').insert({
       profile_id: userId,
       name: String(t.name),
       targets: t.targets,
       sections: t.sections,
       day_type: t.day_type ?? 'training',
       active: true,
-    });
-    setMsg(error ? `Failed: ${error.message}` : `Assigned “${t.name}” ✓`);
-    if (!error) await loadPlans();
+    }).select('id');
+    if (error) { setMsg(`Failed: ${error.message}`); return; }
+    if (!assignedRows?.length) { setMsg('The nutrition template was not assigned. Check staff permissions and retry.'); return; }
+    setMsg(`Assigned “${t.name}” ✓`);
+    await loadPlans();
     } catch { setMsg('Could not assign this template. Check the connection and try again.'); }
     finally { setBusy(false); }
   };
