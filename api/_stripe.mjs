@@ -22,10 +22,12 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
 
   const params = new URLSearchParams({
     mode: 'payment',
+    ui_mode: 'embedded',
     'line_items[0][price]': priceId,
     'line_items[0][quantity]': '1',
-    success_url: `${baseUrl}/#online-coaching?checkout=success`,
-    cancel_url: `${baseUrl}/#online-coaching?checkout=cancelled`,
+    return_url: `${baseUrl}/checkout?checkout=complete&session_id={CHECKOUT_SESSION_ID}`,
+    billing_address_collection: 'auto',
+    'phone_number_collection[enabled]': 'true',
     'metadata[plan_id]': planId,
   });
   if (customerEmail) params.set('customer_email', customerEmail);
@@ -41,5 +43,6 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data?.error?.message || 'Stripe could not create checkout.');
-  return { url: data.url };
+  if (!data.client_secret) throw new Error('Stripe did not return an embedded checkout client secret.');
+  return { clientSecret: data.client_secret };
 }
