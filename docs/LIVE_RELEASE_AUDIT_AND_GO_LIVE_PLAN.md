@@ -30,7 +30,9 @@ The audit found no automated test script in either repository's package scripts.
 
 Work prepared on the review branch `release/staff-hq-tests-and-fixes` (not merged or deployed):
 - Added `npm test` and a Node/tsx test suite for Staff HQ demo data operations: seed/read, create-update-delete, embedded relations, demo reset isolation and unknown-table errors.
-- Fixed plan deletion feedback so Staff HQ checks the returned deleted row instead of reporting success merely because the request had no API error. This matters when Neon RLS blocks a delete and returns zero affected rows.
+- Fixed plan and nutrition-item deletion feedback so Staff HQ checks the returned deleted row instead of reporting success merely because the request had no API error. This matters when Neon RLS blocks a delete and returns zero affected rows.
+- Fixed member-record assignment feedback so memberships, nutrition plans, workout sessions and programme assignments require a returned inserted row before reporting success.
+- A fresh read-only query against the live `mwfitness` Neon branch confirms the enabled `profiles_guard_privileged_changes` and `workout_sessions_guard_member_completion` triggers exist, and the own-profile update policy checks that a user's role remains unchanged. This is schema evidence, not a substitute for runtime role/RLS tests.
 - Added [the repeatable release test runbook](./RELEASE_TEST_RUNBOOK.md), including safe demo testing, disposable Neon-branch integration tests, device checks and release gates.
 - Added website PWA groundwork on this branch: a standalone manifest, square SVG icon, production-only service-worker registration and a worker that does not cache API/cross-origin responses. Browser installability/offline behavior remains unverified.
 
