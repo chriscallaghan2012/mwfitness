@@ -30,7 +30,7 @@ The initial audit found no automated test scripts. Review branches now add websi
 
 Latest checkout work:
 - Replaced the fake disabled card-number/expiry/CVC inputs and misleading 'switch payments on' copy with an embedded Stripe Checkout mount. Stripe.js supplies the payment fields inside the website; the site never handles card numbers or CVCs.
-- Added environment-based checkout modes: Production requires live keys and fails closed when missing; Preview/Development use test keys when configured and fall back to a clearly labelled mock only when both Stripe keys are absent. Partial key pairs and wrong-mode keys fail closed. The API checks the selected Stripe Price object's `livemode` before creating a session.
+- Added environment-based checkout modes: Production requires live keys and fails closed when missing; Preview/Development use test keys when configured and fall back to a clearly labelled mock only when both Stripe keys are absent. Partial key pairs and wrong-mode keys fail closed. For real Stripe sessions, the API verifies the plan is active/online in Neon and checks the selected Stripe Price object's `livemode`, GBP currency and amount against the active database plan before creating a session.
 - Improved checkout input and placeholder contrast.
 - Added a VITE_STRIPE_PUBLISHABLE_KEY placeholder plus server-side secret/Price ID placeholders to .env.example; expanded the health check so checkout is not marked configured until the publishable key, secret and all five active plan Price IDs are present.
 - Added mocked Stripe-session tests, checkout UI regression tests and an optional real Neon CRUD round-trip test that only runs against RELEASE_TEST_DATABASE_URL, never DATABASE_URL.
