@@ -90,6 +90,8 @@ test('Configured Stripe checkout fails closed without the database used to verif
   await withCleanEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_release_placeholder';
+    process.env.STRIPE_PAYMENT_LEDGER_ENABLED = 'true';
     const response = responseDouble();
     await checkoutHandler({ method: 'POST', body: { planId: 'online-gold-8week' } } as never, response as never);
     assert.equal(response.statusCode, 503);
