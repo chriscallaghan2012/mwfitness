@@ -14,7 +14,7 @@ npm run build
 ```
 
 Expected:
-- `npm test` runs Staff HQ demo-data regression tests, public API guard/mount tests, PWA configuration checks, mocked Stripe session tests, checkout UI regression tests, and the Neon integration test when `RELEASE_TEST_DATABASE_URL` is provided.
+- `npm test` runs Staff HQ demo-data regression tests, public API guard/mount tests, PWA configuration checks, mocked Stripe session and checkout API mode tests, checkout UI regression tests, and the Neon integration test when `RELEASE_TEST_DATABASE_URL` is provided.
 - `npm run lint` runs the TypeScript check.
 - `npm run build` creates the Vite production build.
 
@@ -115,7 +115,7 @@ Do not apply migrations, write production test records, run deployments or publi
 
 ## Real Neon CRUD integration test (disposable branch only)
 
-Create a separate Neon branch for release testing and set `RELEASE_TEST_DATABASE_URL` to that branch's connection string. Do not point this variable at the production branch. The test creates one dedicated test table on that disposable branch, inserts/reads/updates/deletes a unique fixture, and cleans up its row. It never falls back to `DATABASE_URL`.
+Create a separate Neon branch for release testing and set `RELEASE_TEST_DATABASE_URL` to that branch's connection string. Do not point this variable at the production branch. If `DATABASE_URL` is available in the test process, the test also checks that the hostname differs. The test creates one dedicated test table on that disposable branch, inserts/reads/updates/deletes a unique fixture, and cleans up its row. It never falls back to `DATABASE_URL`.
 
 ```bash
 RELEASE_TEST_DATABASE_URL='postgresql://...disposable-branch...' npm test
