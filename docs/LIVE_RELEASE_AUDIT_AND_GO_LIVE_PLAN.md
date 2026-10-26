@@ -35,7 +35,8 @@ Latest checkout work:
 - Added a VITE_STRIPE_PUBLISHABLE_KEY placeholder plus server-side secret/Price ID placeholders to .env.example; expanded the health check so checkout is not marked configured until the publishable key, secret and all five active plan Price IDs are present.
 - Added mocked Stripe-session tests, checkout UI regression tests and an optional real Neon CRUD round-trip test that only runs against RELEASE_TEST_DATABASE_URL, never DATABASE_URL.
 - Read-only Vercel environment listing found PUBLIC_SITE_URL and DATABASE_URL, but no Stripe key or Price ID variables. Preview can use mock checkout until test credentials exist; Production remains unavailable until the owner adds real live keys and live Price IDs in Production. Do not create dummy Stripe environment values.
-- Embedded checkout and the environment-safe mock fallback are now in `main` but have not been run or deployed against a verified candidate build. A signed Stripe webhook and idempotent payment-to-membership provisioning remain a separate go-live blocker.
+- PR #138 is merged into `main` at `1dbb45c7eb600f9a5c585a03c7212a86b5de39a8`. Vercel created production deployment `mwfitness-1h2l3hxne-cjc101187s-projects.vercel.app` with state `READY`; the Vite build completed. This is build evidence only, not browser/runtime/functional verification. Vite warned that the minified JavaScript bundle is about 839 kB, above the 500 kB warning threshold.
+- A follow-up branch `release/post-merge-audit-and-payment-lifecycle` adds a prepared server-only payment ledger migration, signed Stripe webhook recording, refund reconciliation, checkout return status verification and a fail-closed payment-ledger environment gate. These changes are not merged/deployed, and the migration is not applied. The webhook records paid sessions as pending account linking/manual review; it does not grant membership access. Automated tests and `npm run lint` remain unrun.
 
 
 The work from `release/staff-hq-tests-and-fixes` was squash-merged into `main` on 2026-10-26 as `1dbb45c7eb600f9a5c585a03c7212a86b5de39a8`. Vercel reported a pending status for that commit at the time of the follow-up audit; automated tests/build have not been run or verified. Further review work is being prepared separately on `release/post-merge-audit-and-payment-lifecycle` (not merged or deployed):
@@ -263,7 +264,7 @@ Changing a PNG in source does not update an already installed app. A fresh nativ
 
 ## 8. Payments and membership activation (separate gate)
 
-The website now prepares an embedded Stripe Checkout Session, but no Stripe credentials or Price IDs are configured in Vercel, and verified webhook processing/automatic membership activation are not complete. The UI/session code is not proof of live payments. Do not take real payments until the correct live environment values are configured, the test-mode flow passes, and the signed webhook plus idempotent payment-to-membership lifecycle is implemented and verified.
+The website now prepares embedded Stripe Checkout, but no Stripe keys or Price IDs were present in the last Vercel environment audit. Production deployment is READY, but functional smoke tests have not been run. The follow-up branch prepares a signed webhook and payment ledger; its migration is not applied and its endpoint is not deployed/configured. Real checkout now also requires `STRIPE_WEBHOOK_SECRET` and `STRIPE_PAYMENT_LEDGER_ENABLED=true`. Keep the gate disabled until the ledger and webhook are verified. Account linking and idempotent membership provisioning remain incomplete; do not accept live payments.
 
 - [ ] Add Stripe test-mode publishable/secret keys and matching test Price IDs to Preview/Development only.
 - [ ] Test embedded checkout in Stripe test mode.
