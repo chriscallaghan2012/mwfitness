@@ -37,7 +37,9 @@ test('checkout status confirms paid state without exposing customer details', as
       mode: 'payment',
       livemode: false,
       payment_status: 'paid',
-      metadata: { plan_id: 'online-gold-8week' },
+      metadata: { plan_id: 'online-gold-8week', expected_amount_pence: '39999' },
+      amount_total: 39999,
+      currency: 'gbp',
       customer_details: { email: 'private@example.com' },
     }), { status: 200, headers: { 'Content-Type': 'application/json' } })) as typeof fetch;
     try {
@@ -49,6 +51,23 @@ test('checkout status confirms paid state without exposing customer details', as
     } finally {
       globalThis.fetch = originalFetch;
     }
+  });
+});
+
+test('checkout status flags a paid session with the wrong amount for manual review', async () => {
+  await withTestStripe(async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async () => new Response(JSON.stringify({
+      id: 'cs_test_release123', mode: 'payment', livemode: false, payment_status: 'paid',
+      metadata: { plan_id: 'online-gold-8week', expected_amount_pence: '39999' },
+      amount_total: 29999, currency: 'gbp',
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } })) as typeof fetch;
+    try {
+      const response = responseDouble();
+      await handler({ method: 'GET', query: { session_id: 'cs_test_release123' } } as never, response as never);
+      assert.equal(response.statusCode, 200);
+      assert.deepEqual(response.body, { ok: true, status: 'review', planId: 'online-gold-8week', membership: 'pending_account_link' });
+    } finally { globalThis.fetch = originalFetch; }
   });
 });
 
