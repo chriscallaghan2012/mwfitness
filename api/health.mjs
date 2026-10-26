@@ -6,6 +6,7 @@ function emailConfigured() {
 
 function checkoutConfigured() {
   return Boolean(
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY &&
     process.env.STRIPE_SECRET_KEY &&
     process.env.STRIPE_PRICE_ONLINE_WEEKLY &&
     process.env.STRIPE_PRICE_ONLINE_12_WEEK &&
