@@ -128,3 +128,14 @@ This verifies a real Neon connection and database CRUD, but it does **not** by i
 The Stripe unit tests mock Stripe's API; they must not charge a card. For manual payment acceptance, use Stripe test-mode keys and test Price IDs on Preview/Development first. Production must use the matching live publishable key, secret key and Price IDs. The current Vercel audit found no Stripe variables, so live checkout is not yet configured.
 
 Embedded Checkout uses Stripe's payment form inside the website; the browser loads Stripe.js directly from `js.stripe.com`. Card data must never be posted to MW Fitness endpoints or logged by the site.
+
+Manual embedded checkout acceptance checklist:
+- [ ] Confirm the form renders inside `/checkout` and does not redirect to a separate Stripe-hosted page for the standard card flow.
+- [ ] Confirm card number, expiry, CVC and billing fields are rendered by Stripe, not ordinary MW Fitness `<input>` elements.
+- [ ] Confirm the name/email placeholders are readable and form borders/focus states have sufficient contrast.
+- [ ] Confirm the amount and selected package match the matching Stripe Price in the current environment.
+- [ ] Complete a Stripe test-mode payment with a Stripe test card; never use real card details in test mode.
+- [ ] Exercise a declined test card and a redirect/3DS flow; verify clear recovery and that the selected package is restored after returning.
+- [ ] Confirm a failed checkout never reports payment success or activates a membership.
+- [ ] Verify no card details, Stripe client secret or secret API key are written to app logs or MW Fitness API requests.
+- [ ] Do not test live charges until the webhook, idempotent payment record and membership activation flow are complete and explicitly approved.
