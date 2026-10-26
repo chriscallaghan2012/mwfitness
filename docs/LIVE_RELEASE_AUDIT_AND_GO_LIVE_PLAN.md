@@ -8,7 +8,7 @@
 
 **Do not sign off the complete system for production use yet.** The website has a Vercel deployment marked READY, and the production Neon schema contains many expected tables. That does not prove that every route, Staff HQ mutation, role boundary, mobile save, native build or payment flow works end to end.
 
-The initial audit found no automated test scripts. Review branches now add starter website/demo and mobile schema-contract suites, but those suites have not yet been run. Staff HQ live CRUD, authorization, mobile-to-Neon round trips, and fresh Android build/device verification still need explicit evidence before release approval.
+The initial audit found no automated test scripts. Review branches now add website demo-data regression tests, a real Neon CRUD integration test gated by RELEASE_TEST_DATABASE_URL, mocked Stripe session tests and mobile schema-contract tests. None have been run in this environment. Staff HQ live CRUD/RLS, mobile-to-Neon round trips and fresh Android build/device verification still need explicit evidence before release approval.
 
 ### Current status snapshot
 
@@ -27,6 +27,15 @@ The initial audit found no automated test scripts. Review branches now add start
 | Release approval | Not ready to sign off | Complete all applicable P0 gates and record an explicit go/no-go decision. |
 
 ## Progress while working through this checklist (2026-10-26)
+
+Latest checkout work:
+- Replaced the fake disabled card-number/expiry/CVC inputs and misleading 'switch payments on' copy with an embedded Stripe Checkout mount. Stripe.js supplies the payment fields inside the website; the site never handles card numbers or CVCs.
+- Improved checkout input and placeholder contrast.
+- Added a VITE_STRIPE_PUBLISHABLE_KEY placeholder plus server-side secret/Price ID placeholders to .env.example; expanded the health check so checkout is not marked configured until the publishable key, secret and all seven current plan Price IDs are present.
+- Added mocked Stripe-session tests and an optional real Neon CRUD round-trip test that only runs against RELEASE_TEST_DATABASE_URL, never DATABASE_URL.
+- Read-only Vercel environment listing found PUBLIC_SITE_URL and DATABASE_URL, but no Stripe key or Price ID variables. Do not create dummy Stripe environment values: real test/live values must be added by the owner in the correct Vercel environment.
+- Embedded checkout code is prepared but has not been run or deployed. A signed Stripe webhook and idempotent payment-to-membership provisioning remain a separate go-live blocker.
+
 
 Work prepared on the review branch `release/staff-hq-tests-and-fixes` (not merged or deployed):
 - Added `npm test` and a Node/tsx test suite for Staff HQ demo data operations: seed/read, create-update-delete, embedded relations, demo reset isolation and unknown-table errors.
@@ -253,9 +262,10 @@ Changing a PNG in source does not update an already installed app. A fresh nativ
 
 ## 8. Payments and membership activation (separate gate)
 
-The audit's existing documentation indicates Stripe checkout-session creation exists, but verified webhook processing and automatic membership activation are not complete. Do not enable the complete paid-member lifecycle until this gate passes.
+The website now prepares an embedded Stripe Checkout Session, but no Stripe credentials or Price IDs are configured in Vercel, and verified webhook processing/automatic membership activation are not complete. The UI/session code is not proof of live payments. Do not take real payments until the correct live environment values are configured, the test-mode flow passes, and the signed webhook plus idempotent payment-to-membership lifecycle is implemented and verified.
 
-- [ ] Test checkout in Stripe test mode.
+- [ ] Add Stripe test-mode publishable/secret keys and matching test Price IDs to Preview/Development only.
+- [ ] Test embedded checkout in Stripe test mode.
 - [ ] Test success, cancellation and payment failure.
 - [ ] Verify signed webhook events.
 - [ ] Make event processing idempotent.
@@ -264,6 +274,7 @@ The audit's existing documentation indicates Stripe checkout-session creation ex
 - [ ] Test account setup and access to purchased coaching.
 - [ ] Test refunds and relevant failure cases.
 - [ ] Prove browser redirects alone cannot grant paid access.
+- [ ] Add live publishable/secret keys and matching live Price IDs to Vercel Production only.
 - [ ] Confirm live Stripe configuration and operational ownership before enabling live payments.
 
 ## 9. Phased go-live checklist
