@@ -125,11 +125,16 @@ This verifies a real Neon connection and database CRUD, but it does **not** by i
 
 ## Stripe Checkout tests and configuration
 
-The Stripe unit tests mock Stripe's API; they must not charge a card. For manual payment acceptance, use Stripe test-mode keys and test Price IDs on Preview/Development first. Production must use the matching live publishable key, secret key and Price IDs. The current Vercel audit found no Stripe variables, so live checkout is not yet configured.
+The Stripe unit tests mock Stripe's API; they must not charge a card. Preview/Development without either Stripe key must use the clearly labelled mock simulation; it must never create a Stripe session, claim a payment succeeded, or activate a membership. When configured, Preview/Development must use matching test publishable/secret keys and test Price IDs. Production must use matching live keys and live Price IDs and must fail closed when keys are missing. Live keys are rejected outside Production. The API retrieves each selected Price and checks its `livemode` flag before creating a session. The current Vercel audit found no Stripe variables, so Production checkout is not yet configured.
 
 Embedded Checkout uses Stripe's payment form inside the website; the browser loads Stripe.js directly from `js.stripe.com`. Card data must never be posted to MW Fitness endpoints or logged by the site.
 
 Manual embedded checkout acceptance checklist:
+- [ ] On a Preview deployment with both Stripe keys absent, continue checkout and verify the explicit “Preview mock checkout” panel appears.
+- [ ] Verify mock checkout says no payment was taken and no membership/access was activated; verify no Stripe session is created.
+- [ ] Verify Production with missing Stripe keys reports checkout unavailable and never shows mock checkout.
+- [ ] Verify a partial key pair or live keys in Preview fails closed instead of falling back to mock.
+- [ ] Verify a Price ID whose Stripe `livemode` does not match the configured key mode is rejected before a Checkout Session is created.
 - [ ] Confirm the form renders inside `/checkout` and does not redirect to a separate Stripe-hosted page for the standard card flow.
 - [ ] Confirm card number, expiry, CVC and billing fields are rendered by Stripe, not ordinary MW Fitness `<input>` elements.
 - [ ] Confirm the name/email placeholders are readable and form borders/focus states have sufficient contrast.
