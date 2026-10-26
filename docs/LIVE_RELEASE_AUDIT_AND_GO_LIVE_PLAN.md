@@ -32,6 +32,7 @@ Work prepared on the review branch `release/staff-hq-tests-and-fixes` (not merge
 - Added `npm test` and a Node/tsx test suite for Staff HQ demo data operations: seed/read, create-update-delete, embedded relations, demo reset isolation and unknown-table errors.
 - Fixed plan deletion feedback so Staff HQ checks the returned deleted row instead of reporting success merely because the request had no API error. This matters when Neon RLS blocks a delete and returns zero affected rows.
 - Added [the repeatable release test runbook](./RELEASE_TEST_RUNBOOK.md), including safe demo testing, disposable Neon-branch integration tests, device checks and release gates.
+- Added website PWA groundwork on this branch: a standalone manifest, square SVG icon, production-only service-worker registration and a worker that does not cache API/cross-origin responses. Browser installability/offline behavior remains unverified.
 
 Work prepared on the mobile review branch `release/neon-schema-contract-tests` (not merged or released):
 - Added a no-new-dependency `npm test` command and schema-contract tests that compare mobile read/write fields with the SQL migrations.
@@ -40,7 +41,7 @@ Work prepared on the mobile review branch `release/neon-schema-contract-tests` (
 **Execution status:** I could not run `npm ci`, tests, TypeScript or production builds from this environment because repository cloning/network resolution is unavailable here. The new tests are authored but are **not yet reported as passing**. Run the commands in the runbook on your machine and capture their output against these exact branches before merging.
 
 **Still outstanding in this scope:**
-- Website PWA support: current source audit did not find a web manifest or service-worker registration; installability/offline behavior is not verified.
+- Website PWA verification: manifest, icon and service-worker registration are now prepared on the review branch; installability, offline fallback, cache refresh and real-browser behavior still need testing.
 - Live Staff HQ UI CRUD, Neon RLS, and mobile-to-Staff-HQ persistence round trips using dedicated test accounts and a disposable Neon branch.
 - Fresh Android native build and physical-device verification. Mobile branding assets are intentionally deferred at the user's request.
 - Stripe webhook/idempotency and paid membership provisioning, email delivery, production browser/HTTP smoke tests, rollback and explicit go/no-go.
