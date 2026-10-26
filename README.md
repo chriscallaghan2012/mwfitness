@@ -81,6 +81,8 @@ Add these environment variables locally and in Vercel:
 ```dotenv
 VITE_STRIPE_PUBLISHABLE_KEY=REPLACE_WITH_STRIPE_PUBLISHABLE_KEY
 STRIPE_SECRET_KEY=REPLACE_WITH_STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET=REPLACE_WITH_STRIPE_WEBHOOK_SIGNING_SECRET
+STRIPE_PAYMENT_LEDGER_ENABLED=false
 STRIPE_PRICE_ONLINE_WEEKLY=price_REPLACE_WITH_PRICE_ID
 STRIPE_PRICE_ONLINE_12_WEEK=price_REPLACE_WITH_PRICE_ID
 STRIPE_PRICE_ONLINE_4_WEEK_ONCE=price_REPLACE_WITH_PRICE_ID
@@ -95,13 +97,16 @@ PUBLIC_SITE_URL=https://mwfitnessuk.com
 - **Production:** set `VITE_STRIPE_PUBLISHABLE_KEY` to the Stripe live publishable key (`pk_live_…`), `STRIPE_SECRET_KEY` to the live secret key (`sk_live_…`), and every active `STRIPE_PRICE_…` value to the corresponding live-mode Price ID from the same Stripe account. Missing keys fail closed; production never falls back to mock checkout.
 - **Preview and Development:** when Stripe is configured, use matching test-mode publishable keys (`pk_test_…`), secret keys (`sk_test_…`) and test-mode Price IDs. Live keys are rejected outside Production.
 - **Preview/Development without keys:** if both Stripe keys are absent, checkout presents an explicitly labelled mock simulation—even if Price IDs were added. It creates no Stripe session, takes no payment and activates no membership. If only one key is set or keys use the wrong mode, checkout fails closed instead of silently mocking.
+- **Payment safety gate:** real checkout also requires `STRIPE_WEBHOOK_SECRET` and `STRIPE_PAYMENT_LEDGER_ENABLED=true`. Keep the flag false until the `stripe_payment_records` migration is applied to the same Neon branch, the matching signed webhook is configured, and test events are confirmed in the ledger. This gate prevents taking payments before the receipt ledger is ready.
 - Before real checkout, the API verifies the selected plan is still active and is an online coaching plan in Neon. It retrieves the selected Stripe Price, checks its `livemode` flag against the environment's key mode, and checks that the Stripe amount/currency match the active plan price before creating a Checkout Session.
 - The publishable key is allowed in browser code; keep the secret key server-side only. Never use a `VITE_` prefix for the secret key or commit real credentials.
+- Configure Stripe webhook endpoint `/api/stripe-webhook` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `charge.refunded`. Use the endpoint's signing secret in `STRIPE_WEBHOOK_SECRET`; test and live endpoints have different signing secrets.
+- `/api/checkout-status` verifies a returned Checkout Session directly with Stripe and does not expose customer details. A paid status still says account linking/membership activation is pending; the webhook ledger deliberately does not grant access automatically.
 - Stripe keys and Price IDs must come from Stripe's dashboard. Placeholder values do not activate payments.
 
 **Current audited Vercel state:** `PUBLIC_SITE_URL` is configured, but no Stripe key or Price ID variables were present in the environment-variable listing. Preview can use mock checkout until test credentials exist; Production checkout remains unavailable until live credentials and Price IDs are configured. No fake credentials were created.
 
-**Important payment lifecycle gap:** the embedded checkout session is prepared, but no verified webhook currently records a payment and provisions/activates the purchased membership. Do not claim automatic paid access, membership activation or receipts until the signed webhook and idempotent membership lifecycle is implemented and tested.
+**Important payment lifecycle gap:** a signed webhook and payment ledger are being prepared on a follow-up branch, but its migration is not applied and the endpoint is not deployed/configured. Even after ledger verification, the webhook records a paid purchase as pending account linking/manual review; it does not grant membership access automatically. Do not enable real checkout until the ledger migration, webhook and idempotent account-linking/provisioning flow have been reviewed and verified.
 
 ## Content & staff controls
 
