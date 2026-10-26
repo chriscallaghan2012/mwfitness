@@ -72,25 +72,34 @@ Production notes:
 The `dist/` folder is the static site and `api/` is auto-detected as serverless functions; `vercel.json` provides the SPA rewrites that `server.mjs` handles natively when self-hosting.
 Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables. The website's Neon migration `0005_website_leads.sql` is maintained in the companion mobile repository and applied to the dedicated MW Fitness database.
 
-### Stripe checkout
+### Stripe Checkout
 
-Create two one-time Prices in Stripe for the online coaching offer, then add these environment variables locally and in Vercel:
+The website creates a **Stripe-hosted Checkout Session server-side**. The website never collects or stores card numbers or CVCs. The checkout button sends the customer to Stripe's secure payment page.
 
+Add these server-side environment variables locally and in Vercel:
+
+```dotenv
+STRIPE_SECRET_KEY=REPLACE_WITH_STRIPE_SECRET_KEY
+STRIPE_PRICE_ONLINE_WEEKLY=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_12_WEEK=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_4_WEEK_ONCE=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_BRONZE_4WEEK=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_SILVER_8WEEK=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_GOLD_8WEEK=price_REPLACE_WITH_PRICE_ID
+STRIPE_PRICE_ONLINE_PLATINUM_8WEEK=price_REPLACE_WITH_PRICE_ID
+PUBLIC_SITE_URL=https://mwfitnessuk.com
 ```
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PRICE_ONLINE_WEEKLY=price_...
-STRIPE_PRICE_ONLINE_12_WEEK=price_...
-STRIPE_PRICE_ONLINE_4_WEEK_ONCE=price_...
-STRIPE_PRICE_ONLINE_BRONZE_4WEEK=price_...
-STRIPE_PRICE_ONLINE_SILVER_8WEEK=price_...
-STRIPE_PRICE_ONLINE_GOLD_8WEEK=price_...
-STRIPE_PRICE_ONLINE_PLATINUM_8WEEK=price_...
-PUBLIC_SITE_URL=https://your-domain.example
-```
 
-The online coaching page creates a Stripe Checkout session server-side. Keep `STRIPE_SECRET_KEY` server-only and never expose it through Vite/client environment variables.
+**Vercel environment setup**
+- **Production:** set `STRIPE_SECRET_KEY` to the Stripe **live secret key** (`sk_live_…`) and set every `STRIPE_PRICE_…` value to the corresponding **live-mode** Price ID from the same Stripe account.
+- **Preview and Development:** use Stripe **test-mode** secret keys (`sk_test_…`) and test-mode Price IDs. Do not use live credentials on preview deployments.
+- Keep the secret key server-side only. Never name it `VITE_STRIPE_SECRET_KEY`, place it in client code, or commit a real key.
+- Stripe keys and Price IDs must come from Stripe's dashboard. Placeholder values do not activate payments.
 
-> **Known gap:** checkout session creation is the only Stripe step implemented. No webhook provisions a membership, creates a payment record or activates an account, and no Stripe credentials are configured yet — do not promise automatic signup, activation or receipts from checkout.
+**Current audited Vercel state:** `PUBLIC_SITE_URL` is configured, but no `STRIPE_*` variables were present in the environment-variable listing. Checkout is therefore **not live yet**. Add the real values in Vercel and redeploy the website before testing payment. I have not created fake credentials or changed Vercel environment variables.
+
+**Important payment lifecycle gap:** the code creates a Checkout Session, but no verified Stripe webhook currently records a payment and provisions/activates the purchased membership. Checkout can take a customer to Stripe once configured, but do not claim automated paid access, membership activation or receipts until the signed webhook and idempotent membership lifecycle is implemented and tested.
+
 
 ## Content & staff controls
 
