@@ -34,6 +34,14 @@ ALTER TABLE public.stripe_payment_records ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.stripe_payment_records FROM PUBLIC;
 REVOKE ALL ON TABLE public.stripe_payment_records FROM anon;
 REVOKE ALL ON TABLE public.stripe_payment_records FROM authenticated;
+GRANT SELECT ON TABLE public.stripe_payment_records TO authenticated;
+
+DROP POLICY IF EXISTS stripe_payment_records_admin_select ON public.stripe_payment_records;
+CREATE POLICY stripe_payment_records_admin_select
+  ON public.stripe_payment_records
+  FOR SELECT
+  TO authenticated
+  USING (public.is_platform_admin());
 
 COMMENT ON TABLE public.stripe_payment_records IS
   'Server-only ledger of Stripe-paid checkout sessions; does not itself grant coaching membership access.';
