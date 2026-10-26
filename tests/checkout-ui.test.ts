@@ -22,7 +22,7 @@ test('server creates embedded Checkout sessions and never returns a hosted redir
   const stripe = readFileSync(join(root, 'api', '_stripe.mjs'), 'utf8');
   assert.match(stripe, /ui_mode: 'embedded'/);
   assert.match(stripe, /return_url:/);
-  assert.match(stripe, /return \{ clientSecret: data\.client_secret \}/);
+  assert.match(stripe, /return \{ mode: 'stripe', clientSecret: data\.client_secret, publishableKey \}/);
   assert.doesNotMatch(stripe, /success_url:/);
   assert.doesNotMatch(stripe, /return \{ url: data\.url \}/);
 });
