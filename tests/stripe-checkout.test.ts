@@ -31,7 +31,7 @@ async function withCleanStripeEnv(run: () => Promise<void>) {
   }
 }
 
-test('Preview falls back to an explicit mock only when no Stripe configuration exists', async () => {
+test('Preview falls back to an explicit mock when both Stripe keys are absent', async () => {
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_configured_without_keys';
     assert.deepEqual(resolveCheckoutMode(), { mode: 'mock' });
