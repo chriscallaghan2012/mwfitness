@@ -6,10 +6,8 @@ export default async function handler(req, res) {
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     // Use the canonical server-configured site URL, never a caller-controlled Origin header.
+    // Mock checkout does not need a site URL; Stripe mode validates it server-side.
     const origin = process.env.PUBLIC_SITE_URL;
-    if (!origin || !/^https:\/\//i.test(origin)) {
-      return res.status(503).json({ ok: false, error: 'Online checkout is temporarily unavailable. Please contact MW Fitness.' });
-    }
     const result = await createCheckoutSession({
       planId: body?.planId,
       origin,
