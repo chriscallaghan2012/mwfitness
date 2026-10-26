@@ -18,7 +18,9 @@ function checkoutStatus() {
     ];
     const hasPrices = requiredActivePrices.every((key) => Boolean(process.env[key]));
     const hasSiteUrl = Boolean(process.env.PUBLIC_SITE_URL || process.env.VERCEL_URL);
-    return hasPrices && hasSiteUrl ? 'configured' : 'misconfigured';
+    const hasWebhook = Boolean(process.env.STRIPE_WEBHOOK_SECRET);
+    const ledgerEnabled = process.env.STRIPE_PAYMENT_LEDGER_ENABLED === 'true';
+    return hasPrices && hasSiteUrl && hasWebhook && ledgerEnabled ? 'configured' : 'misconfigured';
   } catch {
     return 'misconfigured';
   }
