@@ -8,8 +8,6 @@ const PLAN_PRICE_ENV = {
   'online-platinum-8week': 'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
 };
 
-const STRIPE_PRICE_ENV_KEYS = Object.values(PLAN_PRICE_ENV);
-
 function isProductionEnvironment() {
   if (process.env.VERCEL_ENV) return process.env.VERCEL_ENV === 'production';
   return process.env.NODE_ENV === 'production';
