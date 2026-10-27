@@ -42,3 +42,20 @@ test('Staff HQ exposes a read-only payment ledger and never reads it in demo mod
   assert.match(screen, /does not grant coaching access automatically/);
   assert.match(admin, /<PaymentsAdmin \/>/);
 });
+
+
+test('Stripe webhook passes the resolved environment mode to the event recorder', () => {
+  const webhook = readFileSync(join(root, 'api', 'stripe-webhook.mjs'), 'utf8');
+  assert.match(webhook, /const config = resolveCheckoutMode\(\)/);
+  assert.match(webhook, /recordStripeEvent\(event, res, config\.livemode\)/);
+  assert.doesNotMatch(webhook, /recordStripeEvent\(event, res, configuration\.livemode\)/);
+});
+
+test('self-hosted server preserves raw Stripe webhook bytes and exposes payment status', () => {
+  const server = readFileSync(join(root, 'server.mjs'), 'utf8');
+  const rawWebhookRoute = server.indexOf("app.post('/api/stripe-webhook', express.raw(");
+  const jsonParser = server.indexOf('app.use(express.json(');
+  assert.notEqual(rawWebhookRoute, -1, 'self-hosted Stripe webhook route must exist');
+  assert.ok(rawWebhookRoute < jsonParser, 'raw-body webhook route must be registered before JSON parsing');
+  assert.match(server, /app.get\('\/api\/checkout-status', checkoutStatus\)/);
+});
