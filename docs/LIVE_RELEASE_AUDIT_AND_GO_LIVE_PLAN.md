@@ -26,6 +26,13 @@ The initial audit found no automated test scripts. Review branches now add websi
 | Payments | Not ready for automatic paid membership activation until verified webhook lifecycle is complete | Test Stripe events, idempotency, membership provisioning, failures and refunds. |
 | Release approval | Not ready to sign off | Complete all applicable P0 gates and record an explicit go/no-go decision. |
 
+## Follow-up code review (2026-10-27)
+
+- Fixed a source-level Stripe webhook defect: the handler resolved checkout configuration into `config` but passed the undefined identifier `configuration.livemode` into event recording. It now passes `config.livemode`.
+- Wired the self-hosted Express server's `/api/stripe-webhook` route using `express.raw()` before the global JSON parser, so signature verification can receive the original request bytes. Also wired `GET /api/checkout-status` in the self-hosted server.
+- Added regression assertions for the webhook mode variable and self-hosted route/body-parser order.
+- These changes are on `release/post-merge-audit-and-payment-lifecycle` only. They have **not** been merged or deployed. The test suite has **not** been executed in this environment, so these are code changes and authored regression checks—not a test pass.
+
 ## Progress while working through this checklist (2026-10-26)
 
 Latest checkout work:
