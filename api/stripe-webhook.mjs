@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ ok: false, error: 'Invalid Stripe webhook signature.' });
     }
     const event = JSON.parse(rawBody.toString('utf8'));
-    return await recordStripeEvent(event, res, configuration.livemode);
+    return await recordStripeEvent(event, res, config.livemode);
   } catch (error) {
     console.error('[MW Fitness] Stripe webhook processing failed:', error instanceof Error ? error.message : 'Unknown error');
     return res.status(500).json({ ok: false, error: 'Stripe event could not be recorded. Stripe will retry.' });
