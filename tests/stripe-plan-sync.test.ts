@@ -37,7 +37,7 @@ test('plan sync rejects unauthenticated requests before contacting Neon or Strip
 });
 
 test('plan sync refuses Preview because it currently shares the production Neon database', async () => {
-  const envKeys = ['VERCEL_ENV', 'NODE_ENV', 'DATABASE_URL', 'NEON_DATA_API_URL', 'VITE_NEON_DATA_API_URL', 'STRIPE_SECRET_KEY', 'VITE_STRIPE_PUBLISHABLE_KEY'] as const;
+  const envKeys = ['VERCEL_ENV', 'NODE_ENV', 'DATABASE_URL', 'NEON_DATA_API_URL', 'VITE_NEON_DATA_API_URL', 'STRIPE_SECRET_KEY', 'VITE_STRIPE_PUBLISHABLE_KEY', 'STRIPE_PLAN_SYNC_PREVIEW_ENABLED', 'STRIPE_PLAN_SYNC_PREVIEW_DATABASE_ISOLATED'] as const;
   const previous = new Map(envKeys.map((key) => [key, process.env[key]]));
   const originalFetch = globalThis.fetch;
   try {
@@ -67,7 +67,7 @@ test('plan sync refuses Preview because it currently shares the production Neon 
       body: { action: 'save', isCreate: true, plan: { id: 'online-custom', name: 'Custom', kind: 'online', price: 50, active: true } },
     } as never, response as never);
     assert.equal(response.code, 503);
-    assert.match(String((response.payload as { error?: string }).error), /production-only/i);
+    assert.match(String((response.payload as { error?: string }).error), /blocked outside Production/i);
     assert.equal(stripeCalled, false);
   } finally {
     globalThis.fetch = originalFetch;
