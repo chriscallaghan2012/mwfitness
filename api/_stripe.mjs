@@ -1,13 +1,3 @@
-const PLAN_PRICE_ENV = {
-  'online-weekly': 'STRIPE_PRICE_ONLINE_WEEKLY',
-  'online-12-week': 'STRIPE_PRICE_ONLINE_12_WEEK',
-  'online-4-week-once': 'STRIPE_PRICE_ONLINE_4_WEEK_ONCE',
-  'online-bronze-4week': 'STRIPE_PRICE_ONLINE_BRONZE_4WEEK',
-  'online-silver-8week': 'STRIPE_PRICE_ONLINE_SILVER_8WEEK',
-  'online-gold-8week': 'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
-  'online-platinum-8week': 'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
-};
-
 function isProductionEnvironment() {
   if (process.env.VERCEL_ENV) return process.env.VERCEL_ENV === 'production';
   return process.env.NODE_ENV === 'production';
@@ -48,21 +38,18 @@ export function resolveCheckoutMode() {
 }
 
 export async function createCheckoutSession({ planId, origin, customerEmail, customerName, expectedAmount, priceId: databasePriceId }) {
-  const priceEnv = PLAN_PRICE_ENV[planId];
-  if (!priceEnv) throw new Error('Invalid coaching plan.');
+  if (typeof planId !== 'string' || !planId.trim()) throw new Error('Invalid coaching plan.');
 
   const configuration = resolveCheckoutMode();
   if (configuration.mode === 'mock') return { mode: 'mock' };
 
   const { secretKey, publishableKey, livemode } = configuration;
-  // Production prices come from the active Neon plan row; Preview/Development use test Price IDs from env.
-  const priceId = livemode ? databasePriceId : process.env[priceEnv];
-  if (!priceId) throw new Error(livemode
-    ? 'The active Neon plan is not linked to a live Stripe Price ID.'
-    : `Stripe is configured, but no test Price ID is set for this plan (${priceEnv}).`);
+  // Neon is the source of truth in both live and test mode. Never require per-plan Price ID env vars.
+  const priceId = databasePriceId;
+  if (!priceId) throw new Error('The active Neon plan is not linked to a Stripe Price ID. Sync the plan from Staff HQ first.');
 
   if (!/^price_[A-Za-z0-9]+$/.test(priceId)) {
-    throw new Error(`The configured Price ID for this plan (${priceEnv}) is invalid.`);
+    throw new Error('The Stripe Price ID stored for this plan is invalid. Sync the plan from Staff HQ first.');
   }
 
   const baseUrl = origin || process.env.PUBLIC_SITE_URL;
