@@ -45,7 +45,7 @@ export function resolveCheckoutMode() {
   return { mode: 'stripe', publishableKey, secretKey, livemode: production };
 }
 
-export async function createCheckoutSession({ planId, origin, customerEmail, customerName, expectedAmount }) {
+export async function createCheckoutSession({ planId, origin, customerEmail, customerName, expectedAmount, priceId: databasePriceId }) {
   const priceEnv = PLAN_PRICE_ENV[planId];
   if (!priceEnv) throw new Error('Invalid coaching plan.');
 
@@ -53,8 +53,11 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
   if (configuration.mode === 'mock') return { mode: 'mock' };
 
   const { secretKey, publishableKey, livemode } = configuration;
-  const priceId = process.env[priceEnv];
-  if (!priceId) throw new Error(`Stripe is configured, but no Price ID is set for this plan (${priceEnv}).`);
+  // Production prices come from the active Neon plan row; Preview/Development use test Price IDs from env.
+  const priceId = livemode ? databasePriceId : process.env[priceEnv];
+  if (!priceId) throw new Error(livemode
+    ? 'The active Neon plan is not linked to a live Stripe Price ID.'
+    : `Stripe is configured, but no test Price ID is set for this plan (${priceEnv}).`);
 
   if (!/^price_[A-Za-z0-9]+$/.test(priceId)) {
     throw new Error(`The configured Price ID for this plan (${priceEnv}) is invalid.`);
