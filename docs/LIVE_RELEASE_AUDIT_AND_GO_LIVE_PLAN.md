@@ -544,3 +544,31 @@ Capture full output and exit code for every command. Inspect the final `api/` in
 All remaining code and documentation work must be assembled into one release candidate. Keep work off `main`, complete review and tests, then make one final merge to `main`. The existing Vercel Git integration automatically triggers a production deployment on that merge. Do not manually deploy or merge intermediate fixes. This documentation update is kept off `main` and has not triggered a production deployment.
 
 **Go-live decision: NOT APPROVED.** The website deployment is READY, but functional verification, automated checks, database verification and the payment lifecycle remain incomplete.
+
+
+## Follow-up verification — 2026-10-30 (SHWAG and live Stripe prices)
+
+Read-only checks against Neon project `MW Fitness`, production branch `br-crimson-pine-zajxyrc0`, database `mwfitness` found:
+- All five active `kind='online'` coaching plans have their expected `stripe_product_id` and `stripe_price_id` populated.
+- Each referenced Stripe Price was retrieved from the `MWFitnessUk` live Stripe account. All five are active, `livemode=true`, one-time GBP prices, and their unit amounts match the Neon plan amounts exactly: £99.99, £159.99, £299.99, £399.99 and £449.99.
+- The columns `plans.stripe_product_id` and `plans.stripe_price_id` exist and the mapped rows are populated. The 2026-10-24 mapping migration is therefore reflected in the current production schema/data; do not reapply it.
+- `public.stripe_payment_records` does not exist in production. The 2026-10-26 payment-ledger migration remains unapplied. Keep `STRIPE_PAYMENT_LEDGER_ENABLED` disabled.
+
+The same read-only check found four active SHWAG products in production Neon: Classic SHWAG T-Shirt, SHWAG Hoodie, SHWAG Gym Bag and SHWAG Water Bottle. Their stored price is £0.00 (the catalogue is enquiry-only; do not present this as a sale price).
+
+### SHWAG API root cause and candidate fix
+
+The production source at `api/products.mjs` used `sql.query(...)` and then read `rows.rows`. The installed Neon serverless driver returns an array of row objects by default; a `rows` property is only returned when `fullResults: true` is explicitly enabled. This explains how a successful query could be converted into `products: []` despite active rows.
+
+Candidate branch `docs/release-status-and-one-build-policy` now:
+- maps the returned row array directly;
+- normalizes price, compare-at price and sizes in an exported pure helper;
+- includes regression tests for row mapping, missing sizes and empty/non-array results.
+
+Commits:
+- API fix: `d8f494be4e7cdce6b46ae352a84fb97fba30660b`
+- Regression test: `c9075c0628fc20732dede7d4cbe82dff490fe19e`
+
+This candidate fix is not merged or deployed. The production endpoint still runs the previous deployed commit until the single authorized final merge. The custom-domain endpoint could not be opened through the available HTTP inspection tool, and Vercel Hobby runtime-log retention did not cover the requested seven-day investigation window. Do not mark the live endpoint as verified until the candidate is tested and deployed once, then checked over HTTP/browser.
+
+Vercel environment metadata lists `DATABASE_URL` across Production/Preview/Development, but the secret value was not available for a safe target comparison in this inspection. The exact production runtime database target therefore remains unverified by this pass. No environment variable was changed.
