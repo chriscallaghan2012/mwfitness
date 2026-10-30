@@ -35,3 +35,45 @@ test('plan sync rejects unauthenticated requests before contacting Neon or Strip
   assert.equal(res.code, 401);
   assert.match(String((res.payload as { error?: string }).error), /staff session/i);
 });
+
+test('plan sync refuses Preview because it currently shares the production Neon database', async () => {
+  const envKeys = ['VERCEL_ENV', 'NODE_ENV', 'DATABASE_URL', 'NEON_DATA_API_URL', 'VITE_NEON_DATA_API_URL', 'STRIPE_SECRET_KEY', 'VITE_STRIPE_PUBLISHABLE_KEY'] as const;
+  const previous = new Map(envKeys.map((key) => [key, process.env[key]]));
+  const originalFetch = globalThis.fetch;
+  try {
+    process.env.VERCEL_ENV = 'preview';
+    process.env.DATABASE_URL = 'postgresql://placeholder.invalid/not-used';
+    process.env.NEON_DATA_API_URL = 'https://neon-data-api.example.test';
+    process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
+    const userId = '123e4567-e89b-42d3-a456-426614174000';
+    const token = 'header.' + Buffer.from(JSON.stringify({ sub: userId })).toString('base64url') + '.signature';
+    let stripeCalled = false;
+    globalThis.fetch = (async (input: string | URL | Request) => {
+      if (String(input).startsWith('https://api.stripe.com/')) stripeCalled = true;
+      return new Response(JSON.stringify([{ id: userId, role: 'admin' }]), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }) as typeof fetch;
+    const response = {
+      code: 200,
+      payload: null as unknown,
+      headers: {} as Record<string, string>,
+      setHeader(name: string, value: string) { this.headers[name] = value; },
+      status(code: number) { this.code = code; return this; },
+      json(payload: unknown) { this.payload = payload; return this; },
+    };
+    await stripePlanSync({
+      method: 'POST',
+      headers: { authorization: 'Bearer ' + token },
+      body: { action: 'save', isCreate: true, plan: { id: 'online-custom', name: 'Custom', kind: 'online', price: 50, active: true } },
+    } as never, response as never);
+    assert.equal(response.code, 503);
+    assert.match(String((response.payload as { error?: string }).error), /production-only/i);
+    assert.equal(stripeCalled, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+    for (const [key, value] of previous) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+});
