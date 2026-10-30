@@ -82,7 +82,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_test_release_placeholder';
+    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_env_should_be_ignored';
     process.env.PUBLIC_SITE_URL = 'https://preview.example.test';
     const originalFetch = globalThis.fetch;
     const requests: Array<{ url: string; method: string; authorization: string | null; body: URLSearchParams }> = [];
@@ -141,7 +141,6 @@ test('Stripe rejects a Price ID from the wrong mode', async () => {
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_live_release_placeholder';
     const originalFetch = globalThis.fetch;
     let sessionCreated = false;
     globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
@@ -163,7 +162,7 @@ test('Stripe rejects a Price ID from the wrong mode', async () => {
   });
 });
 
-test('Stripe Checkout rejects an unknown coaching plan before calling Stripe', async () => {
+test('Stripe Checkout rejects an empty plan identifier before calling Stripe', async () => {
   await assert.rejects(
     () => createCheckoutSession({ planId: '', origin: 'https://mwfitnessuk.com' }),
     /Invalid coaching plan/,
@@ -174,7 +173,6 @@ test('Stripe rejects a Price amount that differs from the active website plan', 
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_test_release_placeholder';
     const originalFetch = globalThis.fetch;
     let sessionCreated = false;
     globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
