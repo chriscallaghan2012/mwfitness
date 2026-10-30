@@ -455,3 +455,9 @@ PR #140 is merged into `main`. It adds:
 - Raw-body webhook routing before Express JSON parsing, including the self-hosted server.
 
 **This is implementation status, not release evidence.** Tests, TypeScript, build, real signed webhook delivery, refund reconciliation, Neon migration/RLS, customer account linking, membership provisioning/revocation, browser checkout and production smoke tests remain unverified. The migration has not been applied and no deployment was performed. Keep the gate disabled until these checks pass on the exact release commit. Membership access is not automatically granted by the webhook.
+
+## Production Stripe price source — 2026-10-30 (PR #141)
+
+PR #141 is merged. Production checkout now reads `stripe_price_id` from the active `public.plans` row in Neon. Preview/Development continue using environment-configured test Price IDs. Before a Checkout Session is created, the server retrieves the Stripe Price and verifies its live/test mode, GBP currency and unit amount against the Neon plan price.
+
+The idempotent mapping migration is now tracked at `db/migrations/20261024_live_stripe_coaching_products.sql`. The previous PR stated that the live Neon rows had already been populated, but those row values were not independently re-verified in this session. Do not apply the migration to production as part of this work. Verify the intended Neon branch and rows using read-only checks first.
