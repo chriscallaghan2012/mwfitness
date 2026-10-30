@@ -469,6 +469,7 @@ export function AdminScreen() {
       )}
       {tab === 'messages' && <MessagesAdmin initialAthleteId={selectedMessageClientId} />}
       {tab === 'leads' && <LeadsAdmin />}
+      {!demoMode && tab === 'communications' && <CommunicationsAdmin />}
       {demoMode && tab === 'communications' && (
         <section className={`${card} !rounded-2xl !border-orange-500/20 !bg-[#131519] space-y-5`}>
           <div>
