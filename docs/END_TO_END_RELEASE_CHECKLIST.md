@@ -17,7 +17,7 @@
 - [ ] Confirm Preview/Development with both Stripe keys absent uses the clearly labelled mock checkout and never creates a Stripe session or takes money.
 - [ ] Confirm partial/mismatched Stripe key configuration fails closed instead of silently using mock checkout.
 - [ ] Confirm Production has matching live Stripe keys. Coaching Price IDs come from Neon `public.plans`; do not add per-plan `STRIPE_PRICE_*` environment variables.
-- [ ] Confirm Staff HQ plan sync is only tested in Production after an approved safe window, or in Preview only after Preview is moved to a separate Neon database and matching Stripe test keys are configured.
+- [ ] Confirm Preview plan sync stays blocked until Preview has separate Neon Auth, Data API and DATABASE_URL values, matching Stripe test keys, and both Preview-only flags `STRIPE_PLAN_SYNC_PREVIEW_ENABLED=true` and `STRIPE_PLAN_SYNC_PREVIEW_DATABASE_ISOLATED=true`.
 - [ ] Confirm no `STRIPE_WEBHOOK_SECRET` is configured yet; live paid membership processing must remain blocked until the real webhook endpoint and signing secret are configured and the ledger/membership lifecycle tests pass.
 - [ ] Confirm no secret keys, database URLs, webhook secrets or customer-sensitive data are pasted into GitHub issues, screenshots or logs.
 - [ ] Confirm any live-data write test uses an explicitly approved test account/fixture and has a cleanup plan.
