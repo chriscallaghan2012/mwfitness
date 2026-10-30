@@ -104,7 +104,7 @@ The website's payment-ledger migration is `db/migrations/20261026_stripe_payment
 
 The website staff panel and the mobile app use the same dedicated Neon project, **MW Fitness**, with Neon Auth and the Neon Data API.
 
-Set these environment variables in Vercel for Production, Preview and Development:
+Set the Neon endpoint variables in Vercel for Production and Preview; use your local `.env` for development. Preview currently shares the production database, so use care with all writes:
 
 ```bash
 VITE_NEON_AUTH_URL=https://<branch-endpoint>/mwfitness/auth
