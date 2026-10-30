@@ -25,7 +25,7 @@ test('real Stripe checkout stays blocked until the signed payment ledger is enab
 });
 
 test('webhook stores paid sessions idempotently without granting membership', () => {
-  const webhook = readFileSync(join(root, 'api', 'stripe-webhook.mjs'), 'utf8');
+  const webhook = readFileSync(join(root, 'lib', 'stripe-webhook-handler.mjs'), 'utf8');
   assert.match(webhook, /verifyStripeSignature/);
   assert.match(webhook, /Math\.abs\(nowSeconds - timestamp\) > 300/);
   assert.match(webhook, /ON CONFLICT \(stripe_session_id\) DO UPDATE/);
