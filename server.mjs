@@ -16,7 +16,7 @@ import { fileURLToPath } from 'url';
 import { sendContactEmail, validatePayload } from './api/_mailer.mjs';
 import { saveWebsiteLead } from './api/_leads.mjs';
 import { sendAutomaticTemplate } from './api/_communications.mjs';
-import { createCheckoutSession } from './api/_stripe.mjs';
+import checkout from './api/create-checkout.mjs';
 import sendPush from './api/send-push.mjs';
 import testCommunication from './api/test-communication.mjs';
 import communicationsSend from './api/communications-send.mjs';
@@ -60,21 +60,7 @@ app.post('/api/send-mail', async (req, res) => {
   }
 });
 
-app.post('/api/create-checkout', async (req, res) => {
-  try {
-    const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
-    const result = await createCheckoutSession({
-      planId: req.body?.planId,
-      origin,
-      customerEmail: typeof req.body?.customerEmail === 'string' ? req.body.customerEmail.trim() : undefined,
-      customerName: typeof req.body?.customerName === 'string' ? req.body.customerName.trim() : undefined,
-    });
-    res.json(result);
-  } catch (err) {
-    const status = /Invalid|not configured|public site|keys are not present|no price ID/i.test(err.message || '') ? 400 : 500;
-    res.status(status).json({ ok: false, error: err.message || 'Checkout could not be started.' });
-  }
-});
+app.post('/api/create-checkout', checkout);
 
 app.post('/api/send-push', sendPush);
 app.post('/api/test-communication', testCommunication);
