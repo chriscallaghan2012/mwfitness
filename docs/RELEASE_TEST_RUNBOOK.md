@@ -1,3 +1,23 @@
+> **CURRENT HANDOFF — 2026-10-30 (PR #143 / production commit 3cab220e8c9acd4ec0587682f4a1ebc33f5223d9)**  
+> This status block supersedes older deployment statements later in this historical runbook. Production Vercel deployment is **READY** with aliases `mwfitnessuk.com` and `www.mwfitnessuk.com`. This confirms build/deployment only, not runtime or end-to-end tests. No manual deployment, production migration or environment change was performed.
+>
+> **Completed:** PR #143 merged; SHWAG Neon result-mapping fix and regression tests added; production build READY. Five active online coaching plans were read-only matched to active live GBP one-time Stripe Prices and Products (amounts and default-price IDs match). The plan/price migration is already reflected in production and must not be reapplied. Four active SHWAG products exist in Neon. Function count remains 11/12.
+>
+> **Owner go-live checklist:**
+> - [ ] **Resend/email:** add and verify the sending domain in Resend; publish its exact DNS records; configure sender/from and API key; add the required server-side Resend environment variables to Vercel Production (Preview separately if needed); then test real enquiry/transactional delivery, reply-to, spam placement, bounces and failure handling. No SMTP variables were found in Vercel. Use the actual Resend integration/configuration; do not assume SMTP.
+> - [ ] **Production smoke test:** verify apex/www HTTPS and redirects; direct-load and hard-refresh public, member and Staff HQ routes; inspect console/network; check `/api/health`, `/api/plans`, `/api/products`. Keep issue #49 open until production products response is confirmed.
+> - [ ] **Automated checks at exact commit:** clean checkout `3cab220e8c9acd4ec0587682f4a1ebc33f5223d9`; run `npm ci`, `npm test`, `npm run lint`, `npm run build`; capture output. Not run here; no passing status is claimed.
+> - [ ] **Auth / Staff HQ / Neon:** dedicated test accounts for signup/login/logout/session restore; coach/admin/member permissions; supported CRUD; member isolation; demo/live separation. Perform destructive writes only on a disposable Neon branch, never real member data.
+> - [ ] **Mobile:** fresh Android export/build and physical-device install; test auth/session, membership, check-ins, weigh-ins, nutrition/workout/cardio, photo privacy and push if in scope; verify mobile → Neon → Staff HQ → mobile reload.
+> - [ ] **PWA:** test installability, manifest/icon, offline fallback, cache refresh and service-worker updates in real browsers.
+> - [ ] **Stripe:** keep live payment activation disabled. Vercel has no Stripe secret/publishable/webhook keys or payment-ledger flag. Before enabling, complete signed/invalid/stale webhook, duplicate idempotency, paid/unpaid, amount/currency/mode mismatch, refunds, account linking and membership provisioning/revocation tests. Ledger migration is prepared but unapplied; do not apply to production without explicit approval. Automatic membership provisioning/revocation is not complete.
+> - [ ] **Operations:** verify backup/recovery, rollback owner/procedure, privacy/legal/contact content and monitoring; record evidence and explicit go/no-go.
+>
+> **No changes made:** Resend, DNS, Vercel environment, Stripe configuration, Neon production data/schema/migrations. Legacy unused Supabase variables were left untouched; encrypted `DATABASE_URL` could not be independently matched to Neon.
+>
+> **One-build rule:** keep remaining code/docs changes off `main`; complete checks on the final candidate, then one approved merge/build. Do not incrementally deploy. This documentation branch has not been merged or deployed.
+>
+> ---
 # MW FITNESS — Release Test Runbook
 
 This runbook is for the website/Staff HQ release candidate. It does not authorize a production deployment or production database writes.
