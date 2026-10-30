@@ -572,3 +572,14 @@ Commits:
 This candidate fix is not merged or deployed. The production endpoint still runs the previous deployed commit until the single authorized final merge. The custom-domain endpoint could not be opened through the available HTTP inspection tool, and Vercel Hobby runtime-log retention did not cover the requested seven-day investigation window. Do not mark the live endpoint as verified until the candidate is tested and deployed once, then checked over HTTP/browser.
 
 Vercel environment metadata lists `DATABASE_URL` across Production/Preview/Development, but the secret value was not available for a safe target comparison in this inspection. The exact production runtime database target therefore remains unverified by this pass. No environment variable was changed.
+
+
+### Vercel environment configuration inspection — 2026-10-30
+
+A metadata-only listing of the `mwfitness` Vercel project's environment-variable names and targets found:
+- `DATABASE_URL`, `PUBLIC_SITE_URL`, `VITE_NEON_AUTH_URL` and `VITE_NEON_DATA_API_URL` are assigned to Production, Preview and Development.
+- No `STRIPE_SECRET_KEY`, `VITE_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` or `STRIPE_PAYMENT_LEDGER_ENABLED` variable is currently listed. Production checkout therefore remains unavailable/fail-closed, as intended until configuration and payment lifecycle tests are approved.
+- No `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER` or `SMTP_PASS` variables are listed. The health endpoint will report email as not configured; enquiry persistence may still work, but email delivery is not configured in this Vercel project.
+- Legacy `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` variables remain assigned to Production and Development. Repository code search found no references to these names and the current package uses Neon. They were not removed; treat them as stale configuration and remove only with explicit approval after a final dependency/code audit.
+
+The Vercel connector returned the `DATABASE_URL` value encrypted rather than as a parseable connection string. Its host/database target could not be independently matched to Neon without exposing or decrypting the secret. No environment values were read into documentation or changed.
