@@ -1,15 +1,17 @@
-> **CURRENT HANDOFF — 2026-10-30 (website release branch, Stripe Staff HQ sync in progress)**  
-> Production remains on commit `3cab220e8c9acd4ec0587682f4a1ebc33f5223d9`; the current website release branch has additional unmerged work. No production deployment or production database migration was performed for the Stripe sync changes.
+> **CURRENT HANDOFF — 2026-10-30 (release candidate; not merged/deployed)**  
+> Website release branch: `release/mwfitness-final-readiness-2026-10-30`. Mobile release branch: `release/final-readiness-2026-10-30`. Both are ahead of `main`; neither is merged or released. Production website baseline is `3cab220e8c9acd4ec0587682f4a1ebc33f5223d9`; mobile baseline is `21870989fcff771953e4823677047e3d8fab98db`. No production deploy or production database migration was performed by this work.
 >
-> **Stripe Staff HQ implementation added on the release branch:** online coaching plan create/edit/price/visibility/archive now uses a server-side sync handler routed through the existing checkout function (no extra top-level Vercel function). Stripe Products and Prices are mapped to `public.plans.stripe_product_id` and `stripe_price_id`; checkout reads the current Price ID from Neon in both modes rather than per-plan Vercel environment variables. A price change creates a new immutable Stripe Price, old prices are deactivated, and online plan deletion archives the plan rather than deleting its history. Preview sync is blocked because Preview currently shares the production Neon database. Automated tests were added/updated but have **not been run** here.
+> **Website code updated:** dynamic Staff HQ online-plan create/edit/visibility/archive sync; Neon-backed Stripe Product/Price mapping; checkout no longer uses per-plan Price environment variables; webhook validation supports new online plan IDs; tests and docs updated. SHWAG products remain catalogue/enquiry-only and are not Stripe-synced because no sales/checkout flow exists. Preview plan sync is blocked while Preview shares production Neon. Full tests/build/lint have not been run in this environment.
 >
-> **Current production environment inventory:** Vercel has `STRIPE_SECRET_KEY` and `VITE_STRIPE_PUBLISHABLE_KEY` targeted at Production, and `STRIPE_PAYMENT_LEDGER_ENABLED` is present for Production and Preview. The environment inventory did **not** show `STRIPE_WEBHOOK_SECRET`. Secret values were not decrypted or inspected. The restricted Stripe secret key must have permission to read/write Products and Prices as well as create Checkout Sessions; otherwise Staff HQ sync will fail safely with a Stripe error.
+> **Vercel environment inventory (metadata only; no secrets decrypted):** only seven project variables are currently listed: `DATABASE_URL`, `PUBLIC_SITE_URL`, `VITE_NEON_AUTH_URL`, `VITE_NEON_DATA_API_URL`, `STRIPE_SECRET_KEY`, `VITE_STRIPE_PUBLISHABLE_KEY`, and `STRIPE_PAYMENT_LEDGER_ENABLED`. No legacy `VITE_SUPABASE_*` variables and no per-plan `STRIPE_PRICE_*` variables are present in this current inventory. `STRIPE_WEBHOOK_SECRET` was not listed. The ledger flag targets Preview and Production; do not enable live payment processing until the migration, webhook and membership lifecycle are reviewed and approved.
 >
-> **Still required before accepting live payments:** configure the Stripe webhook endpoint and its `STRIPE_WEBHOOK_SECRET`; review and explicitly apply the prepared payment-ledger migration to the intended Neon production branch; test signed/invalid/stale and duplicate webhooks, paid/unpaid states, amount/currency/mode mismatch, refunds, account linking and membership provisioning/revocation. Do not treat a READY deployment or a successful product sync as proof of end-to-end payment readiness.
+> **Payment state:** restricted Stripe secret key must allow Product/Price read-write and Checkout Session creation. Product/Price sync is separate from payment verification. The prepared migration `db/migrations/20261026_stripe_payment_records.sql` remains unapplied. No automatic membership activation/revocation is signed off.
 >
-> **Other outstanding release gates:** production HTTP/browser smoke tests; `/api/products` runtime verification (issue #49 remains open); live Staff HQ/RLS checks with dedicated accounts; email delivery; PWA install/offline/update behavior; physical-device mobile tests; backup/restore and rollback; final go/no-go.
+> **Mobile security state:** fake WebCrypto success fallbacks were removed from the mobile release branch and a static test was added. This is not a native crypto sign-off: check SubtleCrypto compatibility, Neon Auth login/session/password reset and Data API access on a fresh physical Android build.
 >
-> **One-build rule:** keep code/docs changes off `main`; run the full test/lint/build suite against the final candidate and capture results, then make one approved merge/build. No merge or production deploy is authorized by these changes.
+> **No CI result found:** GitHub Actions lists no workflow runs for either release branch. Source-level syntax checks were performed for the touched server modules, but the test suite, lint, TypeScript and production builds have not been run.
+>
+> **Release rule:** use disposable Neon test data/branch and dedicated test accounts. Do not merge, deploy, apply production migrations, charge live cards, send production test emails, or publish to Google Play without explicit authorization.
 >
 > ---
 # MW FITNESS — Release Test Runbook
@@ -137,206 +139,78 @@ RELEASE_TEST_DATABASE_URL='postgresql://...disposable-branch...' npm test
 
 This verifies a real Neon connection and database CRUD, and reads public pricing/product endpoints against the disposable branch. It does **not** by itself verify Staff HQ's Neon Data API, user authentication, role permissions or RLS. Those require signed-in test accounts and live UI/API tests against disposable records.
 
-## Stripe Checkout tests and configuration
-
-The Stripe unit tests mock Stripe's API; they must not charge a card. Preview/Development without either Stripe key must use the clearly labelled mock simulation; it must never create a Stripe session, claim a payment succeeded, or activate a membership. When configured, Preview/Development must use matching test publishable/secret keys and test Price IDs. Production must use matching live keys and live Price IDs and must fail closed when keys are missing. Live keys are rejected outside Production. The API verifies the plan is active and `kind=online` in Neon, then retrieves the selected Stripe Price and checks both its `livemode` and GBP amount against the database plan price before creating a session. The current Vercel audit found no Stripe variables, so Production checkout is not yet configured.
-
-Embedded Checkout uses Stripe's payment form inside the website; the browser loads Stripe.js directly from `js.stripe.com`. Card data must never be posted to MW Fitness endpoints or logged by the site.
-
-Manual embedded checkout acceptance checklist:
-- [ ] On a Preview deployment with both Stripe keys absent, continue checkout and verify the explicit “Preview mock checkout” panel appears.
-- [ ] Verify mock checkout says no payment was taken and no membership/access was activated; verify no Stripe session is created.
-- [ ] Verify Production with missing Stripe keys reports checkout unavailable and never shows mock checkout.
-- [ ] Verify a partial key pair or live keys in Preview fails closed instead of falling back to mock.
-- [ ] Verify a Price ID whose Stripe `livemode` does not match the configured key mode is rejected before a Checkout Session is created.
-- [ ] Confirm the form renders inside `/checkout` and does not redirect to a separate Stripe-hosted page for the standard card flow.
-- [ ] Confirm card number, expiry, CVC and billing fields are rendered by Stripe, not ordinary MW Fitness `<input>` elements.
-- [ ] Confirm the name/email placeholders are readable and form borders/focus states have sufficient contrast.
-- [ ] Confirm the amount and selected package match both the active Neon plan and the matching Stripe Price in the current environment.
-- [ ] Complete a Stripe test-mode payment with a Stripe test card; never use real card details in test mode.
-- [ ] Exercise a declined test card and a redirect/3DS flow; verify clear recovery and that the selected package is restored after returning.
-- [ ] Confirm a failed checkout never reports payment success or activates a membership.
-- [ ] Verify no card details, Stripe client secret or secret API key are written to app logs or MW Fitness API requests.
-- [ ] Do not test live charges until the webhook, idempotent payment record and membership activation flow are complete and explicitly approved.
-
-## Payment lifecycle — post-merge gate (2026-10-30)
-
-PR #140 is merged. The current source includes `POST /api/stripe-webhook`, `GET /api/checkout-status`, a prepared `db/migrations/20261026_stripe_payment_records.sql` migration and a read-only Staff HQ payment ledger.
-
-Before enabling real checkout, complete and record all of the following against the exact candidate commit:
-- [ ] Run `npm test`, `npm run lint` and `npm run build`; retain command output and commit SHA.
-- [ ] Apply the ledger migration only to an approved disposable Neon branch first; verify schema, RLS and platform-admin read access.
-- [ ] Verify a valid signed test webhook is recorded once; duplicate events do not duplicate records; invalid/stale signatures are rejected.
-- [ ] Verify paid, unpaid, amount-mismatch, currency-mismatch and test/live-mode-mismatch sessions.
-- [ ] Verify partial refunds go to manual review and full refunds reconcile correctly; confirm membership access is not left active after a confirmed refund.
-- [ ] Verify the checkout return endpoint cannot activate membership or expose secrets and does not trust the redirect alone.
-- [ ] Complete verified customer-account linking and membership provisioning/revocation design and tests before any automatic access is granted.
-- [ ] Verify the self-hosted raw-body webhook route and Vercel webhook configuration independently.
-- [ ] Record evidence and obtain explicit go/no-go approval.
-
-The migration remains prepared only, and `STRIPE_PAYMENT_LEDGER_ENABLED` must remain disabled until the release gates pass. No test pass is claimed from the merge alone. Do not run production migrations or deploy as part of this runbook without explicit authorization.
-
-Production Price ID source note: after PR #141, Production reads the live `stripe_price_id` from the active Neon plan row; Preview/Development still use test Price IDs from environment variables. The source migration is `db/migrations/20261024_live_stripe_coaching_products.sql`. Verify all five active online plan rows and matching Stripe Price mode/currency/amount before enabling the payment gate. Production row values were not independently re-verified during this code change.
-
-
-## Vercel Hobby function-count constraint
-
-The payment webhook and checkout-status paths are rewritten to the existing `/api/create-checkout` serverless function. Their shared handlers live under `lib/`, outside Vercel's `api/` function directory. Do not add new top-level files under `api/` without checking the 12-function Hobby limit and the production deployment result.
-
-
-## Current production candidate — 2026-10-30
-
-Latest known production deployment is commit `d41e7cb2eaddf0c302b84633d0348b8e6c5a5503`, state **READY**:
-[View deployment](https://vercel.com/cjc101187s-projects/mwfitness/AuAhbzTdWgqA6sZgzURUoB3biomx).
-
-The previous deployment failed because Vercel Hobby permits no more than 12 Serverless Functions. PR #142 moved the webhook and checkout-status implementations into `lib/` and routes both paths through `/api/create-checkout`. The current source has 11 top-level API endpoint files, leaving one function slot. The endpoint inventory is recorded in `LIVE_RELEASE_AUDIT_AND_GO_LIVE_PLAN.md`.
-
-**Do not add another top-level API endpoint casually.** Prefer extending an existing route or putting shared handler logic in `lib/`. Count the final candidate's actual Vercel functions before merging. A deployment can be READY while individual routes still fail, so complete the smoke tests below.
-
-### Production browser/API smoke tests — human execution
-
-Use the deployed custom domain and record the tested commit. Do not submit real payments or destructive production writes.
-
-- [ ] Open the apex and www domains; verify HTTPS and canonical redirect behavior.
-- [ ] Open every route listed in the release audit directly and hard-refresh.
-- [ ] Check browser console/network for failed chunks and API errors.
-- [ ] Confirm `GET /api/health`, `GET /api/plans` and `GET /api/products` return expected safe responses.
-- [ ] Confirm unsupported methods return the intended 405 response and do not mutate data.
-- [ ] Confirm `/api/checkout-status` rejects missing/invalid session identifiers safely and does not trust query-string claims.
-- [ ] Confirm `/api/stripe-webhook` rejects unsigned/invalid requests. Do not send fabricated signed events to production; use Stripe test mode and a disposable test setup for positive webhook tests.
-- [ ] Confirm public routes do not expose Stripe Price IDs, secrets, private member data or admin-only fields.
-- [ ] Test account/auth and Staff HQ journeys using dedicated test users, not real member accounts.
-
-### Current human test handoff
-
-The developer must first run the clean-checkout commands in section 1 against the final release candidate. Then the owner should run the production browser/API smoke tests above and the Staff HQ/auth/member-isolation checklist in sections 3–4 of the main release audit. Record exact commit, environment, account role, result and evidence. Do not mark a test complete based only on Vercel READY.
-
-### One-build merge policy
-
-All outstanding source and documentation changes are to be kept together off `main`. Do not merge small PRs one at a time or manually trigger deployments during the work. Once the complete release candidate has passed developer checks and review, merge once to `main`; the existing Git integration will trigger the production deployment. If the candidate changes after testing, rerun affected checks before that single merge.
-
-This documentation update itself is not merged to `main` and has not triggered a production build.
-
-**Current release status: NOT APPROVED.** Payment migrations are not applied, `STRIPE_PAYMENT_LEDGER_ENABLED` remains disabled, and live payment processing must not be enabled until the signed webhook, idempotency, refund and membership lifecycle are tested and approved.
-
-
-## SHWAG catalogue regression — added 2026-10-30
-
-Production Neon contains four active SHWAG products. The prior `api/products.mjs` implementation read `rows.rows` after calling Neon serverless `sql.query()`. With the driver's default result format, `sql.query()` returns the row array directly; the `rows` property is only present when `fullResults: true` is requested. The endpoint could therefore return HTTP 200 with an empty catalogue despite active database rows.
-
-The candidate branch corrects this by mapping the returned array directly and adds `tests/products.test.ts` covering:
-- one returned product row and numeric price conversion;
-- missing optional sizes;
-- empty and non-array results.
-
-Run `npm test` from a clean checkout to execute the new regression test. This test has been added but has **not yet been run** in this environment. The fix is on `docs/release-status-and-one-build-policy`, not deployed. Do not count issue #49 as resolved until the final candidate passes automated checks, is merged/deployed once, and `GET /api/products` is verified on the production domain.
-
-## Live coaching Stripe price verification — 2026-10-30
-
-Read-only Neon and Stripe checks verified all five active online coaching plans against the live `MWFitnessUk` Stripe account. Each Price is active, GBP, one-time, live mode, and matches the Neon amount. The mapping migration is already reflected in production rows/schema and should not be reapplied. The payment-ledger table is still absent from production, so the ledger migration remains unapplied and the payment gate stays disabled.
-
-
-## Vercel environment readiness — 2026-10-30
-
-Metadata-only inspection found Neon Auth/Data API and DATABASE_URL variables assigned to Production, Preview and Development. No Stripe secret/publishable keys, webhook secret or payment-ledger gate are listed, so live checkout must remain unavailable. No SMTP host/port/user/password variables are listed, so email delivery is not configured in Vercel and remains outstanding. Legacy VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY variables remain in Production and Development, but repository code search found no current references; they were left untouched. The encrypted Vercel DATABASE_URL could not be safely matched to a Neon host/database in this pass.
-
-
-> **Stripe key follow-up — 2026-10-30:** The connected Stripe session exposes the `MWFitnessUk` account in live mode only; no test-mode context for this account is available in the current connection. Stripe product/price objects were previously verified in live mode. The Stripe API integration does not expose/recover the account's existing secret API key, and the secret key is not stored in the repository or Vercel environment. Do not try to retrieve or commit it. The owner must add `STRIPE_SECRET_KEY` and `VITE_STRIPE_PUBLISHABLE_KEY` directly as encrypted/sensitive Vercel **Production** environment variables from Stripe Dashboard → Developers → API keys. Do not paste secret keys into chat or commit them to Git. Keep `STRIPE_PAYMENT_LEDGER_ENABLED` absent/false and do not enable live checkout until `STRIPE_WEBHOOK_SECRET`, the approved ledger migration and webhook/idempotency/membership lifecycle tests are complete. No Stripe keys were added or changed in this session. With no Stripe keys, Preview/Development already resolve to the clearly labelled mock checkout; Production intentionally fails closed and must not be switched to mock.
-
-
-## Latest external configuration results — 2026-10-30
-
-### Stripe live setup
-
-The connected MWFitnessUk live account has five active coaching Products and five active GBP one-time Prices matching the Neon plans: £99.99, £159.99, £299.99, £399.99 and £449.99. No live webhook endpoint exists. Vercel has no Stripe key variables configured. The connected Stripe account list did not expose an MWFitnessUk test/sandbox account; do not use another client's account for testing.
-
-For the web server, prefer a restricted API key with only:
-- Prices: Read
-- Checkout Sessions: Write
-
-The final-readiness branch accepts rk_live_ / rk_test_ keys as well as sk_live_ / sk_test_. Set the restricted key in Vercel as a **sensitive** Production environment variable named STRIPE_SECRET_KEY; set the matching pk_live_ value as VITE_STRIPE_PUBLISHABLE_KEY. Never commit keys or put them in mobile app configuration.
-
-The same branch adds a server-side webhook gate: the handler returns 503 until STRIPE_PAYMENT_LEDGER_ENABLED=true. This is deliberate. Do not create the live webhook endpoint or enable the gate until the payment-ledger migration is applied to an approved branch, webhook tests pass, and the account-linking/membership fulfilment design is complete. The new tests are authored but **not run**.
-
-If no MW Fitness test credentials are available, Preview/Development should remain with both Stripe keys absent and show the explicit mock simulation. It must not create a Stripe session, take a payment, or activate a membership. Production must continue to fail closed.
-
-### Resend setup blocker
-
-The connected Resend account has reached its three-domain plan limit. mwfitnessuk.com is not registered there; the attempt to add it was rejected by the plan limit. No DNS or existing domains were changed.
-
-Owner actions:
-1. Upgrade the Resend plan to permit another domain, or explicitly choose an approved alternative sending domain.
-2. Add the chosen domain in the EU region and publish the exact DNS records Resend returns.
-3. Verify the domain, then create a dedicated sending_access API key restricted to that domain.
-4. Add RESEND_API_KEY as a sensitive Vercel Production variable and set RESEND_FROM_EMAIL to the verified sender.
-5. Confirm MAIL_TO (the current code default is mwfitnessukonline@gmail.com) and test an enquiry alert plus customer acknowledgement.
-
-The website mailer already supports Resend directly; Gmail SMTP is not required if Resend is configured.
-
-### Mobile security / build checks
-
-A source review found that mobile index.ts contains permissive placeholder crypto methods: Math.random() random fallback, subtle.verify always true, no-op importKey, zero-filled sign and digest fallbacks. Replace this with a genuine supported WebCrypto implementation before signing off production auth. The current main branch also has no npm test script; release/neon-schema-contract-tests adds schema-contract tests and the script but is unmerged and untested.
-
-Current mobile checks still required:
-- [ ] Replace and test the unsafe crypto shim.
-- [ ] Run npm ci, npx tsc --noEmit, npm run lint, and npx expo export --platform android.
-- [ ] Run the schema-contract tests from the release candidate.
-- [ ] Build and install a fresh Android app on a physical device.
-- [ ] Verify login, session restore, logout, reset deep link, member/staff roles and cross-account isolation.
-- [ ] Verify check-ins, weigh-ins, progress photos, cardio, nutrition and workout completion persist through Neon and appear in Staff HQ.
-- [ ] Verify Expo push token registration, delivery and cleanup on logout using valid FCM/Expo credentials.
-- [ ] Keep Google Play on internal testing until Mike approves a production-track release.
-
-### Website / Staff HQ checks still required
-
-- [ ] Run npm ci, npm test, npm run lint, npm run build on the exact final candidate; tests have not been run in this environment.
-- [ ] Verify /api/health, /api/plans, /api/products over HTTPS; keep issue #49 open until products return the four active SHWAG rows.
-- [ ] Test direct navigation/hard refresh, desktop/mobile responsive layouts, console/network, PWA install/offline/update.
-- [ ] Test Neon Auth signup/login/logout/session restore/password recovery using dedicated accounts.
-- [ ] Test all supported Staff HQ create/edit/delete actions in demo mode, then repeat live CRUD and RLS checks on a disposable Neon branch.
-- [ ] Prove Member A cannot access Member B's profile, progress photos, check-ins, nutrition, workouts or messages.
-- [ ] Verify coach/admin role restrictions, named-admin allowlist, account panel limitations and safe error feedback.
-- [ ] Verify contact enquiries persist when email delivery fails, then test Resend delivery after domain verification.
-- [ ] Confirm notification rules/templates are actually triggered and delivered; a saved template/rule is not evidence of an automation.
-- [ ] Verify the payment ledger UI only becomes live after the approved migration and platform-admin access test.
-
-### Platform evidence limitations
-
-The current production Vercel deployment is READY for commit 3cab220e8c9acd4ec0587682f4a1ebc33f5223d9, but no live HTTP/browser smoke test was completed. The last 50 minutes of runtime logs contained no entries. A successful Vercel status is not an end-to-end pass. The website main commit has a Vercel success status but no GitHub Actions workflow run was returned. Mobile main has no status checks returned. Local GitHub cloning was unavailable due DNS resolution failure, so no local install, lint, tests, TypeScript or Expo export was run here.
-
-The website PWA files are present on main, but browser install/offline/update tests remain outstanding. Vercel Hobby still has 11 of 12 top-level API function slots in use.
-
-## Exact Stripe environment variable names
-
-Add values in Vercel Project → Settings → Environment Variables. Do not put values in GitHub, source files, mobile config or chat.
-
-### Production (live)
-
-- `STRIPE_SECRET_KEY` — restricted live API key, preferably `rk_live_…`. Minimum current checkout scope: **Prices: Read** and **Checkout Sessions: Write**. Keep server-only/sensitive.
-- `VITE_STRIPE_PUBLISHABLE_KEY` — matching live publishable key, `pk_live_…`. This is public by design, but must match live mode.
-- `STRIPE_WEBHOOK_SECRET` — signing secret generated by the **live webhook endpoint** (starts `whsec_…`). It is not an API key and is unique to each endpoint.
-- `STRIPE_PAYMENT_LEDGER_ENABLED` — leave `false` or unset until the approved ledger migration is applied and the webhook/membership lifecycle passes acceptance. Do not enable live checkout just because keys exist.
-- `DATABASE_URL` and `PUBLIC_SITE_URL=https://mwfitnessuk.com` must already be configured.
-
-### Preview / Development (test)
-
-- `STRIPE_SECRET_KEY` — restricted test/sandbox key, `rk_test_…` (or standard `sk_test_…` only if a restricted key is unavailable).
-- `VITE_STRIPE_PUBLISHABLE_KEY` — matching `pk_test_…`.
-- `STRIPE_WEBHOOK_SECRET` — signing secret from a **test/sandbox webhook endpoint** pointing to the Preview deployment URL, using the same path below. Test endpoint secrets are not interchangeable with live secrets.
-- `STRIPE_PAYMENT_LEDGER_ENABLED` — keep `false` until the test database has the ledger migration and lifecycle tests pass.
-- Test Price IDs, if testing Stripe mode, use the existing variable names: `STRIPE_PRICE_ONLINE_4_WEEK_ONCE`, `STRIPE_PRICE_ONLINE_BRONZE_4WEEK`, `STRIPE_PRICE_ONLINE_SILVER_8WEEK`, `STRIPE_PRICE_ONLINE_GOLD_8WEEK`, and `STRIPE_PRICE_ONLINE_PLATINUM_8WEEK`. They must be test-mode Prices in the same Stripe sandbox as the test key. If no test credentials/Prices are available, leave **both Stripe keys absent** in Preview/Development so the explicit mock flow remains active. Do not put live keys in Preview.
-
-### Webhook endpoint
-
-Once the ledger and lifecycle are ready, register a Stripe webhook for:
-
-- Live URL: `https://mwfitnessuk.com/api/create-checkout?route=webhook`
-- Preview URL: the exact Vercel Preview deployment URL followed by `/api/create-checkout?route=webhook`.
-
-Subscribe at minimum to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `charge.refunded`. The endpoint handler currently records paid sessions as `pending_account_link`; it does **not** automatically activate memberships. The live endpoint must not be enabled until that operational workflow and refund/manual-review handling are agreed and tested.
-
-### Staff HQ product ↔ Stripe behavior (current implementation)
-
-Staff HQ currently saves coaching plan rows to Neon `public.plans` and SHWAG catalogue rows to Neon `public.swag_products`. It does **not** create or update Stripe Products/Prices. Online checkout reads the active plan's existing `stripe_price_id` and validates its mode, GBP currency and amount. Changing a price in Staff HQ without also updating/relinking the Stripe Price can make checkout fail closed with a price mismatch.
-
-SHWAG products are currently enquiry/catalogue-only; they do not have a Stripe checkout flow. Do not silently create Stripe prices for them. A future Stripe sync must be a server-side operation with an admin authorization check, explicit product/price mapping, idempotency, deactivation/archive handling, and a clear partial-failure result. Stripe secret keys must never be used in browser code.
+## 7. Stripe plan-management and payment-release checks
+
+### Staff HQ plan sync (production-only code path)
+Use a dedicated admin and an approved safe test window. The release candidate blocks Preview sync because Preview currently shares the production Neon database; do not bypass that guard.
+
+Before enabling this workflow:
+- [ ] Confirm the production restricted Stripe key has Product and Price read/write plus Checkout Session create permissions.
+- [ ] Confirm current online plan rows have correct `stripe_product_id` / `stripe_price_id` mappings in Neon and match the expected active GBP Prices in Stripe.
+- [ ] Test a create/edit/price change/hide/reactivate/archive sequence against a disposable Stripe test account and a disposable Neon branch once Preview has its own database and test keys.
+- [ ] Verify a price change creates a new Price, deactivates the old one, and the public checkout uses the new Neon mapping.
+- [ ] Verify failed Stripe sync is shown as an error and does not falsely report success; verify retries do not create duplicate Products/Prices.
+- [ ] Verify archiving prevents new purchases but retains the plan and historic payment records.
+- [ ] Verify SHWAG remains catalogue/enquiry-only; do not create Stripe Prices until its checkout/sales flow is designed.
+
+### Before any live paid checkout
+- [ ] Create the Stripe webhook endpoint for the production checkout route and configure its exact signing secret as `STRIPE_WEBHOOK_SECRET` in Vercel Production.
+- [ ] Review the prepared `db/migrations/20261026_stripe_payment_records.sql` and obtain explicit approval before applying it to the intended production Neon branch.
+- [ ] Verify valid, invalid, stale and duplicate webhook signatures/events; paid vs unpaid sessions; amount/currency/mode mismatch; refund/reversal; replay/idempotency.
+- [ ] Implement and verify safe customer/account linking, membership provisioning and revocation. A payment-ledger row alone must not grant membership.
+- [ ] Keep live checkout disabled until the complete lifecycle has passed. Never use live cards for tests.
+
+## 8. Final website release checklist — Chris
+
+Run from the website repo root against the exact release branch/commit:
+
+```bash
+npm ci
+npm test
+npm run lint
+npm run build
+```
+
+- [ ] Record branch + commit SHA, Node/npm versions, output and exit code for each command.
+- [ ] Open the production site and verify homepage, package/pricing pages, contact form, app waitlist, legal pages, direct-route refresh and mobile/desktop layout.
+- [ ] Verify `/api/health` and `/api/products` over HTTP; issue #49 for `/api/products` remains open until verified against the intended deployment.
+- [ ] Sign in to Staff HQ as the real authorized admin; verify non-staff is denied and coach cannot make platform-admin-only changes.
+- [ ] Demo mode: CRUD/visibility for supported screens; refresh; invalid input; cancel delete; confirm demo writes do not persist to Neon.
+- [ ] Disposable Neon branch: create/edit/assign plan and member data; confirm persisted after refresh and visible to the correct app account.
+- [ ] Verify member A cannot read/write member B's data; verify private progress photos are private.
+- [ ] Verify PWA install prompt/manifest/icon, offline fallback and service-worker update in a real browser.
+- [ ] Verify enquiry persistence and email notification delivery/failure/retry.
+- [ ] Run payment tests only in Stripe test mode after isolated Preview DB/test keys exist; do not test live payment until the payment gate above is complete.
+
+## 9. Final mobile release checklist — Chris
+
+Run from the mobile repo root against `release/final-readiness-2026-10-30`:
+
+```bash
+npm ci
+npx tsc --noEmit
+npm run lint
+npm test
+npx expo export --platform android
+```
+
+- [ ] Record branch + commit SHA, Node/npm versions, output and exit code for each command.
+- [ ] Resolve lockfile/install errors before interpreting downstream failures.
+- [ ] Build a fresh Android binary and install it on a physical device; a JS export is not proof that the native app starts.
+- [ ] Test cold start, fatal-error screen, secure random generation and whether the actual Neon Auth dependency requires SubtleCrypto; never add a fake crypto success fallback.
+- [ ] Test sign-up/sign-in, session restore, sign-out, password reset email/deep link, invalid/expired token and role routing.
+- [ ] Verify profile/membership, check-ins, weigh-ins, photos, cardio, daily metrics, nutrition logs, workout completion/calendar, supplements/steps where enabled, and coach/member messages survive reload and appear in Staff HQ.
+- [ ] Verify account isolation with two dedicated test members and an authorized coach/admin.
+- [ ] Verify denied permissions, offline/retry/error states, photo privacy and notification token/permission flows if push is in day-one scope.
+- [ ] Check app icon/splash/adaptive icon and font/layout/back navigation on device.
+- [ ] Keep distribution to Google Play internal testing until the owner explicitly approves a wider release.
+
+## 10. Human-only sign-off / do not skip
+
+- [ ] Chris records the real web and mobile test results and any failures.
+- [ ] Mike approves coaching/business acceptance and app release scope.
+- [ ] Production backup/restore and rollback owner are confirmed.
+- [ ] Final go/no-go is recorded against the exact tested commits.
+- [ ] Only after approval: one planned merge/build/deployment; no repeated deployments during the test cycle.
+
+Do not mark a test as passed based on source review, a branch existing, or a Vercel deployment marked READY.
