@@ -87,7 +87,7 @@ Required environment variables:
 - `STRIPE_PAYMENT_LEDGER_ENABLED` — keep disabled until the payment-ledger migration, signed webhook and lifecycle tests have been reviewed and approved.
 - `PUBLIC_SITE_URL` — canonical website origin for checkout return URLs.
 
-Production must use matching live keys. Preview/Development must use matching test keys; live keys outside Production fail closed. **Plan syncing is currently production-only** because Preview shares the production Neon database; it is intentionally blocked in Preview to protect live Stripe mappings.
+Production must use matching live keys. Preview/Development must use matching test keys; live keys outside Production fail closed. **Preview plan syncing is blocked by default** because Preview shares the production Neon database. To test it safely, first give Preview its own Neon Auth endpoint, Data API endpoint and `DATABASE_URL`, add matching Stripe test keys, then set `STRIPE_PLAN_SYNC_PREVIEW_ENABLED=true` and `STRIPE_PLAN_SYNC_PREVIEW_DATABASE_ISOLATED=true` on Preview only.
 
 **Current release gate:** Stripe keys are present in Vercel Production. The latest metadata-only environment inventory did not list `STRIPE_WEBHOOK_SECRET`; the ledger flag is targeted at Production and Preview. Secret values were not decrypted. The Stripe webhook endpoint and payment ledger are not yet signed off, and automatic paid membership provisioning/refunds are not complete. Do not enable paid membership access until those gates are verified.
 
