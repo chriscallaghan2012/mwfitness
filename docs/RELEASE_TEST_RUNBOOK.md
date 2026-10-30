@@ -144,3 +144,20 @@ Manual embedded checkout acceptance checklist:
 - [ ] Confirm a failed checkout never reports payment success or activates a membership.
 - [ ] Verify no card details, Stripe client secret or secret API key are written to app logs or MW Fitness API requests.
 - [ ] Do not test live charges until the webhook, idempotent payment record and membership activation flow are complete and explicitly approved.
+
+## Payment lifecycle — post-merge gate (2026-10-30)
+
+PR #140 is merged. The current source includes `POST /api/stripe-webhook`, `GET /api/checkout-status`, a prepared `db/migrations/20261026_stripe_payment_records.sql` migration and a read-only Staff HQ payment ledger.
+
+Before enabling real checkout, complete and record all of the following against the exact candidate commit:
+- [ ] Run `npm test`, `npm run lint` and `npm run build`; retain command output and commit SHA.
+- [ ] Apply the ledger migration only to an approved disposable Neon branch first; verify schema, RLS and platform-admin read access.
+- [ ] Verify a valid signed test webhook is recorded once; duplicate events do not duplicate records; invalid/stale signatures are rejected.
+- [ ] Verify paid, unpaid, amount-mismatch, currency-mismatch and test/live-mode-mismatch sessions.
+- [ ] Verify partial refunds go to manual review and full refunds reconcile correctly; confirm membership access is not left active after a confirmed refund.
+- [ ] Verify the checkout return endpoint cannot activate membership or expose secrets and does not trust the redirect alone.
+- [ ] Complete verified customer-account linking and membership provisioning/revocation design and tests before any automatic access is granted.
+- [ ] Verify the self-hosted raw-body webhook route and Vercel webhook configuration independently.
+- [ ] Record evidence and obtain explicit go/no-go approval.
+
+The migration remains prepared only, and `STRIPE_PAYMENT_LEDGER_ENABLED` must remain disabled until the release gates pass. No test pass is claimed from the merge alone. Do not run production migrations or deploy as part of this runbook without explicit authorization.
