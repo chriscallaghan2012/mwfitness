@@ -36,6 +36,17 @@ Expected:
 
 Record the branch and commit SHA, Node/npm versions, each command's exit code, and the full output for any failure. Do not report a check as passed unless it was run against the exact candidate commit.
 
+## Checks actually performed in this environment — 2026-10-30
+
+- [x] Read-only Vercel environment inventory: seven entries listed; no `VITE_SUPABASE_*` or per-plan `STRIPE_PRICE_*` environment variables listed; `STRIPE_WEBHOOK_SECRET` absent. Secret values were not decrypted.
+- [x] Scoped `STRIPE_PAYMENT_LEDGER_ENABLED` to Production only; Preview was removed from its target because Preview shares the production Neon database. Its encrypted value was preserved and not inspected.
+- [x] JavaScript syntax checks passed for `lib/stripe-plan-sync.mjs`, `api/_stripe.mjs`, `api/create-checkout.mjs`, and `lib/stripe-webhook-handler.mjs`.
+- [x] Executed the extracted `validatePlanPayload` function against a valid new dynamic plan ID, feature cleanup, zero online price, and invalid decimal precision; all four assertions behaved as expected.
+- [x] Confirmed no per-plan Stripe Price env lookup remains in the touched runtime modules and the Vercel API function count is 11 (under the Hobby limit of 12).
+- [x] Checked GitHub Actions run listings for both release branches; no workflow runs were found.
+- [ ] Full tests, lint, TypeScript and builds have **not** run. A local clone attempt failed because this execution environment could not resolve `github.com`; no full test pass is claimed.
+- [ ] No browser/device end-to-end test or real Stripe API request was run. No production database migration, merge or deployment was performed.
+
 ## 2. Automated coverage currently added
 
 `tests/admin-demo-db.test.ts` covers:
