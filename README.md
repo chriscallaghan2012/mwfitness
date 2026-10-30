@@ -78,7 +78,7 @@ The website uses embedded Stripe Checkout. Stripe collects card and billing deta
 
 **Neon is the source of truth for coaching plans.** Staff HQ → Plans creates/edits/activates/archives online coaching plans and synchronises the corresponding Stripe Product/Price server-side. Each plan stores `stripe_product_id` and `stripe_price_id` in `public.plans`. When a price changes, Stripe creates a new immutable Price, Neon is updated to the new Price ID, and the previous Price is deactivated. Archiving a plan preserves its history and prevents new purchases.
 
-Do **not** create per-plan environment variables such as `STRIPE_PRICE_ONLINE_GOLD_8WEEK`. The application reads the current Price ID from Neon and verifies the Stripe mode, GBP currency and amount against the active plan before creating Checkout. SHWAG products remain catalogue/enquiry-only; Stripe product sync for SHWAG is not part of the current scope because it has no checkout/sales flow.
+Do **not** create package-specific Stripe Price environment variables. The application reads the current Price ID from Neon and verifies the Stripe mode, GBP currency and amount against the active plan before creating Checkout. SHWAG products remain catalogue/enquiry-only; Stripe product sync for SHWAG is not part of the current scope because it has no checkout/sales flow.
 
 Required environment variables:
 - `STRIPE_SECRET_KEY` — server-only secret or restricted key. It needs permission to create Checkout Sessions and read/write Stripe Products and Prices for Staff HQ plan sync.
