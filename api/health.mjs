@@ -9,18 +9,11 @@ function checkoutStatus() {
   try {
     const configuration = resolveCheckoutMode();
     if (configuration.mode === 'mock') return 'mock';
-    const requiredActivePrices = [
-      'STRIPE_PRICE_ONLINE_4_WEEK_ONCE',
-      'STRIPE_PRICE_ONLINE_BRONZE_4WEEK',
-      'STRIPE_PRICE_ONLINE_SILVER_8WEEK',
-      'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
-      'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
-    ];
-    const hasPrices = requiredActivePrices.every((key) => Boolean(process.env[key]));
+    const hasPlanPriceSource = Boolean(process.env.DATABASE_URL);
     const hasSiteUrl = Boolean(process.env.PUBLIC_SITE_URL || process.env.VERCEL_URL);
     const hasWebhook = Boolean(process.env.STRIPE_WEBHOOK_SECRET);
     const ledgerEnabled = process.env.STRIPE_PAYMENT_LEDGER_ENABLED === 'true';
-    return hasPrices && hasSiteUrl && hasWebhook && ledgerEnabled ? 'configured' : 'misconfigured';
+    return hasPlanPriceSource && hasSiteUrl && hasWebhook && ledgerEnabled ? 'configured' : 'misconfigured';
   } catch {
     return 'misconfigured';
   }
