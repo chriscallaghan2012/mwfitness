@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { test } from 'node:test';
-import handler, { verifyStripeSignature } from '../api/stripe-webhook.mjs';
+import handler, { verifyStripeSignature } from '../lib/stripe-webhook-handler.mjs';
 
 function signatureFor(body: Buffer, secret: string, timestamp: number) {
   const digest = createHmac('sha256', secret).update(String(timestamp)).update('.').update(body).digest('hex');
