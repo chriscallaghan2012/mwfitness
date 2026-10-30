@@ -1,6 +1,7 @@
 // PlansAdmin — products (PT blocks + online coaching), same catalogue as the site.
 import { useEffect, useState } from 'react';
-import { adminDb } from '../../lib/admin/adminDb';
+import { adminDb, isDemoMode } from '../../lib/admin/adminDb';
+import { neon } from '../../lib/neon';
 import { AdminTable, Fmt, Row, StatusPill, btn, btnGhost, card, inp } from './fields';
 import { SwagProductsAdmin } from './SwagProductsAdmin';
 
@@ -31,6 +32,21 @@ export function PlansAdmin() {
   }, []);
 
   if (showSwag) return <SwagProductsAdmin onBack={() => setShowSwag(false)} />;
+
+  const syncOnlinePlan = async (action: 'save' | 'archive', plan: Record<string, unknown>, isCreate = false) => {
+    if (!neon) throw new Error('Neon Auth is not configured. Sign in again after the configuration is fixed.');
+    const auth = neon.auth as typeof neon.auth & { getJWTToken?: (allowAnonymous?: boolean) => Promise<string | null> };
+    const token = await auth.getJWTToken?.(false);
+    if (!token) throw new Error('Could not obtain a Neon staff token. Sign in again.');
+    const response = await fetch('/api/create-checkout?route=plan-sync', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, plan, isCreate }),
+    });
+    const result = await response.json() as { ok?: boolean; error?: string; action?: string; stripe?: { synced?: boolean } };
+    if (!response.ok || !result.ok) throw new Error(result.error || 'Plan and Stripe sync failed.');
+    return result;
+  };
 
   const blank = () => {
     setEdit({ id: '', active: true } as Row);
@@ -65,13 +81,23 @@ export function PlansAdmin() {
       .map((feature) => feature.trim())
       .filter(Boolean);
     try {
+      const shouldSyncStripe = f.kind === 'online' || edit?.kind === 'online';
+      if (shouldSyncStripe && !isDemoMode()) {
+        const result = await syncOnlinePlan('save', body, !edit?.id);
+        setMsg(result.stripe?.synced
+          ? 'Plan saved. Stripe product and price are synced; checkout will use the current Neon mapping.'
+          : 'Plan saved. The previous Stripe coaching product was archived.');
+        setEdit(null);
+        await load();
+        return;
+      }
       const result = edit?.id ? await db.from('plans').update(body).eq('id', edit.id).select('id') : await db.from('plans').insert(body).select('id');
       if (result.error) {
         setMsg(`Save failed: ${result.error.message}`);
       } else if (!result.data?.length) {
         setMsg('Nothing was saved. The package may no longer exist or your staff permissions may not allow this change.');
       } else {
-        setMsg('Package saved.');
+        setMsg(isDemoMode() ? 'Demo package saved. No Stripe or live Neon changes were made.' : 'Package saved.');
         setEdit(null);
         await load();
       }
@@ -84,6 +110,12 @@ export function PlansAdmin() {
     if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
     setBusy(true); setMsg('');
     try {
+      if (p.kind === 'online' && !isDemoMode()) {
+        await syncOnlinePlan('archive', { ...p, active: false }, false);
+        setMsg('Coaching plan archived in Neon and Stripe. Historic payments and records were retained.');
+        await load();
+        return;
+      }
       const result = await db.from('plans').delete().eq('id', p.id).select('id');
       if (result.error) {
         setMsg(`Delete failed: ${result.error.message}`);
@@ -93,7 +125,7 @@ export function PlansAdmin() {
         setMsg('The plan was not deleted. It may already be gone or your staff permissions may not allow this change.');
         return;
       }
-      setMsg('Plan deleted.');
+      setMsg(isDemoMode() ? 'Demo plan deleted. No live Neon or Stripe changes were made.' : 'Plan deleted.');
       await load();
     } catch {
       setMsg('Could not delete this plan. Check the connection and retry.');
@@ -104,10 +136,21 @@ export function PlansAdmin() {
     if (!db) { setMsg('Neon is not configured; no changes were made.'); return; }
     setBusy(true); setMsg('');
     try {
+      if (p.kind === 'online' && !isDemoMode()) {
+        await syncOnlinePlan('save', {
+          id: p.id, name: p.name, tag: p.tag ?? null, price: Number(p.price),
+          original_price: p.original_price == null ? null : Number(p.original_price), badge: p.badge ?? null,
+          is_popular: Boolean(p.is_popular), description: p.description ?? '', features: Array.isArray(p.features) ? p.features : [],
+          cta_text: p.cta_text ?? '', kind: 'online', active: !p.active,
+        }, false);
+        setMsg(String(p.name) + ' is now ' + (p.active ? 'hidden' : 'live') + ' in Neon and Stripe.');
+        await load();
+        return;
+      }
       const result = await db.from('plans').update({ active: !p.active }).eq('id', p.id).select('id');
       if (result.error) { setMsg(`Could not update visibility: ${result.error.message}`); return; }
       if (!result.data?.length) { setMsg('Visibility was not changed. The package may no longer exist or your staff permissions may not allow this change.'); return; }
-      setMsg(`${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);
+      setMsg(isDemoMode() ? 'Demo visibility updated. No live Stripe changes were made.' : `${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);
       await load();
     } catch {
       setMsg('Could not update plan visibility. Check the connection and retry.');
