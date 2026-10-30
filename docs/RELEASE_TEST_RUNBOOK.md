@@ -220,3 +220,8 @@ Run `npm test` from a clean checkout to execute the new regression test. This te
 ## Live coaching Stripe price verification — 2026-10-30
 
 Read-only Neon and Stripe checks verified all five active online coaching plans against the live `MWFitnessUk` Stripe account. Each Price is active, GBP, one-time, live mode, and matches the Neon amount. The mapping migration is already reflected in production rows/schema and should not be reapplied. The payment-ledger table is still absent from production, so the ledger migration remains unapplied and the payment gate stays disabled.
+
+
+## Vercel environment readiness — 2026-10-30
+
+Metadata-only inspection found Neon Auth/Data API and DATABASE_URL variables assigned to Production, Preview and Development. No Stripe secret/publishable keys, webhook secret or payment-ledger gate are listed, so live checkout must remain unavailable. No SMTP host/port/user/password variables are listed, so email delivery is not configured in Vercel and remains outstanding. Legacy VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY variables remain in Production and Development, but repository code search found no current references; they were left untouched. The encrypted Vercel DATABASE_URL could not be safely matched to a Neon host/database in this pass.
