@@ -1,7 +1,7 @@
 > **CURRENT HANDOFF — 2026-10-30 (release candidate; not merged/deployed)**  
 > Website release branch: `release/mwfitness-final-readiness-2026-10-30`. Mobile release branch: `release/final-readiness-2026-10-30`. Both are ahead of `main`; neither is merged or released. Production website baseline is `3cab220e8c9acd4ec0587682f4a1ebc33f5223d9`; mobile baseline is `21870989fcff771953e4823677047e3d8fab98db`. No production deploy or production database migration was performed by this work.
 >
-> **Website code updated:** dynamic Staff HQ online-plan create/edit/visibility/archive sync; Neon-backed Stripe Product/Price mapping; checkout no longer uses per-plan Price environment variables; webhook validation supports new online plan IDs; tests and docs updated. SHWAG products remain catalogue/enquiry-only and are not Stripe-synced because no sales/checkout flow exists. Preview plan sync is blocked while Preview shares production Neon. Full tests/build/lint have not been run in this environment.
+> **Website code updated:** dynamic Staff HQ online-plan create/edit/visibility/archive sync; Neon-backed Stripe Product/Price mapping; checkout no longer uses per-plan Price environment variables; webhook validation supports new online plan IDs; tests and docs updated. SHWAG products remain catalogue/enquiry-only and are not Stripe-synced because no sales/checkout flow exists. Preview plan sync is blocked by default while Preview shares production Neon. To test safely, isolate Preview's Neon Auth endpoint, Data API endpoint and `DATABASE_URL`, add matching Stripe test keys, and set `STRIPE_PLAN_SYNC_PREVIEW_ENABLED=true` plus `STRIPE_PLAN_SYNC_PREVIEW_DATABASE_ISOLATED=true` on Preview only. Full tests/build/lint have not been run in this environment.
 >
 > **Vercel environment inventory (metadata only; no secrets decrypted):** only seven project variables are currently listed: `DATABASE_URL`, `PUBLIC_SITE_URL`, `VITE_NEON_AUTH_URL`, `VITE_NEON_DATA_API_URL`, `STRIPE_SECRET_KEY`, `VITE_STRIPE_PUBLISHABLE_KEY`, and `STRIPE_PAYMENT_LEDGER_ENABLED`. No legacy `VITE_SUPABASE_*` variables and no per-plan `STRIPE_PRICE_*` variables are present in this current inventory. `STRIPE_WEBHOOK_SECRET` was not listed. The ledger flag is targeted at Production only; its encrypted value was not inspected. Do not enable live payment processing until the migration, webhook and membership lifecycle are reviewed and approved.
 >
@@ -153,7 +153,7 @@ This verifies a real Neon connection and database CRUD, and reads public pricing
 ## 7. Stripe plan-management and payment-release checks
 
 ### Staff HQ plan sync (production-only code path)
-Use a dedicated admin and an approved safe test window. The release candidate blocks Preview sync because Preview currently shares the production Neon database; do not bypass that guard.
+Use a dedicated admin and an approved safe test window. The release candidate blocks Preview sync by default because Preview currently shares the production Neon database; do not bypass that guard. After isolating Preview's Neon Auth/Data API/database and adding matching test keys, enable only with both Preview-only flags `STRIPE_PLAN_SYNC_PREVIEW_ENABLED=true` and `STRIPE_PLAN_SYNC_PREVIEW_DATABASE_ISOLATED=true`.
 
 Before enabling this workflow:
 - [ ] Confirm the production restricted Stripe key has Product and Price read/write plus Checkout Session create permissions.
