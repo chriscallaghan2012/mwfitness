@@ -144,8 +144,8 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
         <p className="mt-2 text-sm text-zinc-300">{checkoutReturn ? 'Checking the payment result. Do not start another payment.' : mockCheckout ? 'This Preview is using a simulation; no payment will be taken.' : 'Enter your details, then pay securely without leaving this page.'}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
-        <div className="border border-[#20232b] bg-[#121419] p-6 sm:p-8">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)] lg:gap-8 xl:gap-10">
+        <div className="min-w-0 border border-[#20232b] bg-[#121419] p-6 sm:p-8">
           {checkoutReturn ? (
             <div role="status" aria-live="polite" className="mt-5 border border-[#343943] bg-[#191c22] p-5">
               <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#ff5500]">Stripe payment return</p>
@@ -171,11 +171,20 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
               </label>
             </div>
 
-            <h2 className="mt-8 font-display text-2xl text-white uppercase">Payment</h2>
-            <div className="mt-4 border border-[#343943] bg-[#191c22] p-4">
-              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-200"><Lock className="h-3.5 w-3.5 text-[#ff5500]" /> {mockCheckout ? 'Preview mock checkout simulation' : 'Secure embedded Stripe payment'}</div>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-300">{mockCheckout ? 'Mock mode does not load card fields, contact Stripe, or take payment.' : 'Your card and billing details are collected securely by Stripe inside this checkout. The website does not receive or store your card number or security code.'}</p>
-              {!clientSecret && !mockCheckout && <p className="mt-2 text-xs leading-relaxed text-zinc-400">Stripe will load here after you continue. If this Preview has no Stripe test keys configured, a clearly labelled mock checkout is shown instead. Your total is shown in the order summary.</p>}
+            <div className="mt-8 flex items-center justify-between gap-4 border-b border-[#292d36] pb-3">
+              <h2 className="font-display text-2xl text-white uppercase">Payment details</h2>
+              <span className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-zinc-400"><Lock className="h-3.5 w-3.5 text-[#ff5500]" /> Stripe secure form</span>
+            </div>
+            <div className="mt-4 border border-[#343943] bg-[#191c22] p-4 sm:p-5">
+              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-200"><ShieldCheck className="h-4 w-4 text-[#ff5500]" /> {mockCheckout ? 'Preview mock checkout simulation' : 'Secure payment on MW Fitness'}</div>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-300">{mockCheckout ? 'Mock mode does not load card fields, contact Stripe, or take payment.' : 'The secure Stripe payment form is embedded directly on this page. You will not be redirected to a separate Stripe checkout page.'}</p>
+              <ul className="mt-4 grid gap-2 text-xs leading-relaxed text-zinc-300 sm:grid-cols-2">
+                <li className="flex items-start gap-2"><Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff5500]" /><span>Card number, expiry date and security code are entered into Stripe’s secure fields.</span></li>
+                <li className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff5500]" /><span>MW Fitness does not receive or store your full card details or security code.</span></li>
+                <li className="flex items-start gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff5500]" /><span>Stripe may request your billing address and phone number to process the payment.</span></li>
+                <li className="flex items-start gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff5500]" /><span>Available card and wallet payment methods are displayed securely by Stripe.</span></li>
+              </ul>
+              {!clientSecret && !mockCheckout && <p className="mt-4 border-t border-[#343943] pt-3 text-xs leading-relaxed text-zinc-400">Select Continue to payment to load the secure payment form below. This is a one-off payment for the selected coaching package, not an automatic recurring subscription. If this Preview has no Stripe test keys, it will show a clearly labelled simulation instead.</p>}
             </div>
           </>}
 
@@ -208,20 +217,32 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
           {!checkoutReturn && (!mockCheckout ? <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-300"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Card details are handled securely by Stripe</p> : <p className="mt-3 text-center text-[11px] text-amber-200">No card details collected in mock mode</p>)}
         </div>
 
-        <aside className="border border-[#20232b] bg-[#121419] p-6 sm:p-8 lg:sticky lg:top-36">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-[#ff5500]">Order summary</p>
-          <h2 className="mt-2 font-display text-3xl text-white uppercase">{plan.name}</h2>
+        <aside className="min-w-0 self-start border border-[#343943] bg-[#15181e] p-6 sm:p-7 lg:sticky lg:top-28">
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-[#ff5500]">Order summary</p>
+            <span className="border border-[#454a55] px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-zinc-300">1 × package</span>
+          </div>
+          <h2 className="mt-3 font-display text-3xl leading-none text-white uppercase">{plan.name}</h2>
           <p className="mt-1 text-xs font-mono uppercase tracking-wider text-zinc-400">{plan.tag}</p>
           <div className="mt-4 flex items-baseline gap-3 border-b border-[#20232b] pb-4">
-            <span className="font-display text-4xl text-white">{formatPrice(plan.price)}</span>
+            <span className="font-display text-4xl leading-none text-white">{formatPrice(plan.price)}</span>
             {plan.original_price !== null && <span className="text-xs font-mono text-zinc-400 line-through">{formatPrice(plan.original_price)}</span>}
             {plan.badge && <span className="bg-[#ff5500] px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-black">{plan.badge}</span>}
           </div>
           <p className="mt-4 text-sm leading-relaxed text-zinc-300">{plan.description}</p>
+          <div className="mt-5 space-y-3 border-y border-[#343943] py-4 text-xs">
+            <div className="flex items-center justify-between gap-4 text-zinc-300"><span>Package subtotal</span><span className="font-mono tabular-nums text-white">{formatPrice(plan.price)}</span></div>
+            <div className="flex items-center justify-between gap-4 text-zinc-300"><span>Payment frequency</span><span className="font-mono uppercase text-white">One-off</span></div>
+            <div className="flex items-center justify-between gap-4 pt-1 text-sm font-bold text-white"><span>Total due today</span><span className="font-mono tabular-nums text-[#ff7547]">{formatPrice(plan.price)}</span></div>
+          </div>
           <ul className="mt-5 space-y-2 text-xs text-zinc-300">
             {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ff5500]" /><span>{feature}</span></li>)}
           </ul>
-          <p className="mt-5 border-t border-[#20232b] pt-4 text-[11px] leading-relaxed text-zinc-300">Questions first? <button type="button" onClick={() => onSelectScreen('contact')} className="text-[#ff7547] underline underline-offset-4">Contact Mike</button> before buying.</p>
+          <div className="mt-5 border-t border-[#343943] pt-4">
+            <p className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-zinc-300"><Lock className="h-3.5 w-3.5 text-[#ff5500]" /> Secure payment powered by Stripe</p>
+            <p className="mt-2 text-[11px] leading-relaxed text-zinc-400">Your payment is processed by Stripe. The amount shown above is the full one-off package price.</p>
+          </div>
+          <p className="mt-4 text-[11px] leading-relaxed text-zinc-300">Questions first? <button type="button" onClick={() => onSelectScreen('contact')} className="text-[#ff7547] underline underline-offset-4">Contact Mike</button> before buying.</p>
         </aside>
       </div>
     </section>
