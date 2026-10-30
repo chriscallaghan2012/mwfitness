@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import handler from '../api/checkout-status.mjs';
+import handler from '../lib/checkout-status-handler.mjs';
 
 function responseDouble() {
   return {
