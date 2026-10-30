@@ -664,3 +664,14 @@ No production Vercel variables, Stripe keys, Stripe webhook endpoints, Resend do
 - Fixed on branch release/mwfitness-final-readiness-2026-10-30 by rendering CommunicationsAdmin for live mode while keeping the explicit demo placeholder for demo mode.
 - This is a source fix only: it has not been run, merged or deployed. The live communications workflows, database permissions, Resend delivery and automation triggers still need end-to-end verification.
 - PaymentsAdmin is reachable inside the Plans & memberships tab under “Stripe payment ledger”; it is not a separate sidebar tab. The ledger remains unavailable until its migration is approved/applied and platform-admin access is verified.
+
+
+### Payment-ledger migration dependency check
+
+A fresh read-only query against the production Neon branch confirms:
+- public.stripe_payment_records does not exist yet.
+- public.is_platform_admin() does exist, so the migration's named admin-policy function dependency is present.
+- The five active online plan rows and their Stripe Product/Price IDs are present and match the live catalogue/amounts above.
+- No migration or row was changed by this query.
+
+The ledger migration is therefore still outstanding, but the previously identified admin-function dependency is not a blocker. It still requires explicit approval before applying to production.
