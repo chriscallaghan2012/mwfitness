@@ -1,3 +1,17 @@
+> **CURRENT HANDOFF — 2026-10-30 (web + mobile release readiness; not released)**  
+> Website branch `release/mwfitness-final-readiness-2026-10-30`; mobile branch `release/final-readiness-2026-10-30`. Both are ahead of `main`, neither is merged/deployed. Production baselines: website `3cab220e8c9acd4ec0587682f4a1ebc33f5223d9`, mobile `21870989fcff771953e4823677047e3d8fab98db`.
+>
+> **Website changes:** Staff HQ online coaching plans now have server-side Stripe Product/Price sync on the candidate branch. Checkout reads Stripe Price IDs from Neon, not per-plan env vars. SHWAG remains enquiry/catalogue-only. Preview plan sync is blocked by default while Preview shares production Neon. It can be enabled for test-mode sync only after isolating Preview's Neon Auth/Data API/database and setting two Preview-only flags. README, .env.example, tests and the release runbook were updated to remove obsolete per-plan Stripe Price env setup.
+>
+> **Vercel env audit (metadata only):** current inventory has seven entries: `DATABASE_URL`, `PUBLIC_SITE_URL`, `VITE_NEON_AUTH_URL`, `VITE_NEON_DATA_API_URL`, `STRIPE_SECRET_KEY`, `VITE_STRIPE_PUBLISHABLE_KEY`, `STRIPE_PAYMENT_LEDGER_ENABLED`. No `VITE_SUPABASE_*` or `STRIPE_PRICE_*` project variables are listed. No `STRIPE_WEBHOOK_SECRET` is listed. Secret values were not decrypted, so the inventory confirms entries, not that secret contents are valid. There is no delete action exposed by the current Vercel connector; no stale Vercel env entries were present in the latest inventory to remove.
+>
+> **Payments:** Stripe Product/Price sync does not mean paid checkout is ready. Configure the real webhook endpoint and signing secret, review the prepared ledger migration, then test signed events, idempotency, refunds and the complete membership lifecycle. No production migration was applied.
+>
+> **Mobile:** the candidate branch removes fake crypto-success fallbacks and adds static crypto/schema-contract tests. Native SubtleCrypto compatibility, auth/session/password reset, data round-trips, fresh Android build and physical-device tests remain unverified.
+>
+> **Checks:** no GitHub Actions workflow runs were found for either release branch. Source-level syntax checks passed for the touched server-side JavaScript modules; no full website/mobile test, lint, TypeScript or build result is recorded. No merge, deploy, migration or Play release is authorized.
+>
+> ---
 # MW FITNESS — Live Release Audit & Go-Live Plan
 
 **Status:** Planning / release not yet approved  
@@ -585,3 +599,73 @@ A metadata-only listing of the `mwfitness` Vercel project's environment-variable
 The Vercel connector returned the `DATABASE_URL` value encrypted rather than as a parseable connection string. Its host/database target could not be independently matched to Neon without exposing or decrypting the secret. No environment values were read into documentation or changed.
 
 Additional Stripe product verification: all five linked live Stripe Product objects were also retrieved and are active. Each product's `default_price` is the exact Price ID stored on its corresponding active Neon plan row.
+
+
+> **Stripe key follow-up — 2026-10-30:** The connected Stripe session exposes the `MWFitnessUk` account in live mode only; no test-mode context for this account is available in the current connection. Stripe product/price objects were previously verified in live mode. The Stripe API integration does not expose/recover the account's existing secret API key, and the secret key is not stored in the repository or Vercel environment. Do not try to retrieve or commit it. The owner must add `STRIPE_SECRET_KEY` and `VITE_STRIPE_PUBLISHABLE_KEY` directly as encrypted/sensitive Vercel **Production** environment variables from Stripe Dashboard → Developers → API keys. Do not paste secret keys into chat or commit them to Git. Keep `STRIPE_PAYMENT_LEDGER_ENABLED` absent/false and do not enable live checkout until `STRIPE_WEBHOOK_SECRET`, the approved ledger migration and webhook/idempotency/membership lifecycle tests are complete. No Stripe keys were added or changed in this session. With no Stripe keys, Preview/Development already resolve to the clearly labelled mock checkout; Production intentionally fails closed and must not be switched to mock.
+
+
+## Connected-service audit — 2026-10-30 (verified through integrations)
+
+### Stripe — live account and catalogue
+
+- Connected live account: **MWFitnessUk**.
+- Five active live Stripe Products and five active live GBP one-time Prices were retrieved directly from that account.
+- The five verified prices are: 4 Week One-Off £99.99; Bronze 4 Week £159.99; Silver 8 Week £299.99; Gold 8 Week £399.99; Platinum 8 Week £449.99.
+- Each Product's default Price points to its matching active Price. The previous read-only Neon audit confirmed the five active public.plans rows have matching live Price IDs and amounts. No product or price was created or modified during this check.
+- **No webhook endpoints exist** in the live account yet.
+- The connected account list exposes MWFitnessUk in live mode, but no MWFitnessUk test/sandbox account. Genafize is a separate client/account and must not be used for MW Fitness tests.
+- The Stripe integration does not expose existing secret API key values or a key-creation operation. Do not try to retrieve or invent them.
+- Production Vercel currently has no STRIPE_SECRET_KEY, VITE_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET, or STRIPE_PAYMENT_LEDGER_ENABLED. Keep live checkout fail-closed.
+- A final-readiness branch now accepts Stripe restricted API keys (rk_live_ / rk_test_) as well as standard secret keys, and adds an explicit webhook gate so the webhook returns 503 until STRIPE_PAYMENT_LEDGER_ENABLED=true. Tests were added for both behaviors, but have **not** been run. This branch is not merged or deployed.
+- Prefer a restricted live API key with only **Prices: Read** and **Checkout Sessions: Write** permissions. Store it as a sensitive Vercel Production variable named STRIPE_SECRET_KEY; set VITE_STRIPE_PUBLISHABLE_KEY to the matching live publishable key. Do not commit either key.
+- Do not create the live webhook endpoint or enable the payment gate until the ledger migration and lifecycle tests are approved and ready. The current handler intentionally leaves paid records at pending_account_link; automatic membership provisioning/revocation is still not implemented.
+
+### Resend — domain limit reached
+
+- The connected Resend account currently has three verified sending domains: christopherjcallaghan.com, rub-n-scub.com, and dapperman.co.uk.
+- mwfitnessuk.com is not present.
+- Attempting to add mwfitnessuk.com in the EU region was rejected by Resend because the account has reached its three-domain plan limit. No existing domain was removed and no DNS record was changed.
+- No MWFitness-specific Resend API key exists in the listed key names. No new key was created.
+- **Owner action:** upgrade the Resend plan to allow another domain, or explicitly choose a different sending domain. Do not remove one of the existing domains without confirming which project depends on it.
+- Once the domain is added, publish the exact DNS records returned by Resend, verify the domain, create a dedicated sending_access API key restricted to that domain, then add RESEND_API_KEY as a sensitive Vercel Production variable and set RESEND_FROM_EMAIL to the verified sender.
+- The website's api/_mailer.mjs supports Resend directly. MAIL_TO currently falls back to mwfitnessukonline@gmail.com; confirm that is Mike's intended notification inbox before the first live send.
+
+### Vercel / production verification
+
+- Production deployment for main commit 3cab220e8c9acd4ec0587682f4a1ebc33f5223d9 is still **READY**, with aliases mwfitnessuk.com and www.mwfitnessuk.com. This confirms deployment/build only.
+- GitHub commit status contains a successful Vercel check; no GitHub Actions workflow run was returned for this commit.
+- The last 50 minutes of runtime logs for that deployment returned no entries. This is not evidence that endpoints were exercised successfully.
+- No production HTTP/browser test was completed. In particular, issue #49 remains open until /api/products is verified live.
+- Website PWA manifest, icon, service worker and production-only registration are present on main. Installability, offline fallback and update behavior remain untested in real browsers.
+- Vercel Hobby API endpoint count remains 11/12. Keep shared handlers under lib/ and do not add a new top-level api/ function without recounting.
+
+### Mobile release blocker discovered in source review
+
+- Mobile main is 21870989fcff771953e4823677047e3d8fab98db.
+- index.ts currently contains an unsafe WebCrypto fallback: it can use Math.random() for random values, returns an empty object from subtle.importKey, returns true from subtle.verify, returns zero bytes from subtle.sign, and returns a zero digest on errors. This is not a valid cryptographic implementation and must be replaced with a real supported implementation before production authentication is signed off. Do not interpret this as evidence of a confirmed exploit; it is a release-blocking implementation flaw.
+- The mobile main package.json has no test script. Branch release/neon-schema-contract-tests is five commits ahead of main with a schema-contract test and an npm test script; it has no commits behind main, but the tests have not been run and the branch is not merged.
+- The mobile CI workflow currently runs on manual dispatch or pushes to bulk/admin-activity-messages-only, not on every main push. No status checks were returned for the current mobile main SHA.
+- eas.json routes play-internal to Google Play's **internal** track; it does not publish to the production track. A fresh native build and physical-device verification are still required.
+
+### Execution boundary
+
+No production Vercel variables, Stripe keys, Stripe webhook endpoints, Resend domains/keys, DNS records, Neon schema/data, or mobile store releases were changed during this audit. The final-readiness code branch is not merged, tests are not claimed as passing, and no production deployment was triggered.
+
+
+### Additional Staff HQ finding — live communications tab
+
+- Source review found the Communications tab was present in the Staff HQ sidebar and the live CommunicationsAdmin component was imported, but only the demo-mode placeholder was rendered. A signed-in live staff user selecting “Notifications & email” would see an empty content area.
+- Fixed on branch release/mwfitness-final-readiness-2026-10-30 by rendering CommunicationsAdmin for live mode while keeping the explicit demo placeholder for demo mode.
+- This is a source fix only: it has not been run, merged or deployed. The live communications workflows, database permissions, Resend delivery and automation triggers still need end-to-end verification.
+- PaymentsAdmin is reachable inside the Plans & memberships tab under “Stripe payment ledger”; it is not a separate sidebar tab. The ledger remains unavailable until its migration is approved/applied and platform-admin access is verified.
+
+
+### Payment-ledger migration dependency check
+
+A fresh read-only query against the production Neon branch confirms:
+- public.stripe_payment_records does not exist yet.
+- public.is_platform_admin() does exist, so the migration's named admin-policy function dependency is present.
+- The five active online plan rows and their Stripe Product/Price IDs are present and match the live catalogue/amounts above.
+- No migration or row was changed by this query.
+
+The ledger migration is therefore still outstanding, but the previously identified admin-function dependency is not a blocker. It still requires explicit approval before applying to production.

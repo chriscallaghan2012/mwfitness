@@ -72,36 +72,26 @@ Production notes:
 The `dist/` folder is the static site and `api/` is auto-detected as serverless functions; `vercel.json` provides the SPA rewrites that `server.mjs` handles natively when self-hosting.
 Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables. The website's Neon migration `0005_website_leads.sql` is maintained in the companion mobile repository and applied to the dedicated MW Fitness database.
 
-### Embedded Stripe Checkout
+### Embedded Stripe Checkout and dynamic Staff HQ plans
 
-The website creates an **embedded Stripe Checkout Session server-side**. Stripe's secure payment form appears inside the website, while Stripe itself collects card and billing details; the website never receives or stores card numbers or CVCs.
+The website uses embedded Stripe Checkout. Stripe collects card and billing details; the website does not handle or store card numbers/CVCs.
 
-Add these environment variables locally and in Vercel:
+**Neon is the source of truth for coaching plans.** Staff HQ → Plans creates/edits/activates/archives online coaching plans and synchronises the corresponding Stripe Product/Price server-side. Each plan stores `stripe_product_id` and `stripe_price_id` in `public.plans`. When a price changes, Stripe creates a new immutable Price, Neon is updated to the new Price ID, and the previous Price is deactivated. Archiving a plan preserves its history and prevents new purchases.
 
-```dotenv
-VITE_STRIPE_PUBLISHABLE_KEY=REPLACE_WITH_STRIPE_PUBLISHABLE_KEY
-STRIPE_SECRET_KEY=REPLACE_WITH_STRIPE_SECRET_KEY
-STRIPE_PRICE_ONLINE_WEEKLY=price_REPLACE_WITH_PRICE_ID
-STRIPE_PRICE_ONLINE_12_WEEK=price_REPLACE_WITH_PRICE_ID
-STRIPE_PRICE_ONLINE_4_WEEK_ONCE=price_REPLACE_WITH_PRICE_ID
-STRIPE_PRICE_ONLINE_BRONZE_4WEEK=price_REPLACE_WITH_PRICE_ID
-STRIPE_PRICE_ONLINE_SILVER_8WEEK=price_REPLACE_WITH_PRICE_ID
-STRIPE_PRICE_ONLINE_GOLD_8WEEK=price_REPLACE_WITH_PRICE_ID
-STRIPE_PRICE_ONLINE_PLATINUM_8WEEK=price_REPLACE_WITH_PRICE_ID
-PUBLIC_SITE_URL=https://mwfitnessuk.com
-```
+Do **not** create package-specific Stripe Price environment variables. The application reads the current Price ID from Neon and verifies the Stripe mode, GBP currency and amount against the active plan before creating Checkout. SHWAG products remain catalogue/enquiry-only; Stripe product sync for SHWAG is not part of the current scope because it has no checkout/sales flow.
 
-**Vercel environment setup**
-- **Production:** set `VITE_STRIPE_PUBLISHABLE_KEY` to the Stripe live publishable key (`pk_live_…`), `STRIPE_SECRET_KEY` to the live secret key (`sk_live_…`), and every active `STRIPE_PRICE_…` value to the corresponding live-mode Price ID from the same Stripe account. Missing keys fail closed; production never falls back to mock checkout.
-- **Preview and Development:** when Stripe is configured, use matching test-mode publishable keys (`pk_test_…`), secret keys (`sk_test_…`) and test-mode Price IDs. Live keys are rejected outside Production.
-- **Preview/Development without keys:** if both Stripe keys are absent, checkout presents an explicitly labelled mock simulation—even if Price IDs were added. It creates no Stripe session, takes no payment and activates no membership. If only one key is set or keys use the wrong mode, checkout fails closed instead of silently mocking.
-- Before real checkout, the API verifies the selected plan is still active and is an online coaching plan in Neon. It retrieves the selected Stripe Price, checks its `livemode` flag against the environment's key mode, and checks that the Stripe amount/currency match the active plan price before creating a Checkout Session.
-- The publishable key is allowed in browser code; keep the secret key server-side only. Never use a `VITE_` prefix for the secret key or commit real credentials.
-- Stripe keys and Price IDs must come from Stripe's dashboard. Placeholder values do not activate payments.
+Required environment variables:
+- `STRIPE_SECRET_KEY` — server-only secret or restricted key. It needs permission to create Checkout Sessions and read/write Stripe Products and Prices for Staff HQ plan sync.
+- `VITE_STRIPE_PUBLISHABLE_KEY` — publishable key for the matching Stripe mode.
+- `STRIPE_WEBHOOK_SECRET` — signing secret for the configured webhook endpoint. Required for verified payment processing, not product/price syncing.
+- `STRIPE_PAYMENT_LEDGER_ENABLED` — keep disabled until the payment-ledger migration, signed webhook and lifecycle tests have been reviewed and approved.
+- `PUBLIC_SITE_URL` — canonical website origin for checkout return URLs.
 
-**Current audited Vercel state:** `PUBLIC_SITE_URL` is configured, but no Stripe key or Price ID variables were present in the environment-variable listing. Preview can use mock checkout until test credentials exist; Production checkout remains unavailable until live credentials and Price IDs are configured. No fake credentials were created.
+Production must use matching live keys. Preview/Development must use matching test keys; live keys outside Production fail closed. **Preview plan syncing is blocked by default** because Preview shares the production Neon database. To test it safely, first give Preview its own Neon Auth endpoint, Data API endpoint and `DATABASE_URL`, add matching Stripe test keys, then set `STRIPE_PLAN_SYNC_PREVIEW_ENABLED=true` and `STRIPE_PLAN_SYNC_PREVIEW_DATABASE_ISOLATED=true` on Preview only.
 
-**Important payment lifecycle gap:** the embedded checkout session is prepared, but no verified webhook currently records a payment and provisions/activates the purchased membership. Do not claim automatic paid access, membership activation or receipts until the signed webhook and idempotent membership lifecycle is implemented and tested.
+**Current release gate:** Stripe keys are present in Vercel Production. The latest metadata-only environment inventory did not list `STRIPE_WEBHOOK_SECRET`; the ledger flag is targeted at Production and Preview. Secret values were not decrypted. The Stripe webhook endpoint and payment ledger are not yet signed off, and automatic paid membership provisioning/refunds are not complete. Do not enable paid membership access until those gates are verified.
+
+The website's payment-ledger migration is `db/migrations/20261026_stripe_payment_records.sql`. It is prepared but must not be applied to production without explicit approval. A successful product/price sync is not evidence that payment processing or membership activation is ready.
 
 ## Content & staff controls
 
@@ -114,7 +104,7 @@ PUBLIC_SITE_URL=https://mwfitnessuk.com
 
 The website staff panel and the mobile app use the same dedicated Neon project, **MW Fitness**, with Neon Auth and the Neon Data API.
 
-Set these environment variables in Vercel for Production, Preview and Development:
+Set the Neon endpoint variables in Vercel for Production and Preview; use your local `.env` for development. Preview currently shares the production database, so use care with all writes:
 
 ```bash
 VITE_NEON_AUTH_URL=https://<branch-endpoint>/mwfitness/auth

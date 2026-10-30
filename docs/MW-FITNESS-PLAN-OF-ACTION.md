@@ -1,6 +1,19 @@
 # MW Fitness — plan of action and test gates
 
-This file contains historical notes for both `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). For current website work, `main` is the source of truth. Compare divergent branches at file level and recover only changes genuinely missing from `main`; do not merge stale branches wholesale or assume ahead/behind counts equal missing features. Keep website and Android changes separate. Do not deploy, dispatch GitHub workflows/build submissions, post to Slack, send test emails, or change the shared Neon database without explicit approval. Website verification is configured as manual-only.
+## Current release handoff — 2026-10-30
+
+- Website release candidate: `release/mwfitness-final-readiness-2026-10-30`; mobile release candidate: `release/final-readiness-2026-10-30`. Both are unmerged and undeployed. Check current GitHub comparison before using ahead/behind counts.
+- Website Staff HQ online coaching plans now have candidate code for server-side Stripe Product/Price sync. Neon is authoritative; no per-plan Stripe Price env variables are needed. SHWAG remains enquiry/catalogue-only. Preview sync is blocked by default while Preview shares production Neon; safe test-mode sync requires isolated Preview Neon Auth/Data API/database, matching test keys and two Preview-only flags.
+- Current Vercel inventory has no `VITE_SUPABASE_*` or `STRIPE_PRICE_*` project variables. The current inventory does not include `STRIPE_WEBHOOK_SECRET`; secret values were not decrypted. `STRIPE_PAYMENT_LEDGER_ENABLED` is now targeted at Production only. Do not treat the Stripe secret key entry as verified until a safe checkout/session smoke test proves the credential and permissions work.
+- The mobile release branch removes fake crypto success fallbacks; native SubtleCrypto compatibility and real Android auth/data round-trip tests are still required.
+- No GitHub Actions runs were found for either release branch. Full tests, lint, typecheck/build and device checks have not been run here. The source-level syntax checks are not a substitute.
+- Do not merge, deploy, apply production migrations, send test emails, run live-card tests or publish to Google Play without explicit approval.
+
+See `docs/RELEASE_TEST_RUNBOOK.md`, `docs/END_TO_END_RELEASE_CHECKLIST.md`, `docs/LIVE_RELEASE_AUDIT_AND_GO_LIVE_PLAN.md` and the mobile repo's `docs/FINAL_RELEASE_READINESS_2026-10-30.md` for the current release steps.
+
+---
+
+This file contains historical notes for both `mwfitness` (website / Staff HQ) and `MW-FITNESS-APP-MOBILE` (Expo app). For current release work, use the release handoff above and compare the exact release candidate with `main` at file level. Do not merge stale branches wholesale or assume ahead/behind counts equal missing features. Keep website and Android changes separate. Do not deploy, dispatch GitHub workflows/build submissions, post to Slack, send test emails, or change the shared Neon database without explicit approval. Website verification is configured as manual-only.
 
 ## Completed in this work batch
 - [x] Android nutrition day selector now loads and saves the selected calendar date rather than always reading/writing today's nutrition log.

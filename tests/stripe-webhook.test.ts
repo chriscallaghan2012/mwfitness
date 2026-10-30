@@ -37,14 +37,41 @@ test('Stripe webhook signature verification rejects altered bodies and stale sig
   assert.equal(verifyStripeSignature(body, 't=not-a-number,v1=bad', secret, timestamp), false);
 });
 
-test('Stripe webhook rejects an invalid signature before attempting database work', async () => {
-  const envKeys = ['VERCEL_ENV', 'NODE_ENV', 'STRIPE_SECRET_KEY', 'VITE_STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET', 'DATABASE_URL'] as const;
+test('Stripe webhook stays disabled until the payment ledger gate is explicitly enabled', async () => {
+  const envKeys = ['VERCEL_ENV', 'NODE_ENV', 'STRIPE_SECRET_KEY', 'VITE_STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PAYMENT_LEDGER_ENABLED', 'DATABASE_URL'] as const;
   const previous = new Map(envKeys.map((key) => [key, process.env[key]]));
   try {
     process.env.VERCEL_ENV = 'preview';
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
     process.env.STRIPE_WEBHOOK_SECRET = 'whsec_release_test_secret';
+    process.env.STRIPE_PAYMENT_LEDGER_ENABLED = 'false';
+    process.env.DATABASE_URL = 'postgresql://invalid:invalid@127.0.0.1:5432/not_used';
+    const response = responseDouble();
+    await handler({
+      method: 'POST',
+      body: Buffer.from('{"id":"evt_test","type":"checkout.session.completed","data":{"object":{}}}'),
+      headers: { 'stripe-signature': 't=1800000000,v1=invalid' },
+    } as never, response as never);
+    assert.equal(response.statusCode, 503);
+    assert.match(JSON.stringify(response.body), /ledger is not enabled/i);
+  } finally {
+    for (const [key, value] of previous) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+});
+
+test('Stripe webhook rejects an invalid signature before attempting database work', async () => {
+  const envKeys = ['VERCEL_ENV', 'NODE_ENV', 'STRIPE_SECRET_KEY', 'VITE_STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PAYMENT_LEDGER_ENABLED', 'DATABASE_URL'] as const;
+  const previous = new Map(envKeys.map((key) => [key, process.env[key]]));
+  try {
+    process.env.VERCEL_ENV = 'preview';
+    process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_release_test_secret';
+    process.env.STRIPE_PAYMENT_LEDGER_ENABLED = 'true';
     process.env.DATABASE_URL = 'postgresql://invalid:invalid@127.0.0.1:5432/not_used';
     const response = responseDouble();
     await handler({

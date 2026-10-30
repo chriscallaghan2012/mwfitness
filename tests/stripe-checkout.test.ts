@@ -8,13 +8,6 @@ const envKeys = [
   'PUBLIC_SITE_URL',
   'STRIPE_SECRET_KEY',
   'VITE_STRIPE_PUBLISHABLE_KEY',
-  'STRIPE_PRICE_ONLINE_WEEKLY',
-  'STRIPE_PRICE_ONLINE_12_WEEK',
-  'STRIPE_PRICE_ONLINE_4_WEEK_ONCE',
-  'STRIPE_PRICE_ONLINE_BRONZE_4WEEK',
-  'STRIPE_PRICE_ONLINE_SILVER_8WEEK',
-  'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
-  'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
 ] as const;
 
 async function withCleanStripeEnv(run: () => Promise<void>) {
@@ -33,7 +26,6 @@ async function withCleanStripeEnv(run: () => Promise<void>) {
 
 test('Preview falls back to an explicit mock when both Stripe keys are absent', async () => {
   await withCleanStripeEnv(async () => {
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_configured_without_keys';
     assert.deepEqual(resolveCheckoutMode(), { mode: 'mock' });
     const result = await createCheckoutSession({ planId: 'online-gold-8week' });
     assert.deepEqual(result, { mode: 'mock' });
@@ -51,11 +43,37 @@ test('Production without Stripe configuration fails closed instead of using mock
   });
 });
 
+test('Preview accepts restricted Stripe test API keys', async () => {
+  await withCleanStripeEnv(async () => {
+    process.env.STRIPE_SECRET_KEY = 'rk_test_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
+    assert.deepEqual(resolveCheckoutMode(), {
+      mode: 'stripe',
+      publishableKey: 'pk_test_release_placeholder',
+      secretKey: 'rk_test_release_placeholder',
+      livemode: false,
+    });
+  });
+});
+
+test('Production accepts restricted Stripe live API keys', async () => {
+  await withCleanStripeEnv(async () => {
+    process.env.VERCEL_ENV = 'production';
+    process.env.STRIPE_SECRET_KEY = 'rk_live_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_live_release_placeholder';
+    assert.deepEqual(resolveCheckoutMode(), {
+      mode: 'stripe',
+      publishableKey: 'pk_live_release_placeholder',
+      secretKey: 'rk_live_release_placeholder',
+      livemode: true,
+    });
+  });
+});
+
 test('Stripe Checkout verifies the Price mode and creates an embedded session', async () => {
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_test_release_placeholder';
     process.env.PUBLIC_SITE_URL = 'https://preview.example.test';
     const originalFetch = globalThis.fetch;
     const requests: Array<{ url: string; method: string; authorization: string | null; body: URLSearchParams }> = [];
@@ -69,7 +87,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
         body: new URLSearchParams(String(init?.body ?? '')),
       });
       if (method === 'GET') {
-        return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false, currency: 'gbp', unit_amount: 9999 }), {
+        return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false, currency: 'gbp', unit_amount: 39999 }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
         });
@@ -84,9 +102,10 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
       const result = await createCheckoutSession({
         planId: 'online-gold-8week',
         origin: 'https://preview.example.test',
+        priceId: 'price_test_release_placeholder',
         customerEmail: 'release-test@example.com',
         customerName: 'Release Test',
-        expectedAmount: 99.99,
+        expectedAmount: 399.99,
       });
       assert.deepEqual(result, {
         mode: 'stripe',
@@ -113,7 +132,6 @@ test('Stripe rejects a Price ID from the wrong mode', async () => {
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_live_release_placeholder';
     const originalFetch = globalThis.fetch;
     let sessionCreated = false;
     globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
@@ -125,7 +143,7 @@ test('Stripe rejects a Price ID from the wrong mode', async () => {
     }) as typeof fetch;
     try {
       await assert.rejects(
-        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test' }),
+        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', priceId: 'price_live_release_placeholder', expectedAmount: 399.99 }),
         /does not match this environment/i,
       );
       assert.equal(sessionCreated, false);
@@ -135,9 +153,9 @@ test('Stripe rejects a Price ID from the wrong mode', async () => {
   });
 });
 
-test('Stripe Checkout rejects an unknown coaching plan before calling Stripe', async () => {
+test('Stripe Checkout rejects an empty plan identifier before calling Stripe', async () => {
   await assert.rejects(
-    () => createCheckoutSession({ planId: 'not-a-real-plan', origin: 'https://mwfitnessuk.com' }),
+    () => createCheckoutSession({ planId: '', origin: 'https://mwfitnessuk.com' }),
     /Invalid coaching plan/,
   );
 });
@@ -146,7 +164,6 @@ test('Stripe rejects a Price amount that differs from the active website plan', 
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_test_release_placeholder';
     const originalFetch = globalThis.fetch;
     let sessionCreated = false;
     globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
@@ -158,7 +175,7 @@ test('Stripe rejects a Price amount that differs from the active website plan', 
     }) as typeof fetch;
     try {
       await assert.rejects(
-        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', expectedAmount: 99.99 }),
+        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', priceId: 'price_test_release_placeholder', expectedAmount: 99.99 }),
         /does not match the active website plan price/i,
       );
       assert.equal(sessionCreated, false);

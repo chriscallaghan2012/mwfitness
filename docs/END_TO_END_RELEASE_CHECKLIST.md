@@ -16,7 +16,9 @@
 - [ ] Confirm Preview/Development use Stripe test mode when test credentials are configured.
 - [ ] Confirm Preview/Development with both Stripe keys absent uses the clearly labelled mock checkout and never creates a Stripe session or takes money.
 - [ ] Confirm partial/mismatched Stripe key configuration fails closed instead of silently using mock checkout.
-- [ ] Confirm Production is intended to use live Stripe keys/Price IDs only after payment lifecycle approval.
+- [ ] Confirm Production has matching live Stripe keys. Coaching Price IDs come from Neon `public.plans`; do not add per-plan `STRIPE_PRICE_*` environment variables.
+- [ ] Confirm Preview plan sync stays blocked until Preview has separate Neon Auth, Data API and DATABASE_URL values, matching Stripe test keys, and both Preview-only flags `STRIPE_PLAN_SYNC_PREVIEW_ENABLED=true` and `STRIPE_PLAN_SYNC_PREVIEW_DATABASE_ISOLATED=true`.
+- [ ] Confirm no `STRIPE_WEBHOOK_SECRET` is configured yet; live paid membership processing must remain blocked until the real webhook endpoint and signing secret are configured and the ledger/membership lifecycle tests pass.
 - [ ] Confirm no secret keys, database URLs, webhook secrets or customer-sensitive data are pasted into GitHub issues, screenshots or logs.
 - [ ] Confirm any live-data write test uses an explicitly approved test account/fixture and has a cleanup plan.
 - [ ] Confirm current database schema/migrations are documented before running schema changes.
@@ -61,7 +63,9 @@ Run these checks with authorised staff test accounts, not demo mode. Use safe fi
 - [ ] Edit an approved test record; verify the persisted values after reload.
 - [ ] Test validation errors and duplicate/conflicting input handling.
 - [ ] Test delete/archive only against a disposable fixture; confirm related-data protection and expected confirmation.
-- [ ] Test plans/package reads and permitted edits; verify public package prices remain consistent with Stripe price configuration.
+- [ ] Test plans/package reads and permitted edits; verify each online coaching plan's Neon Stripe Product/Price mapping matches the correct active GBP Price. The release candidate creates a new immutable Price on price change and archives online plans instead of hard-deleting them.
+- [ ] Test online coaching plan create/edit/price-change/hide/reactivate/archive against a disposable Stripe test account + disposable Neon branch when Preview has isolated credentials/database. Do not test destructive sync against live plans.
+- [ ] Confirm SHWAG products remain catalogue/enquiry-only; do not create Stripe Prices until its checkout/sales flow exists.
 - [ ] Test memberships reads/updates with a disposable account; confirm correct member association and no cross-member leakage.
 - [ ] Test nutrition, workouts, check-ins, progress entries/photos, messages, videos, programmes/assignments and leads where the UI supports those operations.
 - [ ] Confirm failed writes show a visible error and do not claim success.
