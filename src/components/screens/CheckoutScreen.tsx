@@ -187,7 +187,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)] lg:gap-8 xl:gap-10">
-        <div className="min-w-0 border border-[#20232b] bg-[#121419] p-6 sm:p-8">
+        <div className="order-2 min-w-0 border border-[#20232b] bg-[#121419] p-6 sm:p-8 lg:order-1">
           {checkoutReturn ? (
             <div role="status" aria-live="polite" className="mt-5 border border-[#343943] bg-[#191c22] p-5">
               <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#ff5500]">Stripe payment return</p>
@@ -252,7 +252,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
           {!checkoutReturn && (!mockCheckout ? <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-300"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Card details are handled securely by Stripe</p> : <p className="mt-3 text-center text-[11px] text-amber-200">No card details collected in mock mode</p>)}
         </div>
 
-        <aside className="min-w-0 self-start border border-[#343943] bg-[#15181e] p-6 sm:p-7 lg:sticky lg:top-28">
+        <aside className="order-1 min-w-0 self-start border border-[#343943] bg-[#15181e] p-6 sm:p-7 lg:order-2 lg:sticky lg:top-28">
           <div className="flex items-center justify-between gap-3">
             <p className="font-mono text-[10px] uppercase tracking-widest text-[#ff5500]">Order summary</p>
             <span className="border border-[#454a55] px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-zinc-300">1 × package</span>
