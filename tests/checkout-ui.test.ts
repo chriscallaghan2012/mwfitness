@@ -5,10 +5,11 @@ import { test } from 'node:test';
 
 const root = process.cwd();
 
-test('checkout loads Stripe payment fields automatically instead of requiring a details step', () => {
+test('checkout loads dark Stripe Elements automatically instead of requiring a details step', () => {
   const screen = readFileSync(join(root, 'src', 'components', 'screens', 'CheckoutScreen.tsx'), 'utf8');
-  assert.match(screen, /checkoutMountRef/);
-  assert.match(screen, /Secure embedded Stripe payment/);
+  assert.match(screen, /contactMountRef/);
+  assert.match(screen, /paymentMountRef/);
+  assert.match(screen, /Secure Stripe payment/);
   assert.match(screen, /createCheckoutSession\(plan\.id\)/);
   assert.match(screen, /if \(!plan \|\| checkoutReturn\?\.sessionId\) return/);
   assert.match(screen, /Your secure payment form loads automatically/);
@@ -17,18 +18,21 @@ test('checkout loads Stripe payment fields automatically instead of requiring a 
   assert.match(screen, /no paid membership or account access has been activated/);
   assert.doesNotMatch(screen, /Continue to payment/);
   assert.doesNotMatch(screen, /Your details/);
-  assert.match(screen, /createEmbeddedCheckoutPage\(\{ fetchClientSecret:/);
+  assert.match(screen, /initCheckoutElementsSdk\(\{/);
+  assert.match(screen, /theme: 'night'/);
+  assert.match(screen, /colorPrimary: '#ff5500'/);
+  assert.match(screen, /createContactDetailsElement\(\)/);
+  assert.match(screen, /createPaymentElement\(\{ fields: \{ billingDetails: \{ name: 'always' \} \} \}\)/);
+  assert.match(screen, /checkoutActions\.confirm\(\)/);
+  assert.match(screen, /Pay \$\{formatPrice\(plan\.price\)\}/);
   assert.doesNotMatch(screen, /placeholder="Card number"/);
   assert.doesNotMatch(screen, /placeholder="MM \/ YY"/);
   assert.doesNotMatch(screen, /placeholder="CVC"/);
 });
 
-test('server creates embedded Checkout sessions and never returns a hosted redirect URL', () => {
+test('server creates Checkout Elements sessions and never returns a hosted redirect URL', () => {
   const stripe = readFileSync(join(root, 'api', '_stripe.mjs'), 'utf8');
-  assert.match(stripe, /ui_mode: 'embedded_page'/);
-  assert.match(stripe, /branding_settings\[background_color\].*#121419/);
-  assert.match(stripe, /branding_settings\[button_color\].*#ff5500/);
-  assert.match(stripe, /branding_settings\[display_name\].*MWFitnessUK/);
+  assert.match(stripe, /ui_mode: 'elements'/);
   assert.match(stripe, /return_url:/);
   assert.match(stripe, /return \{ mode: 'stripe', clientSecret: data\.client_secret, publishableKey \}/);
   assert.doesNotMatch(stripe, /success_url:/);

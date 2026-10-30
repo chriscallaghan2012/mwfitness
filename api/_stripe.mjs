@@ -78,18 +78,12 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
 
   const params = new URLSearchParams({
     mode: 'payment',
-    ui_mode: 'embedded_page',
+    ui_mode: 'elements',
     'line_items[0][price]': priceId,
     'line_items[0][quantity]': '1',
     return_url: `${baseUrl}/checkout?checkout=complete&plan=${encodeURIComponent(planId)}&session_id={CHECKOUT_SESSION_ID}`,
-    redirect_on_completion: 'if_required',
     billing_address_collection: 'auto',
     'phone_number_collection[enabled]': 'true',
-    'branding_settings[background_color]': '#121419',
-    'branding_settings[button_color]': '#ff5500',
-    'branding_settings[border_style]': 'rectangular',
-    'branding_settings[font_family]': 'montserrat',
-    'branding_settings[display_name]': 'MWFitnessUK',
     'metadata[plan_id]': planId,
     'metadata[expected_amount_pence]': String(Math.round(expectedAmount * 100)),
   });
@@ -106,6 +100,6 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data?.error?.message || 'Stripe could not create checkout.');
-  if (!data.client_secret) throw new Error('Stripe did not return an embedded checkout client secret.');
+  if (!data.client_secret) throw new Error('Stripe did not return a checkout client secret.');
   return { mode: 'stripe', clientSecret: data.client_secret, publishableKey };
 }

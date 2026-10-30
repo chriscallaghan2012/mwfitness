@@ -72,9 +72,9 @@ Production notes:
 The `dist/` folder is the static site and `api/` is auto-detected as serverless functions; `vercel.json` provides the SPA rewrites that `server.mjs` handles natively when self-hosting.
 Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO` as Vercel environment variables. The website's Neon migration `0005_website_leads.sql` is maintained in the companion mobile repository and applied to the dedicated MW Fitness database.
 
-### Embedded Stripe Checkout and dynamic Staff HQ plans
+### Dark Stripe Checkout Elements and dynamic Staff HQ plans
 
-The website uses Stripe's embedded Checkout page (`ui_mode=embedded_page`), automatically loaded when a customer opens an active package. Stripe collects contact, card and billing details in a dark branded form; the website does not handle or store card numbers/CVCs.
+The website automatically loads Stripe Checkout Elements when a customer opens an active package. Stripe's Contact Details and Payment Elements collect contact, card and billing details in a dark appearance matched to the MW Fitness palette; the website does not handle or store card numbers/CVCs. The customer confirms payment using the site's secure payment button, and Stripe handles any required authentication and return flow.
 
 **Neon is the source of truth for coaching plans.** Staff HQ → Plans creates/edits/activates/archives online coaching plans and synchronises the corresponding Stripe Product/Price server-side. Each plan stores `stripe_product_id` and `stripe_price_id` in `public.plans`. When a price changes, Stripe creates a new immutable Price, Neon is updated to the new Price ID, and the previous Price is deactivated. Archiving a plan preserves its history and prevents new purchases.
 

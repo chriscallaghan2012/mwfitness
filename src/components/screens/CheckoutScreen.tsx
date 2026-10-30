@@ -32,8 +32,11 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
   const [stripePublishableKey, setStripePublishableKey] = useState('');
   const [mockCheckout, setMockCheckout] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
+  const [confirmingPayment, setConfirmingPayment] = useState(false);
+  const [checkoutActions, setCheckoutActions] = useState<StripeCheckoutActions | null>(null);
   const [returnStatus, setReturnStatus] = useState<'checking' | 'paid' | 'pending' | 'review' | 'error' | null>(null);
-  const checkoutMountRef = useRef<HTMLDivElement>(null);
+  const contactMountRef = useRef<HTMLDivElement>(null);
+  const paymentMountRef = useRef<HTMLDivElement>(null);
   const checkoutRequestsRef = useRef(new Map<string, ReturnType<typeof createCheckoutSession>>());
 
   useEffect(() => {
@@ -64,6 +67,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
     setMockCheckout(false);
     setClientSecret('');
     setStripePublishableKey('');
+    setCheckoutActions(null);
     setSubmitting(true);
 
     let request = checkoutRequestsRef.current.get(plan.id);
@@ -92,9 +96,10 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
   }, [plan?.id, checkoutReturn?.sessionId, checkoutAttempt]);
 
   useEffect(() => {
-    if (!clientSecret || !checkoutMountRef.current) return;
+    if (!clientSecret || !contactMountRef.current || !paymentMountRef.current) return;
     let cancelled = false;
-    let embeddedCheckout: StripeEmbeddedCheckout | null = null;
+    let contactElement: StripeMountableElement | null = null;
+    let paymentElement: StripeMountableElement | null = null;
 
     const mountCheckout = async () => {
       setStripeLoading(true);
@@ -103,12 +108,31 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
         if (!stripePublishableKey) throw new Error('Stripe is not configured for this website yet. Please contact Mike.');
         if (!window.Stripe) throw new Error('Stripe could not be initialised. Please refresh and try again.');
         const stripe = window.Stripe(stripePublishableKey);
-        embeddedCheckout = await stripe.createEmbeddedCheckoutPage({ fetchClientSecret: async () => clientSecret });
-        if (cancelled || !checkoutMountRef.current) {
-          embeddedCheckout.unmount();
-          return;
-        }
-        embeddedCheckout.mount(checkoutMountRef.current);
+        const checkout = stripe.initCheckoutElementsSdk({
+          clientSecret,
+          elementsOptions: {
+            appearance: {
+              theme: 'night',
+              variables: {
+                colorPrimary: '#ff5500',
+                colorBackground: '#121419',
+                colorText: '#f3f4f6',
+                colorDanger: '#f87171',
+                fontFamily: 'Hanken Grotesk, sans-serif',
+                fontSizeBase: '16px',
+                borderRadius: '0px',
+              },
+            },
+          },
+        });
+        const actionsResult = await checkout.loadActions();
+        if (actionsResult.type === 'error') throw new Error(actionsResult.error.message);
+        contactElement = checkout.createContactDetailsElement();
+        paymentElement = checkout.createPaymentElement({ fields: { billingDetails: { name: 'always' } } });
+        if (cancelled || !contactMountRef.current || !paymentMountRef.current) return;
+        contactElement.mount(contactMountRef.current);
+        paymentElement.mount(paymentMountRef.current);
+        setCheckoutActions(actionsResult.actions);
       } catch (error) {
         if (!cancelled) {
           setPaymentWarning(error instanceof Error ? error.message : 'Secure payment could not be loaded.');
@@ -122,9 +146,24 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
     void mountCheckout();
     return () => {
       cancelled = true;
-      embeddedCheckout?.unmount();
+      contactElement?.unmount();
+      paymentElement?.unmount();
     };
   }, [clientSecret, stripePublishableKey]);
+
+  const confirmPayment = async () => {
+    if (!checkoutActions) return;
+    setPaymentWarning('');
+    setConfirmingPayment(true);
+    try {
+      const result = await checkoutActions.confirm();
+      if (result.type === 'error') setPaymentWarning(result.error.message);
+    } catch (error) {
+      setPaymentWarning(error instanceof Error ? error.message : 'Payment could not be confirmed. Please try again.');
+    } finally {
+      setConfirmingPayment(false);
+    }
+  };
 
   if (!plan) {
     return (
@@ -142,7 +181,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
     <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <button type="button" onClick={() => onSelectScreen('online-coaching')} className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white"><ArrowLeft className="h-4 w-4" /> Back to packages</button>
       <div className="mb-8">
-        <p className="font-mono text-xs uppercase tracking-widest text-[#ff5500]">Secure embedded Stripe payment</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-[#ff5500]">Secure Stripe payment</p>
         <h1 className="mt-2 font-display text-4xl text-white uppercase tracking-tight sm:text-5xl">Checkout</h1>
         <p className="mt-2 text-sm text-zinc-300">{checkoutReturn ? 'Checking the payment result. Do not start another payment.' : mockCheckout ? 'This Preview is using a simulation; no payment will be taken.' : 'Your secure payment form loads automatically for this package.'}</p>
       </div>
@@ -185,8 +224,8 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
             <div role="alert" className="mt-4 border border-amber-500/50 bg-amber-500/10 p-4">
               <p className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-amber-300"><TriangleAlert className="h-4 w-4" /> Payment unavailable</p>
               <p className="mt-2 text-sm leading-relaxed text-amber-200/90">{paymentWarning}</p>
-              <p className="mt-2 text-xs leading-relaxed text-zinc-300">No card details have been collected. You can <button type="button" onClick={() => onSelectScreen('contact')} className="text-[#ff7547] underline underline-offset-4">contact Mike</button> for help.</p>
-              <button type="button" onClick={() => { checkoutRequestsRef.current.delete(plan.id); setCheckoutAttempt((attempt) => attempt + 1); }} className="mt-3 min-h-10 border border-amber-300/50 px-4 py-2 font-mono text-xs font-bold uppercase text-amber-200 hover:bg-amber-300/10">Try again</button>
+              <p className="mt-2 text-xs leading-relaxed text-zinc-300">Your payment details are handled securely by Stripe and are never stored by MW Fitness. You can <button type="button" onClick={() => onSelectScreen('contact')} className="text-[#ff7547] underline underline-offset-4">contact Mike</button> for help.</p>
+              {!checkoutActions && <button type="button" onClick={() => { checkoutRequestsRef.current.delete(plan.id); setCheckoutAttempt((attempt) => attempt + 1); }} className="mt-3 min-h-10 border border-amber-300/50 px-4 py-2 font-mono text-xs font-bold uppercase text-amber-200 hover:bg-amber-300/10">Try again</button>}
             </div>
           )}
 
@@ -201,7 +240,13 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
           {!checkoutReturn && !mockCheckout && (
             <div className="mt-5 border border-[#343943] bg-[#191c22] p-4">
               {(submitting || stripeLoading) && <p className="mb-3 text-sm text-zinc-300">Loading secure payment fields…</p>}
-              <div ref={checkoutMountRef} aria-label="Stripe secure payment form" />
+              <div ref={contactMountRef} aria-label="Stripe contact details" />
+              <div className="mt-4" ref={paymentMountRef} aria-label="Stripe secure payment form" />
+              {checkoutActions && (
+                <button type="button" onClick={() => void confirmPayment()} disabled={confirmingPayment} className="mt-5 min-h-12 w-full bg-[#ff5500] px-6 py-3.5 font-mono text-xs font-bold uppercase text-black transition hover:bg-[#ff6a1f] disabled:cursor-wait disabled:opacity-60">
+                  {confirmingPayment ? 'Processing securely…' : `Pay ${formatPrice(plan.price)}`}
+                </button>
+              )}
             </div>
           )}
           {!checkoutReturn && (!mockCheckout ? <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-300"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Card details are handled securely by Stripe</p> : <p className="mt-3 text-center text-[11px] text-amber-200">No card details collected in mock mode</p>)}
