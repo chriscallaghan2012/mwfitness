@@ -583,3 +583,5 @@ A metadata-only listing of the `mwfitness` Vercel project's environment-variable
 - Legacy `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` variables remain assigned to Production and Development. Repository code search found no references to these names and the current package uses Neon. They were not removed; treat them as stale configuration and remove only with explicit approval after a final dependency/code audit.
 
 The Vercel connector returned the `DATABASE_URL` value encrypted rather than as a parseable connection string. Its host/database target could not be independently matched to Neon without exposing or decrypting the secret. No environment values were read into documentation or changed.
+
+Additional Stripe product verification: all five linked live Stripe Product objects were also retrieved and are active. Each product's `default_price` is the exact Price ID stored on its corresponding active Neon plan row.
