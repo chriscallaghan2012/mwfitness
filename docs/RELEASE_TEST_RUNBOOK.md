@@ -168,3 +168,39 @@ Production Price ID source note: after PR #141, Production reads the live `strip
 ## Vercel Hobby function-count constraint
 
 The payment webhook and checkout-status paths are rewritten to the existing `/api/create-checkout` serverless function. Their shared handlers live under `lib/`, outside Vercel's `api/` function directory. Do not add new top-level files under `api/` without checking the 12-function Hobby limit and the production deployment result.
+
+
+## Current production candidate — 2026-10-30
+
+Latest known production deployment is commit `d41e7cb2eaddf0c302b84633d0348b8e6c5a5503`, state **READY**:
+[View deployment](https://vercel.com/cjc101187s-projects/mwfitness/AuAhbzTdWgqA6sZgzURUoB3biomx).
+
+The previous deployment failed because Vercel Hobby permits no more than 12 Serverless Functions. PR #142 moved the webhook and checkout-status implementations into `lib/` and routes both paths through `/api/create-checkout`. The current source has 11 top-level API endpoint files, leaving one function slot. The endpoint inventory is recorded in `LIVE_RELEASE_AUDIT_AND_GO_LIVE_PLAN.md`.
+
+**Do not add another top-level API endpoint casually.** Prefer extending an existing route or putting shared handler logic in `lib/`. Count the final candidate's actual Vercel functions before merging. A deployment can be READY while individual routes still fail, so complete the smoke tests below.
+
+### Production browser/API smoke tests — human execution
+
+Use the deployed custom domain and record the tested commit. Do not submit real payments or destructive production writes.
+
+- [ ] Open the apex and www domains; verify HTTPS and canonical redirect behavior.
+- [ ] Open every route listed in the release audit directly and hard-refresh.
+- [ ] Check browser console/network for failed chunks and API errors.
+- [ ] Confirm `GET /api/health`, `GET /api/plans` and `GET /api/products` return expected safe responses.
+- [ ] Confirm unsupported methods return the intended 405 response and do not mutate data.
+- [ ] Confirm `/api/checkout-status` rejects missing/invalid session identifiers safely and does not trust query-string claims.
+- [ ] Confirm `/api/stripe-webhook` rejects unsigned/invalid requests. Do not send fabricated signed events to production; use Stripe test mode and a disposable test setup for positive webhook tests.
+- [ ] Confirm public routes do not expose Stripe Price IDs, secrets, private member data or admin-only fields.
+- [ ] Test account/auth and Staff HQ journeys using dedicated test users, not real member accounts.
+
+### Current human test handoff
+
+The developer must first run the clean-checkout commands in section 1 against the final release candidate. Then the owner should run the production browser/API smoke tests above and the Staff HQ/auth/member-isolation checklist in sections 3–4 of the main release audit. Record exact commit, environment, account role, result and evidence. Do not mark a test complete based only on Vercel READY.
+
+### One-build merge policy
+
+All outstanding source and documentation changes are to be kept together off `main`. Do not merge small PRs one at a time or manually trigger deployments during the work. Once the complete release candidate has passed developer checks and review, merge once to `main`; the existing Git integration will trigger the production deployment. If the candidate changes after testing, rerun affected checks before that single merge.
+
+This documentation update itself is not merged to `main` and has not triggered a production build.
+
+**Current release status: NOT APPROVED.** Payment migrations are not applied, `STRIPE_PAYMENT_LEDGER_ENABLED` remains disabled, and live payment processing must not be enabled until the signed webhook, idempotency, refund and membership lifecycle are tested and approved.

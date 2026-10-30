@@ -454,10 +454,93 @@ PR #140 is merged into `main`. It adds:
 - A fail-closed real-checkout gate requiring `STRIPE_PAYMENT_LEDGER_ENABLED=true` and `STRIPE_WEBHOOK_SECRET`.
 - Raw-body webhook routing before Express JSON parsing, including the self-hosted server.
 
-**This is implementation status, not release evidence.** Tests, TypeScript, build, real signed webhook delivery, refund reconciliation, Neon migration/RLS, customer account linking, membership provisioning/revocation, browser checkout and production smoke tests remain unverified. The migration has not been applied and no deployment was performed. Keep the gate disabled until these checks pass on the exact release commit. Membership access is not automatically granted by the webhook.
+**This is implementation status, not release evidence.** Tests, TypeScript, build, real signed webhook delivery, refund reconciliation, Neon migration/RLS, customer account linking, membership provisioning/revocation, browser checkout and production smoke tests remain unverified. The migration has not been applied. A Git-triggered Vercel production deployment did occur after the subsequent function-limit fix; see the deployment status section below. Keep the gate disabled until these checks pass on the exact release commit. Membership access is not automatically granted by the webhook.
 
 ## Production Stripe price source — 2026-10-30 (PR #141)
 
 PR #141 is merged. Production checkout now reads `stripe_price_id` from the active `public.plans` row in Neon. Preview/Development continue using environment-configured test Price IDs. Before a Checkout Session is created, the server retrieves the Stripe Price and verifies its live/test mode, GBP currency and unit amount against the Neon plan price.
 
 The idempotent mapping migration is now tracked at `db/migrations/20261024_live_stripe_coaching_products.sql`. The previous PR stated that the live Neon rows had already been populated, but those row values were not independently re-verified in this session. Do not apply the migration to production as part of this work. Verify the intended Neon branch and rows using read-only checks first.
+
+
+## Release status update — 2026-10-30 (after PR #142)
+
+### Changes merged to main
+
+- **PR #139 — image crop:** adjusted the approach image crop by 10px while preserving its flip and caption treatment.
+- **PR #140 — payment verification groundwork:** added signed Stripe webhook verification, checkout-return status verification, an idempotent payment ledger handler, a prepared Neon migration and a read-only Staff HQ payment ledger. The real-payment gate remains off; membership activation is not automatic.
+- **PR #141 — Stripe price source:** Production checkout reads the live `stripe_price_id` from the active `public.plans` row in Neon. Preview/Development continue to use test Price IDs from environment variables. The Stripe Price is checked against mode, GBP currency and the plan amount.
+- **PR #142 — Vercel Hobby function cap:** moved webhook and checkout-status handler code into `lib/` and rewrote both public paths through the existing `/api/create-checkout` function. This avoids adding two more Vercel functions.
+
+### Vercel deployment evidence
+
+- The first deployment after the payment endpoint additions failed with `exceeded_serverless_functions_per_deployment` because the Hobby plan permits no more than 12 Serverless Functions.
+- The fix was merged in PR #142.
+- The subsequent Git-triggered production deployment for commit `d41e7cb2eaddf0c302b84633d0348b8e6c5a5503` reached **READY**.
+- Vercel deployment: [inspect deployment](https://vercel.com/cjc101187s-projects/mwfitness/AuAhbzTdWgqA6sZgzURUoB3biomx).
+- Vercel reported aliases including `mwfitnessuk.com` and `www.mwfitnessuk.com`.
+- This is deployment evidence only. It does not prove all HTTP routes, checkout, authentication, Staff HQ operations or browser journeys work correctly.
+
+### Hobby function budget — hard release constraint
+
+The current `api/` directory has **11 top-level endpoint files** (excluding underscore-prefixed shared helper modules). The Hobby limit is 12, leaving **one function slot**.
+
+Current endpoint files: `plans.mjs`, `health.mjs`, `products.mjs`, `send-mail.mjs`, `send-push.mjs`, `unsubscribe.mjs`, `create-checkout.mjs`, `communications-send.mjs`, `communications-rules.mjs`, `communications-notifications.mjs`, `test-communication.mjs`.
+
+Rules:
+1. Do not add a new top-level endpoint under `api/` without first checking the resulting function count.
+2. Prefer extending an existing route or extracting shared implementation into `lib/`.
+3. Count functions from the final merge candidate, not an earlier branch snapshot.
+4. A deployment marked READY is required, but still run route/browser smoke tests.
+5. If work genuinely needs more than 12 functions, stop and discuss the hosting-plan change rather than silently changing the plan.
+
+### Current verification state
+
+| Check | Status | Notes |
+|---|---|---|
+| Vercel production deployment | **READY** | Exact commit above; functional smoke tests remain outstanding. |
+| Hobby function-count deployment error | **RESOLVED** | PR #142 consolidated the two added handlers; current endpoint inventory is 11. |
+| `npm test` | **NOT RUN / NOT VERIFIED** | No passing result is claimed. |
+| `npm run lint` | **NOT RUN / NOT VERIFIED** | No passing result is claimed. |
+| `npm run build` locally | **NOT RUN / NOT VERIFIED** | Vercel production build completed, but local candidate checks remain required. |
+| Production Neon migrations | **NOT APPLIED** | Payment migrations remain prepared only. |
+| Stripe payment gate | **DISABLED** | Do not enable until payment lifecycle gates pass. |
+| Live Stripe plan rows | **NOT RE-VERIFIED** | Read-only verify all five active online plan rows and their Stripe Price mode/currency/amount. |
+| Production route/browser smoke tests | **NOT VERIFIED** | Test custom domain, API routes and checkout return against the deployed commit. |
+
+### Human test pass — do these before go-live
+
+Use dedicated test accounts and a disposable Neon branch wherever writes are involved. Do not use real member accounts or production records for destructive tests.
+
+- [ ] Open `https://mwfitnessuk.com` and `https://www.mwfitnessuk.com`; verify HTTPS, redirects, homepage assets and responsive layout.
+- [ ] Hard-refresh and directly open key routes: `/online-coaching`, `/nutrition`, `/reviews`, `/app`, `/shwag`, `/contact`, `/admin`, `/account`, `/checkout`, `/privacy`, `/cookies` and `/gdpr`.
+- [ ] Check browser console and network tab for failed JS chunks, 4xx/5xx API responses and auth errors.
+- [ ] Verify public pricing and product catalogue load from Neon, including the empty-state behavior for SHWAG if no active products are returned.
+- [ ] Test sign-up, sign-in, sign-out, session restore and protected-page access with dedicated test accounts.
+- [ ] Test Staff HQ with correct roles: list, create, edit, delete/deactivate where supported, reload to prove persistence, and verify unauthorized actions are rejected.
+- [ ] Verify member A cannot read or change member B's profile, check-ins, nutrition, workouts, photos or messages.
+- [ ] Verify demo mode writes never reach Neon and live mode never silently falls back to mock/sample data.
+- [ ] Test contact/enquiry submission, confirmation email, admin visibility and failure handling.
+- [ ] Test PWA install prompt/manifest, icon, service-worker update and offline behavior in a real browser.
+- [ ] Verify checkout mock mode is clearly labelled and never takes payment or activates access.
+- [ ] Do not perform a live payment. Test-mode Stripe checkout/webhook scenarios only after test credentials and a disposable test database are configured.
+- [ ] Record date, account role, environment, tested commit, PASS/FAIL and evidence for each item.
+
+### Developer checks before the next merge
+
+Run on a clean checkout of the final candidate:
+
+```bash
+npm ci
+npm test
+npm run lint
+npm run build
+```
+
+Capture full output and exit code for every command. Inspect the final `api/` inventory and confirm it remains at or below 12 Vercel functions. If any source changes are made after these checks, rerun them against the new candidate.
+
+### Release batching rule
+
+All remaining code and documentation work must be assembled into one release candidate. Keep work off `main`, complete review and tests, then make one final merge to `main`. The existing Vercel Git integration automatically triggers a production deployment on that merge. Do not manually deploy or merge intermediate fixes. This documentation update is kept off `main` and has not triggered a production deployment.
+
+**Go-live decision: NOT APPROVED.** The website deployment is READY, but functional verification, automated checks, database verification and the payment lifecycle remain incomplete.
