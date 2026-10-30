@@ -70,3 +70,13 @@ test('production checkout takes the live Price ID from Neon while Preview keeps 
   assert.match(stripe, /price\.livemode !== livemode/);
   assert.match(stripe, /price\.currency !== 'gbp' \|\| price\.unit_amount !== Math\.round\(expectedAmount \* 100\)/);
 });
+
+
+test('payment webhook and return-status aliases reuse the existing checkout serverless function', () => {
+  const checkout = readFileSync(join(root, 'api', 'create-checkout.mjs'), 'utf8');
+  const vercel = readFileSync(join(root, 'vercel.json'), 'utf8');
+  assert.match(checkout, /route === 'status'/);
+  assert.match(checkout, /route === 'webhook'/);
+  assert.match(vercel, /\/api\/stripe-webhook.*\/api\/create-checkout\?route=webhook/);
+  assert.match(vercel, /\/api\/checkout-status.*\/api\/create-checkout\?route=status/);
+});
