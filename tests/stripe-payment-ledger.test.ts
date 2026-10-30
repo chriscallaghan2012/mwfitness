@@ -59,3 +59,14 @@ test('self-hosted server preserves raw Stripe webhook bytes and exposes payment 
   assert.ok(rawWebhookRoute < jsonParser, 'raw-body webhook route must be registered before JSON parsing');
   assert.match(server, /app.get\('\/api\/checkout-status', checkoutStatus\)/);
 });
+
+
+test('production checkout takes the live Price ID from Neon while Preview keeps test Price IDs in env', () => {
+  const checkout = readFileSync(join(root, 'api', 'create-checkout.mjs'), 'utf8');
+  const stripe = readFileSync(join(root, 'api', '_stripe.mjs'), 'utf8');
+  assert.match(checkout, /SELECT id, price, stripe_price_id, kind, active FROM public\.plans/i);
+  assert.match(checkout, /priceId: checkoutMode\.mode === 'stripe' && checkoutMode\.livemode \? databasePriceId : undefined/);
+  assert.match(stripe, /const priceId = livemode \? databasePriceId : process\.env\[priceEnv\]/);
+  assert.match(stripe, /price\.livemode !== livemode/);
+  assert.match(stripe, /price\.currency !== 'gbp' \|\| price\.unit_amount !== Math\.round\(expectedAmount \* 100\)/);
+});
