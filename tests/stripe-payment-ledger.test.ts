@@ -25,7 +25,7 @@ test('real Stripe checkout stays blocked until the signed payment ledger is enab
 });
 
 test('webhook stores paid sessions idempotently without granting membership', () => {
-  const webhook = readFileSync(join(root, 'api', 'stripe-webhook.mjs'), 'utf8');
+  const webhook = readFileSync(join(root, 'lib', 'stripe-webhook-handler.mjs'), 'utf8');
   assert.match(webhook, /verifyStripeSignature/);
   assert.match(webhook, /Math\.abs\(nowSeconds - timestamp\) > 300/);
   assert.match(webhook, /ON CONFLICT \(stripe_session_id\) DO UPDATE/);
@@ -45,7 +45,7 @@ test('Staff HQ exposes a read-only payment ledger and never reads it in demo mod
 
 
 test('Stripe webhook passes the resolved environment mode to the event recorder', () => {
-  const webhook = readFileSync(join(root, 'api', 'stripe-webhook.mjs'), 'utf8');
+  const webhook = readFileSync(join(root, 'lib', 'stripe-webhook-handler.mjs'), 'utf8');
   assert.match(webhook, /const config = resolveCheckoutMode\(\)/);
   assert.match(webhook, /recordStripeEvent\(event, res, config\.livemode\)/);
   assert.doesNotMatch(webhook, /recordStripeEvent\(event, res, configuration\.livemode\)/);
@@ -69,4 +69,14 @@ test('production checkout takes the live Price ID from Neon while Preview keeps 
   assert.match(stripe, /const priceId = livemode \? databasePriceId : process\.env\[priceEnv\]/);
   assert.match(stripe, /price\.livemode !== livemode/);
   assert.match(stripe, /price\.currency !== 'gbp' \|\| price\.unit_amount !== Math\.round\(expectedAmount \* 100\)/);
+});
+
+
+test('payment webhook and return-status aliases reuse the existing checkout serverless function', () => {
+  const checkout = readFileSync(join(root, 'api', 'create-checkout.mjs'), 'utf8');
+  const vercel = readFileSync(join(root, 'vercel.json'), 'utf8');
+  assert.match(checkout, /route === 'status'/);
+  assert.match(checkout, /route === 'webhook'/);
+  assert.match(vercel, /\/api\/stripe-webhook.*\/api\/create-checkout\?route=webhook/);
+  assert.match(vercel, /\/api\/checkout-status.*\/api\/create-checkout\?route=status/);
 });

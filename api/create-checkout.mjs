@@ -1,11 +1,41 @@
 import { neon } from '@neondatabase/serverless';
 import { createCheckoutSession, resolveCheckoutMode } from './_stripe.mjs';
+import checkoutStatus from '../lib/checkout-status-handler.mjs';
+import stripeWebhook from '../lib/stripe-webhook-handler.mjs';
+
+// Share the existing checkout function for the status and webhook routes so the
+// Hobby deployment stays within Vercel's serverless-function limit.
+export const config = { api: { bodyParser: false } };
+
+async function getRawBody(req) {
+  if (Buffer.isBuffer(req.body)) return req.body;
+  if (typeof req.body === 'string') return Buffer.from(req.body);
+  if (req.body !== undefined && req.body !== null) return Buffer.from(JSON.stringify(req.body));
+  const chunks = [];
+  for await (const chunk of req) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  return Buffer.concat(chunks);
+}
 
 export default async function handler(req, res) {
+  const route = typeof req.query?.route === 'string'
+    ? req.query.route
+    : new URL(req.url || '/api/create-checkout', 'https://mwfitnessuk.com').searchParams.get('route');
+  if (route === 'status') return checkoutStatus(req, res);
+  if (route === 'webhook') {
+    req.body = await getRawBody(req);
+    return stripeWebhook(req, res);
+  }
+
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' });
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    let body = req.body;
+    if (body === undefined || body === null || Buffer.isBuffer(body)) {
+      const raw = Buffer.isBuffer(body) ? body : await getRawBody(req);
+      body = raw.length ? JSON.parse(raw.toString('utf8')) : {};
+    } else if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
     const planId = typeof body?.planId === 'string' ? body.planId.trim() : '';
     if (!planId) return res.status(400).json({ ok: false, error: 'Choose a valid coaching plan.' });
 

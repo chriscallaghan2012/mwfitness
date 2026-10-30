@@ -163,3 +163,8 @@ Before enabling real checkout, complete and record all of the following against 
 The migration remains prepared only, and `STRIPE_PAYMENT_LEDGER_ENABLED` must remain disabled until the release gates pass. No test pass is claimed from the merge alone. Do not run production migrations or deploy as part of this runbook without explicit authorization.
 
 Production Price ID source note: after PR #141, Production reads the live `stripe_price_id` from the active Neon plan row; Preview/Development still use test Price IDs from environment variables. The source migration is `db/migrations/20261024_live_stripe_coaching_products.sql`. Verify all five active online plan rows and matching Stripe Price mode/currency/amount before enabling the payment gate. Production row values were not independently re-verified during this code change.
+
+
+## Vercel Hobby function-count constraint
+
+The payment webhook and checkout-status paths are rewritten to the existing `/api/create-checkout` serverless function. Their shared handlers live under `lib/`, outside Vercel's `api/` function directory. Do not add new top-level files under `api/` without checking the 12-function Hobby limit and the production deployment result.
