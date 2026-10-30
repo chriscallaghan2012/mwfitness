@@ -101,8 +101,8 @@ export function PlansAdmin() {
         setEdit(null);
         await load();
       }
-    } catch {
-      setMsg('Could not save this package. Check the connection and retry.');
+    } catch (error) {
+      setMsg(error instanceof Error ? error.message : 'Could not save this package. Check the connection and retry.');
     } finally { setBusy(false); }
   };
 
@@ -127,8 +127,8 @@ export function PlansAdmin() {
       }
       setMsg(isDemoMode() ? 'Demo plan deleted. No live Neon or Stripe changes were made.' : 'Plan deleted.');
       await load();
-    } catch {
-      setMsg('Could not delete this plan. Check the connection and retry.');
+    } catch (error) {
+      setMsg(error instanceof Error ? error.message : 'Could not delete this plan. Check the connection and retry.');
     } finally { setBusy(false); }
   };
 
@@ -152,8 +152,8 @@ export function PlansAdmin() {
       if (!result.data?.length) { setMsg('Visibility was not changed. The package may no longer exist or your staff permissions may not allow this change.'); return; }
       setMsg(isDemoMode() ? 'Demo visibility updated. No live Stripe changes were made.' : `${String(p.name)} is now ${p.active ? 'hidden' : 'live'}.`);
       await load();
-    } catch {
-      setMsg('Could not update plan visibility. Check the connection and retry.');
+    } catch (error) {
+      setMsg(error instanceof Error ? error.message : 'Could not update plan visibility. Check the connection and retry.');
     } finally { setBusy(false); }
   };
 
