@@ -444,3 +444,14 @@ Start with the test foundation, Staff HQ CRUD/security verification and mobile-t
 ## Manual end-to-end checklist
 
 The current manual test pass is tracked in [`docs/END_TO_END_RELEASE_CHECKLIST.md`](END_TO_END_RELEASE_CHECKLIST.md). Use that checklist for the real website, Staff HQ/live Neon, authentication and isolation, checkout safety, communications, mobile persistence, production smoke tests and sign-off. Tick items only when tested with evidence; mock tests and a Vercel READY build do not count as live end-to-end proof. Mobile icon/splash assets are intentionally deferred by the owner.
+
+## Payment lifecycle follow-up — 2026-10-30 (PR #140)
+
+PR #140 is merged into `main`. It adds:
+- A Stripe webhook endpoint with timestamp-tolerant HMAC signature verification and idempotent Checkout Session recording.
+- Checkout return-status verification against Stripe rather than trusting the browser redirect.
+- A prepared `stripe_payment_records` migration and read-only Staff HQ payment ledger.
+- A fail-closed real-checkout gate requiring `STRIPE_PAYMENT_LEDGER_ENABLED=true` and `STRIPE_WEBHOOK_SECRET`.
+- Raw-body webhook routing before Express JSON parsing, including the self-hosted server.
+
+**This is implementation status, not release evidence.** Tests, TypeScript, build, real signed webhook delivery, refund reconciliation, Neon migration/RLS, customer account linking, membership provisioning/revocation, browser checkout and production smoke tests remain unverified. The migration has not been applied and no deployment was performed. Keep the gate disabled until these checks pass on the exact release commit. Membership access is not automatically granted by the webhook.
