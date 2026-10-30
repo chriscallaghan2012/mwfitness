@@ -10,8 +10,8 @@ type SwagProduct = { id: string; slug: string; name: string; description: string
 // real stock. They mirror the real product cards but cannot be clicked or ordered.
 const COMING_SOON = [
   { id: 'soon-hoodie', name: 'SHWAG Hoodie', tagline: 'Heavyweight hoodie for warm-ups and rest days.', Icon: Shirt },
-  { id: 'soon-tshirt', name: 'SHWAG T-Shirt', tagline: 'Everyday cotton tee with the Solid Hard Work mark.', Icon: Shirt },
-  { id: 'soon-cap', name: 'SHWAG Cap', tagline: 'Six-panel cap. Train harder, dress sharper.', Icon: HardHat },
+  { id: 'soon-tshirt', name: 'SHWAG Tshirt', tagline: 'Everyday cotton tee with the Solid Hard Work mark.', Icon: Shirt },
+  { id: 'soon-cap', name: 'SHWAG Hat', tagline: 'SHWAG Hat. Train harder, dress sharper.', Icon: HardHat },
 ] as const;
 
 interface ShwagScreenProps {
