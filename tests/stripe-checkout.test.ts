@@ -120,6 +120,10 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
       assert.equal(requests[1].body.get('mode'), 'payment');
       assert.equal(requests[1].body.get('ui_mode'), 'embedded_page');
       assert.equal(requests[1].body.get('phone_number_collection[enabled]'), 'true');
+      assert.equal(requests[1].body.get('branding_settings[background_color]'), '#121419');
+      assert.equal(requests[1].body.get('branding_settings[button_color]'), '#ff5500');
+      assert.equal(requests[1].body.get('branding_settings[border_style]'), 'rectangular');
+      assert.equal(requests[1].body.get('branding_settings[display_name]'), 'MWFitnessUK');
       assert.equal(requests[1].body.get('line_items[0][price]'), 'price_testReleasePlaceholder');
       assert.match(requests[1].body.get('return_url') ?? '', /^https:\/\/preview\.example\.test\/checkout\?/);
     } finally {

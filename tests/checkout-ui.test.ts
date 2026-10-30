@@ -5,15 +5,18 @@ import { test } from 'node:test';
 
 const root = process.cwd();
 
-test('checkout mounts Stripe payment fields instead of fake disabled card inputs', () => {
+test('checkout loads Stripe payment fields automatically instead of requiring a details step', () => {
   const screen = readFileSync(join(root, 'src', 'components', 'screens', 'CheckoutScreen.tsx'), 'utf8');
   assert.match(screen, /checkoutMountRef/);
   assert.match(screen, /Secure embedded Stripe payment/);
+  assert.match(screen, /createCheckoutSession\(plan\.id\)/);
+  assert.match(screen, /if \(!plan \|\| checkoutReturn\?\.sessionId\) return/);
+  assert.match(screen, /Your secure payment form loads automatically/);
   assert.match(screen, /Preview mock checkout/);
   assert.match(screen, /No payment has been taken/);
   assert.match(screen, /no paid membership or account access has been activated/);
-  assert.match(screen, /placeholder:text-zinc-400/);
-  assert.ok(screen.includes(String.raw`if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))`));
+  assert.doesNotMatch(screen, /Continue to payment/);
+  assert.doesNotMatch(screen, /Your details/);
   assert.match(screen, /createEmbeddedCheckoutPage\(\{ fetchClientSecret:/);
   assert.doesNotMatch(screen, /placeholder="Card number"/);
   assert.doesNotMatch(screen, /placeholder="MM \/ YY"/);
@@ -23,6 +26,9 @@ test('checkout mounts Stripe payment fields instead of fake disabled card inputs
 test('server creates embedded Checkout sessions and never returns a hosted redirect URL', () => {
   const stripe = readFileSync(join(root, 'api', '_stripe.mjs'), 'utf8');
   assert.match(stripe, /ui_mode: 'embedded_page'/);
+  assert.match(stripe, /branding_settings\[background_color\].*#121419/);
+  assert.match(stripe, /branding_settings\[button_color\].*#ff5500/);
+  assert.match(stripe, /branding_settings\[display_name\].*MWFitnessUK/);
   assert.match(stripe, /return_url:/);
   assert.match(stripe, /return \{ mode: 'stripe', clientSecret: data\.client_secret, publishableKey \}/);
   assert.doesNotMatch(stripe, /success_url:/);

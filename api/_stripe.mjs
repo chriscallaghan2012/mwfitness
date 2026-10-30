@@ -85,6 +85,11 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
     redirect_on_completion: 'if_required',
     billing_address_collection: 'auto',
     'phone_number_collection[enabled]': 'true',
+    'branding_settings[background_color]': '#121419',
+    'branding_settings[button_color]': '#ff5500',
+    'branding_settings[border_style]': 'rectangular',
+    'branding_settings[font_family]': 'montserrat',
+    'branding_settings[display_name]': 'MWFitnessUK',
     'metadata[plan_id]': planId,
     'metadata[expected_amount_pence]': String(Math.round(expectedAmount * 100)),
   });
