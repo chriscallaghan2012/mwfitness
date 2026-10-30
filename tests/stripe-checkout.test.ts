@@ -51,6 +51,33 @@ test('Production without Stripe configuration fails closed instead of using mock
   });
 });
 
+test('Preview accepts restricted Stripe test API keys', async () => {
+  await withCleanStripeEnv(async () => {
+    process.env.STRIPE_SECRET_KEY = 'rk_test_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
+    assert.deepEqual(resolveCheckoutMode(), {
+      mode: 'stripe',
+      publishableKey: 'pk_test_release_placeholder',
+      secretKey: 'rk_test_release_placeholder',
+      livemode: false,
+    });
+  });
+});
+
+test('Production accepts restricted Stripe live API keys', async () => {
+  await withCleanStripeEnv(async () => {
+    process.env.VERCEL_ENV = 'production';
+    process.env.STRIPE_SECRET_KEY = 'rk_live_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_live_release_placeholder';
+    assert.deepEqual(resolveCheckoutMode(), {
+      mode: 'stripe',
+      publishableKey: 'pk_live_release_placeholder',
+      secretKey: 'rk_live_release_placeholder',
+      livemode: true,
+    });
+  });
+});
+
 test('Stripe Checkout verifies the Price mode and creates an embedded session', async () => {
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
