@@ -26,8 +26,8 @@ import unsubscribe from './api/unsubscribe.mjs';
 import health from './api/health.mjs';
 import plans from './api/plans.mjs';
 import products from './api/products.mjs';
-import checkoutStatus from './api/checkout-status.mjs';
-import stripeWebhook from './api/stripe-webhook.mjs';
+import checkoutStatus from './lib/checkout-status-handler.mjs';
+import stripeWebhook from './lib/stripe-webhook-handler.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
