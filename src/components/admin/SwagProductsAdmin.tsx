@@ -86,7 +86,7 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
     if (!Number.isFinite(price) || price < 0 || (compare !== null && (!Number.isFinite(compare) || compare < 0))) { setError('Enter valid non-negative product prices.'); return; }
     for (const key of ['image_url', 'product_url']) {
       const value = String(draft[key] || '').trim();
-      if (value && !/^https?:\/\/\S+$/i.test(value)) { setError(key === 'image_url' ? 'Image URL must begin with https:// or http://' : 'Product URL must begin with https:// or http://'); return; }
+      if (value && !/^https?:\\/\\/\\S+$/i.test(value) && !(key === 'image_url' && value.startsWith('data:image/webp;base64,'))) { setError(key === 'image_url' ? 'Image must be a web URL or uploaded WebP image.' : 'Product URL must begin with https:// or http://'); return; }
     }
     setBusy(true); setError(''); setNotice('');
     const payload = {
