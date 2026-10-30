@@ -154,7 +154,7 @@ export default function App() {
 
   const handleGoCheckout = (plan: PublicPlan) => {
     setCheckoutPlan(plan);
-    if (window.location.pathname !== '/checkout') window.history.pushState({}, '', '/checkout');
+    window.history.pushState({}, '', `/checkout?plan=${encodeURIComponent(plan.id)}`);
     setCurrentScreen('checkout');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -215,7 +215,7 @@ export default function App() {
       {/* Sticky mobile CTA (appears after scrolling past the hero) */}
       {showMobileCta && currentScreen !== 'admin' && (
         <div className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-[#0b0c0e]/95 backdrop-blur-md border-t border-[#ff5500]/40">
-          <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <div className="flex items-center justify-center gap-3 px-4 py-3 text-center">
             <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Ready when you are</span>
             <button
               onClick={() => handleOpenBookCall()}

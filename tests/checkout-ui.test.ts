@@ -14,6 +14,7 @@ test('checkout mounts Stripe payment fields instead of fake disabled card inputs
   assert.match(screen, /no paid membership or account access has been activated/);
   assert.match(screen, /placeholder:text-zinc-400/);
   assert.ok(screen.includes(String.raw`if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))`));
+  assert.match(screen, /createEmbeddedCheckoutPage\(\{ fetchClientSecret:/);
   assert.doesNotMatch(screen, /placeholder="Card number"/);
   assert.doesNotMatch(screen, /placeholder="MM \/ YY"/);
   assert.doesNotMatch(screen, /placeholder="CVC"/);
@@ -21,7 +22,7 @@ test('checkout mounts Stripe payment fields instead of fake disabled card inputs
 
 test('server creates embedded Checkout sessions and never returns a hosted redirect URL', () => {
   const stripe = readFileSync(join(root, 'api', '_stripe.mjs'), 'utf8');
-  assert.match(stripe, /ui_mode: 'embedded'/);
+  assert.match(stripe, /ui_mode: 'embedded_page'/);
   assert.match(stripe, /return_url:/);
   assert.match(stripe, /return \{ mode: 'stripe', clientSecret: data\.client_secret, publishableKey \}/);
   assert.doesNotMatch(stripe, /success_url:/);
@@ -36,4 +37,10 @@ test('checkout API distinguishes mock preview mode from real Stripe mode', () =>
   assert.match(server, /if \(!secretKey && !publishableKey && production\)/);
   assert.match(server, /Preview and development require matching Stripe test keys/);
   assert.match(server, /price\.livemode !== livemode/);
+});
+
+test('checkout URL preserves selected package for direct visits and refreshes', () => {
+  const app = readFileSync(join(root, 'src', 'App.tsx'), 'utf8');
+  assert.match(app, /pushState\(\{\}, '', `\/checkout\?plan=\$\{encodeURIComponent\(plan\.id\)\}`\)/);
+  assert.match(app, /const planId = params\.get\('plan'\)/);
 });

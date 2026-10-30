@@ -118,7 +118,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
       assert.equal(requests[1].url, 'https://api.stripe.com/v1/checkout/sessions');
       assert.equal(requests[1].authorization, 'Bearer sk_test_release_placeholder');
       assert.equal(requests[1].body.get('mode'), 'payment');
-      assert.equal(requests[1].body.get('ui_mode'), 'embedded');
+      assert.equal(requests[1].body.get('ui_mode'), 'embedded_page');
       assert.equal(requests[1].body.get('phone_number_collection[enabled]'), 'true');
       assert.equal(requests[1].body.get('line_items[0][price]'), 'price_testReleasePlaceholder');
       assert.match(requests[1].body.get('return_url') ?? '', /^https:\/\/preview\.example\.test\/checkout\?/);

@@ -74,7 +74,7 @@ Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP
 
 ### Embedded Stripe Checkout and dynamic Staff HQ plans
 
-The website uses embedded Stripe Checkout. Stripe collects card and billing details; the website does not handle or store card numbers/CVCs.
+The website uses Stripe's embedded Checkout page (`ui_mode=embedded_page`). Stripe collects card and billing details; the website does not handle or store card numbers/CVCs. Customers enter their name and email first, then select **Continue to payment** to load Stripe's secure card fields on the same website page.
 
 **Neon is the source of truth for coaching plans.** Staff HQ → Plans creates/edits/activates/archives online coaching plans and synchronises the corresponding Stripe Product/Price server-side. Each plan stores `stripe_product_id` and `stripe_price_id` in `public.plans`. When a price changes, Stripe creates a new immutable Price, Neon is updated to the new Price ID, and the previous Price is deactivated. Archiving a plan preserves its history and prevents new purchases.
 

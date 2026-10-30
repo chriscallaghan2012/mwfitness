@@ -78,7 +78,7 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
 
   const params = new URLSearchParams({
     mode: 'payment',
-    ui_mode: 'embedded',
+    ui_mode: 'embedded_page',
     'line_items[0][price]': priceId,
     'line_items[0][quantity]': '1',
     return_url: `${baseUrl}/checkout?checkout=complete&plan=${encodeURIComponent(planId)}&session_id={CHECKOUT_SESSION_ID}`,

@@ -489,9 +489,9 @@ a[role="button"]:not([class*="bg-[#ff5500]"]):not([class*="bg-brand-orange"]):no
 .industrial-stripe--divider {
   position: relative;
   left: auto;
-  width: 100vw;
+  width: 100%;
   max-width: none;
-  margin-left: calc(50% - 50vw) !important;
+  margin-left: 0 !important;
   box-sizing: border-box;
   display: block;
 }

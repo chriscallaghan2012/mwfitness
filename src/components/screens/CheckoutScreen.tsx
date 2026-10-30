@@ -100,7 +100,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
         if (!stripePublishableKey) throw new Error('Stripe is not configured for this website yet. Please contact Mike.');
         if (!window.Stripe) throw new Error('Stripe could not be initialised. Please refresh and try again.');
         const stripe = window.Stripe(stripePublishableKey);
-        embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret });
+        embeddedCheckout = await stripe.createEmbeddedCheckoutPage({ fetchClientSecret: async () => clientSecret });
         if (cancelled || !checkoutMountRef.current) {
           embeddedCheckout.unmount();
           return;

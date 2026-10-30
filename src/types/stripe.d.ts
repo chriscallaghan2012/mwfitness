@@ -4,7 +4,7 @@ interface StripeEmbeddedCheckout {
 }
 
 interface StripeInstance {
-  initEmbeddedCheckout(options: { clientSecret: string }): Promise<StripeEmbeddedCheckout>;
+  createEmbeddedCheckoutPage(options: { fetchClientSecret: () => Promise<string> }): Promise<StripeEmbeddedCheckout>;
 }
 
 interface Window {
