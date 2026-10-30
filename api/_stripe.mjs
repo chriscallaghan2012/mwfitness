@@ -37,7 +37,10 @@ export function resolveCheckoutMode() {
   return { mode: 'stripe', publishableKey, secretKey, livemode: production };
 }
 
-export async function createCheckoutSession({ planId, origin, customerEmail, customerName, expectedAmount, priceId: databasePriceId }) {
+/**
+ * @param {{ planId?: string, origin?: string, customerEmail?: string, customerName?: string, expectedAmount?: number, priceId?: string }} options
+ */
+export async function createCheckoutSession({ planId, origin, customerEmail, customerName, expectedAmount, priceId: databasePriceId } = {}) {
   if (typeof planId !== 'string' || !planId.trim()) throw new Error('Invalid coaching plan.');
 
   const configuration = resolveCheckoutMode();

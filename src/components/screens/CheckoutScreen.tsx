@@ -139,7 +139,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?
     <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <button type="button" onClick={() => onSelectScreen('online-coaching')} className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white"><ArrowLeft className="h-4 w-4" /> Back to packages</button>
       <div className="mb-8">
-        <p className="font-mono text-xs uppercase tracking-widest text-[#ff5500]">Secure checkout</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-[#ff5500]">Secure embedded Stripe payment</p>
         <h1 className="mt-2 font-display text-4xl text-white uppercase tracking-tight sm:text-5xl">Checkout</h1>
         <p className="mt-2 text-sm text-zinc-300">{checkoutReturn ? 'Checking the payment result. Do not start another payment.' : mockCheckout ? 'This Preview is using a simulation; no payment will be taken.' : 'Enter your details, then pay securely without leaving this page.'}</p>
       </div>

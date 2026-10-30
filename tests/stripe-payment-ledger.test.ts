@@ -61,12 +61,13 @@ test('self-hosted server preserves raw Stripe webhook bytes and exposes payment 
 });
 
 
-test('production checkout takes the live Price ID from Neon while Preview keeps test Price IDs in env', () => {
+test('checkout takes the mode-appropriate Stripe Price ID from Neon in both environments', () => {
   const checkout = readFileSync(join(root, 'api', 'create-checkout.mjs'), 'utf8');
   const stripe = readFileSync(join(root, 'api', '_stripe.mjs'), 'utf8');
   assert.match(checkout, /SELECT id, price, stripe_price_id, kind, active FROM public\.plans/i);
-  assert.match(checkout, /priceId: checkoutMode\.mode === 'stripe' && checkoutMode\.livemode \? databasePriceId : undefined/);
-  assert.match(stripe, /const priceId = livemode \? databasePriceId : process\.env\[priceEnv\]/);
+  assert.match(checkout, /priceId: checkoutMode\.mode === 'stripe' \? databasePriceId : undefined/);
+  assert.match(stripe, /const priceId = databasePriceId/);
+  assert.doesNotMatch(stripe, /STRIPE_PRICE_/);
   assert.match(stripe, /price\.livemode !== livemode/);
   assert.match(stripe, /price\.currency !== 'gbp' \|\| price\.unit_amount !== Math\.round\(expectedAmount \* 100\)/);
 });

@@ -87,7 +87,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
         body: new URLSearchParams(String(init?.body ?? '')),
       });
       if (method === 'GET') {
-        return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false, currency: 'gbp', unit_amount: 39999 }), {
+        return new Response(JSON.stringify({ id: 'price_testReleasePlaceholder', livemode: false, currency: 'gbp', unit_amount: 39999 }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
         });
@@ -102,7 +102,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
       const result = await createCheckoutSession({
         planId: 'online-gold-8week',
         origin: 'https://preview.example.test',
-        priceId: 'price_test_release_placeholder',
+        priceId: 'price_testReleasePlaceholder',
         customerEmail: 'release-test@example.com',
         customerName: 'Release Test',
         expectedAmount: 399.99,
@@ -113,14 +113,14 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
         publishableKey: 'pk_test_release_placeholder',
       });
       assert.equal(requests.length, 2);
-      assert.equal(requests[0].url, 'https://api.stripe.com/v1/prices/price_test_release_placeholder');
+      assert.equal(requests[0].url, 'https://api.stripe.com/v1/prices/price_testReleasePlaceholder');
       assert.equal(requests[0].method, 'GET');
       assert.equal(requests[1].url, 'https://api.stripe.com/v1/checkout/sessions');
       assert.equal(requests[1].authorization, 'Bearer sk_test_release_placeholder');
       assert.equal(requests[1].body.get('mode'), 'payment');
       assert.equal(requests[1].body.get('ui_mode'), 'embedded');
       assert.equal(requests[1].body.get('phone_number_collection[enabled]'), 'true');
-      assert.equal(requests[1].body.get('line_items[0][price]'), 'price_test_release_placeholder');
+      assert.equal(requests[1].body.get('line_items[0][price]'), 'price_testReleasePlaceholder');
       assert.match(requests[1].body.get('return_url') ?? '', /^https:\/\/preview\.example\.test\/checkout\?/);
     } finally {
       globalThis.fetch = originalFetch;
@@ -136,14 +136,14 @@ test('Stripe rejects a Price ID from the wrong mode', async () => {
     let sessionCreated = false;
     globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
       if ((init?.method ?? 'GET') === 'POST') sessionCreated = true;
-      return new Response(JSON.stringify({ id: 'price_live_release_placeholder', livemode: true }), {
+      return new Response(JSON.stringify({ id: 'price_liveReleasePlaceholder', livemode: true }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
     }) as typeof fetch;
     try {
       await assert.rejects(
-        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', priceId: 'price_live_release_placeholder', expectedAmount: 399.99 }),
+        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', priceId: 'price_liveReleasePlaceholder', expectedAmount: 399.99 }),
         /does not match this environment/i,
       );
       assert.equal(sessionCreated, false);
@@ -168,14 +168,14 @@ test('Stripe rejects a Price amount that differs from the active website plan', 
     let sessionCreated = false;
     globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
       if ((init?.method ?? 'GET') === 'POST') sessionCreated = true;
-      return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false, currency: 'gbp', unit_amount: 10000 }), {
+      return new Response(JSON.stringify({ id: 'price_testReleasePlaceholder', livemode: false, currency: 'gbp', unit_amount: 10000 }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
     }) as typeof fetch;
     try {
       await assert.rejects(
-        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', priceId: 'price_test_release_placeholder', expectedAmount: 99.99 }),
+        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', priceId: 'price_testReleasePlaceholder', expectedAmount: 99.99 }),
         /does not match the active website plan price/i,
       );
       assert.equal(sessionCreated, false);

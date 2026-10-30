@@ -108,7 +108,7 @@ export function MessagesAdmin({ initialAthleteId = '' }: { initialAthleteId?: st
       if (!isDemoMode() && result.data?.id) {
         try {
           const tokenResult = await neon?.auth.getSession({ query: {} });
-          const accessToken = tokenResult?.data?.session?.access_token;
+          const accessToken = tokenResult?.data?.session?.token;
           if (!accessToken) {
             deliveryNotice = 'Reply sent; push delivery could not be confirmed';
           } else {
