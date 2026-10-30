@@ -1,3 +1,23 @@
+> **CURRENT HANDOFF — 2026-10-30 (PR #143 / production commit 3cab220e8c9acd4ec0587682f4a1ebc33f5223d9)**  
+> This status block supersedes older deployment statements later in this historical runbook. Production Vercel deployment is **READY** with aliases `mwfitnessuk.com` and `www.mwfitnessuk.com`. This confirms build/deployment only, not runtime or end-to-end tests. No manual deployment, production migration or environment change was performed.
+>
+> **Completed:** PR #143 merged; SHWAG Neon result-mapping fix and regression tests added; production build READY. Five active online coaching plans were read-only matched to active live GBP one-time Stripe Prices and Products (amounts and default-price IDs match). The plan/price migration is already reflected in production and must not be reapplied. Four active SHWAG products exist in Neon. Function count remains 11/12.
+>
+> **Owner go-live checklist:**
+> - [ ] **Resend/email:** add and verify the sending domain in Resend; publish its exact DNS records; configure sender/from and API key; add the required server-side Resend environment variables to Vercel Production (Preview separately if needed); then test real enquiry/transactional delivery, reply-to, spam placement, bounces and failure handling. No SMTP variables were found in Vercel. Use the actual Resend integration/configuration; do not assume SMTP.
+> - [ ] **Production smoke test:** verify apex/www HTTPS and redirects; direct-load and hard-refresh public, member and Staff HQ routes; inspect console/network; check `/api/health`, `/api/plans`, `/api/products`. Keep issue #49 open until production products response is confirmed.
+> - [ ] **Automated checks at exact commit:** clean checkout `3cab220e8c9acd4ec0587682f4a1ebc33f5223d9`; run `npm ci`, `npm test`, `npm run lint`, `npm run build`; capture output. Not run here; no passing status is claimed.
+> - [ ] **Auth / Staff HQ / Neon:** dedicated test accounts for signup/login/logout/session restore; coach/admin/member permissions; supported CRUD; member isolation; demo/live separation. Perform destructive writes only on a disposable Neon branch, never real member data.
+> - [ ] **Mobile:** fresh Android export/build and physical-device install; test auth/session, membership, check-ins, weigh-ins, nutrition/workout/cardio, photo privacy and push if in scope; verify mobile → Neon → Staff HQ → mobile reload.
+> - [ ] **PWA:** test installability, manifest/icon, offline fallback, cache refresh and service-worker updates in real browsers.
+> - [ ] **Stripe:** keep live payment activation disabled. Vercel has no Stripe secret/publishable/webhook keys or payment-ledger flag. Before enabling, complete signed/invalid/stale webhook, duplicate idempotency, paid/unpaid, amount/currency/mode mismatch, refunds, account linking and membership provisioning/revocation tests. Ledger migration is prepared but unapplied; do not apply to production without explicit approval. Automatic membership provisioning/revocation is not complete.
+> - [ ] **Operations:** verify backup/recovery, rollback owner/procedure, privacy/legal/contact content and monitoring; record evidence and explicit go/no-go.
+>
+> **No changes made:** Resend, DNS, Vercel environment, Stripe configuration, Neon production data/schema/migrations. Legacy unused Supabase variables were left untouched; encrypted `DATABASE_URL` could not be independently matched to Neon.
+>
+> **One-build rule:** keep remaining code/docs changes off `main`; complete checks on the final candidate, then one approved merge/build. Do not incrementally deploy. This documentation branch has not been merged or deployed.
+>
+> ---
 # MW FITNESS — Release Test Runbook
 
 This runbook is for the website/Staff HQ release candidate. It does not authorize a production deployment or production database writes.
@@ -225,3 +245,69 @@ Read-only Neon and Stripe checks verified all five active online coaching plans 
 ## Vercel environment readiness — 2026-10-30
 
 Metadata-only inspection found Neon Auth/Data API and DATABASE_URL variables assigned to Production, Preview and Development. No Stripe secret/publishable keys, webhook secret or payment-ledger gate are listed, so live checkout must remain unavailable. No SMTP host/port/user/password variables are listed, so email delivery is not configured in Vercel and remains outstanding. Legacy VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY variables remain in Production and Development, but repository code search found no current references; they were left untouched. The encrypted Vercel DATABASE_URL could not be safely matched to a Neon host/database in this pass.
+
+
+> **Stripe key follow-up — 2026-10-30:** The connected Stripe session exposes the `MWFitnessUk` account in live mode only; no test-mode context for this account is available in the current connection. Stripe product/price objects were previously verified in live mode. The Stripe API integration does not expose/recover the account's existing secret API key, and the secret key is not stored in the repository or Vercel environment. Do not try to retrieve or commit it. The owner must add `STRIPE_SECRET_KEY` and `VITE_STRIPE_PUBLISHABLE_KEY` directly as encrypted/sensitive Vercel **Production** environment variables from Stripe Dashboard → Developers → API keys. Do not paste secret keys into chat or commit them to Git. Keep `STRIPE_PAYMENT_LEDGER_ENABLED` absent/false and do not enable live checkout until `STRIPE_WEBHOOK_SECRET`, the approved ledger migration and webhook/idempotency/membership lifecycle tests are complete. No Stripe keys were added or changed in this session. With no Stripe keys, Preview/Development already resolve to the clearly labelled mock checkout; Production intentionally fails closed and must not be switched to mock.
+
+
+## Latest external configuration results — 2026-10-30
+
+### Stripe live setup
+
+The connected MWFitnessUk live account has five active coaching Products and five active GBP one-time Prices matching the Neon plans: £99.99, £159.99, £299.99, £399.99 and £449.99. No live webhook endpoint exists. Vercel has no Stripe key variables configured. The connected Stripe account list did not expose an MWFitnessUk test/sandbox account; do not use another client's account for testing.
+
+For the web server, prefer a restricted API key with only:
+- Prices: Read
+- Checkout Sessions: Write
+
+The final-readiness branch accepts rk_live_ / rk_test_ keys as well as sk_live_ / sk_test_. Set the restricted key in Vercel as a **sensitive** Production environment variable named STRIPE_SECRET_KEY; set the matching pk_live_ value as VITE_STRIPE_PUBLISHABLE_KEY. Never commit keys or put them in mobile app configuration.
+
+The same branch adds a server-side webhook gate: the handler returns 503 until STRIPE_PAYMENT_LEDGER_ENABLED=true. This is deliberate. Do not create the live webhook endpoint or enable the gate until the payment-ledger migration is applied to an approved branch, webhook tests pass, and the account-linking/membership fulfilment design is complete. The new tests are authored but **not run**.
+
+If no MW Fitness test credentials are available, Preview/Development should remain with both Stripe keys absent and show the explicit mock simulation. It must not create a Stripe session, take a payment, or activate a membership. Production must continue to fail closed.
+
+### Resend setup blocker
+
+The connected Resend account has reached its three-domain plan limit. mwfitnessuk.com is not registered there; the attempt to add it was rejected by the plan limit. No DNS or existing domains were changed.
+
+Owner actions:
+1. Upgrade the Resend plan to permit another domain, or explicitly choose an approved alternative sending domain.
+2. Add the chosen domain in the EU region and publish the exact DNS records Resend returns.
+3. Verify the domain, then create a dedicated sending_access API key restricted to that domain.
+4. Add RESEND_API_KEY as a sensitive Vercel Production variable and set RESEND_FROM_EMAIL to the verified sender.
+5. Confirm MAIL_TO (the current code default is mwfitnessukonline@gmail.com) and test an enquiry alert plus customer acknowledgement.
+
+The website mailer already supports Resend directly; Gmail SMTP is not required if Resend is configured.
+
+### Mobile security / build checks
+
+A source review found that mobile index.ts contains permissive placeholder crypto methods: Math.random() random fallback, subtle.verify always true, no-op importKey, zero-filled sign and digest fallbacks. Replace this with a genuine supported WebCrypto implementation before signing off production auth. The current main branch also has no npm test script; release/neon-schema-contract-tests adds schema-contract tests and the script but is unmerged and untested.
+
+Current mobile checks still required:
+- [ ] Replace and test the unsafe crypto shim.
+- [ ] Run npm ci, npx tsc --noEmit, npm run lint, and npx expo export --platform android.
+- [ ] Run the schema-contract tests from the release candidate.
+- [ ] Build and install a fresh Android app on a physical device.
+- [ ] Verify login, session restore, logout, reset deep link, member/staff roles and cross-account isolation.
+- [ ] Verify check-ins, weigh-ins, progress photos, cardio, nutrition and workout completion persist through Neon and appear in Staff HQ.
+- [ ] Verify Expo push token registration, delivery and cleanup on logout using valid FCM/Expo credentials.
+- [ ] Keep Google Play on internal testing until Mike approves a production-track release.
+
+### Website / Staff HQ checks still required
+
+- [ ] Run npm ci, npm test, npm run lint, npm run build on the exact final candidate; tests have not been run in this environment.
+- [ ] Verify /api/health, /api/plans, /api/products over HTTPS; keep issue #49 open until products return the four active SHWAG rows.
+- [ ] Test direct navigation/hard refresh, desktop/mobile responsive layouts, console/network, PWA install/offline/update.
+- [ ] Test Neon Auth signup/login/logout/session restore/password recovery using dedicated accounts.
+- [ ] Test all supported Staff HQ create/edit/delete actions in demo mode, then repeat live CRUD and RLS checks on a disposable Neon branch.
+- [ ] Prove Member A cannot access Member B's profile, progress photos, check-ins, nutrition, workouts or messages.
+- [ ] Verify coach/admin role restrictions, named-admin allowlist, account panel limitations and safe error feedback.
+- [ ] Verify contact enquiries persist when email delivery fails, then test Resend delivery after domain verification.
+- [ ] Confirm notification rules/templates are actually triggered and delivered; a saved template/rule is not evidence of an automation.
+- [ ] Verify the payment ledger UI only becomes live after the approved migration and platform-admin access test.
+
+### Platform evidence limitations
+
+The current production Vercel deployment is READY for commit 3cab220e8c9acd4ec0587682f4a1ebc33f5223d9, but no live HTTP/browser smoke test was completed. The last 50 minutes of runtime logs contained no entries. A successful Vercel status is not an end-to-end pass. The website main commit has a Vercel success status but no GitHub Actions workflow run was returned. Mobile main has no status checks returned. Local GitHub cloning was unavailable due DNS resolution failure, so no local install, lint, tests, TypeScript or Expo export was run here.
+
+The website PWA files are present on main, but browser install/offline/update tests remain outstanding. Vercel Hobby still has 11 of 12 top-level API function slots in use.
