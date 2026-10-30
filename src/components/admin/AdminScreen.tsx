@@ -6,6 +6,7 @@ import { neon } from '../../lib/neon';
 import { UsersAdmin } from './UsersAdmin';
 import { PlansAdmin } from './PlansAdmin';
 import { MembershipsAdmin } from './MembershipsAdmin';
+import { PaymentsAdmin } from './PaymentsAdmin';
 import { NutritionAdmin } from './NutritionAdmin';
 import { WorkoutsAdmin } from './WorkoutsAdmin';
 import { CheckinsAdmin, ProgressAdmin } from './ProgressAdmin';
@@ -429,6 +430,11 @@ export function AdminScreen() {
             <h2 className="mt-1 text-xl font-semibold text-white">Memberships</h2>
           </div>
           <MembershipsAdmin />
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Reconciliation</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Stripe payment ledger</h2>
+          </div>
+          <PaymentsAdmin />
         </div>
       )}
       {tab === 'nutrition' && <NutritionAdmin />}
