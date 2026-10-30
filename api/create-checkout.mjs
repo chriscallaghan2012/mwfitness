@@ -2,6 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import { createCheckoutSession, resolveCheckoutMode } from './_stripe.mjs';
 import checkoutStatus from '../lib/checkout-status-handler.mjs';
 import stripeWebhook from '../lib/stripe-webhook-handler.mjs';
+import stripePlanSync from '../lib/stripe-plan-sync.mjs';
 
 // Share the existing checkout function for the status and webhook routes so the
 // Hobby deployment stays within Vercel's serverless-function limit.
@@ -21,6 +22,7 @@ export default async function handler(req, res) {
     ? req.query.route
     : new URL(req.url || '/api/create-checkout', 'https://mwfitnessuk.com').searchParams.get('route');
   if (route === 'status') return checkoutStatus(req, res);
+  if (route === 'plan-sync') return stripePlanSync(req, res);
   if (route === 'webhook') {
     req.body = await getRawBody(req);
     return stripeWebhook(req, res);
@@ -74,7 +76,7 @@ export default async function handler(req, res) {
       planId,
       origin,
       expectedAmount,
-      priceId: checkoutMode.mode === 'stripe' && checkoutMode.livemode ? databasePriceId : undefined,
+      priceId: checkoutMode.mode === 'stripe' ? databasePriceId : undefined,
       customerEmail: typeof body?.customerEmail === 'string' ? body.customerEmail.trim().slice(0, 254) : undefined,
       customerName: typeof body?.customerName === 'string' ? body.customerName.trim().slice(0, 100) : undefined,
     });
