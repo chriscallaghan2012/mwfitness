@@ -22,6 +22,8 @@ const envKeys = [
   'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
   'PUBLIC_SITE_URL',
   'DATABASE_URL',
+  'STRIPE_PAYMENT_LEDGER_ENABLED',
+  'STRIPE_WEBHOOK_SECRET',
 ] as const;
 
 async function withCleanEnv(run: () => Promise<void>) {
@@ -101,5 +103,19 @@ test('Checkout API rejects a missing plan ID before attempting any checkout', as
     await checkoutHandler({ method: 'POST', body: { customerEmail: 'test@example.com' } } as never, response as never);
     assert.equal(response.statusCode, 400);
     assert.match(JSON.stringify(response.body), /valid coaching plan/i);
+  });
+});
+
+
+test('Configured Stripe checkout remains disabled until webhook and ledger gate are enabled', async () => {
+  await withCleanEnv(async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
+    process.env.STRIPE_WEBHOOK_SECRET = '';
+    process.env.STRIPE_PAYMENT_LEDGER_ENABLED = 'false';
+    const response = responseDouble();
+    await checkoutHandler({ method: 'POST', body: { planId: 'online-gold-8week' } } as never, response as never);
+    assert.equal(response.statusCode, 503);
+    assert.match(JSON.stringify(response.body), /temporarily unavailable/i);
   });
 });

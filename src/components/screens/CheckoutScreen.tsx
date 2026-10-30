@@ -25,7 +25,7 @@ function loadStripeJs(): Promise<void> {
   });
 }
 
-export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen: (screen: 'home' | 'online-coaching' | 'contact') => void }> = ({ plan, onSelectScreen }) => {
+export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; checkoutReturn?: { sessionId: string; planId: string } | null; onSelectScreen: (screen: 'home' | 'online-coaching' | 'contact') => void }> = ({ plan, checkoutReturn, onSelectScreen }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [formError, setFormError] = useState('');
@@ -35,6 +35,7 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
   const [stripePublishableKey, setStripePublishableKey] = useState('');
   const [mockCheckout, setMockCheckout] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
+  const [returnStatus, setReturnStatus] = useState<'checking' | 'paid' | 'pending' | 'review' | 'error' | null>(null);
   const checkoutMountRef = useRef<HTMLDivElement>(null);
 
   const submit = async () => {
@@ -65,6 +66,27 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (!checkoutReturn?.sessionId) {
+      setReturnStatus(null);
+      return;
+    }
+    let cancelled = false;
+    setReturnStatus('checking');
+    void fetch(`/api/checkout-status?session_id=${encodeURIComponent(checkoutReturn.sessionId)}`, {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    }).then(async (response) => {
+      const data = await response.json();
+      if (!response.ok || !data?.ok) throw new Error('Payment status could not be verified.');
+      if (checkoutReturn.planId && data.planId !== checkoutReturn.planId) throw new Error('Payment details do not match the selected package.');
+      if (!cancelled) setReturnStatus(data.status === 'paid' ? 'paid' : data.status === 'review' ? 'review' : 'pending');
+    }).catch(() => {
+      if (!cancelled) setReturnStatus('error');
+    });
+    return () => { cancelled = true; };
+  }, [checkoutReturn?.sessionId, checkoutReturn?.planId]);
 
   useEffect(() => {
     if (!clientSecret || !checkoutMountRef.current) return;
@@ -119,30 +141,46 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
       <div className="mb-8">
         <p className="font-mono text-xs uppercase tracking-widest text-[#ff5500]">Secure checkout</p>
         <h1 className="mt-2 font-display text-4xl text-white uppercase tracking-tight sm:text-5xl">Checkout</h1>
-        <p className="mt-2 text-sm text-zinc-300">{mockCheckout ? 'This Preview is using a simulation; no payment will be taken.' : 'Enter your details, then pay securely without leaving this page.'}</p>
+        <p className="mt-2 text-sm text-zinc-300">{checkoutReturn ? 'Checking the payment result. Do not start another payment.' : mockCheckout ? 'This Preview is using a simulation; no payment will be taken.' : 'Enter your details, then pay securely without leaving this page.'}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
         <div className="border border-[#20232b] bg-[#121419] p-6 sm:p-8">
-          <h2 className="font-display text-2xl text-white uppercase">Your details</h2>
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-300 sm:col-span-2">Full name *
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Alex Morgan" className={`${inputClass} mt-1.5`} autoComplete="name" />
-            </label>
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-300 sm:col-span-2">Email *
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" className={`${inputClass} mt-1.5`} autoComplete="email" />
-            </label>
-          </div>
+          {checkoutReturn ? (
+            <div role="status" aria-live="polite" className="mt-5 border border-[#343943] bg-[#191c22] p-5">
+              <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#ff5500]">Stripe payment return</p>
+              {returnStatus === 'checking' && <p className="mt-3 text-sm text-zinc-200">Verifying your payment directly with Stripe…</p>}
+              {returnStatus === 'paid' && <>
+                <h2 className="mt-3 font-display text-2xl uppercase text-white">Stripe confirms payment</h2>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-200">Do not pay again. Your coaching access is not activated automatically yet because your customer account still needs to be securely linked to this purchase. Mike will need to confirm your account before access is granted.</p>
+                <p className="mt-3 text-xs text-zinc-400">Reference: {checkoutReturn.sessionId.slice(-12)}</p>
+              </>}
+              {returnStatus === 'review' && <p className="mt-3 text-sm leading-relaxed text-amber-200">Stripe reports a payment, but the amount or currency needs manual verification. Do not pay again. Contact Mike so the payment can be checked before any access is granted.</p>}
+              {returnStatus === 'pending' && <p className="mt-3 text-sm leading-relaxed text-amber-200">Stripe has not confirmed this payment yet. Do not start another payment. Refresh this page shortly or contact Mike if the status does not change.</p>}
+              {returnStatus === 'error' && <p className="mt-3 text-sm leading-relaxed text-amber-200">We could not verify this payment automatically. Do not pay again. Contact Mike and provide reference {checkoutReturn.sessionId.slice(-12)} so the payment can be checked.</p>}
+              <button type="button" onClick={() => onSelectScreen('contact')} className="mt-4 border border-[#454a55] px-4 py-2 font-mono text-xs font-bold uppercase text-white hover:border-[#ff5500]">Contact Mike</button>
+            </div>
+          ) : <>
+            <h2 className="font-display text-2xl text-white uppercase">Your details</h2>
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-300 sm:col-span-2">Full name *
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Alex Morgan" className={`${inputClass} mt-1.5`} autoComplete="name" />
+              </label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-300 sm:col-span-2">Email *
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" className={`${inputClass} mt-1.5`} autoComplete="email" />
+              </label>
+            </div>
 
-          <h2 className="mt-8 font-display text-2xl text-white uppercase">Payment</h2>
-          <div className="mt-4 border border-[#343943] bg-[#191c22] p-4">
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-200"><Lock className="h-3.5 w-3.5 text-[#ff5500]" /> {mockCheckout ? 'Preview mock checkout simulation' : 'Secure embedded Stripe payment'}</div>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-300">{mockCheckout ? 'Mock mode does not load card fields, contact Stripe, or take payment.' : 'Your card and billing details are collected securely by Stripe inside this checkout. The website does not receive or store your card number or security code.'}</p>
-            {!clientSecret && !mockCheckout && <p className="mt-2 text-xs leading-relaxed text-zinc-400">Stripe will load here after you continue. If this Preview has no Stripe test keys configured, a clearly labelled mock checkout is shown instead. Your total is shown in the order summary.</p>}
-          </div>
+            <h2 className="mt-8 font-display text-2xl text-white uppercase">Payment</h2>
+            <div className="mt-4 border border-[#343943] bg-[#191c22] p-4">
+              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-200"><Lock className="h-3.5 w-3.5 text-[#ff5500]" /> {mockCheckout ? 'Preview mock checkout simulation' : 'Secure embedded Stripe payment'}</div>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-300">{mockCheckout ? 'Mock mode does not load card fields, contact Stripe, or take payment.' : 'Your card and billing details are collected securely by Stripe inside this checkout. The website does not receive or store your card number or security code.'}</p>
+              {!clientSecret && !mockCheckout && <p className="mt-2 text-xs leading-relaxed text-zinc-400">Stripe will load here after you continue. If this Preview has no Stripe test keys configured, a clearly labelled mock checkout is shown instead. Your total is shown in the order summary.</p>}
+            </div>
+          </>}
 
-          {formError && <p role="alert" className="mt-4 border border-red-500/40 bg-[#2a1414] px-4 py-3 text-sm text-red-300">{formError}</p>}
-          {paymentWarning && (
+          {!checkoutReturn && formError && <p role="alert" className="mt-4 border border-red-500/40 bg-[#2a1414] px-4 py-3 text-sm text-red-300">{formError}</p>}
+          {!checkoutReturn && paymentWarning && (
             <div role="alert" className="mt-4 border border-amber-500/50 bg-amber-500/10 p-4">
               <p className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-amber-300"><TriangleAlert className="h-4 w-4" /> Payment unavailable</p>
               <p className="mt-2 text-sm leading-relaxed text-amber-200/90">{paymentWarning}</p>
@@ -150,10 +188,10 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
             </div>
           )}
 
-          {!clientSecret && !mockCheckout && <button type="button" onClick={() => void submit()} disabled={submitting} className="mt-6 w-full bg-[#ff5500] px-6 py-4 font-mono font-bold text-xs uppercase text-black transition hover:bg-[#ff6a1f] disabled:opacity-60">
+          {!checkoutReturn && !clientSecret && !mockCheckout && <button type="button" onClick={() => void submit()} disabled={submitting} className="mt-6 w-full bg-[#ff5500] px-6 py-4 font-mono font-bold text-xs uppercase text-black transition hover:bg-[#ff6a1f] disabled:opacity-60">
             {submitting ? 'Preparing checkout…' : `Continue to payment — ${formatPrice(plan.price)}`}
           </button>}
-          {mockCheckout && (
+          {!checkoutReturn && mockCheckout && (
             <div role="status" className="mt-6 border border-amber-500/50 bg-amber-500/10 p-5">
               <p className="font-mono text-xs font-bold uppercase tracking-wider text-amber-300">Preview mock checkout</p>
               <h3 className="mt-2 font-display text-xl uppercase text-white">No payment has been taken</h3>
@@ -161,13 +199,13 @@ export const CheckoutScreen: React.FC<{ plan: PublicPlan | null; onSelectScreen:
               <button type="button" onClick={() => setMockCheckout(false)} className="mt-4 border border-amber-300/50 px-4 py-2 font-mono text-xs font-bold uppercase text-amber-200 hover:bg-amber-300/10">Return to checkout</button>
             </div>
           )}
-          {clientSecret && (
+          {!checkoutReturn && clientSecret && (
             <div className="mt-5 border border-[#343943] bg-[#191c22] p-4">
               {stripeLoading && <p className="mb-3 text-sm text-zinc-300">Loading secure payment fields…</p>}
               <div ref={checkoutMountRef} aria-label="Stripe secure payment form" />
             </div>
           )}
-          {!mockCheckout ? <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-300"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Card details are handled securely by Stripe</p> : <p className="mt-3 text-center text-[11px] text-amber-200">No card details collected in mock mode</p>}
+          {!checkoutReturn && (!mockCheckout ? <p className="mt-3 flex items-center justify-center gap-2 text-[11px] text-zinc-300"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Card details are handled securely by Stripe</p> : <p className="mt-3 text-center text-[11px] text-amber-200">No card details collected in mock mode</p>)}
         </div>
 
         <aside className="border border-[#20232b] bg-[#121419] p-6 sm:p-8 lg:sticky lg:top-36">
