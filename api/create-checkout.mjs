@@ -21,12 +21,15 @@ export default async function handler(req, res) {
       }
       // Never trust a client-provided amount or allow checkout for hidden/inactive plans.
       const sql = neon(process.env.DATABASE_URL);
-      const plans = await sql`SELECT id, price, kind, active FROM public.plans WHERE id = ${planId} LIMIT 1`;
+      const plans = await sql`SELECT id, price, stripe_price_id, kind, active FROM public.plans WHERE id = ${planId} LIMIT 1`;
       const plan = plans[0];
       if (!plan || plan.kind !== 'online' || plan.active !== true) {
         return res.status(400).json({ ok: false, error: 'Choose an available online coaching package.' });
       }
       expectedAmount = Number(plan.price);
+      if (checkoutMode.livemode && (typeof plan.stripe_price_id !== 'string' || !plan.stripe_price_id.startsWith('price_'))) {
+        return res.status(503).json({ ok: false, error: 'Online checkout is temporarily unavailable. Please contact MW Fitness.' });
+      }
       if (!Number.isFinite(expectedAmount) || expectedAmount < 0) {
         return res.status(503).json({ ok: false, error: 'Online checkout is temporarily unavailable. Please contact MW Fitness.' });
       }
@@ -39,6 +42,7 @@ export default async function handler(req, res) {
       planId,
       origin,
       expectedAmount,
+      priceId: checkoutMode.mode === 'stripe' && checkoutMode.livemode ? plan.stripe_price_id : undefined,
       customerEmail: typeof body?.customerEmail === 'string' ? body.customerEmail.trim().slice(0, 254) : undefined,
       customerName: typeof body?.customerName === 'string' ? body.customerName.trim().slice(0, 100) : undefined,
     });
