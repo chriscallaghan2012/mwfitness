@@ -204,3 +204,19 @@ All outstanding source and documentation changes are to be kept together off `ma
 This documentation update itself is not merged to `main` and has not triggered a production build.
 
 **Current release status: NOT APPROVED.** Payment migrations are not applied, `STRIPE_PAYMENT_LEDGER_ENABLED` remains disabled, and live payment processing must not be enabled until the signed webhook, idempotency, refund and membership lifecycle are tested and approved.
+
+
+## SHWAG catalogue regression — added 2026-10-30
+
+Production Neon contains four active SHWAG products. The prior `api/products.mjs` implementation read `rows.rows` after calling Neon serverless `sql.query()`. With the driver's default result format, `sql.query()` returns the row array directly; the `rows` property is only present when `fullResults: true` is requested. The endpoint could therefore return HTTP 200 with an empty catalogue despite active database rows.
+
+The candidate branch corrects this by mapping the returned array directly and adds `tests/products.test.ts` covering:
+- one returned product row and numeric price conversion;
+- missing optional sizes;
+- empty and non-array results.
+
+Run `npm test` from a clean checkout to execute the new regression test. This test has been added but has **not yet been run** in this environment. The fix is on `docs/release-status-and-one-build-policy`, not deployed. Do not count issue #49 as resolved until the final candidate passes automated checks, is merged/deployed once, and `GET /api/products` is verified on the production domain.
+
+## Live coaching Stripe price verification — 2026-10-30
+
+Read-only Neon and Stripe checks verified all five active online coaching plans against the live `MWFitnessUk` Stripe account. Each Price is active, GBP, one-time, live mode, and matches the Neon amount. The mapping migration is already reflected in production rows/schema and should not be reapplied. The payment-ledger table is still absent from production, so the ledger migration remains unapplied and the payment gate stays disabled.
