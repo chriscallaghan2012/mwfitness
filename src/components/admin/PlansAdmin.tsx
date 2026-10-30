@@ -176,6 +176,10 @@ export function PlansAdmin() {
         rows={plans ?? []}
         empty="No plans yet."
         onDelete={remove}
+        deleteLabel={(row) => row.kind === 'online' && !isDemoMode() ? 'Archive' : 'Delete'}
+        deleteDescription={(row) => row.kind === 'online' && !isDemoMode()
+          ? `Archive ${String(row.name ?? row.id)}? This removes it from new purchases and disables its Stripe product/price, while retaining the plan and historic payment records.`
+          : `Delete ${String(row.name ?? row.id ?? 'this record')}? This action may not be reversible.`}
         onEdit={(p) => {
           setEdit(p);
           setF({
