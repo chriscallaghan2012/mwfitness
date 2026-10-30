@@ -45,7 +45,7 @@ test('Staff HQ exposes a read-only payment ledger and never reads it in demo mod
 
 
 test('Stripe webhook passes the resolved environment mode to the event recorder', () => {
-  const webhook = readFileSync(join(root, 'api', 'stripe-webhook.mjs'), 'utf8');
+  const webhook = readFileSync(join(root, 'lib', 'stripe-webhook-handler.mjs'), 'utf8');
   assert.match(webhook, /const config = resolveCheckoutMode\(\)/);
   assert.match(webhook, /recordStripeEvent\(event, res, config\.livemode\)/);
   assert.doesNotMatch(webhook, /recordStripeEvent\(event, res, configuration\.livemode\)/);
