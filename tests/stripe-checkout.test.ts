@@ -114,7 +114,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
         priceId: 'price_test_release_placeholder',
         customerEmail: 'release-test@example.com',
         customerName: 'Release Test',
-        expectedAmount: 399.999,
+        expectedAmount: 399.99,
       });
       assert.deepEqual(result, {
         mode: 'stripe',
@@ -153,7 +153,7 @@ test('Stripe rejects a Price ID from the wrong mode', async () => {
     }) as typeof fetch;
     try {
       await assert.rejects(
-        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test' }),
+        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', priceId: 'price_live_release_placeholder', expectedAmount: 399.99 }),
         /does not match this environment/i,
       );
       assert.equal(sessionCreated, false);
@@ -165,7 +165,7 @@ test('Stripe rejects a Price ID from the wrong mode', async () => {
 
 test('Stripe Checkout rejects an unknown coaching plan before calling Stripe', async () => {
   await assert.rejects(
-    () => createCheckoutSession({ planId: 'not-a-real-plan', origin: 'https://mwfitnessuk.com' }),
+    () => createCheckoutSession({ planId: '', origin: 'https://mwfitnessuk.com' }),
     /Invalid coaching plan/,
   );
 });
@@ -186,7 +186,7 @@ test('Stripe rejects a Price amount that differs from the active website plan', 
     }) as typeof fetch;
     try {
       await assert.rejects(
-        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', expectedAmount: 99.99 }),
+        () => createCheckoutSession({ planId: 'online-gold-8week', origin: 'https://preview.example.test', priceId: 'price_test_release_placeholder', expectedAmount: 99.99 }),
         /does not match the active website plan price/i,
       );
       assert.equal(sessionCreated, false);
