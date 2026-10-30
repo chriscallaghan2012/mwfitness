@@ -26,14 +26,20 @@ import unsubscribe from './api/unsubscribe.mjs';
 import health from './api/health.mjs';
 import plans from './api/plans.mjs';
 import products from './api/products.mjs';
+import checkoutStatus from './api/checkout-status.mjs';
+import stripeWebhook from './api/stripe-webhook.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
+
+// Stripe signature verification requires the untouched raw request body.
+app.post('/api/stripe-webhook', express.raw({ type: 'application/json', limit: '1mb' }), stripeWebhook);
 
 app.use(express.json({ limit: '64kb' }));
 app.use(express.urlencoded({ extended: false, limit: '8kb' }));
 
 app.get('/api/health', health);
+app.get('/api/checkout-status', checkoutStatus);
 app.get('/api/plans', plans);
 app.get('/api/products', products);
 
