@@ -13,8 +13,8 @@ export function resolveCheckoutMode() {
   const publishableKey = process.env.VITE_STRIPE_PUBLISHABLE_KEY;
   const production = isProductionEnvironment();
 
-  // Without either key, Preview/Development stay usable as a labelled mock,
-  // even if someone has added Price IDs but has not obtained test credentials.
+  // Without either key, Preview/Development stay usable as a labelled mock.
+  // Legacy per-plan Price ID environment variables are ignored; Neon is authoritative.
   if (!secretKey && !publishableKey && !production) return { mode: 'mock' };
   if (!secretKey && !publishableKey && production) {
     throw new Error('Live Stripe is not configured for production.');
