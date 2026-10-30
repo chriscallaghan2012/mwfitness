@@ -8,13 +8,6 @@ const envKeys = [
   'PUBLIC_SITE_URL',
   'STRIPE_SECRET_KEY',
   'VITE_STRIPE_PUBLISHABLE_KEY',
-  'STRIPE_PRICE_ONLINE_WEEKLY',
-  'STRIPE_PRICE_ONLINE_12_WEEK',
-  'STRIPE_PRICE_ONLINE_4_WEEK_ONCE',
-  'STRIPE_PRICE_ONLINE_BRONZE_4WEEK',
-  'STRIPE_PRICE_ONLINE_SILVER_8WEEK',
-  'STRIPE_PRICE_ONLINE_GOLD_8WEEK',
-  'STRIPE_PRICE_ONLINE_PLATINUM_8WEEK',
 ] as const;
 
 async function withCleanStripeEnv(run: () => Promise<void>) {
@@ -33,7 +26,6 @@ async function withCleanStripeEnv(run: () => Promise<void>) {
 
 test('Preview falls back to an explicit mock when both Stripe keys are absent', async () => {
   await withCleanStripeEnv(async () => {
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_configured_without_keys';
     assert.deepEqual(resolveCheckoutMode(), { mode: 'mock' });
     const result = await createCheckoutSession({ planId: 'online-gold-8week' });
     assert.deepEqual(result, { mode: 'mock' });
@@ -82,7 +74,6 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
   await withCleanStripeEnv(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_release_placeholder';
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
-    process.env.STRIPE_PRICE_ONLINE_GOLD_8WEEK = 'price_env_should_be_ignored';
     process.env.PUBLIC_SITE_URL = 'https://preview.example.test';
     const originalFetch = globalThis.fetch;
     const requests: Array<{ url: string; method: string; authorization: string | null; body: URLSearchParams }> = [];
