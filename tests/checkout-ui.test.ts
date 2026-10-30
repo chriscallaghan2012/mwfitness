@@ -11,6 +11,7 @@ test('checkout loads dark Stripe Elements automatically instead of requiring a d
   assert.match(screen, /paymentMountRef/);
   assert.match(screen, /Secure Stripe payment/);
   assert.match(screen, /createCheckoutSession\(plan\.id\)/);
+  assert.match(screen, /https:\/\/js\.stripe\.com\/dahlia\/stripe\.js/);
   assert.match(screen, /if \(!plan \|\| checkoutReturn\?\.sessionId\) return/);
   assert.match(screen, /Your secure payment form loads automatically/);
   assert.match(screen, /Preview mock checkout/);

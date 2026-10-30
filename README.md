@@ -74,7 +74,7 @@ Configure `DATABASE_URL` (server-only) and, for email alerts, `SMTP_HOST`, `SMTP
 
 ### Dark Stripe Checkout Elements and dynamic Staff HQ plans
 
-The website automatically loads Stripe Checkout Elements when a customer opens an active package. Stripe's Contact Details and Payment Elements collect contact, card and billing details in a dark appearance matched to the MW Fitness palette; the website does not handle or store card numbers/CVCs. The customer confirms payment using the site's secure payment button, and Stripe handles any required authentication and return flow.
+The website automatically loads Stripe Checkout Elements when a customer opens an active package. Stripe's Contact Details and Payment Elements collect contact, card and billing details in a dark appearance matched to the MW Fitness palette; the website does not handle or store card numbers/CVCs. This integration loads Stripe.js's Dahlia release and pins only Checkout Session API requests to `2026-03-25.dahlia`, which Stripe requires for Checkout Elements. This is a technical API/SDK version, not a paid account upgrade, and does not change the account-wide API version. The customer confirms payment using the site's secure payment button, and Stripe handles any required authentication and return flow.
 
 **Neon is the source of truth for coaching plans.** Staff HQ → Plans creates/edits/activates/archives online coaching plans and synchronises the corresponding Stripe Product/Price server-side. Each plan stores `stripe_product_id` and `stripe_price_id` in `public.plans`. When a price changes, Stripe creates a new immutable Price, Neon is updated to the new Price ID, and the previous Price is deactivated. Archiving a plan preserves its history and prevents new purchases.
 

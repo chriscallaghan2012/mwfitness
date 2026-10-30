@@ -76,7 +76,7 @@ test('Stripe Checkout verifies the Price mode and creates a Checkout Elements se
     process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'pk_test_release_placeholder';
     process.env.PUBLIC_SITE_URL = 'https://preview.example.test';
     const originalFetch = globalThis.fetch;
-    const requests: Array<{ url: string; method: string; authorization: string | null; body: URLSearchParams }> = [];
+    const requests: Array<{ url: string; method: string; authorization: string | null; stripeVersion: string | null; body: URLSearchParams }> = [];
     globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
       const url = String(input);
       const method = init?.method ?? 'GET';
@@ -84,6 +84,7 @@ test('Stripe Checkout verifies the Price mode and creates a Checkout Elements se
         url,
         method,
         authorization: new Headers(init?.headers).get('Authorization'),
+        stripeVersion: new Headers(init?.headers).get('Stripe-Version'),
         body: new URLSearchParams(String(init?.body ?? '')),
       });
       if (method === 'GET') {
@@ -115,7 +116,9 @@ test('Stripe Checkout verifies the Price mode and creates a Checkout Elements se
       assert.equal(requests.length, 2);
       assert.equal(requests[0].url, 'https://api.stripe.com/v1/prices/price_testReleasePlaceholder');
       assert.equal(requests[0].method, 'GET');
+      assert.equal(requests[0].stripeVersion, null);
       assert.equal(requests[1].url, 'https://api.stripe.com/v1/checkout/sessions');
+      assert.equal(requests[1].stripeVersion, '2026-03-25.dahlia');
       assert.equal(requests[1].authorization, 'Bearer sk_test_release_placeholder');
       assert.equal(requests[1].body.get('mode'), 'payment');
       assert.equal(requests[1].body.get('ui_mode'), 'elements');

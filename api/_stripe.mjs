@@ -95,6 +95,7 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
     headers: {
       Authorization: `Bearer ${secretKey}`,
       'Content-Type': 'application/x-www-form-urlencoded',
+      'Stripe-Version': '2026-03-25.dahlia',
     },
     body: params,
   });

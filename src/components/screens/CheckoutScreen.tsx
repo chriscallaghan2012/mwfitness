@@ -15,7 +15,7 @@ function loadStripeJs(): Promise<void> {
       return;
     }
     const script = document.createElement('script');
-    script.src = 'https://js.stripe.com/v3/';
+    script.src = 'https://js.stripe.com/dahlia/stripe.js';
     script.async = true;
     script.dataset.stripeJs = 'true';
     script.onload = () => resolve();
