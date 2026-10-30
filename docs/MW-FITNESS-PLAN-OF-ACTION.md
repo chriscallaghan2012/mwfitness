@@ -3,7 +3,7 @@
 ## Current release handoff — 2026-10-30
 
 - Website release candidate: `release/mwfitness-final-readiness-2026-10-30`; mobile release candidate: `release/final-readiness-2026-10-30`. Both are unmerged and undeployed. Check current GitHub comparison before using ahead/behind counts.
-- Website Staff HQ online coaching plans now have candidate code for server-side Stripe Product/Price sync. Neon is authoritative; no per-plan Stripe Price env variables are needed. SHWAG remains enquiry/catalogue-only. Preview sync is blocked while Preview shares production Neon.
+- Website Staff HQ online coaching plans now have candidate code for server-side Stripe Product/Price sync. Neon is authoritative; no per-plan Stripe Price env variables are needed. SHWAG remains enquiry/catalogue-only. Preview sync is blocked by default while Preview shares production Neon; safe test-mode sync requires isolated Preview Neon Auth/Data API/database, matching test keys and two Preview-only flags.
 - Current Vercel inventory has no `VITE_SUPABASE_*` or `STRIPE_PRICE_*` project variables. The current inventory does not include `STRIPE_WEBHOOK_SECRET`; secret values were not decrypted. `STRIPE_PAYMENT_LEDGER_ENABLED` is now targeted at Production only. Do not treat the Stripe secret key entry as verified until a safe checkout/session smoke test proves the credential and permissions work.
 - The mobile release branch removes fake crypto success fallbacks; native SubtleCrypto compatibility and real Android auth/data round-trip tests are still required.
 - No GitHub Actions runs were found for either release branch. Full tests, lint, typecheck/build and device checks have not been run here. The source-level syntax checks are not a substitute.
