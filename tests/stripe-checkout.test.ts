@@ -96,7 +96,7 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
         body: new URLSearchParams(String(init?.body ?? '')),
       });
       if (method === 'GET') {
-        return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false, currency: 'gbp', unit_amount: 9999 }), {
+        return new Response(JSON.stringify({ id: 'price_test_release_placeholder', livemode: false, currency: 'gbp', unit_amount: 39999 }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
         });
@@ -111,9 +111,10 @@ test('Stripe Checkout verifies the Price mode and creates an embedded session', 
       const result = await createCheckoutSession({
         planId: 'online-gold-8week',
         origin: 'https://preview.example.test',
+        priceId: 'price_test_release_placeholder',
         customerEmail: 'release-test@example.com',
         customerName: 'Release Test',
-        expectedAmount: 99.99,
+        expectedAmount: 399.999,
       });
       assert.deepEqual(result, {
         mode: 'stripe',
