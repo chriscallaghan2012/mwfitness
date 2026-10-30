@@ -1,3 +1,23 @@
+> **CURRENT HANDOFF — 2026-10-30 (PR #143 / production commit 3cab220e8c9acd4ec0587682f4a1ebc33f5223d9)**  
+> This status block supersedes any older branch/deployment statements later in this historical document. Production Vercel deployment is **READY** and aliases `mwfitnessuk.com` and `www.mwfitnessuk.com`. READY confirms build/deployment only; runtime and end-to-end checks are still outstanding. No manual deployment, database migration or environment change was performed.
+>
+> **Completed in this release:** SHWAG Neon row-mapping fix and regression tests added; release audit/runbook updated; PR #143 merged. Five active online coaching plans were read-only verified against active live GBP one-time Stripe Prices and Products, with exact amount and default-price matches. The live plan/price mapping migration is already reflected in production and must not be reapplied. Four active SHWAG products exist in Neon. Production payment ledger table is absent; ledger migration remains unapplied. Vercel Hobby function inventory remains 11/12.
+>
+> **Current blockers / owner actions:**
+> 1. **Email (Resend):** add and verify the sending domain in Resend; publish the exact DNS records Resend supplies; configure the chosen sender/from address and obtain an API key; add the server-side Resend key and any required sender configuration to Vercel Production (and Preview separately if desired); redeploy through the normal Git workflow after configuration; test enquiry/transactional delivery, reply-to, spam placement, bounce/failure handling. No SMTP variables were found in Vercel; this codebase's email integration must be checked against the actual Resend configuration rather than assuming SMTP.
+> 2. **Production HTTP/browser smoke test:** verify apex/www HTTPS and canonical redirects; direct-load and refresh key public/member/Staff HQ routes; inspect browser console/network; verify `/api/health`, `/api/plans`, and especially `/api/products` return expected responses. Keep issue #49 open until the live products endpoint is confirmed.
+> 3. **Automated checks:** run `npm ci`, `npm test`, `npm run lint`, `npm run build` on a clean checkout at commit `3cab220e8c9acd4ec0587682f4a1ebc33f5223d9`; capture output. These have not been run here and must not be described as passing.
+> 4. **Auth / Staff HQ / data:** test signup/login/logout/session restore with dedicated accounts; role boundaries; supported Staff HQ CRUD; member A cannot access member B; verify demo mode never writes to Neon and live mode never falls back to mock; use a disposable Neon branch for write tests.
+> 5. **Mobile:** fresh Android export/build and physical-device install/startup; verify auth/session, member data, check-in, weigh-in, nutrition/workout/cardio, photo privacy, push if in scope; prove mobile → Neon → Staff HQ → mobile reload. Website release does not sign off the Expo app.
+> 6. **PWA:** test manifest/install prompt, icon, offline fallback, cache refresh and service-worker update in real browsers.
+> 7. **Payments:** keep live checkout/payment activation gated. Vercel has no Stripe secret/publishable/webhook keys or payment-ledger flag configured. Configure matching live keys only after approval; test signed webhook, invalid/stale signature rejection, duplicate idempotency, paid/unpaid, amount/currency/mode mismatch, refunds, account linking and membership provisioning/revocation. The payment-ledger migration is prepared but unapplied; do not apply it to production without explicit approval. Membership auto-provisioning/revocation is not complete.
+> 8. **Operations:** confirm backup/recovery and rollback owner/procedure; confirm privacy/legal/contact content and production monitoring; record evidence and explicit go/no-go.
+>
+> **Not changed:** no Vercel environment variables, DNS records, Resend settings, Stripe settings, Neon production data or migrations. Legacy unused Supabase environment variables were left untouched. The encrypted Vercel `DATABASE_URL` could not be independently matched to the Neon host/database.
+>
+> **One-build rule:** do not make incremental production merges/deployments. Keep remaining code/documentation work together off `main`; run checks against the final candidate and do one approved merge/build. External dashboard configuration can be completed by the owner, but do not enable live payment processing until its separate gates pass.
+>
+> ---
 # MW FITNESS — Live Release Audit & Go-Live Plan
 
 **Status:** Planning / release not yet approved  
