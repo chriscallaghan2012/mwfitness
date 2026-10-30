@@ -34,9 +34,11 @@ export function resolveCheckoutMode() {
     throw new Error('Stripe configuration is incomplete: both the secret and publishable keys are required.');
   }
 
-  const expectedSecretPrefix = production ? 'sk_live_' : 'sk_test_';
+  // Prefer a restricted API key (rk_) with only Prices read + Checkout Sessions write.
+  // Accept legacy secret keys (sk_) as well, but keep every key server-side.
+  const expectedSecretPrefixes = production ? ['sk_live_', 'rk_live_'] : ['sk_test_', 'rk_test_'];
   const expectedPublishablePrefix = production ? 'pk_live_' : 'pk_test_';
-  if (!secretKey.startsWith(expectedSecretPrefix) || !publishableKey.startsWith(expectedPublishablePrefix)) {
+  if (!expectedSecretPrefixes.some((prefix) => secretKey.startsWith(prefix)) || !publishableKey.startsWith(expectedPublishablePrefix)) {
     throw new Error(production
       ? 'Production requires matching live Stripe keys.'
       : 'Preview and development require matching Stripe test keys. Live keys are not allowed here.');
