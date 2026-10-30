@@ -55,6 +55,11 @@ export default function App() {
   const [bookCallInterest, setBookCallInterest] = useState('');
   const [showMobileCta, setShowMobileCta] = useState(false);
   const [checkoutPlan, setCheckoutPlan] = useState<PublicPlan | null>(null);
+  const checkoutParams = new URLSearchParams(window.location.search);
+  const checkoutSessionId = checkoutParams.get('session_id');
+  const checkoutReturn = checkoutParams.get('checkout') === 'complete' && checkoutSessionId
+    ? { sessionId: checkoutSessionId, planId: checkoutParams.get('plan') ?? '' }
+    : null;
 
   // Stripe can return the customer to /checkout after a redirect-based payment method.
   // Restore the selected package from the URL rather than showing an empty checkout.
@@ -192,7 +197,7 @@ export default function App() {
         {currentScreen === 'privacy' && <PrivacyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'cookies' && <CookiePolicyScreen onBack={() => { window.location.href = '/'; }} />}
         {currentScreen === 'gdpr' && <GdprRightsScreen onBack={() => { window.location.href = '/'; }} />}
-        {currentScreen === 'checkout' && <CheckoutScreen plan={checkoutPlan} onSelectScreen={handleSelectScreen} />}
+        {currentScreen === 'checkout' && <CheckoutScreen plan={checkoutPlan} checkoutReturn={checkoutReturn} onSelectScreen={handleSelectScreen} />}
         {currentScreen === 'delete-account' && <AccountDeletionScreen onBack={() => { window.location.href = '/'; }} />}
       </main>
 
