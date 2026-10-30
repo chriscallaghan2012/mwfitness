@@ -91,6 +91,7 @@ export async function createCheckoutSession({ planId, origin, customerEmail, cus
     billing_address_collection: 'auto',
     'phone_number_collection[enabled]': 'true',
     'metadata[plan_id]': planId,
+    'metadata[expected_amount_pence]': String(Math.round(expectedAmount * 100)),
   });
   if (customerEmail) params.set('customer_email', customerEmail);
   if (customerName) params.set('metadata[customer_name]', customerName);
