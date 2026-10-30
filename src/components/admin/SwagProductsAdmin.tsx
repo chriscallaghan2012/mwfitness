@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, btn, btnGhost, card, inp } from './fields';
 
-const blank = { slug: '', name: '', description: '', category: 'apparel', price: '0', compare_at_price: '', image_url: '', product_url: '', sizes: '', stock_status: 'enquiry_only', active: false, sort_order: '100' };
+const blank = { slug: '', name: '', description: '', category: 'apparel', price: '50', compare_at_price: '', image_url: '', product_url: '', sizes: '', stock_status: 'enquiry_only', active: false, sort_order: '100' };
 
 export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
   const db = adminDb();
@@ -44,6 +44,37 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
     setError(''); setNotice('');
   };
   const set = (key: string, value: string | boolean) => setDraft((old) => ({ ...old, [key]: value }));
+  const uploadImage = async (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setError('Choose an image file.'); return; }
+    if (file.size > 12 * 1024 * 1024) { setError('Choose an image smaller than 12 MB.'); return; }
+    try {
+      const source = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('Could not read image.'));
+        reader.onerror = () => reject(new Error('Could not read image.'));
+        reader.readAsDataURL(file);
+      });
+      const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('That image could not be opened.'));
+        img.src = source;
+      });
+      const scale = Math.min(1, 1400 / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Image processing is not available in this browser.');
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const optimized = canvas.toDataURL('image/webp', 0.78);
+      if (optimized.length > 1500000) throw new Error('The optimised image is still too large. Choose a simpler or smaller image.');
+      set('image_url', optimized);
+      setNotice('Image ready. Save the product to store it.');
+      setError('');
+    } catch (e) { setError(e instanceof Error ? e.message : 'Image upload failed.'); }
+  };
   const save = async () => {
     if (!db) { setError('Neon is not configured. Nothing was saved.'); return; }
     const slug = String(draft.slug || '').trim().toLowerCase();
@@ -125,7 +156,11 @@ export function SwagProductsAdmin({ onBack }: { onBack: () => void }) {
         <label className="grid gap-1.5 text-xs text-zinc-400">Category<select className={inp} value={String(draft.category || 'apparel')} onChange={(e) => set('category', e.target.value)}>{['apparel','accessories','equipment','other'].map((v) => <option key={v}>{v}</option>)}</select></label>
         <label className="grid gap-1.5 text-xs text-zinc-400">Availability<select className={inp} value={String(draft.stock_status || 'available')} onChange={(e) => set('stock_status', e.target.value)}>{[['available','Available'],['limited','Limited stock'],['sold_out','Sold out'],['preorder','Pre-order'],['enquiry_only','Enquiry only']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></label>
         <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Description<textarea className={inp} rows={3} value={String(draft.description || '')} onChange={(e) => set('description', e.target.value)} /></label>
-        <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Image URL<input className={inp} value={String(draft.image_url || '')} onChange={(e) => set('image_url', e.target.value)} placeholder="https://…" /></label>
+        <div className="grid gap-2 text-xs text-zinc-400 sm:col-span-2">
+          <label className="grid gap-1.5">Upload product image<input type="file" accept="image/*" className={inp} onChange={(e) => void uploadImage(e.target.files?.[0])} /><span className="text-[11px] text-zinc-500">Images are resized to WebP (maximum 1,400px) and stored with this product in Neon. Maximum optimised size: 1.5 MB.</span></label>
+          {String(draft.image_url || '').startsWith('data:image/') || String(draft.image_url || '').startsWith('https://') || String(draft.image_url || '').startsWith('http://') ? <img src={String(draft.image_url)} alt="Product preview" className="h-40 w-40 border border-[#333] object-cover" /> : null}
+          <label className="grid gap-1.5">Or use an image URL<input className={inp} value={String(draft.image_url || '').startsWith('data:image/') ? '' : String(draft.image_url || '')} onChange={(e) => set('image_url', e.target.value)} placeholder="https://…" /></label>
+        </div>
         <label className="grid gap-1.5 text-xs text-zinc-400 sm:col-span-2">Product / order URL (optional)<input className={inp} value={String(draft.product_url || '')} onChange={(e) => set('product_url', e.target.value)} placeholder="https://…" /></label>
         <label className="grid gap-1.5 text-xs text-zinc-400">Sizes / variants (comma-separated)<input className={inp} value={String(draft.sizes || '')} onChange={(e) => set('sizes', e.target.value)} placeholder="S, M, L, XL" /></label>
         <label className="grid gap-1.5 text-xs text-zinc-400">Sort order<input type="number" className={inp} value={String(draft.sort_order || '100')} onChange={(e) => set('sort_order', e.target.value)} /></label>
