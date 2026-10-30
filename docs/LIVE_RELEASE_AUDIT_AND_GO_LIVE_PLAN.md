@@ -656,3 +656,11 @@ Additional Stripe product verification: all five linked live Stripe Product obje
 ### Execution boundary
 
 No production Vercel variables, Stripe keys, Stripe webhook endpoints, Resend domains/keys, DNS records, Neon schema/data, or mobile store releases were changed during this audit. The final-readiness code branch is not merged, tests are not claimed as passing, and no production deployment was triggered.
+
+
+### Additional Staff HQ finding — live communications tab
+
+- Source review found the Communications tab was present in the Staff HQ sidebar and the live CommunicationsAdmin component was imported, but only the demo-mode placeholder was rendered. A signed-in live staff user selecting “Notifications & email” would see an empty content area.
+- Fixed on branch release/mwfitness-final-readiness-2026-10-30 by rendering CommunicationsAdmin for live mode while keeping the explicit demo placeholder for demo mode.
+- This is a source fix only: it has not been run, merged or deployed. The live communications workflows, database permissions, Resend delivery and automation triggers still need end-to-end verification.
+- PaymentsAdmin is reachable inside the Plans & memberships tab under “Stripe payment ledger”; it is not a separate sidebar tab. The ledger remains unavailable until its migration is approved/applied and platform-admin access is verified.
