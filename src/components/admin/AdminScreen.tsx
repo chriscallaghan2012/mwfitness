@@ -78,6 +78,9 @@ export function AdminScreen() {
   });
   const [tab, setTab] = useState<Tab>('overview');
   const [trainingSubTab, setTrainingSubTab] = useState<'programmes' | 'workouts'>('programmes');
+  const [membersSubTab, setMembersSubTab] = useState<'directory' | 'activity'>('directory');
+  const [plansSubTab, setPlansSubTab] = useState<'catalogue' | 'memberships' | 'payments'>('catalogue');
+  const [checkinsSubTab, setCheckinsSubTab] = useState<'checkins' | 'progress'>('checkins');
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedMessageClientId, setSelectedMessageClientId] = useState('');
   const [stats, setStats] = useState<{ users: number; activeUsers: number; plans: number; activePlans: number; memberships: number; activeMemberships: number; leads: number | null; newLeads: number | null } | null>(null);
@@ -411,9 +414,36 @@ export function AdminScreen() {
       {/* Unified tab rendering — demo and live run the same components; only the data source differs. */}
       {tab === 'activity' && <ActivityCalendar onOpenClient={(profileId) => { setSelectedClientId(profileId); setTab('members'); }} />}
       {tab === 'members' && !selectedClientId && (
-        <div className="space-y-4">
-          <UsersAdmin onOpenProfile={(profileId) => setSelectedClientId(profileId)} />
-          <MemberActivityAdmin />
+        <div className="space-y-5">
+          <div className="flex flex-wrap gap-2 border-b border-white/[0.08] pb-3" role="tablist" aria-label="Members workspace">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={membersSubTab === 'directory'}
+              onClick={() => setMembersSubTab('directory')}
+              className={`min-h-10 border px-4 py-2.5 text-xs font-semibold transition ${membersSubTab === 'directory' ? 'border-orange-500 bg-orange-500 text-black' : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.2] hover:text-white'}`}
+            >
+              Member directory
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={membersSubTab === 'activity'}
+              onClick={() => setMembersSubTab('activity')}
+              className={`min-h-10 border px-4 py-2.5 text-xs font-semibold transition ${membersSubTab === 'activity' ? 'border-orange-500 bg-orange-500 text-black' : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.2] hover:text-white'}`}
+            >
+              Member activity
+            </button>
+          </div>
+          {membersSubTab === 'directory' ? (
+            <div role="tabpanel" className="space-y-5">
+              <UsersAdmin onOpenProfile={(profileId) => setSelectedClientId(profileId)} />
+            </div>
+          ) : (
+            <div role="tabpanel" className="space-y-5">
+              <MemberActivityAdmin />
+            </div>
+          )}
         </div>
       )}
       {tab === 'members' && selectedClientId && (
@@ -424,22 +454,29 @@ export function AdminScreen() {
         />
       )}
       {tab === 'plans' && (
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Catalogue</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Plans &amp; pricing</h2>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Commercial workspace</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Plans, memberships &amp; payments</h2>
+            <p className="mt-1 text-xs text-zinc-500">Each area now has its own workspace so unrelated tables and forms do not stack vertically.</p>
           </div>
-          <PlansAdmin />
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Assignments</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Memberships</h2>
+          <div className="flex flex-wrap gap-2 border-b border-white/[0.08] pb-3" role="tablist" aria-label="Plans workspace">
+            {([
+              ['catalogue', 'Plans & pricing'],
+              ['memberships', 'Memberships'],
+              ['payments', 'Payment ledger'],
+            ] as const).map(([id, label]) => (
+              <button key={id} type="button" role="tab" aria-selected={plansSubTab === id} onClick={() => setPlansSubTab(id)}
+                className={`min-h-10 border px-4 py-2.5 text-xs font-semibold transition ${plansSubTab === id ? 'border-orange-500 bg-orange-500 text-black' : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.2] hover:text-white'}`}>
+                {label}
+              </button>
+            ))}
           </div>
-          <MembershipsAdmin />
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Reconciliation</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Stripe payment ledger</h2>
+          <div role="tabpanel" className="min-w-0 space-y-5">
+            {plansSubTab === 'catalogue' && <PlansAdmin />}
+            {plansSubTab === 'memberships' && <MembershipsAdmin />}
+            {plansSubTab === 'payments' && <PaymentsAdmin />}
           </div>
-          <PaymentsAdmin />
         </div>
       )}
       {tab === 'nutrition' && <NutritionAdmin />}
@@ -491,17 +528,21 @@ export function AdminScreen() {
       {tab === 'settings' && <SettingsAdmin />}
       {tab === 'videos' && <VideosAdmin />}
       {tab === 'checkins' && (
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Weekly submissions</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Member check-ins</h2>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Member reporting</p>
+            <h2 className="mt-1 text-xl font-semibold text-white">Check-ins &amp; progress</h2>
           </div>
-          <CheckinsAdmin />
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Weigh-ins</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Progress logs</h2>
+          <div className="flex flex-wrap gap-2 border-b border-white/[0.08] pb-3" role="tablist" aria-label="Member reporting workspace">
+            <button type="button" role="tab" aria-selected={checkinsSubTab === 'checkins'} onClick={() => setCheckinsSubTab('checkins')}
+              className={`min-h-10 border px-4 py-2.5 text-xs font-semibold transition ${checkinsSubTab === 'checkins' ? 'border-orange-500 bg-orange-500 text-black' : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.2] hover:text-white'}`}>Weekly check-ins</button>
+            <button type="button" role="tab" aria-selected={checkinsSubTab === 'progress'} onClick={() => setCheckinsSubTab('progress')}
+              className={`min-h-10 border px-4 py-2.5 text-xs font-semibold transition ${checkinsSubTab === 'progress' ? 'border-orange-500 bg-orange-500 text-black' : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.2] hover:text-white'}`}>Weigh-ins &amp; progress</button>
           </div>
-          <ProgressAdmin />
+          <div role="tabpanel" className="min-w-0 space-y-5">
+            {checkinsSubTab === 'checkins' && <CheckinsAdmin />}
+            {checkinsSubTab === 'progress' && <ProgressAdmin />}
+          </div>
         </div>
       )}
       {tab === 'messages' && <MessagesAdmin initialAthleteId={selectedMessageClientId} />}

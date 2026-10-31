@@ -171,3 +171,33 @@ create trigger profiles_role_change_guard
 ```
 
 This is intentionally documented only. Do not apply it to the shared database without reviewing how the deployment's Neon Auth/Data API role maps to `auth.uid()` and testing coach edits, admin edits and trusted server operations. It also does not replace a proper audit trail for role changes.
+
+
+## Staff HQ workspace and spacing pass (31 October 2026)
+
+### Completed on `fix/shwag-responsive-product-grid`
+
+- SHWAG product cards now use the available item count for desktop columns (one to four columns, capped at four); smaller breakpoints retain their responsive layout.
+- Members is split into **Member directory** and **Member activity** tabs. The selected member's full record workspace remains a separate focused view.
+- Plans & memberships is split into **Plans & pricing**, **Memberships**, and **Payment ledger** tabs. The three unrelated management areas no longer render as one long page.
+- Check-ins & progress is split into **Weekly check-ins** and **Weigh-ins & progress** tabs.
+- Training already has dedicated **Programmes** and **Workout templates & schedules** tabs; the individual programme and workout workspaces retain their own internal tabs.
+- Communications already has separate sections for overview, templates, automations, history, compose and notifications.
+- Added a clear vertical gap above the Nutrition create-plan/template action so it does not visually collide with the table above it.
+
+### Remaining review / verification
+
+- Continue checking nested editors and dynamically added form rows in the remaining Staff HQ screens for spacing and responsive overflow.
+- Run the website TypeScript check, tests and production build in a real checkout before merging.
+- Verify the tab navigation, editor dialogs and CRUD persistence against authorised live staff accounts. No production data has been changed by this UI pass.
+- This branch has not been merged or deployed.
+
+
+### Member record workspace refinement (31 October 2026)
+
+- Split the selected member's long record page into four focused tabs: **Overview**, **Coaching & assignments**, **Progress photos**, and **App submissions**.
+- Overview retains the activity calendar, this-week snapshot, eight-week rollup and recent activity feed.
+- Coaching & assignments retains package, nutrition, workout, programme, supplement and cardio controls, plus the current membership and assigned nutrition summaries.
+- Progress photos and app submissions are separate views, reducing the initial page length and keeping sensitive photo content out of the default overview.
+- Switching the selected client returns the workspace to Overview so staff do not land on an unrelated tab for the next member.
+- Existing data queries and save handlers are retained; this is a presentation/navigation change, not a schema or data migration.
