@@ -60,6 +60,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
   const [users, setUsers] = useState<Row[]>([]);
   const [userId, setUserId] = useState(initialUserId);
   const [dataset, setDataset] = useState<Dataset>('checkins');
+  const [profileTab, setProfileTab] = useState<'overview' | 'assignments' | 'photos' | 'submissions'>('overview');
   const [records, setRecords] = useState<Record<Dataset, Row[]>>(EMPTY_RECORDS);
   const [profile, setProfile] = useState<Row | null>(null);
   const [memberships, setMemberships] = useState<Row[]>([]);
@@ -434,6 +435,22 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
 
       {userId && (
         <>
+          <div className="flex flex-wrap gap-2 border-b border-white/[0.08] pb-3" role="tablist" aria-label="Member record workspace">
+            {([
+              ['overview', 'Overview'],
+              ['assignments', 'Coaching & assignments'],
+              ['photos', 'Progress photos'],
+              ['submissions', 'App submissions'],
+            ] as const).map(([id, label]) => (
+              <button key={id} type="button" role="tab" aria-selected={profileTab === id} onClick={() => setProfileTab(id)}
+                className={`min-h-10 border px-4 py-2.5 text-xs font-semibold transition ${profileTab === id ? 'border-orange-500 bg-orange-500 text-black' : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.2] hover:text-white'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div role="tabpanel" className="min-w-0 space-y-5">
+            {profileTab === 'overview' && <>
           <ActivityCalendar profileId={userId} />
           <div className={card}>
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -492,6 +509,8 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
             ) : <p className="py-5 text-sm text-zinc-500">No activity recorded yet.</p>}
           </div>
 
+            </>}
+            {profileTab === 'assignments' && <>
           <div className={`${card} !border-orange-500/20`}>
             <p className="mb-1 font-mono text-[10px] uppercase tracking-wider text-orange-300">Assign to client</p>
             <p className="mb-4 text-xs text-zinc-500">Assign everything this member needs from one place. Writes go to the same tables the dedicated tabs use.</p>
@@ -569,6 +588,8 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
             {nutritionPlans.length ? nutritionPlans.map((plan) => <div key={String(plan.id)} className="mb-2 rounded-lg border border-zinc-800 p-3"><p className="text-sm font-medium text-white">{String(plan.name)} <span className="text-[10px] uppercase text-zinc-500">· {String(plan.day_type ?? 'training')} day</span></p><p className="mt-1 text-xs text-zinc-400">{String((plan.targets as Row)?.calories ?? '—')} kcal · {(plan.targets as Row)?.protein ?? '—'}g protein · {plan.active ? 'Active' : 'Inactive'}</p></div>) : <p className="text-sm text-zinc-500">No nutrition plans assigned.</p>}
           </div>
 
+            </>}
+            {profileTab === 'photos' && <>
           <div className={card}>
             <p className="mb-2 font-mono text-[10px] uppercase text-zinc-500">Private progress photos</p>
             <p className="mb-3 text-xs text-zinc-500">Recent photos uploaded through the mobile daily check-in. Visible to authorised staff only.</p>
@@ -592,6 +613,8 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
             ) : <p className="text-sm text-zinc-500">No progress photos uploaded for this client yet.</p>}
           </div>
 
+            </>}
+            {profileTab === 'submissions' && <>
           <div className={card}>
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div><p className="font-mono text-[10px] uppercase text-orange-300">Client submissions</p><p className="mt-1 text-xs text-zinc-500">{DATASETS.find((item) => item.id === dataset)?.description}</p></div>
@@ -600,6 +623,8 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
             <div className="mb-4 flex gap-2 overflow-x-auto pb-1">{DATASETS.map((item) => <button key={item.id} onClick={() => setDataset(item.id)} className={dataset === item.id ? 'shrink-0 rounded-lg bg-[#ff5500] px-3 py-2 font-mono text-[10px] font-bold uppercase text-black' : 'shrink-0 rounded-lg border border-zinc-700 px-3 py-2 font-mono text-[10px] uppercase text-zinc-400'}>{item.label}</button>)}</div>
             {message && <p role="status" className="mb-3 text-xs text-orange-200">{message}</p>}
             <AdminTable rows={records[dataset]} cols={cols} empty={busy ? 'Loading records…' : 'No records found for this client.'} />
+          </div>
+            </>}
           </div>
         </>
       )}
