@@ -77,6 +77,51 @@ test('demo Staff HQ resolves embedded profile and plan relations', async () => {
   assert.equal(membership.data?.plans?.price, 45);
 });
 
+test('demo Staff HQ workout library, schedules and performance remain editable', async () => {
+  const templateExercise = await demoDb.from('workout_template_exercises')
+    .select('exercise_name,workout_exercises(name),workout_templates(name)')
+    .eq('id', 'wte-upper-bench')
+    .maybeSingle();
+  assert.equal(templateExercise.error, null);
+  assert.equal(templateExercise.data?.workout_exercises?.name, 'Barbell Bench Press');
+  assert.equal(templateExercise.data?.workout_templates?.name, 'Upper body A');
+
+  const schedule = await demoDb.from('workout_schedules').insert({
+    id: 'release-test-workout-schedule',
+    profile_id: 'demo-coach-mike',
+    template_id: 'wt-upper-a',
+    weekdays: [1, 3],
+    starts_on: '2026-10-31',
+    ends_on: null,
+    active: true,
+  }).select('id,weekdays,starts_on');
+  assert.deepEqual(schedule.data?.[0], {
+    id: 'release-test-workout-schedule',
+    weekdays: [1, 3],
+    starts_on: '2026-10-31',
+  });
+
+  const session = await demoDb.from('workout_sessions').insert({
+    id: 'release-test-workout-session',
+    profile_id: 'demo-coach-mike',
+    template_id: 'wt-upper-a',
+    scheduled_on: '2026-10-31',
+    status: 'completed',
+    exercises: [{ exercise_id: 'we-bench', name: 'Barbell Bench Press' }],
+    performance: { exercises: [{ exercise_id: 'we-bench', name: 'Barbell Bench Press', values: { reps: '8', load: '80' } }] },
+  }).select('id,performance');
+  assert.equal(session.error, null);
+  assert.equal(session.data?.[0].performance.exercises[0].values.load, '80');
+
+  const updated = await demoDb.from('workout_sessions').update({ scheduled_on: '2026-11-01' })
+    .eq('id', 'release-test-workout-session').select('id,scheduled_on');
+  assert.equal(updated.data?.[0].scheduled_on, '2026-11-01');
+
+  const deleted = await demoDb.from('workout_schedules').delete()
+    .eq('id', 'release-test-workout-schedule').select('id');
+  assert.deepEqual(deleted.data, [{ id: 'release-test-workout-schedule' }]);
+});
+
 test('demo Staff HQ reset discards changes from the previous demo session', async () => {
   const inserted = await demoDb.from('plans').insert({
     id: 'release-test-reset',

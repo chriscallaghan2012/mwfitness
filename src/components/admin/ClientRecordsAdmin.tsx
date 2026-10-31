@@ -78,6 +78,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
   const [assignNutritionTemplate, setAssignNutritionTemplate] = useState('');
   const [assignWorkoutTemplate, setAssignWorkoutTemplate] = useState('');
   const [assignWorkoutDate, setAssignWorkoutDate] = useState(todayStr);
+  const [assignWorkoutDay, setAssignWorkoutDay] = useState('1');
   const [assignProgrammeId, setAssignProgrammeId] = useState('');
   const [assignProgrammeStart, setAssignProgrammeStart] = useState(todayStr);
   const [assignProgrammeDue, setAssignProgrammeDue] = useState(() => plusDays(7));
@@ -212,7 +213,14 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
       ...records.nutrition_daily_logs.map((row) => ({ id: `ndl-${row.id}`, at: String(row.log_date ?? row.updated_at ?? ''), kind: 'Nutrition completion', detail: `${row.completed_day ? 'Day completed' : 'Meal progress updated'} · ${Array.isArray(row.completed_meal_ids) ? row.completed_meal_ids.length : 0} meals completed` })),
       ...records.supplement_plans.map((row) => ({ id: `sp-${row.id}`, at: String(row.created_at ?? ''), kind: 'Supplement plan', detail: `${String(row.name ?? 'Supplement')}${row.dosage_string ? ` · ${String(row.dosage_string)}` : ''} · ${row.active ? 'Active' : 'Paused'}` })),
       ...progressPhotos.map((row) => ({ id: `photo-${row.id}`, at: String(row.recorded_on ?? row.created_at ?? ''), kind: 'Progress photo', detail: String(row.caption || 'Progress photo uploaded') })),
-      ...records.workout_sessions.map((row) => ({ id: `ws-${row.id}`, at: String(row.scheduled_on ?? ''), kind: 'Workout', detail: `${String(row.workout_templates?.name ?? 'Session')} — ${String(row.status ?? '')}` })),
+      ...records.workout_sessions.map((row) => {
+        const results = Array.isArray(row.performance?.exercises) ? row.performance.exercises : [];
+        const duration = Number(row.duration_seconds ?? (Number(row.notes?.duration_minutes ?? 0) * 60));
+        const detail = results.length
+          ? `${results.length} exercises · ${Math.round(duration / 60)} min · ${results.map((item: Row) => `${item.name}: ${Object.entries(item.values ?? {}).map(([key, value]) => `${key} ${String(value)}`).join(', ')}`).join(' · ')}`
+          : `${String(row.workout_templates?.name ?? 'Session')} — ${String(row.status ?? '')}`;
+        return { id: `ws-${row.id}`, at: String(row.scheduled_on ?? ''), kind: 'Workout', detail };
+      }),
       ...records.daily_metrics.map((row) => ({ id: `dm-${row.id}`, at: String(row.metric_date ?? ''), kind: 'Water & steps', detail: `${row.water_litres} L · ${Number(row.steps ?? 0).toLocaleString('en-GB')} steps` })),
       ...records.cardio_logs.map((row) => ({ id: `cl-${row.id}`, at: String(row.completed_at ?? ''), kind: 'Cardio', detail: `${String(row.activity ?? '')} · ${row.duration_minutes} min${row.average_heart_rate ? ` · ${row.average_heart_rate} bpm` : ''}` })),
       ...records.coach_messages.map((row) => ({ id: `cm-${row.id}`, at: String(row.created_at ?? ''), kind: 'Message', detail: String(row.body ?? '').slice(0, 90) })),
@@ -257,8 +265,20 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
   const assignWorkout = async () => {
     if (!db || !userId) return;
     if (!assignWorkoutTemplate || !assignWorkoutDate) { setAssignNotice('Choose a workout template and a date.'); return; }
+    const dayNumber = Number(assignWorkoutDay);
+    if (!Number.isInteger(dayNumber) || dayNumber < 1 || dayNumber > 7) { setAssignNotice('Template day must be between 1 and 7.'); return; }
+    const { data: prescriptions, error: prescriptionError } = await db.from('workout_template_exercises')
+      .select('*').eq('template_id', assignWorkoutTemplate).eq('day_number', dayNumber).order('sort_order');
+    if (prescriptionError) { setAssignNotice(`Workout exercises could not be loaded: ${prescriptionError.message}`); return; }
     const { data, error } = await db.from('workout_sessions').insert({
       profile_id: userId, template_id: assignWorkoutTemplate, scheduled_on: assignWorkoutDate, status: 'planned',
+      exercises: (prescriptions ?? []).map((exercise: Row) => ({
+        exercise_id: exercise.exercise_id,
+        name: exercise.exercise_name,
+        prescription: exercise.prescription ?? {},
+        result_fields: exercise.result_fields ?? [],
+      })),
+      performance: {},
     }).select('id');
     if (error) { setAssignNotice(`Session could not be scheduled: ${error.message}`); return; }
     if (!data?.length) { setAssignNotice('The session was not scheduled. Check staff permissions and retry.'); return; }
@@ -354,7 +374,12 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
       { key: 'scheduled_on', label: 'Scheduled', render: (r: Row) => ShortDate(String(r.scheduled_on ?? '')) },
       { key: 'template', label: 'Workout', render: (r: Row) => String(r.workout_templates?.name ?? r.template_id ?? '—') }, { key: 'status', label: 'Status' },
       { key: 'completed_on', label: 'Completed', render: (r: Row) => ShortDate(String(r.completed_on ?? '')) },
-      { key: 'notes', label: 'Session notes', render: (r: Row) => typeof r.notes === 'object' && r.notes !== null ? JSON.stringify(r.notes) : String(r.notes ?? '—') },
+      { key: 'duration_seconds', label: 'Duration', render: (r: Row) => r.duration_seconds != null ? `${Math.round(Number(r.duration_seconds) / 60)} min` : r.notes?.duration_minutes ? `${r.notes.duration_minutes} min` : '—' },
+      { key: 'performance', label: 'Exercise results', render: (r: Row) => {
+        const results = Array.isArray(r.performance?.exercises) ? r.performance.exercises : [];
+        return results.length ? <div className="space-y-1">{results.map((item: Row, index: number) => <p key={`${item.exercise_id ?? item.name}-${index}`} className="whitespace-normal text-xs text-zinc-300"><span className="font-medium text-white">{String(item.name ?? 'Exercise')}</span>{Object.entries(item.values ?? {}).length ? ` · ${Object.entries(item.values ?? {}).map(([key, value]) => `${key}: ${String(value)}`).join(', ')}` : ''}</p>)}</div> : 'No exercise results saved';
+      } },
+      { key: 'notes', label: 'Session notes', render: (r: Row) => String(r.notes?.member_notes ?? (typeof r.notes === 'string' ? r.notes : '—')) },
     ];
     if (dataset === 'daily_metrics') return [
       { key: 'metric_date', label: 'Date', render: (r: Row) => ShortDate(String(r.metric_date ?? '')) },
@@ -498,6 +523,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
                   {workoutTemplates.map((template) => <option key={String(template.id)} value={String(template.id)}>{String(template.name)}</option>)}
                 </select>
                 <input type="date" className={`${inp} mt-2`} value={assignWorkoutDate} onChange={(event) => setAssignWorkoutDate(event.target.value)} aria-label="Session date" />
+                <input type="number" min="1" max="7" className={`${inp} mt-2`} value={assignWorkoutDay} onChange={(event) => setAssignWorkoutDay(event.target.value)} aria-label="Workout template day" placeholder="Template day" />
                 <button type="button" className={`${btn} mt-3`} onClick={() => void assignWorkout()}>Schedule session</button>
               </div>
               <div className="rounded-xl border border-white/[0.07] bg-black/10 p-4">

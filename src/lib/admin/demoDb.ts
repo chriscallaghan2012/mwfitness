@@ -20,6 +20,8 @@ const RELATION_KEYS: Record<string, Record<string, string>> = {
   memberships: { profiles: 'profile_id', plans: 'plan_id' },
   workout_sessions: { workout_templates: 'template_id', profiles: 'profile_id' },
   workout_templates: { plans: 'plan_id' },
+  workout_template_exercises: { workout_templates: 'template_id', workout_exercises: 'exercise_id' },
+  workout_schedules: { profiles: 'profile_id', workout_templates: 'template_id' },
   checkins: { profiles: 'profile_id' },
   progress_logs: { profiles: 'profile_id' },
   coaching_programme_assignments: { profiles: 'profile_id', coaching_programmes: 'programme_id' },
