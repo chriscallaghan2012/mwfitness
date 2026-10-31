@@ -413,7 +413,7 @@ export function ClientRecordsAdmin({ initialUserId = '', onMessageMember, onBack
           </div>
         </div>
         <label className="mb-1 block text-xs text-zinc-400">Client</label>
-        <select className={inp} value={userId} onChange={(event) => setUserId(event.target.value)}>
+        <select className={inp} value={userId} onChange={(event) => { setUserId(event.target.value); setProfileTab('overview'); }}>
           <option value="">Choose a client…</option>
           {users.map((user) => <option key={String(user.id)} value={String(user.id)}>{String(user.full_name || 'Unnamed client')} · {String(user.email ?? '')}</option>)}
         </select>
