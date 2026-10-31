@@ -20,7 +20,6 @@ import { MemberActivityAdmin } from './MemberActivityAdmin';
 import { ActivityCalendar } from './ActivityCalendar';
 import { CommunicationsAdmin } from './CommunicationsAdmin';
 import { SwagProductsAdmin } from './SwagProductsAdmin';
-import { SettingsAdmin } from './SettingsAdmin';
 import { Row, btn, btnGhost, card } from './fields';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { adminDb, isDemoMode, setAdminDemoMode } from '../../lib/admin/adminDb';
@@ -30,7 +29,7 @@ import { isAuthorisedAdminEmail } from '../../lib/adminEmails';
 // Merged sidebar: duplicated tabs are combined so demo and live share one layout.
 // members = user list + per-member app data; plans = catalogue + memberships;
 // training = programmes + workouts; checkins = check-ins + progress logs.
-type Tab = 'overview' | 'members' | 'activity' | 'plans' | 'nutrition' | 'training' | 'swag' | 'settings' | 'videos' | 'checkins' | 'messages' | 'leads' | 'communications';
+type Tab = 'overview' | 'members' | 'activity' | 'plans' | 'nutrition' | 'training' | 'swag' | 'videos' | 'checkins' | 'messages' | 'leads' | 'communications';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -40,7 +39,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'nutrition', label: 'Nutrition' },
   { id: 'training', label: 'Training' },
   { id: 'swag', label: 'Swag catalogue' },
-  { id: 'settings', label: 'Form controls' },
   { id: 'videos', label: 'Videos' },
   { id: 'checkins', label: 'Check-ins & progress' },
   { id: 'messages', label: 'Messages' },
@@ -525,7 +523,6 @@ export function AdminScreen() {
         </div>
       )}
       {tab === 'swag' && <SwagProductsAdmin onBack={() => setTab('plans')} />}
-      {tab === 'settings' && <SettingsAdmin />}
       {tab === 'videos' && <VideosAdmin />}
       {tab === 'checkins' && (
         <div className="space-y-5">
