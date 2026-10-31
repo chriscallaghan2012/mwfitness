@@ -19,6 +19,8 @@ import { PasswordRecovery } from './PasswordRecovery';
 import { MemberActivityAdmin } from './MemberActivityAdmin';
 import { ActivityCalendar } from './ActivityCalendar';
 import { CommunicationsAdmin } from './CommunicationsAdmin';
+import { SwagProductsAdmin } from './SwagProductsAdmin';
+import { SettingsAdmin } from './SettingsAdmin';
 import { Row, btn, btnGhost, card } from './fields';
 import { loadPublicPlans, PublicPlan } from '../../lib/plans';
 import { adminDb, isDemoMode, setAdminDemoMode } from '../../lib/admin/adminDb';
@@ -28,7 +30,7 @@ import { isAuthorisedAdminEmail } from '../../lib/adminEmails';
 // Merged sidebar: duplicated tabs are combined so demo and live share one layout.
 // members = user list + per-member app data; plans = catalogue + memberships;
 // training = programmes + workouts; checkins = check-ins + progress logs.
-type Tab = 'overview' | 'members' | 'activity' | 'plans' | 'nutrition' | 'training' | 'videos' | 'checkins' | 'messages' | 'leads' | 'communications';
+type Tab = 'overview' | 'members' | 'activity' | 'plans' | 'nutrition' | 'training' | 'swag' | 'settings' | 'videos' | 'checkins' | 'messages' | 'leads' | 'communications';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
@@ -37,6 +39,8 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'plans', label: 'Plans & memberships' },
   { id: 'nutrition', label: 'Nutrition' },
   { id: 'training', label: 'Training' },
+  { id: 'swag', label: 'Swag catalogue' },
+  { id: 'settings', label: 'Form controls' },
   { id: 'videos', label: 'Videos' },
   { id: 'checkins', label: 'Check-ins & progress' },
   { id: 'messages', label: 'Messages' },
@@ -73,6 +77,7 @@ export function AdminScreen() {
     return restored;
   });
   const [tab, setTab] = useState<Tab>('overview');
+  const [trainingSubTab, setTrainingSubTab] = useState<'programmes' | 'workouts'>('programmes');
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedMessageClientId, setSelectedMessageClientId] = useState('');
   const [stats, setStats] = useState<{ users: number; activeUsers: number; plans: number; activePlans: number; memberships: number; activeMemberships: number; leads: number | null; newLeads: number | null } | null>(null);
@@ -440,18 +445,50 @@ export function AdminScreen() {
       {tab === 'nutrition' && <NutritionAdmin />}
       {tab === 'training' && (
         <div className="space-y-6">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Programmes</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Coaching programmes</h2>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setTrainingSubTab('programmes')}
+              className={`px-4 py-2 text-xs font-medium rounded-xl border transition
+                ${trainingSubTab === 'programmes'
+                  ? 'border-orange-500 bg-orange-500/10 text-white'
+                  : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.18] hover:text-white'}`}
+            >
+              Programmes
+            </button>
+            <button
+              type="button"
+              onClick={() => setTrainingSubTab('workouts')}
+              className={`px-4 py-2 text-xs font-medium rounded-xl border transition
+                ${trainingSubTab === 'workouts'
+                  ? 'border-orange-500 bg-orange-500/10 text-white'
+                  : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.18] hover:text-white'}`}
+            >
+              Workout templates & schedules
+            </button>
           </div>
-          <ProgrammesAdmin />
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Sessions</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Workout templates &amp; schedules</h2>
-          </div>
-          <WorkoutsAdmin />
+          {trainingSubTab === 'programmes' && (
+            <>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Programmes</p>
+                <h2 className="mt-1 text-xl font-semibold text-white">Coaching programmes</h2>
+              </div>
+              <ProgrammesAdmin />
+            </>
+          )}
+          {trainingSubTab === 'workouts' && (
+            <>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-300">Sessions</p>
+                <h2 className="mt-1 text-xl font-semibold text-white">Workout templates &amp; schedules</h2>
+              </div>
+              <WorkoutsAdmin />
+            </>
+          )}
         </div>
       )}
+      {tab === 'swag' && <SwagProductsAdmin onBack={() => setTab('plans')} />}
+      {tab === 'settings' && <SettingsAdmin />}
       {tab === 'videos' && <VideosAdmin />}
       {tab === 'checkins' && (
         <div className="space-y-6">

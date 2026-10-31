@@ -9,7 +9,7 @@ INSERT INTO public.swag_products
 VALUES
   ('shwag-hoodie', 'SHWAG Hoodie', 'SHWAG Hoodie. Price shown is a temporary placeholder and will be updated.', 'apparel', 50.00, '', '', ARRAY[]::text[], 'enquiry_only', true, 10),
   ('shwag-tshirt', 'SHWAG Tshirt', 'SHWAG Tshirt. Price shown is a temporary placeholder and will be updated.', 'apparel', 50.00, '', '', ARRAY[]::text[], 'enquiry_only', true, 20),
-  ('shwag-hat', 'SHWAG Hat', 'SHWAG Hat. Price shown is a temporary placeholder and will be updated.', 'accessories', 50.00, '', '', ARRAY[]::text[], 'enquiry_only', true, 30)
+  ('shwag-cap', 'SHWAG Cap', 'SHWAG Cap. Price shown is a temporary placeholder and will be updated.', 'accessories', 50.00, '', '', ARRAY[]::text[], 'enquiry_only', true, 30)
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   description = EXCLUDED.description,

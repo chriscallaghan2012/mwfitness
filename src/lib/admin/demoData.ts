@@ -36,6 +36,26 @@ const MEAL_SECTION = (name: string, calories: number, protein: number, carbs: nu
 
 export function createDemoTables(): DemoTables {
   const tables: DemoTables = {
+    admin_settings: [
+      {
+        key: 'cardio_activity_options',
+        value: [
+          { id: 'Treadmill', label: 'Treadmill Run/Walk', icon: 'directions_run', active: true },
+          { id: 'Outdoor Run', label: 'Outdoor Running', icon: 'directions_run', active: true },
+          { id: 'Outdoor Walk', label: 'Outdoor Walking', icon: 'directions_walk', active: true },
+          { id: 'Stationary Bike', label: 'Stationary Bike / Spin', icon: 'pedal_bike', active: true },
+          { id: 'Road Cycling', label: 'Outdoor Cycling', icon: 'directions_bike', active: true },
+          { id: 'Rowing Machine', label: 'Rowing Machine', icon: 'rowing', active: true },
+          { id: 'Stair Climber', label: 'Stair Climber / Stepper', icon: 'stairs', active: true },
+          { id: 'Elliptical', label: 'Elliptical Trainer', icon: 'fitness_center', active: true },
+          { id: 'Swimming', label: 'Swimming Laps', icon: 'pool', active: true },
+          { id: 'HIIT Session', label: 'HIIT / Circuit Cardio', icon: 'bolt', active: true },
+          { id: 'Jump Rope', label: 'Jump Rope', icon: 'fitness_center', active: true },
+          { id: 'Other', label: 'Other Activity', icon: 'sports', active: true },
+        ],
+        updated_at: isoTime(daysAgo(1)),
+      },
+    ],
     profiles: [
       {
         id: 'demo-coach-mike', full_name: 'Mike Whitworth', email: 'mwfitnessukonline@gmail.com',
@@ -120,6 +140,10 @@ export function createDemoTables(): DemoTables {
       { id: 'prog-foundation', name: 'Foundation Strength · 8 weeks', description: 'Build strength on the big four lifts with simple progression.', duration_weeks: 8, days_per_week: 3, level: 'Beginner to intermediate', active: true, created_at: isoTime(daysAgo(90)) },
       { id: 'prog-fat-loss', name: 'Fat Loss Accelerator · 12 weeks', description: 'Training plus habit coaching for sustainable fat loss.', duration_weeks: 12, days_per_week: 4, level: 'All levels', active: true, created_at: isoTime(daysAgo(90)) },
       { id: 'prog-onboarding', name: 'App onboarding · 2 weeks', description: 'Get comfortable with check-ins, logging and weekly targets.', duration_weeks: 2, days_per_week: 2, level: 'Complete beginner', active: true, created_at: isoTime(daysAgo(90)) },
+    ],
+    coaching_programme_content: [
+      { id: 'demo-programme-content-1', programme_id: 'prog-foundation', content_type: 'workout_template', content_id: 'wt-starter-hypertrophy', content_name: 'Hypertrophy session · starter', sort_order: 10, created_at: isoTime(daysAgo(30)) },
+      { id: 'demo-programme-content-2', programme_id: 'prog-foundation', content_type: 'nutrition_template', content_id: 'tpl-maintenance', content_name: 'Busy-person maintenance', sort_order: 20, created_at: isoTime(daysAgo(30)) },
     ],
     coaching_programme_assignments: [],
     website_leads: [],

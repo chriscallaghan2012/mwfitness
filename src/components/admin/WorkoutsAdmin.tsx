@@ -1,7 +1,8 @@
 // WorkoutsAdmin — shared exercise library, workout templates and member schedules.
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, List, Layout, Calendar, Settings } from 'lucide-react';
 import { adminDb } from '../../lib/admin/adminDb';
+import { createDemoTables } from '../../lib/admin/demoData';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
 
 type ResultFieldDraft = { label: string; type: 'number' | 'text' | 'duration'; unit: string };
@@ -39,8 +40,20 @@ function snapshotFromLibrary(exercise: Row, values: { sets?: string; reps?: stri
   };
 }
 
+const importKey = (value: unknown) => String(value ?? '').trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+type Tab = 'exercises' | 'templates' | 'schedules' | 'misc';
+
+const TABS: { id: Tab; label: string; icon: any }[] = [
+  { id: 'exercises', label: 'Exercise library', icon: List },
+  { id: 'templates', label: 'Workout templates', icon: Layout },
+  { id: 'schedules', label: 'Member schedules', icon: Calendar },
+  { id: 'misc', label: 'Miscellaneous', icon: Settings },
+];
+
 export function WorkoutsAdmin() {
   const db = adminDb();
+  const [activeTab, setActiveTab] = useState<Tab>('exercises');
   const [exercises, setExercises] = useState<Row[]>([]);
   const [templates, setTemplates] = useState<Row[]>([]);
   const [templateItems, setTemplateItems] = useState<Row[]>([]);
@@ -63,17 +76,20 @@ export function WorkoutsAdmin() {
   const [scheduleEdit, setScheduleEdit] = useState<Row | null>(null);
   const [sessionEditDate, setSessionEditDate] = useState('');
   const [sessionEditExercises, setSessionEditExercises] = useState<Row[]>([]);
+  const [miscSettings, setMiscSettings] = useState<Record<string, any> | null>(null);
+  const [miscEdit, setMiscEdit] = useState(false);
   const requestId = useRef(0);
 
   const load = async () => {
     if (!db) { setMessage('Neon is not configured; live workouts cannot be loaded.'); return; }
     try {
-      const [exerciseResult, templateResult, userResult, planResult, itemResult] = await Promise.all([
+      const [exerciseResult, templateResult, userResult, planResult, itemResult, settingsResult] = await Promise.all([
         db.from('workout_exercises').select('*').order('sort_order').order('name'),
         db.from('workout_templates').select('*, plans(name)').order('name'),
         db.from('profiles').select('id,full_name,role').order('full_name'),
         db.from('plans').select('id,name').order('name'),
         db.from('workout_template_exercises').select('*').order('day_number').order('sort_order'),
+        db.from('admin_settings').select('key,value').eq('key', 'cardio_activity_options').maybeSingle(),
       ]);
       if (exerciseResult.error) setMessage(`Exercise library unavailable: ${exerciseResult.error.message}`);
       else setExercises((exerciseResult.data ?? []) as Row[]);
@@ -83,6 +99,8 @@ export function WorkoutsAdmin() {
       else setUsers((userResult.data ?? []) as Row[]);
       if (!planResult.error) setPlans((planResult.data ?? []) as Row[]);
       if (!itemResult.error) setTemplateItems((itemResult.data ?? []) as Row[]);
+      if (settingsResult.error) setMessage(`Could not load misc settings: ${settingsResult.error.message}`);
+      else setMiscSettings(settingsResult.data?.value ?? null);
     } catch (error) {
       setMessage(`Could not load workout setup: ${error instanceof Error ? error.message : 'Unexpected error'}`);
     }
@@ -235,6 +253,67 @@ export function WorkoutsAdmin() {
     setMessage('Template exercise removed.'); await load();
   };
 
+  const importDemoLibrary = async () => {
+    if (!db) { setMessage('Neon is not configured; no demo library was imported.'); return; }
+    setBusy(true); setMessage('Preparing demo exercise import...');
+    try {
+      const demo = createDemoTables();
+      const exerciseIdMap = new Map<string, string>();
+      let createdExercises = 0;
+      let skippedExercises = 0;
+      for (const source of demo.workout_exercises ?? []) {
+        const existing = exercises.find((row) => importKey(row.name) === importKey(source.name));
+        if (existing) {
+          exerciseIdMap.set(String(source.id), String(existing.id));
+          skippedExercises += 1;
+          continue;
+        }
+        const result = await db.from('workout_exercises').insert({
+          name: source.name, category: source.category, description: source.description, coach_cues: source.coach_cues,
+          result_fields: source.result_fields, default_prescription: source.default_prescription, sort_order: source.sort_order, active: true,
+        }).select('id');
+        if (result.error || !result.data?.[0]?.id) throw new Error(result.error?.message ?? `Could not import exercise ${source.name}.`);
+        exerciseIdMap.set(String(source.id), String(result.data[0].id));
+        createdExercises += 1;
+      }
+
+      const liveTemplates = [...templates];
+      const liveItems = [...templateItems];
+      let createdTemplates = 0;
+      let createdItems = 0;
+      let skippedTemplates = 0;
+      for (const sourceTemplate of demo.workout_templates ?? []) {
+        const existing = liveTemplates.find((row) => importKey(row.name) === importKey(sourceTemplate.name));
+        let templateId = existing ? String(existing.id) : '';
+        if (existing) skippedTemplates += 1;
+        else {
+          const result = await db.from('workout_templates').insert({ name: sourceTemplate.name, description: sourceTemplate.description, days_per_week: sourceTemplate.days_per_week ?? null, plan_id: sourceTemplate.plan_id ?? null }).select('id');
+          if (result.error || !result.data?.[0]?.id) throw new Error(result.error?.message ?? `Could not import template ${sourceTemplate.name}.`);
+          templateId = String(result.data[0].id);
+          liveTemplates.push({ ...sourceTemplate, id: templateId });
+          createdTemplates += 1;
+        }
+        for (const item of (demo.workout_template_exercises ?? []).filter((candidate) => String(candidate.template_id) === String(sourceTemplate.id))) {
+          const exerciseId = exerciseIdMap.get(String(item.exercise_id));
+          if (!exerciseId) continue;
+          const duplicate = liveItems.some((candidate) => String(candidate.template_id) === templateId && Number(candidate.day_number) === Number(item.day_number) && importKey(candidate.exercise_name) === importKey(item.exercise_name));
+          if (duplicate) continue;
+          const result = await db.from('workout_template_exercises').insert({
+            template_id: templateId, exercise_id: exerciseId, exercise_name: item.exercise_name, day_number: item.day_number,
+            sort_order: item.sort_order, prescription: item.prescription, result_fields: item.result_fields,
+          }).select('id');
+          if (result.error) throw new Error(result.error.message);
+          liveItems.push({ ...item, template_id: templateId, exercise_id: exerciseId });
+          createdItems += 1;
+        }
+      }
+      setMessage(`Demo import complete: ${createdExercises} exercises created, ${skippedExercises} already present; ${createdTemplates} templates created, ${skippedTemplates} already present; ${createdItems} template exercises added.`);
+      await load();
+    } catch (error) {
+      setMessage(`Demo import stopped safely: ${error instanceof Error ? error.message : 'Unexpected error'}`);
+    } finally { setBusy(false); }
+  };
+
   const templateSnapshot = (templateId: string, dayNumber: number) => templateItems
     .filter((item) => String(item.template_id) === templateId && Number(item.day_number) === dayNumber)
     .sort((left, right) => Number(left.sort_order) - Number(right.sort_order))
@@ -329,15 +408,71 @@ export function WorkoutsAdmin() {
     });
   };
 
+  const saveMiscSettings = async () => {
+    if (!db) { setMessage('Neon is not configured; no changes were saved.'); return; }
+    if (!miscSettings) { setMessage('No settings loaded to save.'); return; }
+    setBusy(true); setMessage('');
+    try {
+      const result = await db.from('admin_settings').upsert({
+        key: 'cardio_activity_options',
+        value: miscSettings,
+        updated_at: new Date().toISOString(),
+      });
+      if (result.error) { setMessage(`Could not save misc settings: ${result.error.message}`); return; }
+      setMiscEdit(false);
+      setMessage('Miscellaneous settings saved.');
+      await load();
+    } catch (error) { setMessage(`Could not save misc settings: ${error instanceof Error ? error.message : 'Unexpected error'}`); }
+    finally { setBusy(false); }
+  };
+
   const activeTemplateItems = templateItems.filter((item) => String(item.template_id) === activeTemplateId);
   const selectedTemplate = templates.find((item) => String(item.id) === sessionForm.template_id);
   const customExercises = exercises.filter((exercise) => sessionForm.extraExerciseIds.includes(String(exercise.id)));
 
+  const tabCount = {
+    exercises: exercises.length,
+    templates: templates.length,
+    schedules: schedules.length + (sessions ? sessions.length : 0),
+    misc: miscSettings ? (Array.isArray(miscSettings) ? miscSettings.length : 0) : 0,
+  };
+
   return (
     <div className="space-y-4">
+      {/* Tab navigation */}
       <section className={card}>
-        <p className="mb-3 text-[10px] font-mono uppercase text-orange-300">Exercise library</p>
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`inline-flex items-center gap-2 px-4 py-3 text-xs font-medium rounded-xl border transition
+                ${activeTab === tab.id
+                  ? 'border-orange-500 bg-orange-500/10 text-white shadow-sm shadow-orange-950/20'
+                  : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.18] hover:text-white'}`}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+              {tabCount[tab.id] > 0 && <span className="ml-1 text-[10px] opacity-70">[{tabCount[tab.id]}]</span>}
+            </button>
+          ))}
+        </div>
+        {message && (
+          <div className="mt-3 px-4 py-2 rounded-xl border border-orange-500/20 bg-orange-500/[0.04] text-[11px] text-orange-300">
+            {message}
+          </div>
+        )}
+      </section>
+
+      {/* ── TAB: EXERCISES ── */}
+      {activeTab === 'exercises' && (
+        <section className={card}>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[10px] font-mono uppercase text-orange-300">Exercise library</p>
+            <button type="button" className={btnGhost} disabled={busy} onClick={() => void importDemoLibrary()}>Import demo exercises</button>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
           <input className={inp} placeholder="Exercise name" value={exerciseForm.name} onChange={(event) => setExerciseForm({ ...exerciseForm, name: event.target.value })} />
           <input className={inp} placeholder="Category" value={exerciseForm.category} onChange={(event) => setExerciseForm({ ...exerciseForm, category: event.target.value })} />
           <input className={inp} placeholder="Description" value={exerciseForm.description} onChange={(event) => setExerciseForm({ ...exerciseForm, description: event.target.value })} />
@@ -371,9 +506,12 @@ export function WorkoutsAdmin() {
           { key: 'active', label: 'Availability', render: (row) => row.active ? 'Active' : 'Archived' },
         ]} />
       </section>
+      )}
 
-      <section className={card}>
-        <p className="mb-3 text-[10px] font-mono uppercase text-orange-300">Reusable workout templates</p>
+      {/* ── TAB: TEMPLATES ── */}
+      {activeTab === 'templates' && (
+        <section className={card}>
+          <p className="mb-3 text-[10px] font-mono uppercase text-orange-300">Reusable workout templates</p>
         <div className="grid gap-2 sm:grid-cols-3">
           <input className={inp} placeholder="Template name" value={templateForm.name} onChange={(event) => setTemplateForm({ ...templateForm, name: event.target.value })} />
           <input className={inp} placeholder="Description" value={templateForm.description} onChange={(event) => setTemplateForm({ ...templateForm, description: event.target.value })} />
@@ -405,9 +543,12 @@ export function WorkoutsAdmin() {
           ]} />
         </div>
       </section>
+      )}
 
-      <section className={card}>
-        <p className="mb-3 text-[10px] font-mono uppercase text-orange-300">Assign training</p>
+      {/* ── TAB: SCHEDULES ── */}
+      {activeTab === 'schedules' && (
+        <section className={card}>
+          <p className="mb-3 text-[10px] font-mono uppercase text-orange-300">Assign training</p>
         <div className="grid gap-2 sm:grid-cols-[1.2fr_1fr_1fr]">
           <select className={inp} value={userId} onChange={(event) => { setUserId(event.target.value); void loadMemberData(event.target.value); }}><option value="">Customer…</option>{users.filter((user) => user.role !== 'coach' && user.role !== 'admin').map((user) => <option key={user.id} value={user.id}>{user.full_name}</option>)}</select>
           <select className={inp} value={sessionForm.template_id} onChange={(event) => setSessionForm({ ...sessionForm, template_id: event.target.value })}><option value="">Workout template…</option>{templates.map((template) => <option key={template.id} value={template.id}>{template.name}</option>)}</select>
@@ -448,6 +589,84 @@ export function WorkoutsAdmin() {
           ]} />
         </div>
       </section>
+      )}
+
+      {/* ── TAB: MISCELLANEOUS ── */}
+      {activeTab === 'misc' && (
+        <section className={card}>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[10px] font-mono uppercase text-orange-300">Miscellaneous settings</p>
+            <p className="text-[11px] text-zinc-500">Cardio activity options and other shared settings not grouped elsewhere.</p>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <p className="mb-2 text-xs font-semibold text-white">Cardio activity options</p>
+              <p className="text-[11px] text-zinc-500 mb-3">These appear as dropdown choices in the member Cardio screen. Edit labels, toggle active status, or add new activities.</p>
+              {miscEdit ? (
+                <div className="space-y-2">
+                  {Array.isArray(miscSettings) ? miscSettings.map((item, index) => (
+                    <div key={String(item.id ?? index)} className="grid gap-2 sm:grid-cols-[1fr_0.3fr_0.2fr_auto] items-center p-2 rounded-lg border border-white/[0.06] bg-white/[0.015]">
+                      <input className={inp} placeholder="Activity name" defaultValue={String(item.label ?? '')} onChange={(e) => {
+                        const next = [...miscSettings];
+                        next[index] = { ...next[index], label: e.target.value };
+                        setMiscSettings(next);
+                      }} />
+                      <input className={inp} placeholder="Icon" defaultValue={String(item.icon ?? '')} onChange={(e) => {
+                        const next = [...miscSettings];
+                        next[index] = { ...next[index], icon: e.target.value };
+                        setMiscSettings(next);
+                      }} />
+                      <label className="flex items-center gap-1 text-[10px] text-zinc-400">
+                        <input type="checkbox" defaultChecked={Boolean(item.active)} onChange={(e) => {
+                          const next = [...miscSettings];
+                          next[index] = { ...next[index], active: e.target.checked };
+                          setMiscSettings(next);
+                        }} />
+                        Active
+                      </label>
+                      <button type="button" className={btnGhost} onClick={() => {
+                        const next = [...miscSettings];
+                        next.splice(index, 1);
+                        setMiscSettings(next);
+                      }}>Remove</button>
+                    </div>
+                  )) : <p className="text-[11px] text-zinc-500">No cardio activities configured.</p>}
+                  <button type="button" className={btnGhost} onClick={() => {
+                    const next = [...(Array.isArray(miscSettings) ? miscSettings : [])];
+                    next.push({ id: `custom-${Date.now()}`, label: 'New Activity', icon: 'sports', active: true });
+                    setMiscSettings(next);
+                  }}>+ Add activity</button>
+                  <div className="mt-3 flex gap-2">
+                    <button type="button" disabled={busy} onClick={() => void saveMiscSettings()} className={btn}>{busy ? 'Saving…' : 'Save cardio options'}</button>
+                    <button type="button" onClick={() => { setMiscEdit(false); void load(); }} className={btnGhost}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-white/[0.08] bg-black/10 p-4">
+                  {Array.isArray(miscSettings) && miscSettings.length > 0 ? (
+                    <div className="space-y-2">
+                      {miscSettings.map((item) => (
+                        <div key={String(item.id ?? item.label)} className="flex items-center justify-between gap-3 p-2 rounded-lg border border-white/[0.06] bg-white/[0.015]">
+                          <span className="text-sm text-white">{String(item.label ?? 'Activity')}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded ${item.active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-zinc-800 text-zinc-500 border-zinc-700'}`}>
+                            {item.active ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-zinc-500">No cardio activities configured yet.</p>
+                  )}
+                  <div className="mt-4 flex gap-2">
+                    <button type="button" onClick={() => setMiscEdit(true)} className={btn}>Edit cardio options</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {sessionEdit ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSessionEdit(null); }}>
         <div role="dialog" aria-modal="true" aria-labelledby="session-edit-title" className={`${card} max-h-[90vh] w-full max-w-2xl overflow-y-auto`}>

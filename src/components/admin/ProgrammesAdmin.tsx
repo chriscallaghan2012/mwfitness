@@ -1,14 +1,29 @@
 import { useEffect, useState } from 'react';
 import { adminDb } from '../../lib/admin/adminDb';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
+import { List, ClipboardList } from 'lucide-react';
 
 const EMPTY = { name: '', description: '', duration_weeks: '12', days_per_week: '4', level: 'All levels', active: 'true' };
+type ContentType = 'workout_template' | 'exercise' | 'nutrition_template' | 'supplement';
+type ContentRef = { id?: string; programme_id: string; content_type: ContentType; content_id: string; content_name: string; sort_order?: number };
+type ContentChoice = { id: string; name: string; content_type: ContentType };
+
+type PTab = 'programmes' | 'assignments';
+
+const PTABS: { id: PTab; label: string; icon: any }[] = [
+  { id: 'programmes', label: 'Programmes', icon: List },
+  { id: 'assignments', label: 'Client assignments', icon: ClipboardList },
+];
 
 export function ProgrammesAdmin() {
   const db = adminDb();
+  const [activeTab, setActiveTab] = useState<PTab>('programmes');
   const [programmes, setProgrammes] = useState<Row[]>([]);
   const [clients, setClients] = useState<Row[]>([]);
   const [assignments, setAssignments] = useState<Row[]>([]);
+  const [content, setContent] = useState<ContentRef[]>([]);
+  const [contentChoices, setContentChoices] = useState<ContentChoice[]>([]);
+  const [selectedContent, setSelectedContent] = useState<ContentRef[]>([]);
   const [edit, setEdit] = useState<Row | null>(null);
   const [form, setForm] = useState(EMPTY);
   const [clientId, setClientId] = useState('');
@@ -22,10 +37,15 @@ export function ProgrammesAdmin() {
   const load = async () => {
     if (!db) { setSchemaMissing(true); setMessage('Neon is not configured for this website environment.'); return; }
     try {
-    const [programResult, clientResult, assignmentResult] = await Promise.all([
+    const [programResult, clientResult, assignmentResult, contentResult, templateResult, exerciseResult, nutritionResult, supplementResult] = await Promise.all([
       db.from('coaching_programmes').select('*').order('created_at', { ascending: false }),
       db.from('profiles').select('id,full_name,email').eq('role', 'athlete').order('full_name'),
       db.from('coaching_programme_assignments').select('*, profiles(full_name,email), coaching_programmes(name)').order('created_at', { ascending: false }),
+      db.from('coaching_programme_content').select('*').order('sort_order').order('content_name'),
+      db.from('workout_templates').select('id,name').order('name'),
+      db.from('workout_exercises').select('id,name').eq('active', true).order('name'),
+      db.from('nutrition_templates').select('id,name').eq('active', true).order('name'),
+      db.from('supplement_plans').select('id,name').eq('active', true).order('name'),
     ]);
     const missing = [programResult, assignmentResult].some((r) => r.error && /does not exist|not found|schema cache|could not find/i.test(r.error.message));
     if (missing) {
@@ -41,6 +61,16 @@ export function ProgrammesAdmin() {
       setProgrammes((programResult.data ?? []) as Row[]);
       setAssignments((assignmentResult.data ?? []) as Row[]);
     }
+    if (contentResult.error && !/does not exist|not found|schema cache|could not find/i.test(contentResult.error.message)) {
+      setMessage((current) => current || `Could not load programme content: ${contentResult.error?.message}`);
+    }
+    setContent((contentResult.data ?? []) as ContentRef[]);
+    setContentChoices([
+      ...(templateResult.data ?? []).map((row: Row) => ({ id: String(row.id), name: String(row.name), content_type: 'workout_template' as const })),
+      ...(exerciseResult.data ?? []).map((row: Row) => ({ id: String(row.id), name: String(row.name), content_type: 'exercise' as const })),
+      ...(nutritionResult.data ?? []).map((row: Row) => ({ id: String(row.id), name: String(row.name), content_type: 'nutrition_template' as const })),
+      ...(supplementResult.data ?? []).map((row: Row) => ({ id: String(row.id), name: String(row.name), content_type: 'supplement' as const })),
+    ]);
     if (clientResult.error) {
       setMessage((current) => current || 'Could not load client list. Check staff permissions and the profiles table.');
       setClients([]);
@@ -57,10 +87,19 @@ export function ProgrammesAdmin() {
 
   useEffect(() => { void load(); }, []);
 
-  const openNew = () => { setEdit({} as Row); setForm({ ...EMPTY }); };
+  const openNew = () => { setEdit({} as Row); setForm({ ...EMPTY }); setSelectedContent([]); };
   const openEdit = (row: Row) => {
     setEdit(row);
     setForm({ name: String(row.name ?? ''), description: String(row.description ?? ''), duration_weeks: String(row.duration_weeks ?? 12), days_per_week: String(row.days_per_week ?? 4), level: String(row.level ?? 'All levels'), active: row.active ? 'true' : 'false' });
+    setSelectedContent(content.filter((item) => String(item.programme_id) === String(row.id)));
+  };
+
+  const toggleContent = (choice: ContentChoice) => {
+    setSelectedContent((current) => {
+      const exists = current.some((item) => item.content_type === choice.content_type && item.content_id === choice.id);
+      if (exists) return current.filter((item) => !(item.content_type === choice.content_type && item.content_id === choice.id));
+      return [...current, { programme_id: String(edit?.id ?? ''), content_type: choice.content_type, content_id: choice.id, content_name: choice.name, sort_order: current.length * 10 }];
+    });
   };
 
   const save = async () => {
@@ -78,7 +117,14 @@ export function ProgrammesAdmin() {
         : await db.from('coaching_programmes').insert(payload).select('id');
       if (result.error) { setMessage('Save failed: ' + result.error.message); return; }
       if (!result.data?.length) { setMessage('Nothing was saved. Check that the programme still exists and staff permissions allow this change.'); return; }
-      setEdit(null); setMessage('Programme saved.'); await load();
+      const savedId = String(edit?.id ?? result.data[0].id);
+      const deleteResult = await db.from('coaching_programme_content').delete().eq('programme_id', savedId).select('id');
+      if (deleteResult.error && !/does not exist|not found|schema cache|could not find/i.test(deleteResult.error.message)) throw deleteResult.error;
+      if (!deleteResult.error && selectedContent.length) {
+        const contentResult = await db.from('coaching_programme_content').insert(selectedContent.map((item, index) => ({ programme_id: savedId, content_type: item.content_type, content_id: item.content_id, content_name: item.content_name, sort_order: index * 10 }))).select('id');
+        if (contentResult.error) throw contentResult.error;
+      }
+      setEdit(null); setSelectedContent([]); setMessage('Programme saved.'); await load();
     } catch (error) {
       setMessage('Could not save programme: ' + (error instanceof Error ? error.message : 'Unexpected error'));
     } finally { setBusy(false); }
@@ -140,9 +186,43 @@ export function ProgrammesAdmin() {
     } finally { setBusy(false); }
   };
 
+  const tabCount = {
+    programmes: programmes.length,
+    assignments: assignments.length,
+  };
+
   return (
     <div className="space-y-4">
-      <div className={card}>
+      {/* Tab navigation */}
+      <section className={card}>
+        <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+          {PTABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`inline-flex items-center gap-2 px-4 py-3 text-xs font-medium rounded-xl border transition
+                ${activeTab === tab.id
+                  ? 'border-orange-500 bg-orange-500/10 text-white shadow-sm shadow-orange-950/20'
+                  : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.18] hover:text-white'}`}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+              {tabCount[tab.id] > 0 && <span className="ml-1 text-[10px] opacity-70">[{tabCount[tab.id]}]</span>}
+            </button>
+          ))}
+        </div>
+        {message && (
+          <div className="mt-3 px-4 py-2 rounded-xl border border-orange-500/20 bg-orange-500/[0.04] text-[11px] text-orange-300">
+            {message}
+          </div>
+        )}
+      </section>
+
+      {/* ── TAB: PROGRAMMES ── */}
+      {activeTab === 'programmes' && (
+        <>
+          <div className={card}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div><p className="font-mono text-[10px] uppercase text-orange-300">Online coaching</p><h2 className="mt-1 text-lg font-semibold text-white">Programme builder</h2><p className="mt-1 max-w-2xl text-sm text-zinc-400">Create a time-bound training programme and assign it to a client with a completion date (usually a week). Members see the assignment, its deadline and their workout / check-in / nutrition progress in the app. Requires the prepared 0012_coaching_programmes.sql migration (mobile repo) to be applied to the intended Neon branch first.</p></div>
           <button className={btn} onClick={openNew} disabled={schemaMissing}>+ New programme</button>
@@ -155,8 +235,14 @@ export function ProgrammesAdmin() {
         { key: 'days_per_week', label: 'Training', render: (r) => `${String(r.days_per_week)} days/week` },
         { key: 'active', label: 'Status', render: (r) => <button className={btnGhost} disabled={busy || schemaMissing} onClick={() => void toggleVisibility(r)}>{r.active ? 'Live' : 'Hidden'}</button> },
       ]} />
-      <div className={card}>
-        <h3 className="font-semibold text-white">Assign programme</h3>
+        </>
+      )}
+
+      {/* ── TAB: ASSIGNMENTS ── */}
+      {activeTab === 'assignments' && (
+        <>
+          <div className={card}>
+            <h3 className="font-semibold text-white">Assign programme</h3>
         <p className="mb-3 mt-1 text-sm text-zinc-400">Choose a client, an active programme, and the start and completion dates. Members work through their assigned workouts, check-ins and nutrition by the completion date — usually a week.</p>
         <div className="grid gap-3 sm:grid-cols-4">
           <label className="text-xs text-zinc-400">Client
@@ -190,10 +276,35 @@ export function ProgrammesAdmin() {
             <label className="text-xs text-zinc-400">Days per week<input className={`${inp} mt-1`} type="number" min="1" max="7" value={form.days_per_week} onChange={(e) => setForm({ ...form, days_per_week: e.target.value })} /></label>
             <label className="text-xs text-zinc-400 sm:col-span-2">Level<input className={`${inp} mt-1`} value={form.level} onChange={(e) => setForm({ ...form, level: e.target.value })} /></label>
           </div>
+          <section className="mt-5 border-t border-white/[0.08] pt-4">
+            <h4 className="text-sm font-semibold text-white">Optional programme content</h4>
+            <p className="mt-1 text-xs leading-5 text-zinc-500">Attach existing records without copying them. Leave any group empty when it is not needed.</p>
+            <div className="mt-3 space-y-4">
+              {([
+                ['workout_template', 'Workout templates'],
+                ['exercise', 'Exercises'],
+                ['nutrition_template', 'Nutrition plans'],
+                ['supplement', 'Supplements'],
+              ] as [ContentType, string][]).map(([type, label]) => {
+                const choices = contentChoices.filter((choice) => choice.content_type === type);
+                return <div key={type}>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-orange-300">{label}</p>
+                  {choices.length ? <div className="grid gap-2 sm:grid-cols-2">{choices.map((choice) => {
+                    const checked = selectedContent.some((item) => item.content_type === choice.content_type && item.content_id === choice.id);
+                    return <label key={`${choice.content_type}-${choice.id}`} className="flex items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.02] px-3 py-2 text-xs text-zinc-300">
+                      <input type="checkbox" checked={checked} onChange={() => toggleContent(choice)} className="accent-orange-500" />
+                      <span className="truncate">{choice.name}</span>
+                    </label>;
+                  })}</div> : <p className="text-xs text-zinc-600">No records available.</p>}
+                </div>;
+              })}
+            </div>
+          </section>
           <label className="mt-3 flex items-center gap-2 text-xs text-zinc-400"><input type="checkbox" checked={form.active === 'true'} onChange={(e) => setForm({ ...form, active: e.target.checked ? 'true' : 'false' })} /> Available for assignment</label>
           <div className="mt-5 flex justify-end gap-2"><button className={btnGhost} onClick={() => setEdit(null)}>Cancel</button><button className={btn} disabled={busy || schemaMissing} onClick={() => void save()}>{busy ? 'Saving…' : 'Save programme'}</button></div>
         </div>
       </div>}
+      </>)}
     </div>
   );
 }

@@ -11,7 +11,8 @@ export function normalizeProductRows(rows) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+  // Product edits are made in Staff HQ, so never serve an outdated catalogue from a CDN.
+  res.setHeader('Cache-Control', 'no-store, max-age=0, must-revalidate');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
