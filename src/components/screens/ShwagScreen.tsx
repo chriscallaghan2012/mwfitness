@@ -179,7 +179,11 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
         {productsLoading ? <p className="text-sm text-zinc-400">Loading the latest SHWAG range…</p> : null}
         {productsError ? <p role="status" className="mb-4 border border-orange-500/20 bg-orange-500/5 p-3 text-sm text-zinc-300">{productsError} You can still send an order enquiry below.</p> : null}
         {!productsLoading && products.length === 0 ? <p className="mb-6 text-sm text-zinc-400">The full webshop is coming. Until the first drop lands, take a look below — and send Mike an enquiry to reserve yours.</p> : null}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${products.length > 0 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+        {(() => {
+          const productCount = products.length || COMING_SOON.length;
+          const desktopColumns = productCount >= 4 ? 'lg:grid-cols-4' : productCount === 3 ? 'lg:grid-cols-3' : productCount === 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-1';
+          return (
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${desktopColumns} gap-6`}>
           {products.length > 0 ? products.map((product) => (
             <article key={product.id} className="bg-[#121419] border border-[#20232b] p-5 flex flex-col hover:border-[#ff5500]/50 transition-all duration-300">
               <div className="aspect-square bg-[#16181d] border border-[#262930] flex items-center justify-center mb-4 overflow-hidden">
@@ -210,6 +214,8 @@ export const ShwagScreen: React.FC<ShwagScreenProps> = () => {
             </article>
           ))}
         </div>
+          );
+        })()}
       </section>
 
       {/* 4. ORDER ENQUIRY */}
