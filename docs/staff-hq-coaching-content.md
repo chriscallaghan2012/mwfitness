@@ -190,7 +190,7 @@ This is intentionally documented only. Do not apply it to the shared database wi
 - Continue checking nested editors and dynamically added form rows in the remaining Staff HQ screens for spacing and responsive overflow.
 - Run the website TypeScript check, tests and production build in a real checkout before merging.
 - Verify the tab navigation, editor dialogs and CRUD persistence against authorised live staff accounts. No production data has been changed by this UI pass.
-- This branch has not been merged or deployed.
+- This UI pass was merged into `main` and deployed to production on 31 October 2026. Public route and asset smoke checks passed; authenticated interactive Staff HQ CRUD testing remains outstanding.
 
 
 ### Member record workspace refinement (31 October 2026)
@@ -201,3 +201,12 @@ This is intentionally documented only. Do not apply it to the shared database wi
 - Progress photos and app submissions are separate views, reducing the initial page length and keeping sensitive photo content out of the default overview.
 - Switching the selected client returns the workspace to Overview so staff do not land on an unrelated tab for the next member.
 - Existing data queries and save handlers are retained; this is a presentation/navigation change, not a schema or data migration.
+
+
+## Cardio settings consolidation (31 October 2026)
+
+- Removed the duplicate **Form controls** Staff HQ sidebar page. It exposed a second editor for the same `admin_settings.cardio_activity_options` record already managed in Training.
+- Kept **Training → Workout templates & schedules → Cardio options** as the single management interface for the member Cardio dropdown choices.
+- Renamed the Training sub-tab and clarified its copy so staff can find the one authoritative editor.
+- The existing `admin_settings.cardio_activity_options` key, option IDs, labels, active flags, member dropdown reads and saved cardio history are unchanged. No database migration or production data edit is required.
+- Verification still required: confirm the single editor loads and saves in demo and with an authorised live staff account, then confirm the member Cardio dropdown reflects active options.
