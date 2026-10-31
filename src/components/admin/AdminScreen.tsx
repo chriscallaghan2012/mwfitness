@@ -78,6 +78,7 @@ export function AdminScreen() {
   });
   const [tab, setTab] = useState<Tab>('overview');
   const [trainingSubTab, setTrainingSubTab] = useState<'programmes' | 'workouts'>('programmes');
+  const [membersSubTab, setMembersSubTab] = useState<'directory' | 'activity'>('directory');
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedMessageClientId, setSelectedMessageClientId] = useState('');
   const [stats, setStats] = useState<{ users: number; activeUsers: number; plans: number; activePlans: number; memberships: number; activeMemberships: number; leads: number | null; newLeads: number | null } | null>(null);
@@ -411,9 +412,36 @@ export function AdminScreen() {
       {/* Unified tab rendering — demo and live run the same components; only the data source differs. */}
       {tab === 'activity' && <ActivityCalendar onOpenClient={(profileId) => { setSelectedClientId(profileId); setTab('members'); }} />}
       {tab === 'members' && !selectedClientId && (
-        <div className="space-y-4">
-          <UsersAdmin onOpenProfile={(profileId) => setSelectedClientId(profileId)} />
-          <MemberActivityAdmin />
+        <div className="space-y-5">
+          <div className="flex flex-wrap gap-2 border-b border-white/[0.08] pb-3" role="tablist" aria-label="Members workspace">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={membersSubTab === 'directory'}
+              onClick={() => setMembersSubTab('directory')}
+              className={`min-h-10 border px-4 py-2.5 text-xs font-semibold transition ${membersSubTab === 'directory' ? 'border-orange-500 bg-orange-500 text-black' : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.2] hover:text-white'}`}
+            >
+              Member directory
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={membersSubTab === 'activity'}
+              onClick={() => setMembersSubTab('activity')}
+              className={`min-h-10 border px-4 py-2.5 text-xs font-semibold transition ${membersSubTab === 'activity' ? 'border-orange-500 bg-orange-500 text-black' : 'border-white/[0.1] bg-white/[0.025] text-zinc-400 hover:border-white/[0.2] hover:text-white'}`}
+            >
+              Member activity
+            </button>
+          </div>
+          {membersSubTab === 'directory' ? (
+            <div role="tabpanel" className="space-y-5">
+              <UsersAdmin onOpenProfile={(profileId) => setSelectedClientId(profileId)} />
+            </div>
+          ) : (
+            <div role="tabpanel" className="space-y-5">
+              <MemberActivityAdmin />
+            </div>
+          )}
         </div>
       )}
       {tab === 'members' && selectedClientId && (
