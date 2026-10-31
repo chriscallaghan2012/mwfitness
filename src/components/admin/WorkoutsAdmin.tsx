@@ -1,6 +1,6 @@
 // WorkoutsAdmin — shared exercise library, workout templates and member schedules.
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Trash2, List, Layout, Calendar, Settings } from 'lucide-react';
+import { Plus, Trash2, List, Layout, Calendar, Activity } from 'lucide-react';
 import { adminDb } from '../../lib/admin/adminDb';
 import { createDemoTables } from '../../lib/admin/demoData';
 import { AdminTable, Row, ShortDate, btn, btnGhost, card, inp } from './fields';
@@ -48,7 +48,7 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: 'exercises', label: 'Exercise library', icon: List },
   { id: 'templates', label: 'Workout templates', icon: Layout },
   { id: 'schedules', label: 'Member schedules', icon: Calendar },
-  { id: 'misc', label: 'Miscellaneous', icon: Settings },
+  { id: 'misc', label: 'Cardio options', icon: Activity },
 ];
 
 export function WorkoutsAdmin() {
@@ -595,13 +595,13 @@ export function WorkoutsAdmin() {
       {activeTab === 'misc' && (
         <section className={card}>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[10px] font-mono uppercase text-orange-300">Miscellaneous settings</p>
-            <p className="text-[11px] text-zinc-500">Cardio activity options and other shared settings not grouped elsewhere.</p>
+            <p className="text-[10px] font-mono uppercase text-orange-300">Training settings</p>
+            <p className="text-[11px] text-zinc-500">Manage the activities available in the member Cardio dropdown. These options are shared across the app.</p>
           </div>
 
           <div className="space-y-4">
             <div>
-              <p className="mb-2 text-xs font-semibold text-white">Cardio activity options</p>
+              <p className="mb-2 text-xs font-semibold text-white">Cardio dropdown options</p>
               <p className="text-[11px] text-zinc-500 mb-3">These appear as dropdown choices in the member Cardio screen. Edit labels, toggle active status, or add new activities.</p>
               {miscEdit ? (
                 <div className="space-y-2">
