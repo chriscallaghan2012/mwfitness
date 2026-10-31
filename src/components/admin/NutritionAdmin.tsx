@@ -243,6 +243,7 @@ export function NutritionAdmin() {
         ]}
       />
       <button
+        className={`${btn} mt-4`}
         onClick={() => {
           setEdit({ id: '', active: true } as Row);
           setF({ name: '', description: '', targets: '{"calories":2000,"protein":150,"carbs":200,"fats":60,"water_ml":3500}', calories: '2000', protein: '150', carbs: '200', fats: '60', water_ml: '3500', sections: '[]', active: 'true', day_type: 'training' });
