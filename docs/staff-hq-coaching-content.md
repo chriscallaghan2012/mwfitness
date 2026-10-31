@@ -191,3 +191,13 @@ This is intentionally documented only. Do not apply it to the shared database wi
 - Run the website TypeScript check, tests and production build in a real checkout before merging.
 - Verify the tab navigation, editor dialogs and CRUD persistence against authorised live staff accounts. No production data has been changed by this UI pass.
 - This branch has not been merged or deployed.
+
+
+### Member record workspace refinement (31 October 2026)
+
+- Split the selected member's long record page into four focused tabs: **Overview**, **Coaching & assignments**, **Progress photos**, and **App submissions**.
+- Overview retains the activity calendar, this-week snapshot, eight-week rollup and recent activity feed.
+- Coaching & assignments retains package, nutrition, workout, programme, supplement and cardio controls, plus the current membership and assigned nutrition summaries.
+- Progress photos and app submissions are separate views, reducing the initial page length and keeping sensitive photo content out of the default overview.
+- Switching the selected client returns the workspace to Overview so staff do not land on an unrelated tab for the next member.
+- Existing data queries and save handlers are retained; this is a presentation/navigation change, not a schema or data migration.
