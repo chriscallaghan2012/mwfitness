@@ -183,10 +183,10 @@ export function NutritionAdmin() {
   };
 
   return (
-    <div>
-      <div className="flex gap-2 mb-4">
+    <div className="space-y-5">
+      <div className="flex flex-wrap gap-2 border-b border-white/[0.08] pb-3" role="tablist" aria-label="Nutrition workspace">
         {(['templates', 'plans'] as const).map((m) => (
-          <button key={m} onClick={() => { setEdit(null); setMode(m); }} className={m === mode ? btn : btnGhost}>
+          <button key={m} type="button" role="tab" aria-selected={m === mode} onClick={() => { setEdit(null); setMode(m); }} className={m === mode ? btn : btnGhost}>
             {m === 'templates' ? 'Meal templates' : 'Client plans'}
           </button>
         ))}
@@ -248,7 +248,6 @@ export function NutritionAdmin() {
           setEdit({ id: '', active: true } as Row);
           setF({ name: '', description: '', targets: '{"calories":2000,"protein":150,"carbs":200,"fats":60,"water_ml":3500}', calories: '2000', protein: '150', carbs: '200', fats: '60', water_ml: '3500', sections: '[]', active: 'true', day_type: 'training' });
         }}
-        className={btn}
       >
         + New {mode === 'templates' ? 'template' : 'plan'}
       </button>
